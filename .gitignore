@@ -1,0 +1,11 @@
+/build/
+/out/
+/.vs/
+__pycache__/
+*.user
+
+# Local cross-library benchmark
+/comparisons/juce/
+/scripts/compare_juce.py
+/scripts/report_juce.py
+/docs/JuceComparison.md

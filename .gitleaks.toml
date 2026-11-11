@@ -1,0 +1,8 @@
+title = "CyDSP source scan"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated outputs and local IDE state excluded from publication"
+paths = ['''(?:^|[/\\])(?:build|out|\.vs|__pycache__)(?:[/\\]|$)''', '''\.user$''']

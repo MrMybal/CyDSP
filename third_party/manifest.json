@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "name": "DSPFilters",
+      "license": "MIT",
+      "repository": "https://github.com/vinniefalco/DSPFilters",
+      "revision": "acc49170e79a94fcb9c04b8a2116e9f8dffd1c7d",
+      "files": [
+        {
+          "upstreamPath": "shared/DSPFilters/source/RBJ.cpp",
+          "archivePath": "third_party/dspfilters/upstream/RBJ.cpp.txt",
+          "sha256": "572d9121c1c70e4624ae3b488c518c376b23b41e0a3a45b0f939827f415ab0c2",
+          "url": "https://raw.githubusercontent.com/vinniefalco/DSPFilters/acc49170e79a94fcb9c04b8a2116e9f8dffd1c7d/shared/DSPFilters/source/RBJ.cpp"
+        }
+      ],
+      "adaptedFiles": [
+        "src/processors/BiquadDesign.cpp"
+      ],
+      "scope": "RBJ low-pass, high-pass, constant-peak band-pass, notch, all-pass, peaking and low/high shelf coefficient equations only; CyDSP lifecycle, state, validation and block API are new.",
+      "noticePath": "third_party/licenses/DSPFilters.txt",
+      "copyrights": [
+        "Copyright (c) 2009 by Vinnie Falco"
+      ]
+    },
+    {
+      "name": "FFTConvolver",
+      "license": "MIT",
+      "noticePath": "third_party/licenses/FFTConvolver.txt",
+      "copyrights": [
+        "Copyright (c) 2017 HiFi-LoFi"
+      ],
+      "repository": "https://github.com/HiFi-LoFi/FFTConvolver",
+      "revision": "f2cdeb04c42141d2caec19ca4f137398b2a76b85",
+      "files": [
+        {
+          "upstreamPath": "FFTConvolver.cpp",
+          "archivePath": "third_party/fftconvolver/upstream/FFTConvolver.cpp.txt",
+          "sha256": "3011c584c69687cb15f1d13a4f88701d697531da7cade474191142d0b4707767",
+          "url": "https://raw.githubusercontent.com/HiFi-LoFi/FFTConvolver/f2cdeb04c42141d2caec19ca4f137398b2a76b85/FFTConvolver.cpp"
+        },
+        {
+          "upstreamPath": "FFTConvolver.h",
+          "archivePath": "third_party/fftconvolver/upstream/FFTConvolver.h.txt",
+          "sha256": "f23a63c09fa51b51f882f69ad297cc862531f82e24236b20603f210f65e5fff4",
+          "url": "https://raw.githubusercontent.com/HiFi-LoFi/FFTConvolver/f2cdeb04c42141d2caec19ca4f137398b2a76b85/FFTConvolver.h"
+        },
+        {
+          "upstreamPath": "COPYING.txt",
+          "archivePath": "third_party/fftconvolver/upstream/COPYING.txt.txt",
+          "sha256": "1537d3165d802602de45a40ce5cb335d33cd801da8f25060d010e691c548ae65",
+          "url": "https://raw.githubusercontent.com/HiFi-LoFi/FFTConvolver/f2cdeb04c42141d2caec19ca4f137398b2a76b85/COPYING.txt"
+        }
+      ],
+      "adaptedFiles": [
+        "src/processors/PartitionedConvolver.cpp",
+        "src/processors/MatrixConvolver.cpp",
+        "src/processors/ScheduledConvolver.cpp"
+      ],
+      "scope": "Uniform partitioning and overlap-add adapted into CyDSP independent-channel/shared MIMO streaming, including progressive late jobs; uses original CyDSP FFT/complex kernels and scheduling, no upstream AudioFFT runtime."
+    },
+    {
+      "name": "r8brain-free-src",
+      "license": "MIT",
+      "noticePath": "third_party/licenses/r8brain-free-src.txt",
+      "copyrights": [
+        "r8brain-free-src Copyright (c) 2013-2025 Aleksey Vaneev"
+      ],
+      "repository": "https://github.com/avaneev/r8brain-free-src",
+      "revision": "5792291ad66b04e87fd61a3d92606214632c6cfc",
+      "files": [
+        {
+          "upstreamPath": "CDSPSincFilterGen.h",
+          "archivePath": "third_party/r8brain-free-src/upstream/CDSPSincFilterGen.h.txt",
+          "sha256": "c5ee2159220cfeead04154aa56323fa0bd912aca10a6f71c42451510bbaa2a74",
+          "url": "https://raw.githubusercontent.com/avaneev/r8brain-free-src/5792291ad66b04e87fd61a3d92606214632c6cfc/CDSPSincFilterGen.h"
+        },
+        {
+          "upstreamPath": "LICENSE",
+          "archivePath": "third_party/r8brain-free-src/upstream/LICENSE.txt",
+          "sha256": "5b2fca0def6e5c93d42f2cb226f4731cfbb6eb30bf12226ad6a9ff299d333c2a",
+          "url": "https://raw.githubusercontent.com/avaneev/r8brain-free-src/5792291ad66b04e87fd61a3d92606214632c6cfc/LICENSE"
+        }
+      ],
+      "adaptedFiles": [
+        "src/math/WindowedSinc.cpp"
+      ],
+      "scope": "Windowed-sinc and cosine window equations only; CyDSP rational streaming, phase tables, memory and lifecycle are independent; not the complete r8brain SRC algorithm."
+    }
+  ]
+}

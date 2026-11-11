@@ -1,0 +1,72 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-x64",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/windows-x64",
+      "cacheVariables": {
+        "CYDSP_ENABLE_SIMD": "ON",
+        "CYDSP_COMPILE_CHECKS": "OFF",
+        "CYDSP_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "windows-x86",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Win32",
+      "binaryDir": "${sourceDir}/build/windows-x86",
+      "cacheVariables": {
+        "CYDSP_ENABLE_SIMD": "ON",
+        "CYDSP_COMPILE_CHECKS": "OFF",
+        "CYDSP_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "portable",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/portable",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CYDSP_ENABLE_SIMD": "OFF",
+        "CYDSP_BUILD_TESTS": "OFF",
+        "CYDSP_COMPILE_CHECKS": "OFF"
+      }
+    },
+    {
+      "name": "windows-x64-scalar",
+      "inherits": "windows-x64",
+      "binaryDir": "${sourceDir}/build/windows-x64-scalar",
+      "cacheVariables": {
+        "CYDSP_ENABLE_SIMD": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-x64",
+      "configurePreset": "windows-x64",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-x86",
+      "configurePreset": "windows-x86",
+      "configuration": "Release"
+    },
+    {
+      "name": "portable",
+      "configurePreset": "portable"
+    },
+    {
+      "name": "windows-x64-scalar",
+      "configurePreset": "windows-x64-scalar",
+      "configuration": "Release"
+    }
+  ]
+}
