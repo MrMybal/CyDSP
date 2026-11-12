@@ -171,13 +171,14 @@ void routingRegression();
 void completionRegression();
 void realtimeRegression();
 void optimizationRegression();
+void performanceRegression();
 void schedulingRegression();
 void matrixSchedulingRegression();
 void expandedRegression();
 void stretchFftRegression();
 int main() {
  try {
-  dawExpansionRegression(); stretchFftRegression(); expandedRegression();
+  performanceRegression(); dawExpansionRegression(); stretchFftRegression(); expandedRegression();
   variableSincRealtimeRegression(); realtimeRegression(); schedulingRegression();
   matrixSchedulingRegression(); optimizationRegression(); completionRegression();
   routingRegression(); filtersRegression(); advancedRegression();

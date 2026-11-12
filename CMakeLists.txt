@@ -150,6 +150,7 @@ set(cydsp_test_sources
  tests/FiltersRegression.cpp
  tests/MatrixSchedulingRegression.cpp
  tests/OptimizationRegression.cpp
+ tests/PerformanceRegression.cpp
  tests/RealtimeRegression.cpp
  tests/Regression.cpp
  tests/RoutingRegression.cpp
@@ -179,16 +180,18 @@ if(CYDSP_COMPILE_CHECKS)
  target_link_libraries(cydsp_contract_checks PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_contract_checks PRIVATE src)
  target_compile_definitions(cydsp_contract_checks PRIVATE CYDSP_HAS_SSE2=${cydsp_sse2} CYDSP_HAS_AVX2=${cydsp_avx2} CYDSP_HAS_NEON=${cydsp_neon} CYDSP_HAS_AVX512=${cydsp_avx512} CYDSP_HAS_SVE=${cydsp_sve})
- add_library(cydsp_measurement_checks OBJECT tests/Measurements.cpp)
+ add_library(cydsp_measurement_checks OBJECT tests/Measurements.cpp tests/FocusedMeasurements.cpp)
  target_link_libraries(cydsp_measurement_checks PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_measurement_checks PRIVATE src)
 endif()
 if(CYDSP_BUILD_MEASUREMENTS)
+ add_executable(cydsp_focused_measurements tests/FocusedMeasurements.cpp)
+ target_link_libraries(cydsp_focused_measurements PRIVATE CyDSP::CyDSP)
  add_executable(cydsp_measurements tests/Measurements.cpp)
  target_link_libraries(cydsp_measurements PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_measurements PRIVATE src)
 endif()
-foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_measurements cydsp_measurement_checks)
+foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_measurements cydsp_focused_measurements cydsp_measurement_checks)
  if(TARGET ${t})
   if(MSVC)
    target_compile_options(${t} PRIVATE /W4 /permissive- /fp:strict /utf-8)
@@ -198,7 +201,7 @@ foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_m
  endif()
 endforeach()
 if(CYDSP_SANITIZE_ADDRESS)
- foreach(t IN ITEMS CyDSP CyDSPStretch cydsp_tests cydsp_measurements)
+ foreach(t IN ITEMS CyDSP CyDSPStretch cydsp_tests cydsp_measurements cydsp_focused_measurements)
   if(TARGET ${t})
    if(MSVC)
     target_compile_options(${t} PRIVATE /fsanitize=address /Zi)

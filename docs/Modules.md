@@ -559,11 +559,12 @@ reset clears history, snaps to the target and cancels the ramp. Empty blocks do 
 advance it. Ramps cause pitch/Doppler changes and are not a band-limited modulation
 method. Channels remain independent.
 
-makeWindow supports rectangular, Hann, Hamming and Blackman windows. Symmetric uses
-N-1 in the angular denominator, periodic uses N. A singleton is 1; an empty span or
-invalid enum is an error without writes. Window generation evaluates trigonometric
-functions and should be done during preparation. No amplitude/energy normalization
-beyond the named window formula is implicit.
+makeWindow supports rectangular, Hann, Hamming, Blackman, Blackman-Harris, Nuttall,
+flat-top, Bartlett, triangular, cosine and Kaiser windows. Symmetric uses N-1 in
+the angular denominator, periodic uses N. WindowParameters adds explicit peak,
+coherent-gain or energy normalization; the default is none. A singleton is 1;
+an empty span or invalid parameters fail without writes. Generate windows during
+preparation, outside the audio callback.
 
 ## Expanded DSP
 
@@ -574,10 +575,13 @@ triangle, PolyBLEP saw/square and deterministic white noise. Triangle is not
 band-limited. No generator promises alias-free output at arbitrary frequencies.
 
 `Dynamics<T>` offers compressor, downward expander/gate and hard-ceiling limiter,
-peak/RMS detection, channel linking, knee and makeup. The gate uses a downward
-expansion curve; there is no hold/hysteresis or look-ahead. `gainReductionDb()` is the
-latest processed channel/frame value, not a block minimum. `BallisticsFilter<T>`
-has independent attack/release envelope state per channel.
+peak/RMS detection, channel linking, knee and makeup. The noise gate has hold,
+hysteresis and a smoothed linear opening/closing gain with a -160 dB floor.
+Look-ahead is bounded by the maximum reserved at prepare; latencyFrames reports
+the active delay. Changing that delay clears its history. `gainReductionDb()` is
+the latest processed channel/frame value; empty blocks preserve it. Gate processing
+uses its linear gain directly and converts only the final meter value to dB.
+`BallisticsFilter<T>` has independent attack/release envelope state per channel.
 
 `TptFilter<T>` implements first-order and state-variable responses; `LinkwitzRiley<T>`
 returns separate LR4 low/high blocks and rejects overlapping outputs. `LadderFilter`
@@ -590,11 +594,13 @@ a circuit emulation. `designButterworth` designs 1..32-order low/high-pass SOS;
 be paired with a same-sized wet mix before the next push. `WaveShaper<T>` offers
 built-in functions or a borrowed noexcept callback. `Bias<T>` adds a constant.
 
-`Oversampler<T>` offers 1/2/4/8/16 factors using prepared FIR filters. `processUp`
-returns a borrowed internal high-rate block for the user's nonlinear processing;
-`processDown` completes the matching block. Latency is 32 input frames above 1x,
-zero at 1x. Reset cancels an unfinished block. This implementation is not a
-half-band IIR oversampler. It adds filter latency even around identity processing.
+`Oversampler<T>` offers 1/2/4/8/16 factors with FIR, cascaded half-band FIR or IIR
+modes. `processUp` returns a borrowed internal high-rate block for nonlinear
+processing; `processDown` completes the matching block. The default FIR path has
+32 input frames of latency above 1x, zero at 1x. Half-band stages have their own
+accumulated latency. IIR group delay depends on frequency; latencyAtDcFrames gives
+its DC estimate, and linearPhase distinguishes the modes. Reset cancels an
+unfinished block. Identity processing still includes the selected filters.
 
 `Chorus<T>` uses a modulated interpolated delay; `Phaser<T>` uses six all-pass
 stages; `Reverb<T>` uses an original decorrelated Schroeder network. Parameters
@@ -621,6 +627,11 @@ on the first flush, so budget that call for the complete tail computation.
 ## Prepared sample data and wavetables
 
 Wavetable, WavetableOscillator and SampleData remain independent DSP primitives.
+WavetableOscillator selects harmonic banks once per block at its fixed frequency,
+then interpolates each sample. It refreshes this view every call, so an idle table
+can be replaced without retaining stale bank pointers. Table lifetime and serialized
+access remain the caller's responsibility; no audio-rate frequency modulation is
+implied by this block path.
 SampleData::prepare owns immutable sample/mip storage; value selects a prepared
 level for the ratio and interpolates without allocation. Loop boundaries are
 exclusive and optional loop crossfades retain their existing behavior. MIDI voice

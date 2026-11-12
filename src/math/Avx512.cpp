@@ -9,26 +9,36 @@ __mmask16 maskF32(std::size_t n) noexcept {
     return static_cast<__mmask16>((1u << n) - 1u);
 }
 void copyF32(const float* a, float* d, std::size_t n) noexcept {
-    for (std::size_t i = 0; i < n; i += 16) {
-        const auto pg = maskF32(n - i < 16 ? n - i : 16);
-        const auto x = _mm512_maskz_loadu_ps(pg, a + i);
-        _mm512_mask_storeu_ps(d + i, pg, x);
+    std::size_t i = 0;
+    for (; n - i >= 16; i += 16)
+        _mm512_storeu_ps(d + i, _mm512_loadu_ps(a + i));
+    if (i < n) {
+        const auto pg = maskF32(n - i);
+        _mm512_mask_storeu_ps(d + i, pg, _mm512_maskz_loadu_ps(pg, a + i));
     }
 }
 void scaleF32(const float* a, float* d, std::size_t n, float gain) noexcept {
-    for (std::size_t i = 0; i < n; i += 16) {
-        const auto pg = maskF32(n - i < 16 ? n - i : 16);
-        const auto x = _mm512_maskz_loadu_ps(pg, a + i);
-        _mm512_mask_storeu_ps(d + i, pg, _mm512_mul_ps(x, _mm512_set1_ps(gain)));
+    std::size_t i = 0;
+    for (; n - i >= 16; i += 16)
+        _mm512_storeu_ps(d + i, _mm512_mul_ps(_mm512_loadu_ps(a + i), _mm512_set1_ps(gain)));
+    if (i < n) {
+        const auto pg = maskF32(n - i);
+        _mm512_mask_storeu_ps(
+            d + i, pg, _mm512_mul_ps(_mm512_maskz_loadu_ps(pg, a + i), _mm512_set1_ps(gain)));
     }
 }
 void addScaledF32(const float* a, float* d, std::size_t n, float gain) noexcept {
-    for (std::size_t i = 0; i < n; i += 16) {
-        const auto pg = maskF32(n - i < 16 ? n - i : 16);
-        const auto x = _mm512_maskz_loadu_ps(pg, a + i);
-        _mm512_mask_storeu_ps(d + i, pg,
-                              _mm512_add_ps(_mm512_maskz_loadu_ps(pg, d + i),
-                                            _mm512_mul_ps(x, _mm512_set1_ps(gain))));
+    std::size_t i = 0;
+    for (; n - i >= 16; i += 16)
+        _mm512_storeu_ps(
+            d + i, _mm512_add_ps(_mm512_loadu_ps(d + i),
+                                 _mm512_mul_ps(_mm512_loadu_ps(a + i), _mm512_set1_ps(gain))));
+    if (i < n) {
+        const auto pg = maskF32(n - i);
+        _mm512_mask_storeu_ps(
+            d + i, pg,
+            _mm512_add_ps(_mm512_maskz_loadu_ps(pg, d + i),
+                          _mm512_mul_ps(_mm512_maskz_loadu_ps(pg, a + i), _mm512_set1_ps(gain))));
     }
 }
 void multiplyF32(const float* a, const float* b, float* d, std::size_t n) noexcept {
@@ -39,8 +49,11 @@ void multiplyF32(const float* a, const float* b, float* d, std::size_t n) noexce
     }
 }
 void fillF32(float* d, std::size_t n, float value) noexcept {
-    for (std::size_t i = 0; i < n; i += 16) {
-        const auto pg = maskF32(n - i < 16 ? n - i : 16);
+    std::size_t i = 0;
+    for (; n - i >= 16; i += 16)
+        _mm512_storeu_ps(d + i, _mm512_set1_ps(value));
+    if (i < n) {
+        const auto pg = maskF32(n - i);
         _mm512_mask_storeu_ps(d + i, pg, _mm512_set1_ps(value));
     }
 }
@@ -136,26 +149,36 @@ __mmask8 maskF64(std::size_t n) noexcept {
     return static_cast<__mmask8>((1u << n) - 1u);
 }
 void copyF64(const double* a, double* d, std::size_t n) noexcept {
-    for (std::size_t i = 0; i < n; i += 8) {
-        const auto pg = maskF64(n - i < 8 ? n - i : 8);
-        const auto x = _mm512_maskz_loadu_pd(pg, a + i);
-        _mm512_mask_storeu_pd(d + i, pg, x);
+    std::size_t i = 0;
+    for (; n - i >= 8; i += 8)
+        _mm512_storeu_pd(d + i, _mm512_loadu_pd(a + i));
+    if (i < n) {
+        const auto pg = maskF64(n - i);
+        _mm512_mask_storeu_pd(d + i, pg, _mm512_maskz_loadu_pd(pg, a + i));
     }
 }
 void scaleF64(const double* a, double* d, std::size_t n, double gain) noexcept {
-    for (std::size_t i = 0; i < n; i += 8) {
-        const auto pg = maskF64(n - i < 8 ? n - i : 8);
-        const auto x = _mm512_maskz_loadu_pd(pg, a + i);
-        _mm512_mask_storeu_pd(d + i, pg, _mm512_mul_pd(x, _mm512_set1_pd(gain)));
+    std::size_t i = 0;
+    for (; n - i >= 8; i += 8)
+        _mm512_storeu_pd(d + i, _mm512_mul_pd(_mm512_loadu_pd(a + i), _mm512_set1_pd(gain)));
+    if (i < n) {
+        const auto pg = maskF64(n - i);
+        _mm512_mask_storeu_pd(
+            d + i, pg, _mm512_mul_pd(_mm512_maskz_loadu_pd(pg, a + i), _mm512_set1_pd(gain)));
     }
 }
 void addScaledF64(const double* a, double* d, std::size_t n, double gain) noexcept {
-    for (std::size_t i = 0; i < n; i += 8) {
-        const auto pg = maskF64(n - i < 8 ? n - i : 8);
-        const auto x = _mm512_maskz_loadu_pd(pg, a + i);
-        _mm512_mask_storeu_pd(d + i, pg,
-                              _mm512_add_pd(_mm512_maskz_loadu_pd(pg, d + i),
-                                            _mm512_mul_pd(x, _mm512_set1_pd(gain))));
+    std::size_t i = 0;
+    for (; n - i >= 8; i += 8)
+        _mm512_storeu_pd(
+            d + i, _mm512_add_pd(_mm512_loadu_pd(d + i),
+                                 _mm512_mul_pd(_mm512_loadu_pd(a + i), _mm512_set1_pd(gain))));
+    if (i < n) {
+        const auto pg = maskF64(n - i);
+        _mm512_mask_storeu_pd(
+            d + i, pg,
+            _mm512_add_pd(_mm512_maskz_loadu_pd(pg, d + i),
+                          _mm512_mul_pd(_mm512_maskz_loadu_pd(pg, a + i), _mm512_set1_pd(gain))));
     }
 }
 void multiplyF64(const double* a, const double* b, double* d, std::size_t n) noexcept {
@@ -166,8 +189,11 @@ void multiplyF64(const double* a, const double* b, double* d, std::size_t n) noe
     }
 }
 void fillF64(double* d, std::size_t n, double value) noexcept {
-    for (std::size_t i = 0; i < n; i += 8) {
-        const auto pg = maskF64(n - i < 8 ? n - i : 8);
+    std::size_t i = 0;
+    for (; n - i >= 8; i += 8)
+        _mm512_storeu_pd(d + i, _mm512_set1_pd(value));
+    if (i < n) {
+        const auto pg = maskF64(n - i);
         _mm512_mask_storeu_pd(d + i, pg, _mm512_set1_pd(value));
     }
 }

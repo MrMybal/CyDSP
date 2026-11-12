@@ -5,6 +5,7 @@
 namespace cydsp {
 // Prepared immutable harmonic mip bank; cycle must have a power-of-two length.
 // Processing borrows the table; serialize preparation/move/destruction with readers.
+template <Sample T> class WavetableOscillator;
 template <Sample T> class Wavetable {
   public:
     Wavetable();
@@ -17,6 +18,16 @@ template <Sample T> class Wavetable {
     [[nodiscard]] std::size_t levels() const noexcept;
 
   private:
+    friend class WavetableOscillator<T>;
+    struct ReadView {
+        const T* first = nullptr;
+        const T* second = nullptr;
+        std::size_t size = 0;
+        double mix = 0;
+        bool blend = false;
+    };
+    [[nodiscard]] ReadView readView(double frequency, double sampleRate) const noexcept;
+    [[nodiscard]] static T read(const ReadView&, double phase) noexcept;
     struct State;
     std::unique_ptr<State> state_;
 };

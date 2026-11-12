@@ -188,7 +188,18 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept 
     auto status = validateProcessBlocks(s.spec, in, out);
     if (status != Status::ok)
         return status;
+    if (!in.frames())
+        return Status::ok;
+    const auto holdFrames = s.mode == DynamicsMode::noiseGate
+                                ? std::uint64_t(std::ceil(s.p.holdMs * s.spec.sampleRate / 1000))
+                                : 0;
+    const double halfKnee = s.p.kneeDb * 0.5;
+    const double slope = s.mode == DynamicsMode::limiter ? -1.0 : 1.0 / s.p.ratio - 1;
+    const double ceiling =
+        s.mode == DynamicsMode::limiter ? std::pow(10.0, s.p.thresholdDb / 20) : 1;
     for (std::size_t i = 0; i < in.frames(); ++i) {
+        const auto readHead =
+            s.delayFrames ? (s.head + s.delayCapacity - s.delayFrames) % s.delayCapacity : 0;
         double linked = 0;
         if (s.p.linkedChannels)
             for (std::size_t ch = 0; ch < in.channels(); ++ch)
@@ -226,15 +237,12 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept 
             const double level = 20 * std::log10(std::max(1e-12, envelope));
             double over = level - s.p.thresholdDb, db = 0;
             if (s.mode == DynamicsMode::compressor || s.mode == DynamicsMode::limiter) {
-                const double slope = s.mode == DynamicsMode::limiter ? -1.0 : 1.0 / s.p.ratio - 1;
-                if (s.p.kneeDb > 0 && std::abs(over) < s.p.kneeDb * 0.5) {
-                    const double t = over + s.p.kneeDb * 0.5;
+                if (s.p.kneeDb > 0 && std::abs(over) < halfKnee) {
+                    const double t = over + halfKnee;
                     db = slope * t * t / (2 * s.p.kneeDb);
-                } else if (over >= s.p.kneeDb * 0.5)
+                } else if (over >= halfKnee)
                     db = slope * over;
             } else if (s.mode == DynamicsMode::noiseGate) {
-                const auto holdFrames =
-                    std::uint64_t(std::ceil(s.p.holdMs * s.spec.sampleRate / 1000));
                 if (level >= s.p.thresholdDb) {
                     s.gateOpen[ch] = 1;
                     s.hold[ch] = holdFrames;
@@ -247,27 +255,28 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept 
                     s.hold[ch] = holdFrames;
                 s.gateGain[ch] =
                     advance(s.gateOpen[ch] ? 1.0 : 0.0, s.gateGain[ch], s.attack, s.release);
-                db = 20 * std::log10(std::max(1e-8, s.gateGain[ch]));
             } else if (over < 0)
                 db = std::max(-160.0, (s.p.ratio - 1) * over);
             s.reduction = db;
             const auto index = ch * s.delayCapacity + s.head;
-            const double delayed =
-                s.delayFrames
-                    ? s.delay[ch * s.delayCapacity +
-                              (s.head + s.delayCapacity - s.delayFrames) % s.delayCapacity]
-                    : x;
+            const double delayed = s.delayFrames ? s.delay[ch * s.delayCapacity + readHead] : x;
             s.delay[index] = static_cast<T>(x);
-            double value = delayed * std::pow(10.0, db / 20) * s.makeup;
-            if (s.mode == DynamicsMode::limiter) {
-                const double ceiling = std::pow(10.0, s.p.thresholdDb / 20);
+            // The gate envelope already is a linear gain. Retain the -160 dB floor,
+            // avoiding the log10/pow round trip for every sample.
+            const double gain = s.mode == DynamicsMode::noiseGate ? std::max(1e-8, s.gateGain[ch])
+                                                                  : std::pow(10.0, db / 20);
+            double value = delayed * gain * s.makeup;
+            if (s.mode == DynamicsMode::limiter)
                 value = std::clamp(value, -ceiling, ceiling);
-            }
             out.channel(ch)[i] = static_cast<T>(value);
         }
         s.head = (s.head + 1) % s.delayCapacity;
         ++s.clock;
     }
+    // Observers are owner-serialized; only the final channel/frame is observable.
+    // Empty blocks must preserve the previous meter value.
+    if (s.mode == DynamicsMode::noiseGate && in.frames())
+        s.reduction = 20 * std::log10(std::max(1e-8, s.gateGain[in.channels() - 1]));
     return Status::ok;
 }
 template class BallisticsFilter<float>;

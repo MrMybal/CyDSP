@@ -1,6 +1,118 @@
-> Historical measurements of the monolithic snapshot. Revalidate the split version before comparing performance.
+# CyDSP 0.2.0 measurements and optimizations
 
-# Native measurements
+2026-11-12. Baseline: split commit `350523c`; measured on AMD Ryzen 9 7900X,
+Windows x64, MSVC 19.40.33821.0 Release, `/O2 /fp:strict`. No fast-math, FMA contraction,
+CPU affinity, frequency lock or global floating-point setting changes.
+The baseline library/executables were retained before production edits. Both
+versions use the same focused measurement source. This compares CyDSP with its
+previous implementation; it is not a JUCE comparison.
+
+## Measured changes
+
+Each processor row uses **128 stereo frames at 48 kHz, float**. Times are
+microseconds per complete public process call. **Speedup = before time / after
+time**: 3x means the same measured operation takes one third of its former time.
+
+| Operation | Before us | After us | Speedup |
+| --- | ---: | ---: | ---: |
+| Wavetable, 2048 points, 440 Hz | 2.791 | 0.969 | 2.88x |
+| Gate, peak, no look-ahead | 8.244 | 2.513 | 3.28x |
+| Gate, peak, 5 ms look-ahead | 9.363 | 3.378 | 2.77x |
+| Gate, RMS, 5 ms look-ahead | 10.088 | 4.981 | 2.03x |
+| Limiter, peak, no look-ahead | 9.691 | 8.134 | 1.19x |
+
+Wavetables choose harmonic banks and their blend once per block, refreshing the
+view on every call. Phase progression and interpolation remain unchanged. The gate
+uses its existing linear gain directly, retains the -160 dB floor, and calculates
+the final meter in dB once per block. Hold count, knee/slope, limiter ceiling and
+shared delay-read position are moved outside their repeated channel/sample work.
+Zero blocks preserve state. Compressor/expander cases are controls; this change
+does not establish a general speedup for those modes.
+
+AVX-512 copy, scale, addScaled and fill use unmasked complete vectors followed by
+one masked remainder. Examples below include public validation/dispatch overhead,
+use **128 scalar elements with offset 1**, and report **nanoseconds per call**.
+They are separate vector operations, not stereo audio blocks.
+
+| AVX-512 operation / sample type | Before ns | After ns | Speedup |
+| --- | ---: | ---: | ---: |
+| Copy / float | 10.94 | 10.16 | 1.08x |
+| Scale / float | 11.52 | 10.16 | 1.13x |
+| Add scaled / float | 12.89 | 12.30 | 1.05x |
+| Fill / double | 15.04 | 11.33 | 1.33x |
+
+The proposed complex-MAC rewrite regressed measured cases and was removed. Simple
+multiplication showed no clear benefit and retains its previous implementation.
+Untouched dot/FFT/convolution paths remain in the general measurement suite.
+Automatic ISA selection still follows CPU/OS support; these results do not justify
+changing the dispatch policy for all processors or other CPUs. Sample-by-sample
+wavetable next/value probes also showed no slowdown in this run; their local raw
+results are in `build/optimization-2026-11-12/next-comparison.json`.
+
+## Repetition and limits
+
+`tests/FocusedMeasurements.cpp` supplies 680 float/double cases: available scalar,
+SSE2, AVX2 and AVX-512 vectors at lengths 16/31/128/511/4096 and offsets 0/1;
+dynamics at 32/128/512 frames with peak/RMS and 0/5 ms look-ahead; wavetable blocks
+at four fixed frequencies. Offset zero does not promise 64-byte alignment.
+
+Six before/after pairs alternate executable order. Each pair uses the same
+shuffled case seed. Each case warms up for two batches, then records 51 timed
+batches (256 vector calls, 16 dynamics blocks or 32 oscillator blocks per batch).
+Tables use the median of the six trial medians. Raw p95BatchMeanNs values describe
+batch-average costs, not individual callback percentiles or real-time bounds.
+The original general suite separately retains single-call p95/p99/max records.
+The smaller nanosecond cases remain sensitive to code layout, caches and OS noise;
+unchanged control cases also vary. A whole-library speedup cannot be inferred.
+
+Original executables and before/after JSON are retained locally under
+`build/optimization-2026-11-12/`. The [compact result data](measurements/optimization-2026-11-12.json)
+retains selected raw trial medians, compiler-input hashes, quality and platform
+coverage. The complete comparison is `build/optimization-2026-11-12/final-comparison.json`.
+To reproduce, build the opt-in `cydsp_focused_measurements` target separately at
+each revision with the same harness, retain both executables, then run:
+
+```sh
+python -B scripts/compare_optimizations.py --before path/to/before.exe --after path/to/after.exe --baseline-report path/to/native-before.json --output build/comparison.json --trials 6
+```
+
+## Numerical, spectral and realtime validation
+
+MSVC x64, clang-cl x64, explicit-SIMD-disabled x64, x64 AddressSanitizer and
+Quest 3 ARM64 scalar/NEON regressions pass. The independent dynamics oracle scans
+the look-ahead window directly and retains the former dB/gain equations. It covers
+all four modes, peak/RMS, linked/unlinked transitions, knee changes, silence,
+hold/hysteresis, changing delay, reset, in-place processing and irregular/empty
+blocks. Maximum absolute sample error is 0 for float and 5.55112e-17 for double;
+the final gain-reduction meter matches exactly on both tested machines.
+Wavetable tests cover block/next equality, phase/frequency changes, add mode,
+Nyquist, moved/reprepared tables and invalid/empty blocks. Existing independent
+harmonic-projection checks pass. Allocation/free auditing passes for process/reset.
+ASan tail tests include offset sources ending at the last valid sample.
+
+| Quality observation | x64 | Quest ARM64 |
+| --- | ---: | ---: |
+| Numerical/spectral quality records | 321 | 285 |
+| Worst float FFT roundtrip absolute error | 5.901e-7 | 5.901e-7 |
+| Worst double FFT roundtrip absolute error | 1.510e-15 | 1.299e-15 |
+| Maximum sampled preset passband error, dB | 0.001333 | 0.001333 |
+| Weakest sampled preset stopband gain, dB | -79.127 | -79.127 |
+
+All 321 x64 quality records are identical to the retained baseline. The general
+runs contain 730 x64 and 502 Quest records including performance/capability rows.
+These are finite numerical and spectral grids, without listening tests or physical
+audio I/O. The connected Quest does not advertise SVE. SVE is compiled, linked and
+disassembled in the Android ARM64 build, with runtime still unverified. Windows
+ARM64 libraries/headers compile; Windows ARM64 execution, desktop Linux and macOS
+remain unverified. See [validation](Validation.md).
+
+<details>
+<summary>Earlier monolithic measurements, retained for history</summary>
+
+The following numbers precede the project split and do not establish current
+platform coverage or before/after gains for the changes above.
+
+# Historical monolithic measurements
 
 2026-11-12. Explicit Release validation runs; strict floating-point policy, no
 fast-math/FMA contraction or global CPU-environment changes. Raw JSON retains
@@ -230,3 +342,5 @@ Each timing is a 128-frame stereo callback, float, mean microseconds. These are 
 | Quest ARM32 | NEON | 93.272 | 81.218 | 7.717 | 93.20 |
 
 Sampler rejection is 10log10(linear-output power / filtered-mip-output power) for a0.35-cycles/sample sine read at2x, excluding boundaries. Higher positive dB means stronger alias reduction. This one out-of-band tone does not establish full-band transparency. Wavetable banks and mip samples are prepared before timing; device/file I/O is excluded. IIR delay is frequency dependent, and half-band FIR has a longer fixed delay than the original FIR mode; see the integration contracts.
+
+</details>

@@ -52,28 +52,40 @@ Status Wavetable<T>::prepare(std::span<const T> cycle, CpuBackend backend) noexc
         return Status::allocation_failed;
     }
 }
-template <Sample T> T Wavetable<T>::value(double phase, double hz, double rate) const noexcept {
-    if (!state_ || !isFinite(phase) || !isFinite(hz) || !isFinite(rate) || rate <= 0 || hz < 0 ||
-        hz > rate * .5)
-        return T{};
+template <Sample T> auto Wavetable<T>::readView(double hz, double rate) const noexcept -> ReadView {
+    if (!state_ || !isFinite(hz) || !isFinite(rate) || rate <= 0 || hz < 0 || hz > rate * .5)
+        return {};
     const auto& s = *state_;
-    phase -= std::floor(phase);
-    const auto position = phase * double(s.size), fraction = position - std::floor(position);
-    const auto index = std::size_t(position);
-    auto read = [&](std::size_t level) {
-        const auto offset = level * (s.size + 1) + index;
-        return double(s.data[offset]) + (double(s.data[offset + 1]) - s.data[offset]) * fraction;
-    };
-    // Conservative crossfade: both selected banks fit below .45 * sampleRate.
     const auto harmonicRatio = hz * double(s.size / 2) / (rate * .45);
     if (harmonicRatio <= .5)
-        return static_cast<T>(read(0));
+        return {s.data.data(), nullptr, s.size, 0, false};
+    // Conservative crossfade: both selected banks fit below .45 * sampleRate.
     const auto level = std::max(0.0, std::log2(harmonicRatio) + 1);
     const auto first = std::min(std::size_t(level), s.levels - 1),
                second = std::min(first + 1, s.levels - 1);
-    const auto mix = std::min(1.0, level - double(first));
-    return static_cast<T>(read(first) * (1 - mix) + read(second) * mix);
+    return {s.data.data() + first * (s.size + 1), s.data.data() + second * (s.size + 1), s.size,
+            std::min(1.0, level - double(first)), true};
 }
+
+template <Sample T> T Wavetable<T>::read(const ReadView& view, double phase) noexcept {
+    if (!view.first || !isFinite(phase))
+        return T{};
+    phase -= std::floor(phase);
+    const auto position = phase * double(view.size), fraction = position - std::floor(position);
+    const auto index = std::size_t(position);
+    auto interpolate = [&](const T* data) {
+        return double(data[index]) + (double(data[index + 1]) - data[index]) * fraction;
+    };
+    if (!view.blend)
+        return static_cast<T>(interpolate(view.first));
+    return static_cast<T>(interpolate(view.first) * (1 - view.mix) +
+                          interpolate(view.second) * view.mix);
+}
+
+template <Sample T> T Wavetable<T>::value(double phase, double hz, double rate) const noexcept {
+    return read(readView(hz, rate), phase);
+}
+
 template <Sample T> std::size_t Wavetable<T>::size() const noexcept {
     return state_ ? state_->size : 0;
 }
@@ -115,8 +127,13 @@ template <Sample T> Status WavetableOscillator<T>::process(AudioBlock<T> out, bo
     auto r = validateProcessBlocks<T>(spec_, out, out);
     if (r != Status::ok)
         return r;
+    // Refresh per call: the owner may reprepare or move the borrowed table while idle.
+    const auto view = table_->readView(frequency_, spec_.sampleRate);
+    const auto increment = frequency_ / spec_.sampleRate;
     for (std::size_t i = 0; i < out.frames(); ++i) {
-        const auto v = next();
+        const auto v = Wavetable<T>::read(view, phase_);
+        phase_ += increment;
+        phase_ -= std::floor(phase_);
         for (std::size_t ch = 0; ch < out.channels(); ++ch) {
             if (add)
                 out.channel(ch)[i] += v;
