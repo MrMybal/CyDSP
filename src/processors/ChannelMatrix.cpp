@@ -2,6 +2,16 @@
 #include "detail/MatrixAlgorithm.h"
 #include <algorithm>
 namespace cydsp {
+Status defaultChannelMatrix(std::size_t in, std::size_t out,
+                            std::span<double> coefficients) noexcept {
+    if (!in || in > 256 || !out || out > 256 || coefficients.size() != in * out)
+        return Status::invalid_argument;
+    for (std::size_t o = 0; o < out; ++o)
+        for (std::size_t i = 0; i < in; ++i)
+            coefficients[o * in + i] = out == 1 ? 1.0 / double(in) : in == 1 || o == i ? 1.0 : 0.0;
+    return Status::ok;
+}
+
 template <Sample T>
     requires(!std::is_const_v<T>)
 void ChannelMatrix<T>::swap(ChannelMatrix& other) noexcept {

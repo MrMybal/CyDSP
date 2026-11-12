@@ -1,6 +1,6 @@
 # Native measurements
 
-2026-11-11. Explicit Release validation runs; strict floating-point policy, no
+2026-11-12. Explicit Release validation runs; strict floating-point policy, no
 fast-math/FMA contraction or global CPU-environment changes. Raw JSON retains
 all cases. Native programs perform numerical audio DSP without opening an audio
 device; no listening or physical audio I/O measurement is claimed.
@@ -13,22 +13,22 @@ Times are microseconds per call, including normal OS scheduling noise.
 
 | Host / backend | Algorithm | Mean us | Median us | p99 us | Maximum us |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Ryzen 9 7900X / scalar | hybrid128 | 80.32 | 72.00 | 151.50 | 264.30 |
-| Ryzen 9 7900X / scalar | nonuniform128 | 34.34 | 30.20 | 90.40 | 147.30 |
-| Ryzen 9 7900X / sse2 | hybrid128 | 39.87 | 42.40 | 49.70 | 52.40 |
-| Ryzen 9 7900X / sse2 | nonuniform128 | 15.58 | 11.90 | 42.60 | 42.90 |
-| Ryzen 9 7900X / avx2 | hybrid128 | 21.38 | 19.80 | 31.10 | 69.30 |
-| Ryzen 9 7900X / avx2 | nonuniform128 | 11.62 | 8.80 | 31.40 | 35.50 |
-| Ryzen 9 7900X / avx512 | hybrid128 | 29.17 | 28.60 | 32.70 | 219.00 |
-| Ryzen 9 7900X / avx512 | nonuniform128 | 12.74 | 10.00 | 34.50 | 62.50 |
-| Quest 3 ARM64 / scalar | hybrid128 | 99.87 | 99.38 | 109.69 | 147.29 |
-| Quest 3 ARM64 / scalar | nonuniform128 | 48.12 | 41.51 | 96.77 | 109.06 |
-| Quest 3 ARM64 / neon | hybrid128 | 87.46 | 85.83 | 102.60 | 201.77 |
-| Quest 3 ARM64 / neon | nonuniform128 | 28.91 | 23.44 | 70.57 | 77.40 |
-| Quest 3 ARM32 / scalar | hybrid128 | 260.10 | 255.21 | 283.23 | 316.72 |
-| Quest 3 ARM32 / scalar | nonuniform128 | 91.59 | 76.51 | 208.33 | 212.87 |
-| Quest 3 ARM32 / neon | hybrid128 | 146.49 | 151.41 | 163.18 | 299.90 |
-| Quest 3 ARM32 / neon | nonuniform128 | 51.82 | 40.62 | 135.57 | 157.86 |
+| Ryzen 9 7900X / scalar | hybrid128 | 68.31 | 67.20 | 117.40 | 124.40 |
+| Ryzen 9 7900X / scalar | nonuniform128 | 27.56 | 24.00 | 54.70 | 59.70 |
+| Ryzen 9 7900X / sse2 | hybrid128 | 29.67 | 29.50 | 34.10 | 38.30 |
+| Ryzen 9 7900X / sse2 | nonuniform128 | 11.91 | 9.20 | 31.30 | 32.00 |
+| Ryzen 9 7900X / avx2 | hybrid128 | 19.27 | 19.20 | 22.90 | 24.50 |
+| Ryzen 9 7900X / avx2 | nonuniform128 | 9.37 | 7.40 | 23.30 | 24.00 |
+| Ryzen 9 7900X / avx512 | hybrid128 | 18.34 | 18.30 | 19.00 | 19.40 |
+| Ryzen 9 7900X / avx512 | nonuniform128 | 9.31 | 7.50 | 21.90 | 25.10 |
+| Quest 3 ARM64 / scalar | hybrid128 | 115.25 | 114.84 | 126.82 | 130.31 |
+| Quest 3 ARM64 / scalar | nonuniform128 | 55.05 | 47.45 | 110.94 | 122.86 |
+| Quest 3 ARM64 / neon | hybrid128 | 90.44 | 86.14 | 109.84 | 182.13 |
+| Quest 3 ARM64 / neon | nonuniform128 | 28.81 | 23.33 | 69.58 | 82.97 |
+| Quest 3 ARM32 / scalar | hybrid128 | 295.34 | 308.70 | 367.14 | 404.64 |
+| Quest 3 ARM32 / scalar | nonuniform128 | 107.87 | 89.64 | 242.66 | 252.19 |
+| Quest 3 ARM32 / neon | hybrid128 | 152.77 | 151.77 | 173.96 | 234.64 |
+| Quest 3 ARM32 / neon | nonuniform128 | 52.95 | 42.24 | 142.34 | 143.49 |
 
 The nonuniform late tier runs less often, so lower average work can coexist with
 larger callback peaks. Choose a configuration against both mean and tail cost.
@@ -55,9 +55,9 @@ configurations are measured independently without declaring every setting high q
 
 | Host | Measurement records | Maximum preset passband error dB | Weakest sampled preset rejection dB | Worst float FFT roundtrip error | Worst double FFT roundtrip error |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Windows x64 | 670 | 0.00133235 | -79.13 | 5.9e-07 | 1.51e-15 |
-| Quest ARM64 | 458 | 0.00133235 | -79.13 | 5.9e-07 | 1.3e-15 |
-| Quest ARM32 | 458 | 0.00133235 | -79.13 | 5.9e-07 | 1.3e-15 |
+| Windows x64 | 734 | 0.00133235 | -79.13 | 5.9e-07 | 1.51e-15 |
+| Quest ARM64 | 506 | 0.00133235 | -79.13 | 5.9e-07 | 1.3e-15 |
+| Quest ARM32 | 506 | 0.00133235 | -79.13 | 5.9e-07 | 1.3e-15 |
 
 The raw 64-tap configuration reached -0.449 dB gain at
 6400.39 Hz for 48000->16000 Hz.
@@ -85,9 +85,9 @@ Float, 128-frame blocks. MIMO is 4 inputs x 4 outputs, 16 routes, 8192 taps per 
 
 | Host / backend | Shared MIMO us | Independent MIMO us | Ratio | Fused graph us | Callback graph us | Ratio |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Ryzen 9 7900X / avx512 | 39.40 | 103.94 | 2.64x | 0.35 | 4.40 | 12.55x |
-| Quest ARM64 / neon | 107.33 | 188.69 | 1.76x | 2.40 | 5.91 | 2.46x |
-| Quest ARM32 / neon | 192.06 | 339.47 | 1.77x | 3.01 | 10.79 | 3.58x |
+| Ryzen 9 7900X / avx512 | 28.93 | 73.38 | 2.54x | 0.33 | 3.98 | 12.07x |
+| Quest ARM64 / neon | 113.40 | 196.86 | 1.74x | 2.41 | 6.26 | 2.60x |
+| Quest ARM32 / neon | 226.02 | 388.41 | 1.72x | 3.01 | 10.63 | 3.53x |
 
 The reference MIMO executes one NonuniformConvolver per route and sums its outputs. The reference graph retains identity callbacks at each stage. Fusion applies to null routing nodes whose semantics are known; this does not fuse arbitrary processors. Costs and ratios depend on workload, ISA, scheduling and hardware. CPU/OS capability records explicitly distinguish AVX-512 execution from SVE compile/link-only coverage.
 
@@ -97,17 +97,17 @@ The FFT comparison uses a 1024-point float forward transform and the same prepar
 
 | Host / backend | Full-stage FFT us | Group reference us | Reference / full-stage |
 | --- | ---: | ---: | ---: |
-| Ryzen 9 7900X / avx512 | 2.04 | 3.93 | 1.93x |
-| Quest ARM64 / neon | 8.20 | 8.89 | 1.08x |
-| Quest ARM32 / neon | 12.91 | 14.81 | 1.15x |
+| Ryzen 9 7900X / avx512 | 1.40 | 2.85 | 2.04x |
+| Quest ARM64 / neon | 9.32 | 10.23 | 1.10x |
+| Quest ARM32 / neon | 13.10 | 14.80 | 1.13x |
 
 The convolution rows use the same 32768-tap IR, two float channels, 128-frame callbacks, early partition 128 and late partition 1024. ScheduledConvolver covers the first 2048 taps with its hybrid prefix, then spreads tail FFT/recombination/MAC/overlap work across a full input interval. NonuniformConvolver covers 1024 early taps and retains boundary transforms. Both produce the same causal response with zero added block latency.
 
 | Host / backend | Nonuniform mean us | Scheduled mean us | Mean cost ratio | Nonuniform p99 us | Scheduled p99 us |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Ryzen 9 7900X / avx512 | 12.74 | 14.34 | 1.13x | 34.50 | 18.50 |
-| Quest ARM64 / neon | 28.91 | 33.14 | 1.15x | 70.57 | 43.23 |
-| Quest ARM32 / neon | 51.82 | 57.40 | 1.11x | 135.57 | 72.60 |
+| Ryzen 9 7900X / avx512 | 9.31 | 10.17 | 1.09x | 21.90 | 11.70 |
+| Quest ARM64 / neon | 28.81 | 37.27 | 1.29x | 69.58 | 176.82 |
+| Quest ARM32 / neon | 52.95 | 58.31 | 1.10x | 142.34 | 72.29 |
 
 Job counts bound the scheduled tail only, not the synchronous prefix or OS scheduling. Chunk costs differ by phase. The sampled p99/max distributions are not hard deadline guarantees. Both modes remain selectable because reducing peaks may increase average CPU. No affinity/frequency or device setting was changed.
 
@@ -125,15 +125,15 @@ The same 32768-tap IR, two float channels and 128-frame callbacks use early=128 
 
 | Host / backend | Engine | Direct mean us | Common interface mean us | Serialized fade mean / p99 us | Async fade mean / p99 us |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Ryzen 9 7900X / avx512 | hybrid | 29.17 | 26.92 | 57.69 / 124.10 | 59.70 / 79.10 |
-| Ryzen 9 7900X / avx512 | nonuniform | 12.74 | 12.67 | 23.22 / 66.10 | 26.84 / 66.90 |
-| Ryzen 9 7900X / avx512 | scheduled | 14.34 | 13.83 | 28.60 / 49.70 | 26.33 / 40.00 |
-| Quest ARM64 / neon | hybrid | 87.46 | 87.29 | 193.93 / 255.26 | 177.34 / 211.09 |
-| Quest ARM64 / neon | nonuniform | 28.91 | 29.28 | 60.44 / 153.39 | 60.08 / 150.21 |
-| Quest ARM64 / neon | scheduled | 33.14 | 33.37 | 73.85 / 264.84 | 67.66 / 85.52 |
-| Quest ARM32 / neon | hybrid | 146.49 | 142.18 | 295.44 / 316.67 | 294.66 / 351.67 |
-| Quest ARM32 / neon | nonuniform | 51.82 | 59.65 | 125.22 / 370.21 | 126.28 / 374.95 |
-| Quest ARM32 / neon | scheduled | 57.40 | 66.83 | 117.25 / 137.45 | 118.55 / 202.29 |
+| Ryzen 9 7900X / avx512 | hybrid | 18.34 | 19.03 | 44.88 / 46.20 | 45.63 / 51.40 |
+| Ryzen 9 7900X / avx512 | nonuniform | 9.31 | 9.37 | 20.63 / 45.90 | 20.05 / 45.10 |
+| Ryzen 9 7900X / avx512 | scheduled | 10.17 | 10.16 | 22.05 / 24.70 | 21.56 / 24.10 |
+| Quest ARM64 / neon | hybrid | 90.44 | 92.36 | 181.69 / 413.75 | 186.31 / 523.85 |
+| Quest ARM64 / neon | nonuniform | 28.81 | 29.18 | 70.06 / 359.43 | 60.71 / 157.97 |
+| Quest ARM64 / neon | scheduled | 37.27 | 39.76 | 67.10 / 79.01 | 67.12 / 79.01 |
+| Quest ARM32 / neon | hybrid | 152.77 | 152.67 | 327.90 / 744.32 | 325.62 / 1131.20 |
+| Quest ARM32 / neon | nonuniform | 52.95 | 60.61 | 116.09 / 341.62 | 105.85 / 255.94 |
+| Quest ARM32 / neon | scheduled | 58.31 | 58.31 | 136.68 / 170.88 | 135.93 / 165.05 |
 
 Separate runs have normal scheduling noise, so small direct/interface differences do not establish dispatch overhead. Transition peaks include two active convolution banks and output blending. Sampled distributions do not guarantee real-time deadlines.
 
@@ -151,12 +151,12 @@ These 4-input/4-output cases use 16 routes, identical finite IR lengths, float s
 
 | Host / backend | Taps per route | Nonuniform mean / p99 us | Progressive mean / p99 us | Mean cost ratio |
 | --- | ---: | ---: | ---: | ---: |
-| Ryzen 9 7900X / avx512 | 8192 | 39.40 / 106.30 | 39.73 / 78.30 | 1.01x |
-| Ryzen 9 7900X / avx512 | 32768 | 60.23 / 179.10 | 71.10 / 115.30 | 1.18x |
-| Quest ARM64 / neon | 8192 | 107.33 / 207.66 | 128.93 / 155.10 | 1.20x |
-| Quest ARM64 / neon | 32768 | 170.51 / 303.12 | 200.86 / 273.59 | 1.18x |
-| Quest ARM32 / neon | 8192 | 192.06 / 373.49 | 223.29 / 250.16 | 1.16x |
-| Quest ARM32 / neon | 32768 | 306.83 / 578.23 | 393.93 / 703.39 | 1.28x |
+| Ryzen 9 7900X / avx512 | 8192 | 28.93 / 56.50 | 32.82 / 36.00 | 1.13x |
+| Ryzen 9 7900X / avx512 | 32768 | 38.18 / 65.80 | 46.70 / 53.80 | 1.22x |
+| Quest ARM64 / neon | 8192 | 113.40 / 231.25 | 144.64 / 421.14 | 1.28x |
+| Quest ARM64 / neon | 32768 | 179.52 / 722.24 | 219.74 / 701.77 | 1.22x |
+| Quest ARM32 / neon | 8192 | 226.02 / 560.94 | 236.56 / 348.75 | 1.05x |
+| Quest ARM32 / neon | 32768 | 319.02 / 1026.93 | 372.90 / 971.04 | 1.17x |
 
 The scheduled late budget is 2528 chunks per 1024-frame interval (at most 3/frame) for 8192 taps, or 9056 (at most 9/frame) for 32768. Those counts exclude direct/early-tier work. Each phase has a different cost; a job count does not bound wall time. The larger prefix and scheduling can increase average CPU; sampled p99/max cannot guarantee an audio deadline and are subject to OS/device variation. No automatic mode switch is introduced.
 
@@ -167,3 +167,64 @@ The scheduled late budget is 2528 chunks per 1024-frame interval (at most 3/fram
 | Quest ARM32 | 8.2e-08 | 1.67e-16 |
 
 The numerical measurement uses 4 inputs, 5 outputs, 6 sparse/duplicate routes with unequal dense IR lengths 1..521, 64-frame late partitions, 769 source frames followed by zeros and variable callbacks up to 137 frames. Independent double time-domain convolution covers every output and the full tail. Regressions also cover all three MIMO modes, rectangular exact aliases, smaller/larger partitions and invalid requests before state mutation.
+
+## Expanded DSP (128 frames, stereo, 48 kHz)
+
+Times below are microseconds per 128-frame callback, float samples, mean / p99. The audio period at 48 kHz is 2666.67 us. These are single-process synthetic workloads, not physical audio latency or universal speedup ratios. Scalar labels describe these processors without an explicit SIMD implementation; oversampling requests the automatic FIR backend.
+
+| Host | Dynamics | TPT | Ladder | Chorus | Phaser | Reverb | FIR4x roundtrip |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Ryzen 9 7900X | 7.27 / 7.70 | 1.55 / 1.60 | 3.94 / 4.20 | 1.93 / 2.10 | 8.45 / 9.00 | 3.50 / 3.90 | 22.92 / 24.50 |
+| Quest ARM64 | 19.49 / 22.97 | 3.34 / 3.39 | 12.39 / 12.86 | 5.11 / 5.31 | 13.61 / 25.68 | 9.07 / 9.43 | 57.32 / 63.33 |
+| Quest ARM32 | 30.95 / 55.57 | 3.01 / 3.02 | 16.12 / 16.93 | 8.61 / 9.01 | 16.18 / 17.14 | 11.19 / 11.30 | 113.67 / 123.80 |
+
+| Host | Float alias reduction dB | Double alias reduction dB |
+| --- | ---: | ---: |
+| Ryzen 9 7900X | -104.23 | -104.73 |
+| Quest ARM64 | -104.89 | -104.73 |
+| Quest ARM32 | -104.89 | -104.73 |
+
+The quality fixture cubes a 0.8-amplitude 9.6 kHz sine at 48 kHz. Without oversampling the third harmonic aliases to 19.2 kHz with amplitude 0.8^3/4. Values are 20log10(measured alias amplitude/reference amplitude), so more negative means stronger rejection. FIR4x adds 32 input frames of latency. This one tone does not establish rejection for every frequency or nonlinear processor.
+
+## Integrated synthesis and Stretch
+
+The synth workload uses sine/ADSR voices with sustained notes, stereo float output at 48 kHz and 128-frame callbacks. Tables report mean microseconds per callback; the available period is 2666.67 us. Voice setup and note publication are outside timing. This is CPU processing cost, not device latency.
+
+| Host / selected backend | 16 voices mean us | 64 voices mean us |
+| --- | ---: | ---: |
+| Ryzen 9 7900X / avx512 | 12.07 | 52.03 |
+| Quest ARM64 / neon | 37.96 | 156.54 |
+| Quest ARM32 / neon | 99.81 | 384.41 |
+
+Stretch compares the pinned unmodified portable Signalsmith engine against the adapted CyDSP engine in the same strict-FP Release binary. The integrated implementation uses CyDSP FFT/vector kernels, half-bin reconstruction, fused packing/permutation and compact 3×power-of-two plans. Original headers are compiled only in this opt-in benchmark. The upstream label scalar identifies its portable implementation, not a ban on compiler auto-vectorization. Both engines use two channels, 128-frame input/output calls and identical configurations: a 4096-frame window/1024 hop without split computation, and the 48 kHz default 5760-frame window with split computation. No pitch change is requested in this CPU workload.
+
+The ratio is **original mean time / integrated mean time**: 1.10x means about 10% more processing throughput in this measured case; below 1.00x means the integration is slower. Small differences are subject to OS noise. These are not comparisons to JUCE or a universal acceleration claim.
+
+| Host | Type | Window | Original mean us | Integrated mean us | Original / integrated |
+| --- | --- | --- | ---: | ---: | ---: |
+| Ryzen 9 7900X | float | 4096 | 22.34 | 19.04 | 1.17x |
+| Ryzen 9 7900X | float | default 5760 | 26.51 | 22.58 | 1.17x |
+| Ryzen 9 7900X | double | 4096 | 27.17 | 23.43 | 1.16x |
+| Ryzen 9 7900X | double | default 5760 | 29.89 | 27.49 | 1.09x |
+| Quest ARM64 | float | 4096 | 46.14 | 43.48 | 1.06x |
+| Quest ARM64 | float | default 5760 | 51.76 | 50.58 | 1.02x |
+| Quest ARM64 | double | 4096 | 54.44 | 56.35 | 0.97x |
+| Quest ARM64 | double | default 5760 | 62.91 | 64.57 | 0.97x |
+| Quest ARM32 | float | 4096 | 62.69 | 64.29 | 0.98x |
+| Quest ARM32 | float | default 5760 | 82.74 | 77.99 | 1.06x |
+| Quest ARM32 | double | 4096 | 67.42 | 82.18 | 0.82x |
+| Quest ARM32 | double | default 5760 | 78.60 | 84.07 | 0.93x |
+
+The unchanged spectral regression also checks an octave shift of a 440 Hz tone, formants, float/double, allocation-free retained processing/reset and finite tail draining. Direct DFT tests independently validate the altered FFT normalization for small mixed sizes. These checks do not replace listening acceptance for transients, music or extreme duration ratios. Worker tests exercise exact native decode, 48-to-44.1 kHz tone timing, arbitrary epoch seeks and final-recording drain; filesystem completion times are deliberately excluded from audio CPU timings.
+
+## DAW expansion measurements
+
+Each timing is a 128-frame stereo callback, float, mean microseconds. These are measured configurations, not a universal speedup ratio. The gate has a scalar detector and no backend selector.
+
+| Target | Backend | Half-band4x roundtrip µs | IIR4x roundtrip µs | Wavetable oscillator µs | Sampler alias rejection dB |
+| --- | --- | --- | --- | --- | --- |
+| Windows x64 | AVX-512 | 34.168 | 27.552 | 2.800 | 93.20 |
+| Quest ARM64 | NEON | 51.767 | 56.141 | 5.383 | 93.20 |
+| Quest ARM32 | NEON | 115.583 | 93.658 | 8.893 | 93.20 |
+
+Sampler rejection is 10log10(linear-output power / filtered-mip-output power) for a0.35-cycles/sample sine read at2x, excluding boundaries. Higher positive dB means stronger alias reduction. This one out-of-band tone does not establish full-band transparency. Wavetable banks and mip samples are prepared before timing; device/file I/O is excluded. IIR delay is frequency dependent, and half-band FIR has a longer fixed delay than the original FIR mode; see the integration contracts.

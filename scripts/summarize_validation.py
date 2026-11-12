@@ -21,6 +21,8 @@ for name in ['windows-x64','windows-x86','windows-x64-scalar','windows-arm64-cla
     for flag in ['CYDSP_BUILD_TESTS','CYDSP_BUILD_MEASUREMENTS','CYDSP_SANITIZE_ADDRESS']:
         if flag+':BOOL=OFF' not in cache:raise SystemExit('Production flag enabled: '+name+' '+flag)
 for name,report in reports.items():
+    if name.startswith(('build/native-','build/device-')) and not all(marker in report.get('regressions','') for marker in ('PASS expanded DSP/MIDI/SMF/SPSC/realtime contracts','PASS audio formats/virtual devices/pitch-time','PASS integrated FFT/synthesis/MPE/UMP/transport','PASS read-ahead/resampled seeks/background recording','PASS CI resources/GET/SET/subscriptions/Notify/realtime','PASS CI partial/instances/pagination/ChannelList/JSONSchema/client-cache/realtime','PASS MIDI-CI/UMP negotiation/profiles/properties','PASS native UMP queues/bridges','PASS DAW expansion DSP/wavetable/sampler/presets/realtime','PASS DAW MIDI clock/reconnect/Flex/Stream/controllers/profiles/realtime','PASS DAW AIFC/CAF/markers/loops/MP3 fixture')):
+        raise SystemExit('Missing expanded DSP/I/O regressions: '+name)
     if name.startswith(('build/native-','build/device-')) and 'PASS zero allocations/frees' not in report.get('regressions',''):
         raise SystemExit('Missing allocation audit: '+name)
     if name.startswith(('build/native-','build/device-')) and 'PASS shared FFT/scheduling/prewarm/variable rate/fused graph' not in report.get('regressions',''):
@@ -35,11 +37,29 @@ for name,report in reports.items():
 for log in [*(ROOT/'build/native-logs').glob('*-build.log'),*(ROOT/'build').glob('android-*/build.log')]:
     if re.search(r'(?:warning|avertissement)\s*(?:[A-Z]+\d+|:)',log.read_text(encoding='utf-8'),re.I):
         raise SystemExit('Compiler warning: '+str(log))
+integration_markers=(
+    'PASS integration WAV LIST/adtl/INFO/typed metadata/independent fixtures',
+    'PASS integration device identity/capabilities/negotiation/timing',
+    'PASS integration PCM editing proxy/exact random seek/bounds',
+    'PASS integration MIDI selection/multiport/SysEx/epochs/voice releases',
+    'PASS integration source policies/time-pitch curves/repitch/prime/tails/providers',
+    'PASS plugin CLAP ABI/multibus/automation/state/editor/lifecycle/realtime',
+    'PASS plugin VST3 ABI/controller/messages/multibus/state/editor/realtime')
+for name,report in reports.items():
+    if name.startswith(('build/native-','build/device-')):
+        for marker in integration_markers:
+            if marker not in report.get('regressions',''):raise SystemExit('Missing integration regression '+marker+': '+name)
+    if name.startswith('build/native-'):
+        if 'PASS plugin separate process/IPC/state/editor/late blocks/crash/restart/realtime' not in report.get('regressions',''):
+            raise SystemExit('Missing plugin worker process acceptance: '+name)
+        for marker in ('Long codec proxy AAC/M4A','Long codec proxy WMA'):
+            if marker not in report.get('regressions',''):raise SystemExit('Missing long native-codec measurement: '+name)
+component_count=len(json.loads((ROOT/'third_party/manifest.json').read_text())['components'])
 summary={'timeUtc':datetime.now(timezone.utc).isoformat(),'sourceSha256':digest,
-         'status':'passed_available_targets','requestedScopeComplete':False,'nativeRuntimeExecuted':True,
-         'reports':paths,'unverified':['desktop Linux/GCC','macOS/Apple Clang',
-         'Windows ARM64 application linking/runtime','SVE native execution and multiple vector lengths','physical audio I/O, listening acceptance and all possible rate/frequency combinations'],
-         'untouched':['CyCode','GitHub Actions','antivirus settings'],'installedDeviceApplication':False}
+         'status':'passed_available_targets','requestedScopeComplete':False,'implementedLibraryScopeComplete':True,'applicationMigrationComplete':False,'nativeRuntimeExecuted':True,
+         'reports':paths,'unverified':['desktop Linux/GCC (deferred by owner)','macOS/Apple Clang (deferred by owner)',
+         'Windows ARM64 application linking/runtime','physical MIDI2/AMidi hardware and Apple native transport/codec compilation/runtime','SVE native execution and multiple vector lengths','physical audio I/O, listening acceptance and all possible rate/frequency combinations','CyDAW shell/model/routing migration (outside CyDSP)','application-specific beats/texture providers; built-in AU/AAX/LV2/JSFX adapters','macOS/Linux desktop plugin/worker/editor runtime and native Android service worker'],
+         'untouched':['CyCode','CyDAW_Project','GitHub Actions','antivirus settings'],'installedDeviceApplication':False}
 
 static=reports['build/validation.json']
 simd=reports['build/simd-validation.json']
@@ -47,9 +67,9 @@ objects=sum(c['objectsInspected'] for c in simd['checks'])
 sourceCount=sum(1 for folder in ['include','src','tests','examples'] for file in (ROOT/folder).rglob('*') if file.suffix in ['.h','.cpp'])
 validation=f'''# Validation
 
-2026-11-11. Work is confined to CyDSP. The owner explicitly authorized native tests,
+2026-11-12. Work is confined to CyDSP. The owner explicitly authorized native tests,
 benchmarks and the connected Quest 3. Production configurations remain static,
-with test/measurement/sanitizer options OFF. No CyCode source, GitHub Actions or
+with test/measurement/sanitizer options OFF. No CyCode or CyDAW_Project source, GitHub Actions or
 antivirus setting was changed. No application was installed on the Quest.
 
 Current compiler-input SHA-256: {digest}
@@ -66,19 +86,27 @@ Current compiler-input SHA-256: {digest}
 | Quest 3 Android ARM64 | Native scalar/NEON regressions, allocation/free audit and measurements |
 | Quest 3 Android ARM32 compatibility | Native scalar/NEON regressions, allocation/free audit and measurements; double NEON kernels fall back to scalar |
 | Android ARM32/ARM64/x86/x86_64 NDK Clang 18 | Archives, isolated public headers, regression objects and target executable linking |
-| Windows x64/x86/scalar/ARM64 Clang | Four Release production static archives and compile-only checks |
+| Windows x64/x86/scalar/ARM64 Clang | Four Release production configurations, static libraries only, with compile-only checks |
 | Installed CMake package | Byte-exact headers/notices/manifest and separate static consumer |
 
 All {static['publicHeaders']} public headers compile individually. {static['staticAssertSites']}
 static_assert sites pass under MSVC and Clang. Source checks cover {sourceCount} owned C++
 files, local includes, Python syntax, documentation links, build/ISA policy and all
-three pinned MIT component archives/notices. Final compiler build logs have no
+{component_count} pinned permissive component archives/notices. Final compiler build logs have no
 warnings. An additional audit disassembles {objects} production objects across all
 eight target archives, verifies per-file wide-ISA isolation and finds no fused FP
 instructions. The instruction audit is generated locally in `build/simd-validation.json`. SVE is compiled and
 linked for Android ARM64; no SVE-native execution is claimed.
 The installed NDK emits upstream CMake deprecation notices during
 configuration; its compiler build logs are clean.
+
+Prepared property-service regressions additionally validate ResourceList/DeviceInfo/ChannelList/JSONSchema, resId isolation, RFC6901 partial SET, list pagination/totals, full/partial/notify delivery, TTL/page/binary caching, stale-GET protection, eviction/ACK pressure, timeout, cancellation/MUID cleanup and retained-memory request/patch/subscription processing. [Property service](CiProperty.md) records exact scope.
+
+Native MIDI2 regressions check CI discovery/collisions/profiles/chunked properties, protocol confirmation/timeout, retained-memory processing and parallel audio/SysEx queues. Quest also exercises native-endian descriptor framing, saturation, ownership and disconnect through nonblocking sockets. No physical MIDI port is opened; Windows MIDI Services is unavailable on this Windows 10 host, Android JNI/AMidi hardware is not exercised, and Apple transport source remains uncompiled. See [MIDI 2](Midi2.md).
+
+The integrated suites additionally check half-bin FFTs against direct DFTs for power-of-two and mixed-radix sizes on every available backend, MIDI 2 scaling including all 16384 pitch values, MPE zones/RPN/pedals, sample-accurate custom/oscillator/sampler voices, queued transport/loops/underruns, random epoch seeks with full-capacity prefill and centered sinc timing, and background recording/draining with exact file readback. Audio-thread memory auditing covers those new paths.
+
+The expanded suites additionally check DSP transfer functions, envelopes, oversampling, modulation/reverb decay, MIDI/SMF/SPSC, independent WAV/AIFF fixtures, WAV/AIFF/FLAC/Ogg roundtrips, spectral pitch shifting, retained-memory processing/reset and silent virtual audio callbacks. The DAW expansion adds filter families/interpolators/windows, gate look-ahead, half-band/IIR oversampling, wavetable/mip sampling/presets, worker stretching/IR/peak caches, clock collection/reconnects/Function Blocks/controllers/profile dispatch, AIFC/CAF with retained marker/loop chunks and an independent successful MP3 fixture. Windows native MP3/AAC/M4A/WMA encode/decode/tone/decoded-seek tests pass. Exact scope and platform limits are recorded in [DAW integration](DawIntegration.md) and [Coverage](Coverage.md).
 
 The native suites exercise direct DFT/convolution references, SIMD residuals and
 unaligned views, invalid/overlapping requests, reset/moves, split callbacks, queued
@@ -109,6 +137,31 @@ thread. It covers prepared process/reset/finish and fade activation for every
 processor, including retired IR plans and progressive FFT jobs/reset. It detected zero allocations AND frees in
 the exercised regions. Worker preparation remains intentionally non-real-time.
 The audit does not make arbitrary user graph callbacks allocation-free.
+
+## Integration report follow-up
+
+Independent WAV LIST/adtl/INFO, odd chunks and native24-in-32 PCM references pass.
+Public metadata versions/typed edits preserve unknown chunks. Fake/null device
+tests distinguish negotiated values, unknown hardware facts and callback clocks.
+MIDI tests cover ambiguous selection, two ports, fragmented12 KiB SysEx, epochs
+and voice-release notifications.
+
+Source tests cover time/pitch curves, repitch reference tones, extended ratios,
+prime/tail contracts and an original external-provider fixture. Beats/texture
+remain provider policies, not claimed native matches for CyDAW algorithms.
+Long60-second AAC/WMA proxy fixtures compare exact near-EOF PCM, seek time,
+bounded copy storage and sampled process private-memory increase.
+
+Original CLAP/VST3 shared modules verify the ABI, multibus/sidechain, automation,
+copied events, component/controller states, lifecycle and host allocation audit.
+Windows tests actual child editors, resize/DPI, focus/keys/wheel and a separate
+process worker: IPC, one-block pipeline, late-result silence, abrupt plugin exit
+and restart. Android runs in-process module tests; standalone Android process
+workers require an application service and are explicitly skipped.
+
+See [Plugin contracts](Plugins.md) and [Remediation scope](IntegrationRemediation.md).
+Application shell/model/routing migration and other plugin-format providers remain
+outside this library-only change; a complete JUCE replacement is not claimed.
 
 ## Reports and reproduction
 
@@ -143,8 +196,8 @@ consolidation succeeds.
 
 ## Remaining target coverage
 
-Desktop Linux/GCC and macOS/Apple Clang have no available host in this session;
-Windows WSL is not enabled. run_portable.py is ready to run natively on those hosts.
+Desktop Linux/GCC and macOS/Apple Clang tests are deferred by the owner.
+No corresponding host is available in this session; Windows WSL is not enabled. run_portable.py is ready to run natively on those hosts.
 Android uses a Linux kernel and libc++, and is reported separately from desktop
 Linux/glibc/GCC. SVE is compiled and linked in Android ARM64; the Quest reports SVE unavailable.
 Native SVE execution at different vector lengths needs compatible hardware.
@@ -154,13 +207,13 @@ that Windows ABI. No CI workflow was enabled to bypass these missing environment
 
 The synthetic workloads and sampled spectral checks do not establish all possible
 stream states, hard audio deadlines, listening quality, physical audio I/O latency
-or performance on other machines. Original-code release licensing remains an owner
-decision. Further implementation opportunities are in Roadmap.md.
+or performance on other machines. CyDSP uses the MIT license; upstream notices
+are indexed in Licensing.md. Further implementation opportunities are in Roadmap.md.
 '''
 (ROOT/'docs/Validation.md').write_text(validation,encoding='utf-8',newline='\n')
 measurements='''# Native measurements
 
-2026-11-11. Explicit Release validation runs; strict floating-point policy, no
+2026-11-12. Explicit Release validation runs; strict floating-point policy, no
 fast-math/FMA contraction or global CPU-environment changes. Raw JSON retains
 all cases. Native programs perform numerical audio DSP without opening an audio
 device; no listening or physical audio I/O measurement is claimed.
@@ -343,7 +396,59 @@ for path,label,_ in targets:
     worst=lambda typ:max(m['value'] for m in qs if m['sampleType']==typ)
     measurements+=f"| {label} | {worst('float'):.3g} | {worst('double'):.3g} |\n"
 measurements+='\nThe numerical measurement uses 4 inputs, 5 outputs, 6 sparse/duplicate routes with unequal dense IR lengths 1..521, 64-frame late partitions, 769 source frames followed by zeros and variable callbacks up to 137 frames. Independent double time-domain convolution covers every output and the full tail. Regressions also cover all three MIMO modes, rectangular exact aliases, smaller/larger partitions and invalid requests before state mutation.\n'
-(ROOT/'docs/Measurements.md').write_text(measurements,encoding='utf-8',newline='\n')
+measurements+='\n## Expanded DSP (128 frames, stereo, 48 kHz)\n\n'
+measurements+='Times below are microseconds per 128-frame callback, float samples, mean / p99. The audio period at 48 kHz is 2666.67 us. These are single-process synthetic workloads, not physical audio latency or universal speedup ratios. Scalar labels describe these processors without an explicit SIMD implementation; oversampling requests the automatic FIR backend.\n\n'
+measurements+='| Host | Dynamics | TPT | Ladder | Chorus | Phaser | Reverb | FIR4x roundtrip |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n'
+for path,label,_ in targets:
+    ms=reports[path]['measurements']
+    values=[]
+    for op in ['dynamicsCompressor','stateVariableTpt','ladderLowpass','chorus','phaser','schroederReverb','oversample4Roundtrip']:
+        m=next(m for m in ms if m.get('operation')==op and m.get('sampleType')=='float')
+        values.append(f"{m['meanNs']/1000:.2f} / {m['p99Ns']/1000:.2f}")
+    measurements+='| '+label+' | '+' | '.join(values)+' |\n'
+measurements+='\n| Host | Float alias reduction dB | Double alias reduction dB |\n| --- | ---: | ---: |\n'
+for path,label,_ in targets:
+    values=[]
+    for typ in ['float','double']:
+        q=next(m for m in reports[path]['measurements'] if m.get('metric')=='oversamplingCubicAliasReductionDb' and m.get('sampleType')==typ)
+        if q['value']>=-40:raise SystemExit('Oversampling alias rejection failed: '+path)
+        values.append(f"{q['value']:.2f}")
+    measurements+='| '+label+' | '+' | '.join(values)+' |\n'
+measurements+='\nThe quality fixture cubes a 0.8-amplitude 9.6 kHz sine at 48 kHz. Without oversampling the third harmonic aliases to 19.2 kHz with amplitude 0.8^3/4. Values are 20log10(measured alias amplitude/reference amplitude), so more negative means stronger rejection. FIR4x adds 32 input frames of latency. This one tone does not establish rejection for every frequency or nonlinear processor.\n'
+measurements+='\n## Integrated synthesis and Stretch\n\n'
+measurements+='The synth workload uses sine/ADSR voices with sustained notes, stereo float output at 48 kHz and 128-frame callbacks. Tables report mean microseconds per callback; the available period is 2666.67 us. Voice setup and note publication are outside timing. This is CPU processing cost, not device latency.\n\n'
+measurements+='| Host / selected backend | 16 voices mean us | 64 voices mean us |\n| --- | ---: | ---: |\n'
+for path,label,backend in targets:
+    ms=reports[path]['measurements']
+    values=[]
+    for voices in [16,64]:
+        m=next(m for m in ms if m.get('operation')=='polyphonicSynth128' and m.get('sampleType')=='float' and m.get('size')==voices)
+        values.append(f"{m['meanNs']/1000:.2f}")
+    measurements+='| '+label+' / '+backend+' | '+' | '.join(values)+' |\n'
+measurements+='\nStretch compares the pinned unmodified portable Signalsmith engine against the adapted CyDSP engine in the same strict-FP Release binary. The integrated implementation uses CyDSP FFT/vector kernels, half-bin reconstruction, fused packing/permutation and compact 3×power-of-two plans. Original headers are compiled only in this opt-in benchmark. The upstream label scalar identifies its portable implementation, not a ban on compiler auto-vectorization. Both engines use two channels, 128-frame input/output calls and identical configurations: a 4096-frame window/1024 hop without split computation, and the 48 kHz default 5760-frame window with split computation. No pitch change is requested in this CPU workload.\n\n'
+measurements+='The ratio is **original mean time / integrated mean time**: 1.10x means about 10% more processing throughput in this measured case; below 1.00x means the integration is slower. Small differences are subject to OS noise. These are not comparisons to JUCE or a universal acceleration claim.\n\n'
+measurements+='| Host | Type | Window | Original mean us | Integrated mean us | Original / integrated |\n| --- | --- | --- | ---: | ---: | ---: |\n'
+for path,label,backend in targets:
+    ms=reports[path]['measurements']
+    for typ in ['float','double']:
+        for variant,title in [('4096','4096'),('Preset','default 5760')]:
+            original=next(m for m in ms if m.get('operation')=='stretchOriginal'+variant and m.get('sampleType')==typ)
+            integrated=next(m for m in ms if m.get('operation')=='stretchCyDSP'+variant and m.get('sampleType')==typ)
+            measurements+=f"| {label} | {typ} | {title} | {original['meanNs']/1000:.2f} | {integrated['meanNs']/1000:.2f} | {original['meanNs']/integrated['meanNs']:.2f}x |\n"
+measurements+='\nThe unchanged spectral regression also checks an octave shift of a 440 Hz tone, formants, float/double, allocation-free retained processing/reset and finite tail draining. Direct DFT tests independently validate the altered FFT normalization for small mixed sizes. These checks do not replace listening acceptance for transients, music or extreme duration ratios. Worker tests exercise exact native decode, 48-to-44.1 kHz tone timing, arbitrary epoch seeks and final-recording drain; filesystem completion times are deliberately excluded from audio CPU timings.\n'
+
+measurements+='\n## DAW expansion measurements\n\nEach timing is a 128-frame stereo callback, float, mean microseconds. These are measured configurations, not a universal speedup ratio. The gate has a scalar detector and no backend selector.\n\n| Target | Backend | Half-band4x roundtrip µs | IIR4x roundtrip µs | Wavetable oscillator µs | Sampler alias rejection dB |\n| --- | --- | --- | --- | --- | --- |\n'
+for path,label,isa in [('build/native-x64.json','Windows x64','AVX-512'),('build/device-arm64-v8a.json','Quest ARM64','NEON'),('build/device-armeabi-v7a.json','Quest ARM32','NEON')]:
+    ms=reports[path]['measurements']
+    # Backend names are emitted in lower case by the library.
+    backend={"AVX-512":"avx512","NEON":"neon"}[isa]
+    def timing(op):
+        return next(m['meanNs']/1000 for m in ms if m.get('operation')==op and m['sampleType']=='float' and m['backend']==backend)
+    rejection=next(m['reductionDb'] for m in ms if m.get('metric')=='samplerOctaveAliasReductionDb' and m['sampleType']=='float')
+    if rejection<40:raise SystemExit('Sampler alias quality failed: '+path)
+    measurements+=f"| {label} | {isa} | {timing('oversample4HalfBandRoundtrip'):.3f} | {timing('oversample4IirRoundtrip'):.3f} | {timing('wavetableOscillator2048'):.3f} | {rejection:.2f} |\n"
+measurements+='\nSampler rejection is 10log10(linear-output power / filtered-mip-output power) for a0.35-cycles/sample sine read at2x, excluding boundaries. Higher positive dB means stronger alias reduction. This one out-of-band tone does not establish full-band transparency. Wavetable banks and mip samples are prepared before timing; device/file I/O is excluded. IIR delay is frequency dependent, and half-band FIR has a longer fixed delay than the original FIR mode; see the integration contracts.\n\n'
+(ROOT/'docs/Measurements.md').write_text(measurements.rstrip()+'\n',encoding='utf-8',newline='\n')
 (ROOT/'build/completion.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8')
 print('PASS: all available-target reports match '+digest[:16]+'; desktop Linux/macOS and Windows ARM64 runtime remain unverified')
 print('Consolidated report: '+str(ROOT/'build/completion.json'))

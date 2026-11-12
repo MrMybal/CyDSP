@@ -1,0 +1,2 @@
+EXPORTS
+    GetPluginFactory=_GetPluginFactory@0

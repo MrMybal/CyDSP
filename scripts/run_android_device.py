@@ -36,14 +36,14 @@ if not re.fullmatch(r'/data/local/tmp/cydsp-[a-f0-9]{12}-[a-z0-9-]+-[a-f0-9]{8}'
 report={'sourceSha256':digest,'model':model,'abi':a.abi,'sdk':invoke([*base,'shell','getprop','ro.build.version.sdk']).strip(),
         'timeUtc':datetime.now(timezone.utc).isoformat(),'status':'running','nativeRuntimeExecuted':True,'installedApplication':False}
 logs=ROOT/'build/device-logs';logs.mkdir(parents=True,exist_ok=True)
-files=['cydsp_tests']+(['cydsp_measurements'] if a.measure else [])
+files=['cydsp_tests','cydsp_fixture.clap','cydsp_vst_fixture.vst3']+(['cydsp_measurements'] if a.measure else [])
 try:
     invoke([*base,'shell','mkdir',remote])
     for name in files:
         if not (folder/name).is_file():raise RuntimeError('Missing executable '+name)
         invoke([*base,'push',str(folder/name),remote+'/'+name])
         invoke([*base,'shell','chmod','700',remote+'/'+name])
-    text=invoke([*base,'shell',remote+'/cydsp_tests'],240)
+    text=invoke([*base,'shell','env','CYDSP_TEST_TMP='+remote,remote+'/cydsp_tests'],240)
     (logs/(a.abi+'-regressions.log')).write_text(text,encoding='utf-8');report['regressions']=text
     if a.measure:
         text=invoke([*base,'shell',remote+'/cydsp_measurements'],600)

@@ -46,7 +46,7 @@
   and divides by N. Real FFT bins run from DC through Nyquist.
 - Keep ISA types private. Never assume the build machine matches the destination.
 - Adapted sources retain attribution, complete notice, pinned revision/hash and
-  original archive. Original-code release licensing is an explicit owner choice.
+  original archive. Original CyDSP code is MIT licensed; retain LICENSE.
 
 - SmoothedBiquadCascade preallocates full cascades, coalesces one following target,
   and clears new histories on immediate edits/reset. Empty sections mean bypass.

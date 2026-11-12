@@ -2,6 +2,11 @@
 #include "cydsp/core/AudioBuffer.h"
 #include "cydsp/math/VectorOps.h"
 namespace cydsp {
+// Preparation-time default for discrete channels: average to mono, replicate mono,
+// otherwise preserve matching channel indices and silence additional outputs.
+Status defaultChannelMatrix(std::size_t inputChannels, std::size_t outputChannels,
+                            std::span<double> coefficients) noexcept;
+
 // Rectangular channel mixer: coefficients are output-major, then input channel.
 // Exact whole-channel aliases, including permutations, use prepared input snapshots.
 template <Sample T>

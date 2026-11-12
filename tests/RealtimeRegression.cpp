@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdlib>
 #include <cydsp/CyDSP.h>
 #include <new>
@@ -242,4 +244,43 @@ template <class T> void audit() {
 void realtimeRegression() {
     audit<float>();
     audit<double>();
+}
+
+void runRealtimeAudit(void (*function)(void*) noexcept, void* context) {
+    {
+        Scope scope;
+        function(context);
+    }
+    require(allocations == 0 && deallocations == 0, "allocation/free in expanded processing/reset");
+}
+
+void assertNoRealtimeAllocations(void (*callback)(void*) noexcept, void* context) {
+    {
+        Scope guard;
+        callback(context);
+    }
+    require(allocations == 0 && deallocations == 0,
+            "plugin/bridge allocated during realtime processing");
+}
+
+void variableSincRealtimeRegression() {
+    using namespace cydsp;
+    SincInterpolator<double> sinc;
+    require(sinc.prepare({48000, 32, 1}, 96000) == Status::ok, "sinc positions prepare");
+    AudioBuffer<double> source, output;
+    require(source.resize(1, 256) == Status::ok && output.resize(1, 32) == Status::ok,
+            "sinc position buffers");
+    std::fill(source.block().channel(0).begin(), source.block().channel(0).end(), 1.);
+    std::array<double, 32> positions;
+    for (std::size_t i = 0; i < 32; ++i)
+        positions[i] = 64 + double(i) * 1.5;
+    Status result;
+    {
+        Scope scope;
+        result = sinc.processPositions(source.block(), positions, output.block());
+    }
+    require(result == Status::ok && allocations == 0 && deallocations == 0,
+            "variable sinc realtime");
+    for (double sample : output.block().channel(0))
+        require(std::abs(sample - 1) < 1e-12, "variable sinc unity");
 }

@@ -564,3 +564,234 @@ N-1 in the angular denominator, periodic uses N. A singleton is 1; an empty span
 invalid enum is an error without writes. Window generation evaluates trigonometric
 functions and should be done during preparation. No amplitude/energy normalization
 beyond the named window formula is implicit.
+
+## Expanded DSP
+
+`DspMath.h`: dB conversion, polynomial evaluation, immutable lookup interpolation,
+linear/multiplicative `SmoothedValue`. `Adsr` has linear segments with exact sample
+endpoints; zero-duration stages advance immediately. `Oscillator<T>` offers sine,
+triangle, PolyBLEP saw/square and deterministic white noise. Triangle is not
+band-limited. No generator promises alias-free output at arbitrary frequencies.
+
+`Dynamics<T>` offers compressor, downward expander/gate and hard-ceiling limiter,
+peak/RMS detection, channel linking, knee and makeup. The gate uses a downward
+expansion curve; there is no hold/hysteresis or look-ahead. `gainReductionDb()` is the
+latest processed channel/frame value, not a block minimum. `BallisticsFilter<T>`
+has independent attack/release envelope state per channel.
+
+`TptFilter<T>` implements first-order and state-variable responses; `LinkwitzRiley<T>`
+returns separate LR4 low/high blocks and rejects overlapping outputs. `LadderFilter`
+is a four-pole low-pass with solved linear feedback and input saturation; it is not
+a circuit emulation. `designButterworth` designs 1..32-order low/high-pass SOS;
+`designWindowedFir` designs odd symmetric Kaiser-windowed low/high-pass taps.
+
+`Panner<T>` supports mono/stereo to stereo, seven pan laws and matrix ramps.
+`DryWetMixer<T>` retains the dry block and integer latency history. Each push must
+be paired with a same-sized wet mix before the next push. `WaveShaper<T>` offers
+built-in functions or a borrowed noexcept callback. `Bias<T>` adds a constant.
+
+`Oversampler<T>` offers 1/2/4/8/16 factors using prepared FIR filters. `processUp`
+returns a borrowed internal high-rate block for the user's nonlinear processing;
+`processDown` completes the matching block. Latency is 32 input frames above 1x,
+zero at 1x. Reset cancels an unfinished block. This implementation is not a
+half-band IIR oversampler. It adds filter latency even around identity processing.
+
+`Chorus<T>` uses a modulated interpolated delay; `Phaser<T>` uses six all-pass
+stages; `Reverb<T>` uses an original decorrelated Schroeder network. Parameters
+change between blocks without implicit smoothing. Reset clears prepared state and
+retains storage. Reverb decaySeconds is nominal low-frequency RT60, affected by
+damping/frequency and not a promise of a particular room response.
+
+## Pitch and time
+
+Link `CyDSP::Stretch` for `TimeStretch<T>`. The adapted MIT engine uses CyDSP
+ComplexFft/VectorOps and private STFT/half-bin reconstruction. FFT sizes are powers
+of two or three times a power of two; inverse scaling is folded into STFT windows.
+The optional trailing prepare backend and backend() follow common CPU selection. Prepare independent maximum input/output
+sizes. The lengths supplied to each process call define the local duration ratio;
+the caller schedules integer lengths to reach the desired long-term ratio. Pitch
+is -48..48 semitones; formant multiplier .25..4. All input/output overlap is rejected.
+Public block offsets are respected. Input/output latency is reported separately.
+Feed inputLatency silence frames at the desired ratio before flushing a finite
+stream, then drain outputLatency frames. Flush caches/drains the tail across short
+callbacks, zero-pads the last block and returns end_of_stream for a short/empty tail.
+Process after flushing returns end_of_stream until reset. Tail generation happens
+on the first flush, so budget that call for the complete tail computation.
+
+## Audio files and devices
+
+Link `CyDSP::Files` for the seekable, synchronous file/stream reader and writer.
+Open is transactional for object state; the path writer creates/truncates its file.
+Readers validate block/channel shape, report exact framesRead and zero-pad EOS.
+An I/O failure may leave partial output/file data; retry policy belongs to the host.
+Maximum block size is configured at open. Float and double planar blocks, including
+nonzero sub-block offsets, are supported. Integer PCM normalization uses 2^(bits-1).
+The WAV/FLAC backend limits negative export to within one LSB of -1. Nonfinite
+export samples are rejected before writing. File methods are not real-time safe.
+
+| Format | Read | Write | Restrictions |
+| --- | --- | --- | --- |
+| WAV | Yes | Yes | Backend-supported integer PCM and float32/64 |
+| AIFF | Yes | Yes | Original PCM8/16/24/32 codec, signed big-endian, 2 GiB limit; no AIFC/compression/metadata |
+| FLAC | Yes | Yes | PCM16/24 export; actual codec limits apply, at most 8 channels |
+| Ogg Vorbis | Yes | Yes | Lossy floating input/output; quality level separate from encoding |
+| MP3 | Yes | No | Compressed source has no PCM bit-depth; exposed decoded encoding is float32 |
+
+Metadata JSON follows the selected codec's schema. It is not a universal lossless
+metadata roundtrip. AIFF rejects metadata on export. `audioFileFormats()` reports
+compiled format availability and writable encodings; it does not imply every
+rate/channel combination is supported.
+
+Link `CyDSP::Devices` for `AudioDeviceContext`, `AudioDevice`, `MidiInput` and
+`MidiOutput`. Device IDs belong to their prepared context, MIDI port indices are
+snapshots. Enumerate again after hotplug. Audio selects the system default for empty
+IDs and negotiates the requested float stream through miniaudio. `sampleRate()`
+reports the actual callback rate. Callbacks receive cleared planar output, are
+split to maxCallbackFrames, and errors yield silence plus a counter. Lifecycle is
+externally serialized; callbacks and user context must outlive stop/close.
+Virtual-device mode is explicit and useful for silent deterministic validation.
+
+MIDI input copies packets <=4096 bytes into a configured bounded SPSC queue. Queue
+full/oversized messages increment droppedMessages. Read with too small a destination
+reports the required size without consuming the packet. Timestamps accumulate backend
+deltas from the first event; they are not audio-sample timestamps. Physical sends
+can block and must run on a worker thread. The legacy RtMidi API is unavailable on
+Android; native UMP instead uses Midi2Device's explicit API33 host JNI bridge.
+
+## MIDI protocol
+
+`MidiMessageView` validates MIDI1 wire messages. `ShortMidiMessage` factories use
+1-based channels and 7-bit note/controller values; invalid arguments yield an empty
+message. `MidiBuffer` has prepared event/byte capacities, stable sample ordering
+and borrowed event views until reset/reprepare. `MidiStreamParser` handles fragmented
+messages, running status and realtime messages inside SysEx; overflow discards the
+oversized SysEx until its terminator, with an explicit error. Callback spans are
+borrowed only for the callback duration. `MidiKeyboardState` tracks notes/sustain.
+
+`MidiFile` reads/writes SMF0/1/2, bounded VLQs, running status, meta and SysEx events,
+PPQN tempo maps and SMPTE timing (including 29.97). Parsing is transactional and
+requires an End Of Track marker. Serialization appends one when absent. File parse
+and serialization allocate; they are not callback services. `SpscQueue<T>` is one producer/one consumer, fixed capacity,
+lock-free after prepare; lifecycle requires both participants idle.
+
+## MPE and MIDI 2
+
+`MidiParameterParser` decodes RPN/NRPN selection/data and bounded increments.
+`MpeInstrument` keeps a bounded 16-channel/128-key state, lower/upper zones, member
+and manager pitch/pressure, CC74, sustain/sostenuto, RPN0 sensitivity and RPN6 zone
+configuration. Defaults are lower 15 members, upper 0; member bend 48 semitones,
+manager 2. Explicit setZones requires idle notes; live RPN6 stops old notes and
+resets expression. Callbacks carry borrowed note state and the supplied frame.
+
+`UmpPacket` stores 1..4 host-order words and serializes big-endian bytes.
+`UmpStreamParser` accepts fragmented words/bytes; use one input representation
+until its incomplete packet is finished. `UmpBuffer` is prepared and sample sorted.
+Factories cover MIDI1 encapsulation, MIDI2 notes/attributes, CC/pitch/pressure,
+per-note controllers, program/bank and SysEx7/8. Scaling preserves min/center/max;
+conversion returns unsupported_format for unrepresentable per-note/bank messages.
+`UmpSysExAssembler` retains one group/stream at a time in bounded storage. Reserved,
+Flex and unrelated Stream packets remain opaque. Native UMP transport, MIDI-CI and
+Stream Configuration use the dedicated APIs described in [Native MIDI 2](Midi2.md);
+that document records platform requirements, ownership and remaining acceptance.
+
+## Polyphonic synthesis
+
+`Synthesizer<T>::prepare(spec, voices, backend)` prepares 1..1024 voices, shared
+buffers and selected vector kernels. Voices reuse Oscillator/Adsr; the sampler
+reuses ChannelMatrix and SIMD envelope/mix operations. Note events merge MIDI1
+and UMP at sample offsets inside the callback (MIDI1 first on equal offsets).
+Out-of-block offsets fail before writes. Output replaces the block unless add=true.
+Voice selection is inactive, then released, then oldest. Steals blend the last
+per-channel contribution over stealFadeFrames; this avoids an immediate jump,
+not a reconstruction of the stolen oscillator's future. Zero fade disables it.
+
+`SampleData<T>` owns a copied planar sample and optional [first,end) loop. setSample
+borrows it: keep it immutable/alive while attached. Sampler pitch uses linear
+interpolation and rate/root-note mapping, without band-limited conversion or
+automatic loop crossfades. Mono samples broadcast, mono output averages sample
+channels, multichannel output retains matching channels and zero-fills extras.
+`SynthVoiceRenderer<T>` borrows noexcept start/stop/render callbacks and context,
+with one mono scratch block and per-voice index/identity/expression. CyDSP applies
+ADSR/velocity/pan afterwards. Callbacks must obey the audio memory/locking contract.
+Renderer errors may leave earlier voices mixed into output.
+
+SetSample/setRenderer/setMpeZones require idle voices and control serialization.
+Parameters are block-boundary edits; envelopes and stealing storage are retained.
+MIDI1/MPE supports pitch/pressure/timbre/pedals plus volume/pan. UMP synthesis handles
+16 groups, high-resolution velocity, pitch attributes, channel/per-note expression,
+selected registered note pitch and sustain. Other instrument/controller policy
+belongs to the host/custom voice. Synthesizer is a signal engine, not a preset bank.
+
+## Sources, transport and worker I/O
+
+`AudioSource<T>` exposes immutable rate/channel/frame info and random readAt. Its
+callback contract is no I/O, allocation or locks, exact framesRead and zero tail.
+`MemoryAudioSource<T>` borrows immutable planar samples; lifetime includes their
+channel pointer table. All source/output aliasing is rejected before writes.
+
+`AudioTransport<T>` borrows a source of matching rate/channels. A single control
+producer enqueues play/pause/stop/seek/loop; the audio consumer applies commands
+at callback boundaries. Loops split inside callbacks at exact frame endpoints.
+Stop resets to frame zero, pause retains position; a loop starts playback inside
+its configured range. EOF stops. would_block increments underruns; hold retains
+the unfilled timeline, silenceAndAdvance skips it. position returns a coherent
+bounded-retry atomic snapshot or transition_in_progress. reset requires idle
+control publication and retains source/loop/storage. There is no thread join.
+`TempoMap` prepares piecewise tempo/signature points, integrates beat/frame and
+preserves bar phase across tempo changes; signature changes begin a new bar.
+Beat is a quarter note and bar is zero-based. Frame precision is limited to 2^53-1.
+
+Link `CyDSP::Sources` (requires Files/Threads) for `ReadAheadSource<T>` and
+`BackgroundRecorder<T>`. Sources owns its dedicated file workers. Prepare/open,
+prefill, close, finish, moves and destruction are control-thread operations; stop
+audio use before them. readAt/push are each single-consumer/producer audio APIs.
+The workers poll bounded SPSC queues; audio calls never wait or notify a condition.
+ReadAhead prepares 2..128 pages of 1..65536 frames, reports misses as would_block
+and discards stale seek epochs. It converts integer source rates to output rates
+1..768000 Hz using shared 64-tap/1024-phase centered SincInterpolator. Rate 0 uses
+the source rate. Very large ratios needing over 1048576 input frames per page are
+rejected. prefill initiates a seek and may wait up to its timeout while audio is idle.
+
+`SincInterpolator<T>` also provides centered random-access processing directly;
+prepare its fixed ratio/cutoff/table, supply documented left/right input context
+and zero padding at finite boundaries. It reuses windowed-sinc design and mixed
+SIMD dots. This API reports no streaming latency; it needs future input context.
+ReadAhead supplies that context and maps absolute seek times without adding delay.
+
+BackgroundRecorder copies whole prepared blocks or returns update_queue_full.
+The host chooses drop/retry policy; audio must not retry in a wait loop. finish
+after producer idle drains the final publication, joins the worker and finalizes
+the header, returning the I/O status. Reprepare while active is rejected. Export
+format/encoding limits match AudioFileWriter. The recorder opens no microphone.
+
+The [DAW example](../examples/DawBuildingBlocks.cpp) composes these original APIs
+without borrowing code from an existing DAW. The optional Plugins target supplies original CLAP/VST3 host/editor and worker interfaces; see [Plugin hosting](Plugins.md).
+
+## Prepared MIDI-CI property service
+
+CiPropertyStore composes MidiCiDevice with generated ResourceList/DeviceInfo/
+ChannelList/JSONSchema, custom fixed resId instances, full/partial SET, paginated
+lists and acknowledged notify/full/partial subscriptions. A retained JSON tree/
+pointer workspace performs bounded edits and list selection. All resource/reply
+payloads and workspaces are allocated during preparation.
+
+CiPropertyClient composes the same core with a bounded TTL cache, per-entry
+generations, transaction slots and ACK FIFO. Older GETs cannot replace newer
+pushed data. Store/client callbacks stay on the serialized control owner and
+communicate with audio through existing prepared queues. Unicode/JSON/header
+validation and PE Notify semantics share the portable core.
+See [Property Exchange](CiProperty.md) for baseline recovery, routing, capacities,
+callback lifetime, transactional mutation and remaining platform acceptance.
+
+The [DAW integration contracts](DawIntegration.md) describe the additional filter designs/windows/interpolators, synthesis/presets, worker playback/assets, managers/clock collector, UMP/controllers/profiles and AIFC/CAF/native codecs.
+
+
+## Integration remediation APIs
+
+AudioMetadata provides typed versioned markers/regions/loops/tags and preserves
+native unknown chunks. EditingPcmProxy provides bounded persistent PCM editing.
+AudioDevice capabilities/descriptions/selectors and extended callback contexts
+make negotiated/known/unknown/clock fields explicit. MidiInputBank/MidiInputGroup
+supply per-port ownership, flexible SysEx and disconnect epochs/voice release.
+ReadAheadSource policies/SourceTimeMap/providers expose curve/seek/tail semantics.
+See [DAW contracts](DawIntegration.md) and [plugin hosts/editors](Plugins.md).

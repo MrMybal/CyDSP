@@ -57,6 +57,13 @@ template <Sample T>
     requires(!std::is_const_v<T>)
 [[nodiscard]] Status validateProcessBlocks(const ProcessSpec&, AudioBlock<const T>,
                                            AudioBlock<T>) noexcept;
+// Independently sized blocks: reject every source/destination overlap before any write.
+template <Sample T>
+[[nodiscard]] Status validateDisjointBlocks(AudioBlock<const T>, AudioBlock<T>) noexcept;
+extern template Status validateDisjointBlocks<float>(AudioBlock<const float>,
+                                                     AudioBlock<float>) noexcept;
+extern template Status validateDisjointBlocks<double>(AudioBlock<const double>,
+                                                      AudioBlock<double>) noexcept;
 extern template Status validateProcessBlocks<float>(const ProcessSpec&, AudioBlock<const float>,
                                                     AudioBlock<float>) noexcept;
 extern template Status validateProcessBlocks<double>(const ProcessSpec&, AudioBlock<const double>,

@@ -1,0 +1,625 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License
+// ============================================================================
+// This is part of the Windows MIDI Services App API and should be used
+// in your Windows application via an official binary distribution.
+// Further information: https://aka.ms/midi
+// ============================================================================
+
+import "unknwn.idl";
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+// Include sw def's and dev prop def's for IDL compiling, but
+// leaving them for clients will result in duplicate definitions.
+cpp_quote("#ifdef MIDL_PASS")
+#define PCWSTR LPCWSTR
+#define PCZZWSTR LPCWSTR
+#include "specstrings.h"
+#include "swdevicedef.h"
+#include "devpropdef.h"
+cpp_quote("#else")
+cpp_quote("#include <swdevicedef.h>")
+cpp_quote("#include <devpropdef.h>")
+cpp_quote("#endif")
+
+// Enumeration of midi data formats. These are used to communicate both a requested format, and the negotiated format.
+typedef enum
+{
+    MidiDataFormats_Invalid = 0,
+    MidiDataFormats_ByteStream = 0x1,
+    MidiDataFormats_UMP = 0x2,
+    MidiDataFormats_Any = 0xFFFFFFFF
+} MidiDataFormats;
+
+// Enumeration to communicate the direction of flow of midi data, with respect to the midi peripheral.
+typedef enum
+{
+    MidiFlowIn = 0,
+    MidiFlowOut,
+    MidiFlowBidirectional
+} MidiFlow;
+
+typedef enum
+{
+    MetadataFlags_None = 0,
+    MetadataFlags_IsRuntimeCreatableByApps = 1,
+    MetadataFlags_IsRuntimeCreatableBySettings = 2,
+    MetadataFlags_IsSystemManaged = 4,
+    MetadataFlags_IsClientConfigurable = 8
+} MetadataFlags;
+
+typedef enum
+{
+    MessageOptionFlags_None = 0,
+    MessageOptionFlags_WaitForSendComplete = 1,
+    MessageOptionFlags_ContextContainsGroupIndex = 2,
+    MessageOptionFlags_CallbackRetry = 4,
+    MessageOptionFlags_SeparateUMPs = 8,
+    MessageOptionFlags_HasRunningStatus = 16
+} MessageOptionFlags;
+
+cpp_quote("#define MessageOptionFlags_Valid 0x0000001F")
+
+// Structure used during transport initialization to communicate format information and other configuration
+typedef struct
+{
+    MessageOptionFlags MessageOptions;
+    MidiDataFormats DataFormat;
+    GUID CallingComponent;
+} TRANSPORTCREATIONPARAMS, * PTRANSPORTCREATIONPARAMS;
+
+
+// This serves as the starting point for activating the various other methods implemented by the transport layer. 
+[
+    object,
+    local,
+    uuid(EA264200-3328-49E5-8815-73649A8748BE)
+]
+interface IMidiTransport : IUnknown
+{
+    HRESULT Activate(
+        [in, annotation("_In_")] REFIID iid,
+        [out, iid_is(iid), annotation("_COM_Outptr_")] void** activatedInterface
+    );
+};
+
+// ============================================================================================
+// Endpoint types: In/Out/Bidirectional and the Callback
+
+// Used for sending data from an transport to the client using the transport.
+// Also used in transforms.
+// Due to this usage, data flowing through IMidiCallback may be MidiIn data, or MidiOut data.
+//
+// The format of the data sent in the callback is determined by the initialization of the MidiTransport,
+// or MidiTransform that is performing the callback. 
+//
+// The position is specified as either 0, or a QPC.
+// Usage of the position depends upon the context of the callback, whether MidiIn or MidiOut.
+// For MidiIn, the position should be the QPC at the time the midi message was received from the transport, or 
+// the QPC when it was first received by the service.
+// For MidiOut, the position should either be 0 indicating that it should be delivered immediately, or the QPC 
+// that it should be delivered at for scheduled playback.
+//
+// context will typically contain the value provided at initialization time, however in some situations internal in
+// the midi service, with midi transforms, the context is defined to contain the group index for the midi data.
+[
+    object,
+        local,
+        uuid(4D6A29E5-DF4F-4A2D-A923-9B23B3F2D6F6)
+]
+interface IMidiCallback : IUnknown
+{
+    HRESULT Callback(
+        [in, annotation("_In_")] MessageOptionFlags optionFlags,
+        [in, annotation("_In_")] PVOID message,
+        [in, annotation("_In_")] UINT size,
+        [in, annotation("_In_")] LONGLONG position,
+        [in, annotation("_In_")] LONGLONG context
+    );
+};
+
+// Represents a MidiIn transport instance, which is used to move data from a peripheral to the client
+// using the transport.
+[
+    object,
+        local,
+        uuid(6C4B8BF9-8133-4B41-8303-1FDE78E20ACA)
+]
+interface IMidiIn : IUnknown
+{
+    HRESULT Initialize(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] PTRANSPORTCREATIONPARAMS creationParams,
+        [in, out, annotation("_Inout_")] DWORD* mmcssTaskId,
+        [in, annotation("_In_")] IMidiCallback* callback,
+        [in, annotation("_In_")] LONGLONG context,
+        [in, annotation("_In_")] GUID sessionId
+
+    );
+
+    HRESULT Shutdown();
+};
+
+// Represents a MidiOut transport instance, which is used to move data from a client to the transport
+[
+    object,
+    local,
+    uuid(F328D645-7D6D-4924-A7E3-9DEE245189F9)
+]
+interface IMidiOut : IUnknown
+{
+    HRESULT Initialize(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] PTRANSPORTCREATIONPARAMS creationParams,
+        [in, annotation("_In_")] DWORD* mmcssTaskId,
+        [in, annotation("_In_")] GUID sessionId
+    );
+
+    HRESULT Shutdown();
+
+    // The format of the data sent through SendMidiMessage is determined by the creationParams provided
+    // during IMidiOut initialization.
+    //
+    // The position is specified as either 0, or a QPC.
+    // The position should either be 0 indicating that it should be delivered immediately, or the QPC 
+    // that it should be delivered at for scheduled playback.
+    HRESULT SendMidiMessage(
+        [in, annotation("_In_")] MessageOptionFlags optionFlags,
+        [in, annotation("_In_")] PVOID message,
+        [in, annotation("_In_")] UINT size,
+        [in, annotation("_In_")] LONGLONG position
+    );
+};
+
+// Represents a bidirectional midi connection, which is used to move data both to and from the midi 
+// transport. This is the primary interface for MIDI 2.0 endpoint communication.
+[
+    object,
+    local,
+    uuid(B89BBB45-7001-4BEA-BBD8-C7CC26E7836C)
+]
+interface IMidiBidirectional : IUnknown
+{
+    HRESULT Initialize(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] PTRANSPORTCREATIONPARAMS creationParams,
+        [in, out, annotation("_Inout_")] DWORD* mmcssTaskId,
+        [in, annotation("_In_")] IMidiCallback* callback,
+        [in, annotation("_In_")] LONGLONG context,
+        [in, annotation("_In_")] GUID sessionId
+    );
+
+    HRESULT Shutdown();
+
+    // The format of the data sent through SendMidiMessage is determined by the creationParams provided
+    // during IMidiBidirectional initialization.
+    //
+    // The position is specified as either 0, or a QPC.
+    // The position should either be 0 indicating that it should be delivered immediately, or the QPC 
+    // that it should be delivered at for scheduled playback.
+    HRESULT SendMidiMessage(
+        [in, annotation("_In_")] MessageOptionFlags optionFlags,
+        [in, annotation("_In_")] PVOID message,
+        [in, annotation("_In_")] UINT size,
+        [in, annotation("_In_")] LONGLONG position
+    );
+};
+
+// ============================================================================================
+// Endpoint management
+
+// These must align to the WinRT MidiEndpointDevicePurpose enum, which is part of the public nuget
+// package.
+typedef enum
+{
+    MidiEndpointDeviceType_Normal = 0,
+    MidiEndpointDeviceType_VirtualDeviceResponder = 100,
+    MidiEndpointDeviceType_MidiSynthesizer = 400,
+    MidiEndpointDeviceType_DiagnosticLoopback = 500,
+    MidiEndpointDeviceType_DiagnosticPing = 510,
+} MidiEndpointDeviceType;
+
+typedef enum
+{
+    MidiEndpointCapabilities_None = 0,
+    MidiEndpointCapabilities_SupportsMidi1Protocol = 1,
+    MidiEndpointCapabilities_SupportsMidi2Protocol = 2,
+    MidiEndpointCapabilities_SupportsMultiClient = 4,
+    MidiEndpointCapabilities_GenerateIncomingTimestamps = 8
+} MidiEndpointCapabilities;
+
+// Used during endpoint creation to communicate common midi endpoint properties.
+typedef struct
+{
+    GUID TransportId;
+    MidiEndpointDeviceType EndpointDeviceType;
+
+    LPCWSTR FriendlyName;
+
+    // a two to four character "code" used to identify the transport as part of
+    // the SWD creation string. New transports should avoid using codes already in use by other
+    // transports, however two or more transports using the same code will not cause functional problems.
+    LPCWSTR TransportCode;
+    LPCWSTR EndpointName;
+    LPCWSTR EndpointDescription;
+
+    LPCWSTR CustomEndpointName;
+    LPCWSTR CustomEndpointDescription;
+
+    // Contents varies by transport, contains a unique identifier that is repeatable
+    // for this endpoint on this transport, possibly a guid or peripheral serial number.
+    // This value does not have to be globally unique across all transports.
+    LPCWSTR UniqueIdentifier;
+    LPCWSTR ManufacturerName;
+
+    MidiDataFormats SupportedDataFormats;
+    MidiDataFormats NativeDataFormat;
+
+    MidiEndpointCapabilities Capabilities;
+} MIDIENDPOINTCOMMONPROPERTIES, * PMIDIENDPOINTCOMMONPROPERTIES;
+
+// Used for communicating midi endpoint information from an transport to MidiSrv, for publishing the SWD's which represent
+// the endpoint(s) and are enumerated by client applications.
+[
+    object,
+    local,
+    uuid(A04374D3-4514-44E1-A2F9-7D8B907AEF1F)
+]
+interface IMidiDeviceManager : IUnknown
+{
+    HRESULT ActivateVirtualParentDevice(
+        [in, annotation("_In_")] ULONG devPropertyCount,
+        [in, size_is(devPropertyCount), annotation("_In_opt_")] const DEVPROPERTY* devProperties,
+        [in] const SW_DEVICE_CREATE_INFO* createInfo,
+        [out, string, annotation("_Out_opt_")] LPWSTR* createdDeviceId
+    );
+
+    HRESULT DeactivateVirtualParentDevice(
+        [in, string, annotation("_In_")] LPCWSTR instanceId
+    );
+
+    HRESULT ActivateEndpoint(
+        [in, string, annotation("_In_")] LPCWSTR parentInstanceId,
+        [in, annotation("_In_")] BOOL umpOnly,
+        [in, annotation("_In_")] MidiFlow midiFlow,
+        [in, annotation("_In_")] const PMIDIENDPOINTCOMMONPROPERTIES commonProperties,
+        [in, annotation("_In_")] ULONG intPropertyCount,
+        [in, annotation("_In_")] ULONG devPropertyCount,
+        [in, size_is(intPropertyCount), annotation("_In_opt_")] const DEVPROPERTY* interfaceDevProperties,
+        [in, size_is(devPropertyCount), annotation("_In_opt_")] const DEVPROPERTY* deviceDevProperties,
+        [in, annotation("_In_opt_")] const SW_DEVICE_CREATE_INFO* createInfo,
+        [out, string, annotation("_Out_opt_")] LPWSTR* createdEndpointDeviceInterfaceId
+    );
+
+    HRESULT UpdateEndpointProperties(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] ULONG intPropertyCount,
+        [in, size_is(intPropertyCount), annotation("_In_")] const DEVPROPERTY* interfaceDevProperties
+    );
+
+    HRESULT DeleteEndpointProperties(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] ULONG devPropertyCount,
+        [in, size_is(devPropertyCount), annotation("_In_opt_")] const DEVPROPERTY* devPropKeys
+    );
+
+    HRESULT DeactivateEndpoint(
+        [in, string, annotation("_In_")] LPCWSTR instanceId
+    );
+
+    HRESULT RemoveEndpoint(
+        [in, string, annotation("_In_")] LPCWSTR instanceId
+    );
+
+    HRESULT RebuildMidi1PortsForEndpoint(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId
+    );
+
+
+
+    // Update the configuration for a transport  or endpoints managed by that transport 
+    HRESULT UpdateTransportConfiguration(
+        [in, annotation("_In_")] GUID transportId,
+        [in, string, annotation("_In_")] LPCWSTR configurationJson,
+        [out, string, annotation("_Out_")] LPWSTR* responseJson
+    );
+
+};
+
+// ============================================================================================
+// Service (and Transport/Transform) Configuration
+
+// Provides common functionality implemented in the service, and used by transports and transforms
+[
+    object,
+    local,
+    uuid(6c21fcda-051b-4f06-8d40-f5bced5957c0)
+]
+interface IMidiServiceConfigurationManager : IUnknown
+{
+    // these parse provided json
+
+    HRESULT GetTransportCreateActionEntry(
+        [in, string, annotation("_In_")] LPCWSTR sourceTransportJson,
+        [out, string, annotation("_Out_")] LPWSTR* responseJson
+    );
+
+    HRESULT GetTransportUpdateActionEntry(
+        [in, string, annotation("_In_")] LPCWSTR sourceTransportJson,
+        [out, string, annotation("_Out_")] LPWSTR* responseJson
+    );
+
+    HRESULT GetTransportRemoveActionEntry(
+        [in, string, annotation("_In_")] LPCWSTR sourceTransportJson,
+        [out, string, annotation("_Out_")] LPWSTR* responseJson
+    );
+
+};
+
+// Used for sending configuration information to the transport from a client (for runtime updates) 
+// or from the device manager in the service (for global configuration file updates), which may 
+// affect the published endpoints
+[
+    object,
+    local,
+    uuid(f19dd642-1809-4497-9eee-f230b11bd6fb)
+]
+interface IMidiTransportConfigurationManager : IUnknown
+{
+    HRESULT Initialize(
+        [in, annotation("_In_")] GUID transportId,
+        [in, annotation("_In_opt_")] IMidiDeviceManager* midiDeviceManager,
+        [in, annotation("_In_opt_")] IMidiServiceConfigurationManager* midiServiceConfigurationManager
+    );
+
+    HRESULT UpdateConfiguration(
+        [in, string, annotation("_In_")] LPCWSTR configurationJsonSection,
+        [out, string, annotation("_Out_")] LPWSTR* responseJson
+    );
+
+    HRESULT Shutdown();
+};
+
+
+
+// ============================================================================================
+// Message transformation
+
+// Configuration parameters for initializing the transform
+// For transforms that change the data format, the in and out
+// data formats are needed.
+// Conversion between UMP and Bytestream also requires a group index
+// for targeting/filtering the messages.
+typedef struct
+{
+    MidiDataFormats DataFormatIn;
+    MidiDataFormats DataFormatOut;
+    BYTE UmpGroupIndex;
+} TRANSFORMCREATIONPARAMS, * PTRANSFORMCREATIONPARAMS;
+
+// All MidiTransform COM components implement the IMidiTransform interface, which contains
+// only a single Activate method. This serves as the starting point for activating the various
+// other methods implemented by the transforms
+[
+    object,
+        local,
+        uuid(65FA86A4-0433-4DCD-88E4-E565051CAB2D)
+]
+interface IMidiTransform : IUnknown
+{
+    HRESULT Activate(
+        [in, annotation("_In_")] REFIID iid,
+        [out, iid_is(iid), annotation("_COM_Outptr_")] void** activatedInterface
+    );
+};
+
+// Represent a midi transform operation which is happening on a stream of midi data
+[
+    object,
+        local,
+        uuid(5D2400F0-F2EE-4A51-A3BE-0AC9A19C09C4)
+]
+interface IMidiDataTransform : IUnknown
+{
+    HRESULT Initialize(
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] PTRANSFORMCREATIONPARAMS creationParams,
+        [in, out, annotation("_Inout_")] DWORD* mmcssTaskId,
+        [in, annotation("_In_")] IMidiCallback* callback,
+        [in, annotation("_In_")] LONGLONG context,
+        [in, annotation("_In_")] IMidiDeviceManager* midiDeviceManager
+    );
+
+    HRESULT Shutdown();
+
+    HRESULT SendMidiMessage(
+        [in, annotation("_In_")] MessageOptionFlags optionFlags,
+        [in, annotation("_In_")] PVOID message,
+        [in, annotation("_In_")] UINT size,
+        [in, annotation("_In_")] LONGLONG position
+    );
+};
+
+
+
+// ============================================================================================
+// MIDI 2.0 Endpoint Discovery and Protocol Negotiation
+
+// The service's input into the protocol negotiation process for a single endpoint
+typedef struct
+{
+    BOOL PreferToSendJitterReductionTimestampsToEndpoint;
+    BOOL PreferToReceiveJitterReductionTimestampsFromEndpoint;
+    BYTE PreferredMidiProtocol;
+} ENDPOINTPROTOCOLNEGOTIATIONPARAMS, *PENDPOINTPROTOCOLNEGOTIATIONPARAMS;
+
+// Endpoint transports for MIDI 2.0 devices need to access the protocol 
+// manager in the service. This interface facilitates that.
+[
+    object,
+    local,
+    uuid(7a3def20-fb76-49b6-a3a0-3dcbcda8f482)
+]
+interface IMidiEndpointProtocolManager : IUnknown
+{
+    HRESULT DiscoverAndNegotiate(
+        [in, annotation("_In_")] GUID transportId,
+        [in, string, annotation("_In_")] LPCWSTR endpointDeviceInterfaceId,
+        [in, annotation("_In_")] ENDPOINTPROTOCOLNEGOTIATIONPARAMS negotiationParams
+    );
+
+    BOOL IsEnabled();
+
+};
+
+// ============================================================================================
+// Endpoint manager in the service
+
+
+// IMidiEndpointManager is implemented by midi endpoint transports, and is called by MidiSrv 
+// during service startup to allow the endpoint transport to coordinate with MidiSrv for 
+// configuring and publishing midi endpoints.
+[
+    object,
+    local,
+    uuid(badff6d2-0e3c-4009-a473-6ba82c008662)
+]
+interface IMidiEndpointManager : IUnknown
+{
+    HRESULT Initialize(
+        [in, annotation("_In_")] IMidiDeviceManager* midiDeviceManager,
+        [in, annotation("_In_")] IMidiEndpointProtocolManager* midiEndpointProtocolManager
+    );
+
+    HRESULT Shutdown();
+};
+
+// ============================================================================================
+// Service Plugin Reporting
+
+// Information provided by the transport to self-identify itself to the user. This 
+// information is supplied through the diagnostics and reporting SDK primarily to the MIDI 
+// Settings and MIDI Console apps. 
+typedef struct
+{
+    GUID TransportId;
+    // a two to four character "code" used to identify the transport as part of
+    // the SWD creation string. New transports should avoid using codes already in use by other
+    // transports, however two or more transports using the same code will not cause functional problems.
+    LPWSTR TransportCode;
+    LPWSTR Name;
+    LPWSTR Description;
+    LPWSTR Author;
+    LPWSTR SmallImagePath;
+    LPWSTR Version;
+    MetadataFlags Flags;
+} TRANSPORTMETADATA, * PTRANSPORTMETADATA;
+
+
+// Information provided by the transform to self-identify itself to the user. This 
+// information is supplied through the diagnostics and reporting SDK primarily to 
+// the MIDI Settings and MIDI Console apps. 
+typedef struct
+{
+    GUID TransformId;
+    LPWSTR Name;
+    LPWSTR Description;
+    LPWSTR Author;
+    LPWSTR SmallImagePath;
+    LPWSTR Version;
+    MetadataFlags Flags;
+} TRANSFORMMETADATA, * PTRANSFORMMETADATA;
+
+// Interface used to obtain the transport metadata for reporting to the user. 
+// This is implemented by each transport in the service.
+[
+    object,
+    local,
+    uuid(8d542740-83f8-4a9a-8627-cd6324b6c1f4)
+]
+interface IMidiServiceTransportPluginMetadataProvider : IUnknown
+{
+    HRESULT Initialize();
+
+    HRESULT GetMetadata(
+        [out, annotation("_Out_")] PTRANSPORTMETADATA metadata
+    );
+
+    HRESULT Shutdown();
+};
+
+// Interface used to obtain the transform metadata for reporting to the user. 
+// This is implemented by each transform in the service.
+[
+    object,
+        local,
+        uuid(76c65f88-061f-4e4f-bb9d-3ac1981f12f2)
+]
+interface IMidiServiceTransformPluginMetadataProvider : IUnknown
+{
+    HRESULT Initialize();
+
+    HRESULT GetMetadata(
+        [out, annotation("_Out_")] PTRANSFORMMETADATA metadata
+    );
+
+    HRESULT Shutdown();
+};
+
+// Used by the client to request the transport and transform metadata.
+[
+    object,
+        local,
+        uuid(469c7722-f779-40c3-b648-52620f75dcee)
+]
+interface IMidiServicePluginMetadataReporter : IUnknown
+{
+    HRESULT GetTransportList(
+        [out, string, annotation("_Out_")] LPWSTR* transportListJson);
+
+    HRESULT GetTransformList(
+        [out, string, annotation("_Out_")] LPWSTR* transformListJson);
+
+};
+
+
+
+// ============================================================================================
+// Session Tracking / Reporting
+
+// Used to register client API sessions so that a user may have visibility into which 
+// application is using which devices.
+// This is a bookkeeping class. It tracks only. It does not own the lifetime of any of the items it tracks.
+[
+    object,
+        local,
+        uuid(194c2746-3ae5-419a-94d9-20416c7dbefe)
+]
+interface IMidiSessionTracker : IUnknown
+{
+    HRESULT Initialize();
+
+    HRESULT AddClientSession(
+        [in, annotation("_In_")] GUID sessionId,
+        [in, string, annotation("_In_")] LPCWSTR sessionName
+    );
+
+    HRESULT UpdateClientSessionName(
+        [in, annotation("_In_")] GUID sessionId,
+        [in, string, annotation("_In_")] LPCWSTR sessionName
+    );
+
+    HRESULT RemoveClientSession(
+        [in, annotation("_In_")] GUID sessionId
+    );
+
+    HRESULT GetSessionList(
+        [out, string, annotation("_Out_")] LPWSTR* sessionDetailsList);
+
+    HRESULT Shutdown();
+
+    // required to ensure demand-start service is running before clients try to enumerate endpoints
+    BOOL VerifyConnectivity();
+};

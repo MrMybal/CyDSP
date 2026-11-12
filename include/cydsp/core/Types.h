@@ -23,7 +23,15 @@ enum class Status {
     allocation_failed,
     transition_in_progress,
     end_of_stream,
-    update_queue_full
+    update_queue_full,
+    io_error,
+    unsupported_format,
+    device_unavailable,
+    would_block,
+    timed_out,
+    ambiguous,
+    incompatible_version,
+    disconnected
 };
 struct ProcessSpec {
     double sampleRate = 48000.0;

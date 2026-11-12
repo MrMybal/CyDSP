@@ -1,3 +1,8 @@
+void variableSincRealtimeRegression();
+void dawMidiRegression();
+void dawExpansionRegression();
+void ciAdvancedRegression();
+void ciPropertyRegression();
 #include <array>
 #include <cmath>
 #include <complex>
@@ -172,8 +177,67 @@ void realtimeRegression();
 void optimizationRegression();
 void schedulingRegression();
 void matrixSchedulingRegression();
-int main() {
+void expandedRegression();
+void midi2ProtocolRegression();
+#if defined(CYDSP_TEST_IO)
+void midi2NativeRegression();
+#endif
+void dawRegression();
+#if defined(CYDSP_TEST_SOURCES)
+void sourcesRegression();
+void sourcePolicyRegression();
+#endif
+#if defined(CYDSP_TEST_IO)
+void ioRegression();
+void dawFilesRegression();
+void metadataRegression();
+void pcmProxyRegression();
+void midiInputContractsRegression();
+void deviceContractsRegression();
+#endif
+#if defined(CYDSP_TEST_PLUGINS)
+void pluginRegression(const std::filesystem::path&);
+void vstPluginRegression(const std::filesystem::path&);
+void pluginWorkerRegression(const std::filesystem::path&);
+#endif
+int main(int, char** argv) {
     try {
+        ciPropertyRegression();
+        ciAdvancedRegression();
+        dawExpansionRegression();
+        dawMidiRegression();
+        midi2ProtocolRegression();
+        std::cout << "PASS MIDI-CI/UMP negotiation/profiles/properties\n";
+#if defined(CYDSP_TEST_IO)
+        midi2NativeRegression();
+        std::cout << "PASS native UMP queues/bridges\n";
+#endif
+        dawRegression();
+        std::cout << "PASS integrated FFT/synthesis/MPE/UMP/transport\n";
+#if defined(CYDSP_TEST_SOURCES)
+        sourcesRegression();
+        sourcePolicyRegression();
+        std::cout << "PASS read-ahead/resampled seeks/background recording\n";
+#endif
+        expandedRegression();
+        std::cout << "PASS expanded DSP/MIDI/SMF/SPSC/realtime contracts\n";
+#if defined(CYDSP_TEST_IO)
+        deviceContractsRegression();
+        midiInputContractsRegression();
+        pcmProxyRegression();
+        metadataRegression();
+        dawFilesRegression();
+        ioRegression();
+        std::cout << "PASS audio formats/virtual devices/pitch-time\n";
+#endif
+#if defined(CYDSP_TEST_PLUGINS)
+        pluginRegression(std::filesystem::path(argv[0]).parent_path());
+        vstPluginRegression(std::filesystem::path(argv[0]).parent_path());
+        pluginWorkerRegression(std::filesystem::path(argv[0]).parent_path());
+#else
+        (void)argv;
+#endif
+        variableSincRealtimeRegression();
         realtimeRegression();
         std::cout << "PASS zero allocations/frees in prepared processing/reset\n";
         schedulingRegression();

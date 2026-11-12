@@ -5,6 +5,10 @@
 #include <chrono>
 #include <cmath>
 #include <cydsp/CyDSP.h>
+#if defined(CYDSP_MEASURE_STRETCH)
+#include "detail/StretchAlgorithm.h"
+#include <signalsmith-stretch.h>
+#endif
 #include <iomanip>
 #include <iostream>
 #include <numbers>
@@ -742,11 +746,224 @@ template <class T> void scheduledQuality() {
             << error << "}";
     }
 }
+template <class T> void expandedMeasurements() {
+    const ProcessSpec spec{48000, 128, 2};
+    AudioBuffer<T> input, output;
+    require(input.resize(2, 128) == Status::ok && output.resize(2, 128) == Status::ok);
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        std::fill(input.block().channel(ch).begin(), input.block().channel(ch).end(), T{.125});
+    const auto* type = std::same_as<T, float> ? "float" : "double";
+    auto measure = [&](const char* name, auto& processor) {
+        require(processor.prepare(spec) == Status::ok);
+        bench(name, type, CpuBackend::scalar, 128, 2, [&] {
+            require(processor.process(input.block(), output.block()) == Status::ok);
+            sink = output.block().channel(0)[127];
+        });
+    };
+    Dynamics<T> dynamics;
+    measure("dynamicsCompressor", dynamics);
+    TptFilter<T> filter;
+    measure("stateVariableTpt", filter);
+    LadderFilter<T> ladder;
+    measure("ladderLowpass", ladder);
+    Chorus<T> chorus;
+    measure("chorus", chorus);
+    Phaser<T> phaser;
+    measure("phaser", phaser);
+    Reverb<T> reverb;
+    measure("schroederReverb", reverb);
+    Oversampler<T> over;
+    require(over.prepare(spec, 4) == Status::ok);
+    bench("oversample4Roundtrip", type, CpuBackend::automatic, 4, 2, [&] {
+        AudioBlock<T> high;
+        require(over.processUp(input.block(), high) == Status::ok &&
+                over.processDown(output.block()) == Status::ok);
+        sink = output.block().channel(0)[127];
+    });
+    // Third harmonic of 9.6 kHz aliases to 19.2 kHz without oversampling.
+    over.reset();
+    std::complex<double> alias{};
+    double phase = 0;
+    std::size_t count = 0;
+    for (unsigned block = 0; block < 400; ++block) {
+        for (std::size_t i = 0; i < 128; ++i) {
+            const auto x = static_cast<T>(.8 * std::sin(phase));
+            phase += 2 * std::numbers::pi * .2;
+            if (phase >= 2 * std::numbers::pi)
+                phase -= 2 * std::numbers::pi;
+            input.block().channel(0)[i] = input.block().channel(1)[i] = x;
+        }
+        AudioBlock<T> high;
+        require(over.processUp(input.block(), high) == Status::ok);
+        for (std::size_t ch = 0; ch < 2; ++ch)
+            for (auto& x : high.channel(ch))
+                x = x * x * x;
+        require(over.processDown(output.block()) == Status::ok);
+        if (block >= 20)
+            for (std::size_t i = 0; i < 128; ++i) {
+                alias += static_cast<double>(output.block().channel(0)[i]) *
+                         std::polar(1.0, -2 * std::numbers::pi * .4 * static_cast<double>(count++));
+            }
+    }
+    const auto amplitude = 2 * std::abs(alias) / static_cast<double>(count),
+               reference = std::pow(.8, 3) / 4,
+               db = 20 * std::log10(std::max(1e-20, amplitude / reference));
+    require(db < -40);
+    separator();
+    std::cout << "{\"kind\":\"quality\",\"metric\":\"oversamplingCubicAliasReductionDb\","
+                 "\"sampleType\":\""
+              << type
+              << "\",\"factor\":4,\"sampleRate\":48000,\"inputFrequencyHz\":9600,"
+                 "\"aliasFrequencyHz\":19200,\"latencyFrames\":"
+              << over.latencyFrames() << ",\"value\":" << db << "}";
+}
+template <class T> void dawMeasurements() {
+    const char* type = std::same_as<T, float> ? "float" : "double";
+    VectorOps selected;
+    require(VectorOps::create(CpuBackend::automatic, selected) == Status::ok);
+    const auto backend = selected.backend();
+    AudioBuffer<T> input, output;
+    require(input.resize(2, 1024) == Status::ok && output.resize(2, 128) == Status::ok);
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        for (std::size_t i = 0; i < 1024; ++i)
+            input.block().channel(ch)[i] = static_cast<T>(
+                .2 * std::sin(.13 * static_cast<double>(i) + static_cast<double>(ch)));
+    SincInterpolator<T> sinc;
+    require(sinc.prepare({44100, 128, 2}, 48000, 64, 1024, backend) == Status::ok);
+    bench("randomAccessSinc128", type, backend, 64, 2, [&] {
+        require(sinc.process(input.block(), 64.375, output.block()) == Status::ok);
+        sink = output.block().channel(0)[127];
+    });
+    for (std::size_t voices : {16u, 64u}) {
+        Synthesizer<T> synth;
+        require(synth.prepare({48000, 128, 2}, voices, backend) == Status::ok);
+        SynthParameters p;
+        p.envelope = {0, 0, 1, .1};
+        require(synth.setParameters(p) == Status::ok);
+        MidiBuffer notes;
+        require(notes.prepare(voices, voices * 3) == Status::ok);
+        for (std::size_t i = 0; i < voices; ++i) {
+            const auto note = midiNoteOn(1, 36 + static_cast<unsigned>(i), 100);
+            require(notes.add(0, note.bytes()) == Status::ok);
+        }
+        require(synth.process(output.block(), &notes) == Status::ok);
+        bench("polyphonicSynth128", type, backend, voices, 2, [&] {
+            require(synth.process(output.block()) == Status::ok);
+            sink = output.block().channel(0)[127];
+        });
+    }
+#if defined(CYDSP_MEASURE_STRETCH)
+    signalsmith::stretch::SignalsmithStretch<T> original(1);
+    detail::StretchAlgorithm<T> integrated(1);
+    integrated.select(backend);
+    original.configure(2, 4096, 1024, false);
+    integrated.configure(2, 4096, 1024, false);
+    const T* in[]{input.block().channel(0).data(), input.block().channel(1).data()};
+    T* out[]{output.block().channel(0).data(), output.block().channel(1).data()};
+    bench("stretchOriginal4096", type, CpuBackend::scalar, 4096, 2, [&] {
+        original.process(in, 128, out, 128);
+        sink = out[0][127];
+    });
+    bench("stretchCyDSP4096", type, backend, 4096, 2, [&] {
+        integrated.process(in, 128, out, 128);
+        sink = out[0][127];
+    });
+    // Typical preset as a separate comparison: FFT padding may differ from upstream.
+    original.presetDefault(2, T{48000}, true);
+    integrated.presetDefault(2, T{48000}, true);
+    bench("stretchOriginalPreset", type, CpuBackend::scalar,
+          static_cast<std::size_t>(original.blockSamples()), 2, [&] {
+              original.process(in, 128, out, 128);
+              sink = out[0][127];
+          });
+    bench("stretchCyDSPPreset", type, backend, static_cast<std::size_t>(integrated.blockSamples()),
+          2, [&] {
+              integrated.process(in, 128, out, 128);
+              sink = out[0][127];
+          });
+#endif
+}
+
+template <class T> void integrationMeasurements() {
+    const auto* type = std::same_as<T, float> ? "float" : "double";
+    const ProcessSpec spec{48000, 128, 2};
+    AudioBuffer<T> input, output;
+    require(input.resize(2, 128) == Status::ok && output.resize(2, 128) == Status::ok);
+    for (std::size_t c = 0; c < 2; ++c)
+        for (std::size_t i = 0; i < 128; ++i)
+            input.block().channel(c)[i] = static_cast<T>(.2 * std::sin(double(i)));
+    for (auto backend : {CpuBackend::scalar, CpuBackend::sse2, CpuBackend::avx2, CpuBackend::avx512,
+                         CpuBackend::neon, CpuBackend::sve}) {
+        VectorOps ops;
+        if (VectorOps::create(backend, ops) != Status::ok)
+            continue;
+        for (auto mode : {OversamplingMode::halfBandFir, OversamplingMode::iir}) {
+            Oversampler<T> over;
+            require(over.prepare(spec, 4, mode, backend) == Status::ok);
+            bench(mode == OversamplingMode::iir ? "oversample4IirRoundtrip"
+                                                : "oversample4HalfBandRoundtrip",
+                  type, backend, 4, 2, [&] {
+                      AudioBlock<T> high;
+                      require(over.processUp(input.block(), high) == Status::ok &&
+                              over.processDown(output.block()) == Status::ok);
+                      sink = output.block().channel(0)[127];
+                  });
+        }
+        Dynamics<T> gate;
+        require(gate.prepare(spec, DynamicsMode::noiseGate) == Status::ok);
+        DynamicsParameters p;
+        p.holdMs = 10;
+        p.hysteresisDb = 6;
+        p.lookAheadMs = 5;
+        require(gate.setParameters(p) == Status::ok);
+        bench("gateLookahead5ms", type, CpuBackend::scalar, 240, 2, [&] {
+            require(gate.process(input.block(), output.block()) == Status::ok);
+            sink = output.block().channel(0)[127];
+        });
+        std::vector<T> cycle(2048);
+        for (std::size_t i = 0; i < cycle.size(); ++i)
+            cycle[i] = static_cast<T>(2 * double(i) / double(cycle.size()) - 1);
+        Wavetable<T> table;
+        require(table.prepare(cycle, backend) == Status::ok);
+        WavetableOscillator<T> oscillator;
+        require(oscillator.prepare(spec, table) == Status::ok &&
+                oscillator.setFrequency(440) == Status::ok);
+        bench("wavetableOscillator2048", type, backend, 2048, 2, [&] {
+            require(oscillator.process(output.block()) == Status::ok);
+            sink = output.block().channel(0)[127];
+        });
+    }
+    AudioBuffer<T> sample;
+    require(sample.resize(1, 8192) == Status::ok);
+    for (std::size_t i = 0; i < 8192; ++i)
+        sample.block().channel(0)[i] =
+            static_cast<T>(std::sin(2 * std::numbers::pi * .35 * double(i)));
+    SampleData<T> data;
+    require(data.prepare(sample.block(), 48000) == Status::ok);
+    double linear = 0, filtered = 0;
+    for (std::size_t i = 128; i < 3968; ++i) {
+        auto a = double(data.value(0, double(i) * 2, 2, SampleInterpolation::linear));
+        auto b = double(data.value(0, double(i) * 2, 2, SampleInterpolation::bandLimited));
+        linear += a * a;
+        filtered += b * b;
+    }
+    separator();
+    std::cout
+        << "{\"kind\":\"quality\",\"metric\":\"samplerOctaveAliasReductionDb\",\"sampleType\":\""
+        << type << "\",\"inputFrequencyCyclesPerSample\":0.35,\"playbackRatio\":2,\"reductionDb\":"
+        << 10 * std::log10(linear / std::max(filtered, 1e-300)) << "}";
+}
 } // namespace
 int main() {
     try {
         std::cout << std::setprecision(12) << "[\n";
         capabilities();
+        integrationMeasurements<float>();
+        integrationMeasurements<double>();
+        dawMeasurements<float>();
+        dawMeasurements<double>();
+        expandedMeasurements<float>();
+        expandedMeasurements<double>();
         scheduledMatrixQuality<float>();
         scheduledMatrixQuality<double>();
         configuredTransitionQuality<float>();

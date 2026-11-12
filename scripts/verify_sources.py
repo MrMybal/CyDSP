@@ -21,16 +21,25 @@ def project_file(relative):
     return path
 
 
+license_text = project_file('LICENSE').read_text(encoding='utf-8')
+require('MIT License' in license_text and 'Copyright (c) 2026 MrMybal CyberAlien' in license_text,
+        'Missing CyDSP MIT license or ownership')
+require('Permission is hereby granted' in license_text and 'THE SOFTWARE IS PROVIDED' in license_text,
+        'Incomplete CyDSP MIT license')
+
+
 manifest = json.loads((ROOT / 'third_party/manifest.json').read_text(encoding='utf-8'))
 require(manifest['schemaVersion'] == 1, 'Unknown manifest schema')
 for component in manifest['components']:
     name = component['name']
-    require(component['license'] == 'MIT', 'Unexpected third-party license: ' + name)
+    require(component['license'] in ('MIT', 'MIT-0', 'ISC AND BSD-3-Clause AND LicenseRef-minimp3-Public-Domain'), 'Unexpected third-party license: ' + name)
     require(bool(re.fullmatch(r'[0-9a-f]{40}', component['revision'])), 'Unpinned revision: ' + name)
     require(bool(component['scope']), 'Missing adaptation scope: ' + name)
     notice = project_file(component['noticePath']).read_text(encoding='utf-8')
-    require('Permission is hereby granted' in notice and 'THE SOFTWARE IS PROVIDED' in notice,
-            'Incomplete MIT notice: ' + name)
+    require(('Permission is hereby granted' in notice or 'Permission to use, copy, modify' in notice) and 'THE SOFTWARE IS PROVIDED' in notice,
+            'Incomplete permissive notice: ' + name)
+    if name == 'choc':
+        require(all(x in notice for x in ('Josh Coalson', 'Xiph.org Foundation', 'Jutta Degener', 'public domain worldwide')), 'Missing embedded codec notice')
     for record in component['files']:
         path = project_file(record['archivePath'])
         require(hashlib.sha256(path.read_bytes()).hexdigest() == record['sha256'],
@@ -88,7 +97,7 @@ presets = json.loads((ROOT / 'CMakePresets.json').read_text(encoding='utf-8'))
 for preset in presets['configurePresets']:
     require(preset.get('cacheVariables', {}).get('CYDSP_BUILD_TESTS', 'OFF') == 'OFF',
             'Native tests enabled by preset: ' + preset['name'])
-for path in [ROOT / 'README.md', *(ROOT / 'docs').glob('*.md')]:
+for path in [ROOT / 'README.md', ROOT / 'README.fr.md', ROOT / 'VERSION.md', ROOT / 'VERSION.fr.md', *(ROOT / 'docs').glob('*.md')]:
     for target in re.findall(r'\[[^\]]+\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
         if '://' in target or target.startswith('#'):
             continue
@@ -100,4 +109,4 @@ require('set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)' in toolchain,
 require(not (ROOT / '.github/workflows').exists(), 'No GitHub Actions authorized')
 if errors:
     raise SystemExit('\n'.join(errors))
-print(f'PASS: {count} C++ sources/headers; {len(manifest["components"])} pinned MIT components; includes, Python, JSON and build policy')
+print(f'PASS: {count} C++ sources/headers; {len(manifest["components"])} pinned permissive components; includes, Python, JSON and build policy')

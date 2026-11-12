@@ -1,0 +1,451 @@
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <cmath>
+#include <complex>
+#include <cydsp/CyDSP.h>
+#include <numbers>
+#include <stdexcept>
+#include <thread>
+#include <vector>
+void runRealtimeAudit(void (*)(void*) noexcept, void*);
+namespace {
+using namespace cydsp;
+void require(bool v, const char* message) {
+    if (!v)
+        throw std::runtime_error(message);
+}
+template <Sample T> void clear(AudioBlock<T> block) {
+    for (std::size_t ch = 0; ch < block.channels(); ++ch)
+        std::fill(block.channel(ch).begin(), block.channel(ch).end(), T{});
+}
+void ok(Status s) {
+    require(s == Status::ok, "expanded status");
+}
+std::complex<double> response(std::span<const BiquadCoefficients> coeff, double hz) {
+    const auto z = std::polar(1.0, -2 * std::numbers::pi * hz / 48000);
+    std::complex<double> h = 1;
+    for (const auto& c : coeff)
+        h *= (c.b0 + c.b1 * z + c.b2 * z * z) / (1.0 + c.a1 * z + c.a2 * z * z);
+    return h;
+}
+void designs() {
+    for (unsigned order = 1; order <= 32; ++order)
+        for (auto type : {BiquadType::lowPass, BiquadType::highPass}) {
+            std::array<BiquadCoefficients, 16> sections;
+            std::size_t n = 0;
+            ok(designButterworth(type, order, 48000, 3000, sections, n));
+            require(n == (order + 1) / 2, "Butterworth section count");
+            require(std::abs(std::abs(response({sections.data(), n}, 3000)) - std::sqrt(.5)) <
+                        1e-10,
+                    "Butterworth cutoff response");
+            require(std::abs(std::abs(response({sections.data(), n},
+                                               type == BiquadType::lowPass ? 0 : 24000)) -
+                             1) < 1e-10,
+                    "Butterworth passband");
+        }
+    std::array<double, 129> taps;
+    ok(designWindowedFir(taps, .15));
+    double dc = 0;
+    std::complex<double> stop{};
+    for (std::size_t i = 0; i < taps.size(); ++i) {
+        dc += taps[i];
+        stop += taps[i] * std::polar(1.0, -2 * std::numbers::pi * .35 * static_cast<double>(i));
+        require(taps[i] == taps[taps.size() - 1 - i], "FIR symmetry");
+    }
+    require(std::abs(dc - 1) < 1e-12 && std::abs(stop) < 1e-5, "FIR DC/stopband");
+    const auto before = taps;
+    require(designWindowedFir(taps, 0) == Status::invalid_argument && taps == before,
+            "FIR invalid transactional");
+    Adsr envelope;
+    ok(envelope.prepare(1000));
+    ok(envelope.setParameters({.004, .002, .5, .004}));
+    envelope.noteOn();
+    for (double expected : {.25, .5, .75, 1., .75, .5, .5})
+        require(std::abs(envelope.next() - expected) < 1e-12, "ADSR endpoints");
+    envelope.noteOff();
+    for (double expected : {.375, .25, .125, 0.})
+        require(std::abs(envelope.next() - expected) < 1e-12, "ADSR release");
+    require(!envelope.active(), "ADSR inactive");
+    SmoothedValue ramp;
+    ok(ramp.reset(1, SmoothingCurve::multiplicative));
+    ok(ramp.setTarget(16, 4));
+    for (double expected : {2., 4., 8., 16.})
+        require(std::abs(ramp.next() - expected) < 1e-12, "multiplicative ramp");
+    LookupTable<double> table;
+    ok(table.prepare(-1, 1, 1001, [](double x, void*) noexcept { return x * x; }));
+    require(std::abs(table.lookup(.42) - .1764) < 1e-6, "lookup numerical reference");
+}
+template <Sample T> void processors() {
+    const ProcessSpec spec{48000, 4096, 2};
+    const double tolerance = std::same_as<T, float> ? 2e-5 : 2e-11;
+    AudioBuffer<T> in, out, other;
+    ok(in.resize(2, 4096));
+    ok(out.resize(2, 4096));
+    ok(other.resize(2, 4096));
+    Oscillator<T> osc;
+    ok(osc.prepare(spec));
+    ok(osc.setFrequency(1000));
+    ok(osc.process(out.block()));
+    for (std::size_t i = 0; i < 4096; ++i)
+        require(std::abs(out.block().channel(0)[i] -
+                         std::sin(2 * std::numbers::pi * 1000 * static_cast<double>(i) / 48000)) <
+                    tolerance,
+                "oscillator frequency/phase");
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        std::fill(in.block().channel(ch).begin(), in.block().channel(ch).end(), T{1});
+    BallisticsFilter<T> envelope;
+    ok(envelope.prepare(spec));
+    ok(envelope.setTimes(10, 100));
+    ok(envelope.process(in.block(), out.block()));
+    require(std::abs(out.block().channel(0)[479] - (1 - std::exp(-1.0))) < tolerance,
+            "ballistics time constant");
+    Dynamics<T> dynamics;
+    ok(dynamics.prepare(spec));
+    DynamicsParameters p;
+    p.attackMs = 0;
+    p.releaseMs = 0;
+    p.kneeDb = 0;
+    p.thresholdDb = -20;
+    p.ratio = 4;
+    ok(dynamics.setParameters(p));
+    ok(dynamics.process(in.block(), out.block()));
+    const auto expected = std::pow(10.0, -15.0 / 20);
+    require(std::abs(out.block().channel(0)[0] - expected) < tolerance,
+            "compressor transfer curve");
+    Dynamics<T> limiter;
+    ok(limiter.prepare(spec, DynamicsMode::limiter));
+    ok(limiter.setParameters(p));
+    ok(limiter.process(in.block(), out.block()));
+    require(std::abs(out.block().channel(0)[0]) <= .100001, "limiter ceiling");
+    TptFilter<T> tpt, split;
+    ok(tpt.prepare(spec));
+    ok(split.prepare(spec));
+    ok(tpt.setParameters(3000, std::sqrt(.5), TptFilterMode::lowPass));
+    ok(split.setParameters(3000, std::sqrt(.5), TptFilterMode::lowPass));
+    clear(in.block());
+    in.block().channel(0)[0] = 1;
+    in.block().channel(1)[0] = 1;
+    ok(tpt.process(in.block(), out.block()));
+    for (std::size_t i = 0; i < 4096; i += 37) {
+        auto n = std::min<std::size_t>(37, 4096 - i);
+        ok(split.process(in.block().subBlock(i, n), other.block().subBlock(i, n)));
+    }
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        for (std::size_t i = 0; i < 4096; ++i)
+            require(out.block().channel(ch)[i] == other.block().channel(ch)[i],
+                    "TPT split invariance");
+    BiquadCoefficients biquad;
+    ok(designBiquad(BiquadType::lowPass, 48000, 3000, std::sqrt(.5), biquad));
+    Biquad<T> direct;
+    ok(direct.prepare(spec));
+    ok(direct.setCoefficients(biquad));
+    ok(direct.process(in.block(), other.block()));
+    for (std::size_t i = 0; i < 4096; ++i)
+        require(std::abs(out.block().channel(0)[i] - other.block().channel(0)[i]) < tolerance,
+                "TPT equivalent bilinear response");
+    LinkwitzRiley<T> crossover;
+    ok(crossover.prepare(spec));
+    ok(crossover.setFrequency(3000));
+    ok(crossover.process(in.block(), out.block(), other.block()));
+    std::complex<double> sum{};
+    for (std::size_t i = 0; i < 4096; ++i)
+        sum += (static_cast<double>(out.block().channel(0)[i]) + other.block().channel(0)[i]) *
+               std::polar(1.0, -2 * std::numbers::pi * 3000 * static_cast<double>(i) / 48000);
+    require(std::abs(std::abs(sum) - 1) < tolerance, "LR summed allpass response");
+    if constexpr (std::same_as<T, float>) {
+        std::array<T, 64> reference;
+        std::copy_n(out.block().channel(0).begin(), reference.size(), reference.begin());
+        require(crossover.setFrequency(1e-5) == Status::invalid_argument,
+                "LR rounded stability validation");
+        crossover.reset();
+        ok(crossover.process(in.block(), out.block(), other.block()));
+        require(std::equal(reference.begin(), reference.end(), out.block().channel(0).begin()),
+                "LR failed update preserves coefficients");
+    }
+    require(crossover.process(in.block(), out.block(), out.block()) == Status::partial_overlap,
+            "LR output alias rejection");
+    LadderFilter<T> ladder;
+    ok(ladder.prepare(spec));
+    ok(ladder.setParameters(18000, 1, 8));
+    ok(ladder.process(in.block(), out.block()));
+    for (auto v : out.block().channel(0))
+        require(isFinite(v), "ladder stability");
+    Panner<T> pan;
+    ok(pan.prepare({48000, 4096, 1}));
+    const T* mono[]{in.block().channel(0).data()};
+    ok(pan.setPan(0));
+    ok(pan.process({mono, 1, 4096}, out.block()));
+    require(std::abs(out.block().channel(0)[0] - std::sqrt(.5)) < tolerance, "pan centre power");
+    DryWetMixer<T> mix;
+    ok(mix.prepare(spec, 64));
+    ok(mix.setWetLatency(32));
+    ok(mix.setMix(0));
+    ok(mix.pushDrySamples(in.block()));
+    clear(out.block());
+    ok(mix.mixWetSamples(out.block()));
+    require(out.block().channel(0)[32] == 1 && out.block().channel(0)[0] == 0,
+            "dry latency alignment");
+    Oversampler<T> over;
+    ok(over.prepare(spec, 4));
+    AudioBlock<T> high;
+    ok(over.processUp(in.block(), high));
+    require(high.frames() == 16384, "oversampling shape");
+    ok(over.processDown(out.block()));
+    const auto peak = static_cast<std::size_t>(
+        std::max_element(out.block().channel(0).begin(), out.block().channel(0).end()) -
+        out.block().channel(0).begin());
+    require(peak == over.latencyFrames(), "oversampling latency impulse");
+    over.reset();
+    clear(in.block());
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        std::fill(in.block().channel(ch).begin(), in.block().channel(ch).end(), T{1});
+    ok(over.processUp(in.block(), high));
+    ok(over.processDown(out.block()));
+    require(std::abs(out.block().channel(0)[1000] - 1) < 1e-4, "oversampling DC");
+    WaveShaper<T> shaper;
+    ok(shaper.prepare(spec));
+    ok(shaper.setDrive(2));
+    ok(shaper.process(in.block(), out.block()));
+    require(std::abs(out.block().channel(0)[0] - std::tanh(2.0)) < tolerance,
+            "waveshaper transfer");
+    Bias<T> bias;
+    ok(bias.prepare(spec));
+    ok(bias.setBias(T{.25}));
+    struct Audit {
+        decltype(in)& input;
+        decltype(out)& output;
+        decltype(other)& second;
+        decltype(tpt)& filter;
+        decltype(ladder)& ladder;
+        decltype(dynamics)& dynamics;
+        decltype(envelope)& envelope;
+        decltype(mix)& mixer;
+        decltype(over)& over;
+        decltype(shaper)& shape;
+        decltype(osc)& osc;
+        decltype(crossover)& crossover;
+        decltype(bias)& bias;
+        bool success = true;
+    };
+    Audit audit{in,  out,  other,  tpt, ladder,    dynamics, envelope,
+                mix, over, shaper, osc, crossover, bias};
+    runRealtimeAudit(
+        [](void* ptr) noexcept {
+            auto& a = *static_cast<Audit*>(ptr);
+            auto capture = [&](Status s) { a.success = a.success && s == Status::ok; };
+            capture(a.filter.process(a.input.block(), a.output.block()));
+            capture(a.ladder.process(a.input.block(), a.output.block()));
+            capture(a.dynamics.process(a.input.block(), a.output.block()));
+            capture(a.envelope.process(a.input.block(), a.output.block()));
+            capture(a.mixer.pushDrySamples(a.input.block()));
+            capture(a.mixer.mixWetSamples(a.output.block()));
+            AudioBlock<T> h;
+            capture(a.over.processUp(a.input.block(), h));
+            capture(a.over.processDown(a.output.block()));
+            capture(a.shape.process(a.input.block(), a.output.block()));
+            capture(a.osc.process(a.output.block()));
+            capture(a.crossover.process(a.input.block(), a.output.block(), a.second.block()));
+            capture(a.bias.process(a.output.block(), a.output.block()));
+            a.filter.reset();
+            a.ladder.reset();
+            a.dynamics.reset();
+            a.envelope.reset();
+            a.mixer.reset();
+            a.over.reset();
+            a.osc.reset();
+            a.crossover.reset();
+            a.shape.reset();
+            a.bias.reset();
+        },
+        &audit);
+    require(audit.success, "expanded realtime statuses");
+    auto moved = std::move(tpt);
+    require(tpt.process(in.block(), out.block()) == Status::not_prepared, "moved TPT state");
+    ok(moved.process(in.block(), out.block()));
+}
+template <Sample T> void effects() {
+    const ProcessSpec spec{48000, 4096, 2};
+    AudioBuffer<T> in, out, other;
+    ok(in.resize(2, 4096));
+    ok(out.resize(2, 4096));
+    ok(other.resize(2, 4096));
+    in.block().channel(0)[0] = 1;
+    in.block().channel(1)[0] = 1;
+    Chorus<T> chorus;
+    ok(chorus.prepare(spec));
+    ok(chorus.setParameters({0, 0, 10, 0, 1}));
+    ok(chorus.process(in.block(), out.block()));
+    for (std::size_t i = 0; i < 4096; ++i)
+        require(out.block().channel(0)[i] == (i == 480 ? T{1} : T{}), "chorus exact static delay");
+    Phaser<T> phaser;
+    ok(phaser.prepare(spec));
+    ok(phaser.setParameters({0, 0, 1000, 0, 1}));
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        std::fill(in.block().channel(ch).begin(), in.block().channel(ch).end(), T{1});
+    ok(phaser.process(in.block(), out.block()));
+    require(std::abs(out.block().channel(0)[4095] - 1) < 1e-5, "phaser allpass DC");
+    // Split blocks preserve LFO/feedback state exactly, including in-place operation.
+    Chorus<T> split;
+    ok(split.prepare(spec));
+    ok(split.setParameters({2, .8, 15, .7, .6}));
+    ok(chorus.setParameters({2, .8, 15, .7, .6}));
+    chorus.reset();
+    ok(chorus.process(in.block(), out.block()));
+    for (std::size_t i = 0; i < 4096; i += 29) {
+        const auto n = std::min<std::size_t>(29, 4096 - i);
+        ok(split.process(in.block().subBlock(i, n), other.block().subBlock(i, n)));
+    }
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        for (std::size_t i = 0; i < 4096; ++i)
+            require(other.block().channel(ch)[i] == out.block().channel(ch)[i],
+                    "chorus split invariance");
+    Reverb<T> reverb;
+    ok(reverb.prepare(spec));
+    ok(reverb.setParameters({.4, 0, 1, 1}));
+    clear(in.block());
+    in.block().channel(0)[0] = 1;
+    double early = 0, late = 0;
+    for (unsigned block = 0; block < 32; ++block) {
+        ok(reverb.process(in.block(), out.block()));
+        for (auto v : out.block().channel(0)) {
+            require(isFinite(v), "reverb finite");
+            if (block < 4)
+                early += v * v;
+            if (block > 24)
+                late += v * v;
+        }
+        clear(in.block());
+    }
+    require(early > 0 && late < early * 1e-8, "reverb decaying tail");
+    struct Audit {
+        Chorus<T>& c;
+        Phaser<T>& p;
+        Reverb<T>& r;
+        AudioBuffer<T>& a;
+        AudioBuffer<T>& b;
+        bool success = true;
+    };
+    Audit audit{chorus, phaser, reverb, in, out};
+    runRealtimeAudit(
+        [](void* p) noexcept {
+            auto& a = *static_cast<Audit*>(p);
+            a.success = a.c.process(a.a.block(), a.b.block()) == Status::ok &&
+                        a.p.process(a.b.block(), a.b.block()) == Status::ok &&
+                        a.r.process(a.b.block(), a.b.block()) == Status::ok;
+            a.c.reset();
+            a.p.reset();
+            a.r.reset();
+        },
+        &audit);
+    require(audit.success, "effects realtime statuses");
+}
+void midi() {
+    auto a = midiNoteOn(1, 60, 100), b = midiNoteOff(1, 60);
+    require(MidiMessageView(a.bytes()).valid() && MidiMessageView(a.bytes()).noteOn(),
+            "MIDI note parsing");
+    MidiBuffer buffer;
+    ok(buffer.prepare(4, 64));
+    ok(buffer.add(20, a.bytes()));
+    ok(buffer.add(10, b.bytes()));
+    ok(buffer.add(20, b.bytes()));
+    require(buffer.event(0).frame == 10 && buffer.event(1).bytes[0] == 0x90,
+            "MIDI stable sample ordering");
+    MidiStreamParser parser;
+    ok(parser.prepare(8));
+    std::vector<std::vector<std::uint8_t>> result;
+    auto callback = [](void* p, std::span<const std::uint8_t> message, double) noexcept {
+        static_cast<decltype(result)*>(p)->emplace_back(message.begin(), message.end());
+    };
+    const std::array<std::uint8_t, 13> wire{0x90, 60, 100,  61,   0,  0xf0, 1,
+                                            0xf8, 2,  0xf7, 0xc0, 12, 0xfe};
+    for (auto byte : wire)
+        ok(parser.feed({&byte, 1}, 0, callback, &result));
+    require(result.size() == 6 && result[1] == std::vector<std::uint8_t>({0x90, 61, 0}) &&
+                result[2][0] == 0xf8 && result[3] == std::vector<std::uint8_t>({0xf0, 1, 2, 0xf7}),
+            "MIDI fragmented running status/realtime SysEx");
+    MidiKeyboardState keyboard;
+    ok(keyboard.apply(MidiMessageView(a.bytes())));
+    auto sustain = midiController(1, 64, 127);
+    ok(keyboard.apply(MidiMessageView(sustain.bytes())));
+    ok(keyboard.apply(MidiMessageView(b.bytes())));
+    require(keyboard.active(1, 60), "MIDI sustain");
+    sustain = midiController(1, 64, 0);
+    ok(keyboard.apply(MidiMessageView(sustain.bytes())));
+    require(!keyboard.active(1, 60), "MIDI sustain release");
+    ok(keyboard.apply(MidiMessageView(sustain.bytes())));
+    auto unrelated = midiNoteOff(1, 70);
+    ok(keyboard.apply(MidiMessageView(unrelated.bytes())));
+    require(!keyboard.active(1, 70), "MIDI unrelated note-off under sustain");
+    MidiFile file;
+    file.format = 0;
+    file.tracks = {{{0, MidiFileEventKind::meta, 0x51, {0x07, 0xa1, 0x20}},
+                    {0, MidiFileEventKind::message, 0, {0x90, 60, 100}},
+                    {960, MidiFileEventKind::message, 0, {0x80, 60, 0}}}};
+    std::vector<std::uint8_t> bytes;
+    ok(file.serialize(bytes));
+    MidiFile decoded;
+    ok(decoded.parse(bytes));
+    double seconds = 0;
+    ok(decoded.tickToSeconds(960, seconds));
+    require(std::abs(seconds - .5) < 1e-12 && decoded.tracks[0].size() == 4,
+            "SMF roundtrip/time map");
+    const auto original = bytes;
+    bytes.pop_back();
+    require(decoded.parse(bytes) == Status::invalid_argument && decoded.tracks[0].size() == 4,
+            "SMF truncation transactional");
+    // Running status fixture independent of our serializer.
+    const std::array<std::uint8_t, 33> fixture{
+        'M', 'T', 'h', 'd', 0,  0, 0,    6,  0,   0, 0,  1, 1, 0xe0, 'M',  'T', 'r',
+        'k', 0,   0,   0,   11, 0, 0x90, 60, 127, 1, 61, 0, 0, 0xff, 0x2f, 0};
+    ok(decoded.parse(fixture));
+    require(decoded.tracks[0][1].data == std::vector<std::uint8_t>({0x90, 61, 0}),
+            "SMF running-status fixture");
+    SpscQueue<unsigned> queue;
+    ok(queue.prepare(127));
+    std::atomic<bool> correct{true};
+    std::thread producer([&] {
+        for (unsigned i = 0; i < 50000; ++i)
+            while (!queue.push(i))
+                std::this_thread::yield();
+    });
+    for (unsigned i = 0; i < 50000; ++i) {
+        unsigned value;
+        while (!queue.pop(value))
+            std::this_thread::yield();
+        if (value != i)
+            correct.store(false);
+    }
+    producer.join();
+    require(correct.load() && !queue.peek(), "SPSC concurrent order");
+    struct Audit {
+        MidiBuffer& buffer;
+        MidiStreamParser& parser;
+        SpscQueue<unsigned>& queue;
+        std::span<const std::uint8_t> message;
+    };
+    Audit audit{buffer, parser, queue, a.bytes()};
+    runRealtimeAudit(
+        [](void* p) noexcept {
+            auto& a = *static_cast<Audit*>(p);
+            a.buffer.reset();
+            (void)a.buffer.add(0, a.message);
+            a.parser.reset();
+            (void)a.parser.feed(
+                a.message, 0, [](void*, std::span<const std::uint8_t>, double) noexcept {},
+                nullptr);
+            unsigned value;
+            (void)a.queue.push(42);
+            (void)a.queue.pop(value);
+        },
+        &audit);
+}
+} // namespace
+void expandedRegression() {
+    designs();
+    processors<float>();
+    processors<double>();
+    effects<float>();
+    effects<double>();
+    midi();
+}

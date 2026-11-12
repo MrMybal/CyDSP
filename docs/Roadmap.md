@@ -14,7 +14,7 @@ correctness coverage as secondary targets. Focus upcoming performance work on:
 ARM32-specific long-IR progressive MIMO tuning is lower priority. Its measured
 regression remains documented and the nonuniform mode remains available. Existing
 32-bit support is retained; prioritizing 64-bit does not change the numerical API,
-backend availability checks or the owner's still-pending release-license choice.
+backend availability checks or upstream license/notice requirements.
 
 ## Implemented milestones
 
@@ -119,8 +119,49 @@ Windows ARM64 application execution likewise requires a compatible host/runtime.
   nonuniform paths retain whole-transform boundaries and remain separately selectable.
 - Higher-order/band-limited delay modulation and an explicit FMA/RISC-V policy.
 - Arbitrary callback fusion needs explicit processor semantics; callbacks remain borrowed.
-- The separate Unreal adapter and original-code release license remain owner decisions.
+- A separate Unreal adapter requires integration with the intended host project.
 
 GitHub workflows are not part of the build configuration.
 Native launches use explicit owner-authorized validation commands; production
 presets remain static libraries with native targets disabled.
+
+## DSP and audio-service expansion (2026-11-12)
+
+The new increment adds original generators/envelopes, dynamics, TPT/LR/ladder and
+Butterworth/FIR design, pan/mix/shaping, FIR oversampling, chorus/phaser/reverb,
+MIDI1/SMF/SPSC and optional private file/device/stretch targets. All available-target
+validation is regenerated for this increment. The earlier convolution/SIMD milestones
+do not imply full audio-framework coverage. Additional designs/codecs and physical/platform acceptance
+are tracked explicitly in the [functional inventory](Coverage.md).
+
+## Integrated DAW services (2026-11-12)
+
+Delivered: owned MIT Stretch/STFT adaptation with CyDSP SIMD FFT and mixed radix,
+shared file-worker sinc conversion, audio layout reuse, MPE/RPN/UMP/MIDI 2 messages,
+polyphonic oscillator/sampler/custom voices, queued sample-position transport,
+tempo maps, epoch read-ahead and bounded recording/drain. New numerical, allocation
+and worker-concurrency checks are included in the same validation matrix.
+The local reports define actual executed coverage; source presence alone is not
+evidence of physical device acceptance. No CyDAW_Project or JUCE source was imported.
+Remaining codec/design/hardware and MIDI 2 application-policy gaps are recorded in
+[Coverage](Coverage.md). GUI rendering remains application work; the subsequent
+[plugin module](Plugins.md) supplies CLAP/VST3 hosting, native editors and an
+explicit worker boundary.
+
+## Native MIDI 2 / MIDI-CI increment (2026-11-12)
+
+Delivered: owned UMP worker queues and Windows MIDI Services, CoreMIDI, Linux UMP
+and Android AMidi adapters; discovery/profiles/chunked Property Exchange, MUID
+collision recovery and UMP Stream Configuration. See [MIDI 2](Midi2.md) for the
+exact scope. Physical MIDI2 equipment and Apple build/runtime acceptance remain
+unverified; application property resources/profile behavior remain host policy.
+
+## Prepared Property Exchange resources (2026-11-12)
+
+Delivered: generated ResourceList/DeviceInfo/ChannelList/JSONSchema; bounded custom
+resources/instances, full/partial SET, list pagination/totalCount, access/validation
+hooks, retained replies and notify/full/partial subscriptions. A prepared initiator
+adds TTL/page/instance caching, acknowledged updates, coalesced refresh and stale-GET
+protection. Core Notify handles keepalive/cancel. [Service contracts](CiProperty.md)
+record ownership, recovery and limits. macOS/Linux desktop tests are deferred by
+the owner; physical MIDI2 and other unavailable hardware acceptance remain open.

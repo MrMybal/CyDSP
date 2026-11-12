@@ -3,6 +3,28 @@
 #include "detail/OrderedAlias.h"
 namespace cydsp {
 template <Sample T>
+Status validateDisjointBlocks(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
+    if (!in.isValid() || !out.isValid() ||
+        in.frames() > std::numeric_limits<std::size_t>::max() / sizeof(T) ||
+        out.frames() > std::numeric_limits<std::size_t>::max() / sizeof(T))
+        return Status::invalid_argument;
+    for (std::size_t a = 0; a < out.channels(); ++a) {
+        for (std::size_t b = 0; b < a; ++b)
+            if (detail::overlaps(out.channel(a).data(), out.frames() * sizeof(T),
+                                 out.channel(b).data(), out.frames() * sizeof(T)))
+                return Status::partial_overlap;
+        for (std::size_t b = 0; b < in.channels(); ++b)
+            if (detail::overlaps(out.channel(a).data(), out.frames() * sizeof(T),
+                                 in.channel(b).data(), in.frames() * sizeof(T)))
+                return Status::partial_overlap;
+    }
+    return Status::ok;
+}
+template Status validateDisjointBlocks<float>(AudioBlock<const float>, AudioBlock<float>) noexcept;
+template Status validateDisjointBlocks<double>(AudioBlock<const double>,
+                                               AudioBlock<double>) noexcept;
+
+template <Sample T>
     requires(!std::is_const_v<T>)
 Status validateProcessBlocks(const ProcessSpec& spec, AudioBlock<const T> input,
                              AudioBlock<T> output) noexcept {

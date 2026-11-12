@@ -15,8 +15,8 @@ subprocess.run([a.cmake, '--install', str(ROOT / 'build/windows-x64'), '--config
                 '--prefix', str(stage)], cwd=ROOT, check=True)
 (consumer / 'CMakeLists.txt').write_text(
     'cmake_minimum_required(VERSION 3.24)\nproject(CyDSPConsumer LANGUAGES CXX)\n'
-    'find_package(CyDSP 0.1 CONFIG REQUIRED)\nadd_library(Consumer STATIC Consumer.cpp)\n'
-    'target_link_libraries(Consumer PRIVATE CyDSP::CyDSP)\n', encoding='utf-8')
+    'find_package(CyDSP 0.1 CONFIG REQUIRED COMPONENTS Files Devices Stretch Sources Plugins)\nadd_library(Consumer STATIC Consumer.cpp)\n'
+    'target_link_libraries(Consumer PRIVATE CyDSP::CyDSP CyDSP::Files CyDSP::Devices CyDSP::Stretch CyDSP::Sources CyDSP::Plugins)\n', encoding='utf-8')
 (consumer / 'Consumer.cpp').write_text(
     '#include <cydsp/CyDSP.h>\n#include <array>\n'
     'cydsp::Status prepareConsumer() {\n'
@@ -83,14 +83,45 @@ subprocess.run([a.cmake, '--install', str(ROOT / 'build/windows-x64'), '--config
     '  status=graph.prepare(spec,{},pass);if(status!=cydsp::Status::ok)return status;\n'
     '  status=converter.setRates(48000,32000);if(status!=cydsp::Status::ok)return status;\n'
     '  status=converter.finish({channels,2,4}).status;if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::Synthesizer<float> synth; status=synth.prepare(spec,32);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::IirDesign design;design.family=cydsp::IirFamily::bessel;\n'
+    '  std::array<cydsp::BiquadCoefficients,8> sos{};std::size_t sections=0;\n'
+    '  status=cydsp::designIir(design,sos,sections);if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::PolynomialInterpolator<float> polynomial;status=polynomial.prepare(spec,44100);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::Oversampler<float> oversampling;status=oversampling.prepare(spec,4,cydsp::OversamplingMode::iir);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::WaveformPeakCache peaks;cydsp::ImpulseResponse<float> impulseFile;\n'
+    '  cydsp::InstrumentPreset preset;std::string json;status=cydsp::serializeInstrumentPreset(preset,json);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::Instrument<float> instrument;cydsp::AudioDeviceManager audioManager;cydsp::MidiConnection midiConnection;\n'
+    '  cydsp::MidiEventCollector collector;status=collector.prepare();if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::Midi2Controllers controllers;status=controllers.prepare();if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::UmpEndpointService endpoint;cydsp::CiProfileDispatcher profiles;\n'
+    '  cydsp::Midi2Device nativeMidi; cydsp::MidiCiDevice ci; cydsp::CiPropertyStore properties; cydsp::CiPropertyHeader propertyHeader; cydsp::CiPropertyClient propertyClient; cydsp::CiPropertyPatch propertyPatch; cydsp::UmpEndpointNegotiator negotiation;\n'
+    '  auto discovery=cydsp::umpEndpointDiscovery();(void)discovery;\n'
+    '  cydsp::UmpBuffer ump;status=ump.prepare(16);if(status!=cydsp::Status::ok)return status;\n'
+    '  status=ump.add(0,cydsp::umpNote(true,0,1,60,65535));if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::MemoryAudioSource<float> source; status=source.prepare({channels,2,4},48000);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::AudioTransport<float> transport;status=transport.prepare(spec,source);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
+    '  cydsp::ReadAheadSource<float> background; cydsp::BackgroundRecorder<float> recorder;\n'
+    '  cydsp::AudioMetadata metadata; cydsp::EditingPcmProxy proxy; cydsp::MidiInputBank inputs; cydsp::MidiInputGroup inputGroup;\n'
+    '  cydsp::AudioStreamDescription negotiated; cydsp::SourceTimeMap timeMap; cydsp::ReadAheadOptions readOptions; (void)negotiated;(void)readOptions;\n'
+    '  cydsp::PluginInstance plugin; cydsp::PluginWorker worker; cydsp::PluginEventBuffer events;\n'
+    '  status=events.prepare();if(status!=cydsp::Status::ok)return status;\n'
+    '  std::unique_ptr<cydsp::PluginProvider> provider;status=cydsp::createPluginProvider(cydsp::PluginFormat::clap,provider);\n'
+    '  if(status!=cydsp::Status::ok)return status;\n'
     '  cydsp::BiquadCascade<float> cascade;return cascade.prepare(spec,std::span{&eq,1});\n'
     '}\n', encoding='utf-8')
 subprocess.run([a.cmake, '-S', str(consumer), '-B', str(consumer / 'build'), '-G',
                 'Visual Studio 17 2022', '-A', 'x64', '-DCMAKE_PREFIX_PATH=' + str(stage)],
                cwd=ROOT, check=True)
 subprocess.run([a.cmake, '--build', str(consumer / 'build'), '--config', 'Release'], cwd=ROOT, check=True)
-for relative in ('lib/CyDSP.lib', 'lib/cmake/CyDSP/CyDSPConfig.cmake', 'include/cydsp/CyDSP.h',
-                 'share/CyDSP/manifest.json', 'share/CyDSP/Licensing.md'):
+for relative in ('lib/CyDSP.lib', 'lib/CyDSPFiles.lib', 'lib/CyDSPDevices.lib', 'lib/CyDSPStretch.lib', 'lib/CyDSPSources.lib', 'lib/CyDSPPlugins.lib', 'lib/cmake/CyDSP/CyDSPConfig.cmake', 'include/cydsp/CyDSP.h',
+                 'share/CyDSP/manifest.json', 'share/CyDSP/Licensing.md', 'share/CyDSP/LICENSE'):
     if not (stage / relative).is_file():
         raise SystemExit('Missing installed artifact: ' + relative)
 manifest = json.loads((ROOT / 'third_party/manifest.json').read_text(encoding='utf-8'))
@@ -104,9 +135,11 @@ for source in (ROOT / 'include').rglob('*.h'):
         raise SystemExit('Changed installed header: ' + str(installed))
 if (ROOT / 'third_party/manifest.json').read_bytes() != (stage / 'share/CyDSP/manifest.json').read_bytes():
     raise SystemExit('Changed installed manifest')
+if (ROOT/'LICENSE').read_bytes() != (stage/'share/CyDSP/LICENSE').read_bytes():
+    raise SystemExit('Changed installed CyDSP MIT license')
 if (ROOT/'docs/Licensing.md').read_bytes() != (stage/'share/CyDSP/Licensing.md').read_bytes():
     raise SystemExit('Changed installed licensing/provenance document')
 targets = (stage / 'lib/cmake/CyDSP/CyDSPTargets.cmake').read_text(encoding='utf-8')
 if ROOT.as_posix().lower() in targets.replace('\\', '/').lower():
     raise SystemExit('Source checkout path leaked into installed target')
-print('PASS: staged CMake package, all MIT notices and static consumer compilation; no executable link/runtime check')
+print('PASS: staged CMake package, all permissive notices and static consumer compilation; no executable link/runtime check')

@@ -17,13 +17,13 @@ def inspect(label,folder,arm=False,ninja=False):
         objects=[];current='';flags={}
         for line in text.splitlines():
             if line.startswith('build '):current=line.replace('\\','/')
-            elif line.startswith('  FLAGS =') and 'CMakeFiles/CyDSP.dir/src/' in current:
+            elif line.startswith('  FLAGS =') and any('CMakeFiles/'+target+'.dir/' in current for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins')):
                 obj=current[6:].split(': ',1)[0];flags[obj]=line
                 if '-mavx512' in line:require('/Avx512.cpp.' in obj,'AVX-512 flags leaked: '+obj)
                 if '+sve' in line or '-msve-vector-bits' in line:require('/Sve.cpp.' in obj,'SVE flags leaked: '+obj)
                 objects.append(folder/obj)
         require(objects,'Missing object rules: '+label)
-    else:objects=list((folder/'CyDSP.dir/Release').glob('*.obj'))
+    else:objects=[p for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins') for p in (folder/(target+'.dir/Release')).glob('*.obj')]
     require(len(objects)>=26,'Incomplete archive objects: '+label)
     kernels=[]
     for path in objects:

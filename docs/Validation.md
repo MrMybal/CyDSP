@@ -1,11 +1,11 @@
 # Validation
 
-2026-11-11. Work is confined to CyDSP. The owner explicitly authorized native tests,
+2026-11-12. Work is confined to CyDSP. The owner explicitly authorized native tests,
 benchmarks and the connected Quest 3. Production configurations remain static,
-with test/measurement/sanitizer options OFF. No CyCode source, GitHub Actions or
+with test/measurement/sanitizer options OFF. No CyCode or CyDAW_Project source, GitHub Actions or
 antivirus setting was changed. No application was installed on the Quest.
 
-Current compiler-input SHA-256: 79a39fe71e6f67c85e007536e5df6eb18eda374c34981922984e2bff9c3c9203
+Current compiler-input SHA-256: 078b0f7b6fd46af3ddddf51ced2356fa3664b2e6131a3c487d9ee7d99854f04e
 
 ## Executed and passed
 
@@ -19,19 +19,27 @@ Current compiler-input SHA-256: 79a39fe71e6f67c85e007536e5df6eb18eda374c34981922
 | Quest 3 Android ARM64 | Native scalar/NEON regressions, allocation/free audit and measurements |
 | Quest 3 Android ARM32 compatibility | Native scalar/NEON regressions, allocation/free audit and measurements; double NEON kernels fall back to scalar |
 | Android ARM32/ARM64/x86/x86_64 NDK Clang 18 | Archives, isolated public headers, regression objects and target executable linking |
-| Windows x64/x86/scalar/ARM64 Clang | Four Release production static archives and compile-only checks |
+| Windows x64/x86/scalar/ARM64 Clang | Four Release production configurations, static libraries only, with compile-only checks |
 | Installed CMake package | Byte-exact headers/notices/manifest and separate static consumer |
 
-All 29 public headers compile individually. 95
-static_assert sites pass under MSVC and Clang. Source checks cover 92 owned C++
+All 73 public headers compile individually. 95
+static_assert sites pass under MSVC and Clang. Source checks cover 231 owned C++
 files, local includes, Python syntax, documentation links, build/ISA policy and all
-three pinned MIT component archives/notices. Final compiler build logs have no
-warnings. An additional audit disassembles 238 production objects across all
+11 pinned permissive component archives/notices. Final compiler build logs have no
+warnings. An additional audit disassembles 666 production objects across all
 eight target archives, verifies per-file wide-ISA isolation and finds no fused FP
 instructions. The instruction audit is generated locally in `build/simd-validation.json`. SVE is compiled and
 linked for Android ARM64; no SVE-native execution is claimed.
 The installed NDK emits upstream CMake deprecation notices during
 configuration; its compiler build logs are clean.
+
+Prepared property-service regressions additionally validate ResourceList/DeviceInfo/ChannelList/JSONSchema, resId isolation, RFC6901 partial SET, list pagination/totals, full/partial/notify delivery, TTL/page/binary caching, stale-GET protection, eviction/ACK pressure, timeout, cancellation/MUID cleanup and retained-memory request/patch/subscription processing. [Property service](CiProperty.md) records exact scope.
+
+Native MIDI2 regressions check CI discovery/collisions/profiles/chunked properties, protocol confirmation/timeout, retained-memory processing and parallel audio/SysEx queues. Quest also exercises native-endian descriptor framing, saturation, ownership and disconnect through nonblocking sockets. No physical MIDI port is opened; Windows MIDI Services is unavailable on this Windows 10 host, Android JNI/AMidi hardware is not exercised, and Apple transport source remains uncompiled. See [MIDI 2](Midi2.md).
+
+The integrated suites additionally check half-bin FFTs against direct DFTs for power-of-two and mixed-radix sizes on every available backend, MIDI 2 scaling including all 16384 pitch values, MPE zones/RPN/pedals, sample-accurate custom/oscillator/sampler voices, queued transport/loops/underruns, random epoch seeks with full-capacity prefill and centered sinc timing, and background recording/draining with exact file readback. Audio-thread memory auditing covers those new paths.
+
+The expanded suites additionally check DSP transfer functions, envelopes, oversampling, modulation/reverb decay, MIDI/SMF/SPSC, independent WAV/AIFF fixtures, WAV/AIFF/FLAC/Ogg roundtrips, spectral pitch shifting, retained-memory processing/reset and silent virtual audio callbacks. The DAW expansion adds filter families/interpolators/windows, gate look-ahead, half-band/IIR oversampling, wavetable/mip sampling/presets, worker stretching/IR/peak caches, clock collection/reconnects/Function Blocks/controllers/profile dispatch, AIFC/CAF with retained marker/loop chunks and an independent successful MP3 fixture. Windows native MP3/AAC/M4A/WMA encode/decode/tone/decoded-seek tests pass. Exact scope and platform limits are recorded in [DAW integration](DawIntegration.md) and [Coverage](Coverage.md).
 
 The native suites exercise direct DFT/convolution references, SIMD residuals and
 unaligned views, invalid/overlapping requests, reset/moves, split callbacks, queued
@@ -62,6 +70,31 @@ thread. It covers prepared process/reset/finish and fade activation for every
 processor, including retired IR plans and progressive FFT jobs/reset. It detected zero allocations AND frees in
 the exercised regions. Worker preparation remains intentionally non-real-time.
 The audit does not make arbitrary user graph callbacks allocation-free.
+
+## Integration report follow-up
+
+Independent WAV LIST/adtl/INFO, odd chunks and native24-in-32 PCM references pass.
+Public metadata versions/typed edits preserve unknown chunks. Fake/null device
+tests distinguish negotiated values, unknown hardware facts and callback clocks.
+MIDI tests cover ambiguous selection, two ports, fragmented12 KiB SysEx, epochs
+and voice-release notifications.
+
+Source tests cover time/pitch curves, repitch reference tones, extended ratios,
+prime/tail contracts and an original external-provider fixture. Beats/texture
+remain provider policies, not claimed native matches for CyDAW algorithms.
+Long60-second AAC/WMA proxy fixtures compare exact near-EOF PCM, seek time,
+bounded copy storage and sampled process private-memory increase.
+
+Original CLAP/VST3 shared modules verify the ABI, multibus/sidechain, automation,
+copied events, component/controller states, lifecycle and host allocation audit.
+Windows tests actual child editors, resize/DPI, focus/keys/wheel and a separate
+process worker: IPC, one-block pipeline, late-result silence, abrupt plugin exit
+and restart. Android runs in-process module tests; standalone Android process
+workers require an application service and are explicitly skipped.
+
+See [Plugin contracts](Plugins.md) and [Remediation scope](IntegrationRemediation.md).
+Application shell/model/routing migration and other plugin-format providers remain
+outside this library-only change; a complete JUCE replacement is not claimed.
 
 ## Reports and reproduction
 
@@ -96,8 +129,8 @@ consolidation succeeds.
 
 ## Remaining target coverage
 
-Desktop Linux/GCC and macOS/Apple Clang have no available host in this session;
-Windows WSL is not enabled. run_portable.py is ready to run natively on those hosts.
+Desktop Linux/GCC and macOS/Apple Clang tests are deferred by the owner.
+No corresponding host is available in this session; Windows WSL is not enabled. run_portable.py is ready to run natively on those hosts.
 Android uses a Linux kernel and libc++, and is reported separately from desktop
 Linux/glibc/GCC. SVE is compiled and linked in Android ARM64; the Quest reports SVE unavailable.
 Native SVE execution at different vector lengths needs compatible hardware.
@@ -107,5 +140,5 @@ that Windows ABI. No CI workflow was enabled to bypass these missing environment
 
 The synthetic workloads and sampled spectral checks do not establish all possible
 stream states, hard audio deadlines, listening quality, physical audio I/O latency
-or performance on other machines. Original-code release licensing remains an owner
-decision. Further implementation opportunities are in Roadmap.md.
+or performance on other machines. CyDSP uses the MIT license; upstream notices
+are indexed in Licensing.md. Further implementation opportunities are in Roadmap.md.
