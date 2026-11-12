@@ -53,4 +53,6 @@ tests are deferred by the owner.
 
 November12 DAW expansion: [contracts and scope](docs/DawIntegration.md) cover DSP, synthesis/presets, playback, devices/MIDI and files/codecs. macOS/Linux desktop validation remains deferred.
 
-Integration-report remediation adds public WAV metadata, device capabilities/identity/clocks, multiport/SysEx MIDI, PCM editing proxies and source policies. The [Plugins module](docs/Plugins.md) hosts CLAP/VST3 with native editors and a separate worker. Additional formats/application-specific modes use explicit providers; CyDAW migration and physical acceptance remain separate.
+Integration-report remediation adds public WAV metadata, device capabilities/identity/clocks, multiport/SysEx MIDI, PCM editing proxies and source policies. The [Plugins module](docs/Plugins.md) hosts CLAP/VST3/LV2/JSFX with native editors and a separate worker. Additional formats/application-specific modes use explicit providers; CyDAW migration and physical acceptance remain separate.
+
+LV2/JSFX hosting: original CyDSP providers, automation/MIDI/state, LV2 port groups/worker and native Windows editor/canvas. Dependencies retain their notices; see [Plugin contracts](docs/Plugins.md) and [Licensing](docs/Licensing.md).

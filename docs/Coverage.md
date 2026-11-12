@@ -4,8 +4,8 @@
 [JUCE module documentation](https://docs.juce.com/master/index.html), without using
 JUCE implementation code. API compatibility and identical algorithms are not goals.
 It records delivered scope and the remaining work; it does not claim complete JUCE
-replacement. GUI rendering remains application work. CLAP/VST3 hosting and native editor
-management are delivered; AU/AAX/LV2/JSFX use external providers.
+replacement. GUI rendering remains application work. CLAP/VST3/LV2/JSFX hosting and native editor
+management are delivered; AU uses an external provider; AAX hosting rights remain unestablished.
 
 | Area | CyDSP implementation | Remaining coverage |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ management are delivered; AU/AAX/LV2/JSFX use external providers.
 | File playback/source infrastructure | AudioSource/memory source, queued play/pause/stop/seek/loops, tempo map, worker read-ahead/sinc/stretch/channel mapping, persistent waveform and PCM editing caches, absolute time/pitch curves, repitch/tonal/complex modes and recording queue | Network sources and more application adapters |
 | Synthesis | Prepared oscillator/wavetable/mip sampler/custom voices, loop crossfades, CyDSPInstrument v1 presets, ADSR, voice stealing/fades, sample-accurate MIDI1/MPE/UMP expression | SF2/SFZ formats, sound-bank/tuning-table application and more MIDI profile sound engines |
 | JSON/XML | CHOC JSON internally for metadata | Application-facing serialization/XML API is outside this DSP/device/file increment |
-| Plugin hosting and native editors | Original CLAP/VST3 adapters, multibus/automation/state, native embedding/resize/DPI/focus and separate-process worker | AU/AAX/LV2/JSFX providers; cross-platform UI/third-party plugin acceptance and application exports |
+| Plugin hosting and native editors | Original CLAP/VST3/LV2/JSFX adapters, multibus/automation/state, native embedding/resize/DPI/focus and separate-process worker | AU/AAX hosting; non-Windows JSFX canvas; cross-platform UI/third-party plugin acceptance and application exports |
 
 ## Validation boundaries
 

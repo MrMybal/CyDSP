@@ -14,6 +14,8 @@ struct PluginAudioScope {
 };
 std::unique_ptr<PluginProvider> makeClapProvider();
 std::unique_ptr<PluginProvider> makeVst3Provider();
+std::unique_ptr<PluginProvider> makeLv2Provider();
+std::unique_ptr<PluginProvider> makeJsfxProvider();
 class SharedModule {
   public:
     SharedModule() = default;

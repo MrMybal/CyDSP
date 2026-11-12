@@ -1,0 +1,6 @@
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+<urn:cydsp:lv2-fixture> a lv2:Plugin ;
+    lv2:binary <@CYDSP_LV2_BINARY@> ; rdfs:seeAlso <plugin.ttl> .
+<urn:cydsp:lv2-fixture-ui> a <http://lv2plug.in/ns/extensions/ui#WindowsUI> ;
+    <http://lv2plug.in/ns/extensions/ui#binary> <@CYDSP_LV2_BINARY@> .

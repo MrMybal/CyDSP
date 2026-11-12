@@ -83,7 +83,30 @@ pinned and covered by their original MIT notices and manifest records.
 
 
 Plugin interfaces and the original worker keep CyDSP's MIT grant. Exact SDK
-revisions and notices are pinned in the manifest. No AAX, ASIO, VST2, JUCE,
-GPL JSFX interpreter or copyleft LV2 host is bundled. External providers retain
+revisions and notices are pinned in the manifest. No AAX/ASIO/VST2 SDK, JUCE implementation, JUCE JSFX wrapper or copyleft LV2
+host is bundled. External providers retain
 their own terms. OS/native or separately licensed SDK access is not granted by
 CyDSP MIT. The built-in hosts are not a GUI framework or a complete DAW.
+
+
+## LV2 and JSFX
+
+LV2, Lilv, Serd, Sord, Sratom and Zix are pinned ISC components compiled privately
+inside Plugins. ysfx is Apache2.0, with embedded WDL/EEL2/LICE (Zlib-style), ISC
+Base64 helpers, MIT dr_libs and stb's published licensing choices. All original
+source notices remain intact; the installed ysfx notice collects embedded grants.
+
+The generated EEL2 parser has GPL-2.0-or-later WITH Bison-exception-2.2. The
+exception explicitly permits a larger work under its own license when it is not a
+parser generator using this skeleton. CyDSP uses it as a language runtime; it is
+not a Bison-style parser generator. The complete exception and GPL2 text are
+retained. This does not require CyDSP or a consuming commercial DAW to adopt GPL.
+The complete combined expression and per-file hashes are in the manifest; an
+Apache repository label alone is not substituted for the dependency review.
+
+Original CyDSP host/editor/IPC code remains MIT. Adapted runtime files retain their
+upstream grants, marked modifications and notice links. The complete distribution
+therefore includes licenses besides MIT; imported components are not relicensed
+by changing the library's top-level license. Plugin/script redistribution is a
+separate question from implementing the host. No third-party effects are bundled;
+fixtures are original CyDSP test code.

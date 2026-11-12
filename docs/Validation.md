@@ -5,7 +5,7 @@ benchmarks and the connected Quest 3. Production configurations remain static,
 with test/measurement/sanitizer options OFF. No CyCode or CyDAW_Project source, GitHub Actions or
 antivirus setting was changed. No application was installed on the Quest.
 
-Current compiler-input SHA-256: 078b0f7b6fd46af3ddddf51ced2356fa3664b2e6131a3c487d9ee7d99854f04e
+Current compiler-input SHA-256: ba56976d76e6165443325a093c7411c226cb7853257629d4efb2471dfe2ceccd
 
 ## Executed and passed
 
@@ -23,10 +23,10 @@ Current compiler-input SHA-256: 078b0f7b6fd46af3ddddf51ced2356fa3664b2e6131a3c48
 | Installed CMake package | Byte-exact headers/notices/manifest and separate static consumer |
 
 All 73 public headers compile individually. 95
-static_assert sites pass under MSVC and Clang. Source checks cover 231 owned C++
+static_assert sites pass under MSVC and Clang. Source checks cover 242 owned C++
 files, local includes, Python syntax, documentation links, build/ISA policy and all
-11 pinned permissive component archives/notices. Final compiler build logs have no
-warnings. An additional audit disassembles 666 production objects across all
+18 pinned commercially compatible component archives/notices. Final compiler build logs have no
+warnings. An additional audit disassembles 1366 production objects across all
 eight target archives, verifies per-file wide-ISA isolation and finds no fused FP
 instructions. The instruction audit is generated locally in `build/simd-validation.json`. SVE is compiled and
 linked for Android ARM64; no SVE-native execution is claimed.
@@ -85,9 +85,9 @@ remain provider policies, not claimed native matches for CyDAW algorithms.
 Long60-second AAC/WMA proxy fixtures compare exact near-EOF PCM, seek time,
 bounded copy storage and sampled process private-memory increase.
 
-Original CLAP/VST3 shared modules verify the ABI, multibus/sidechain, automation,
+Original CLAP/VST3/LV2 shared modules and JSFX scripts verify the ABI, multibus/sidechain, automation,
 copied events, component/controller states, lifecycle and host allocation audit.
-Windows tests actual child editors, resize/DPI, focus/keys/wheel and a separate
+Windows tests actual child editors (including the JSFX canvas), resize/DPI, focus/keys/wheel and a separate
 process worker: IPC, one-block pipeline, late-result silence, abrupt plugin exit
 and restart. Android runs in-process module tests; standalone Android process
 workers require an application service and are explicitly skipped.

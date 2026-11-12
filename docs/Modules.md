@@ -765,7 +765,7 @@ the header, returning the I/O status. Reprepare while active is rejected. Export
 format/encoding limits match AudioFileWriter. The recorder opens no microphone.
 
 The [DAW example](../examples/DawBuildingBlocks.cpp) composes these original APIs
-without borrowing code from an existing DAW. The optional Plugins target supplies original CLAP/VST3 host/editor and worker interfaces; see [Plugin hosting](Plugins.md).
+without borrowing code from an existing DAW. The optional Plugins target supplies original CLAP/VST3/LV2/JSFX host/editor and worker interfaces; see [Plugin hosting](Plugins.md).
 
 ## Prepared MIDI-CI property service
 
@@ -795,3 +795,11 @@ make negotiated/known/unknown/clock fields explicit. MidiInputBank/MidiInputGrou
 supply per-port ownership, flexible SysEx and disconnect epochs/voice release.
 ReadAheadSource policies/SourceTimeMap/providers expose curve/seek/tail semantics.
 See [DAW contracts](DawIntegration.md) and [plugin hosts/editors](Plugins.md).
+
+
+LV2 groups/Atom/worker/state and JSFX sliders/MIDI/serialization use the same
+PluginInstance and PluginWorker interface. Native LV2 precision is float, with a
+prepared conversion for double callers; JSFX has both sample entry points.
+The JSFX interpreter retains prepared local VM memory and exposes a native Windows
+canvas. Foreign code may still allocate or perform I/O. Exact format/extension,
+canvas/platform and licensing boundaries are in [Plugin hosting](Plugins.md).

@@ -48,7 +48,7 @@ try:
         environment['PATH']=';'.join(str(p) for p in [llvm,msvc/'bin/Hostx64'/target,sdk/'bin'/version/'x64'])+';'+environment.get('PATH','')
         ninja=vs/'Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe'
         command=[a.cmake,'-S',str(ROOT),'-B',str(folder),'-G','Ninja','-DCMAKE_MAKE_PROGRAM='+str(ninja),
-            '-DCMAKE_CXX_COMPILER='+str(llvm/'clang-cl.exe'),'-DCMAKE_LINKER='+str(llvm/'lld-link.exe'),
+            '-DCMAKE_C_COMPILER='+str(llvm/'clang-cl.exe'),'-DCMAKE_C_COMPILER_TARGET='+('i686-pc-windows-msvc' if a.arch=='x86' else 'x86_64-pc-windows-msvc'),'-DCMAKE_CXX_COMPILER='+str(llvm/'clang-cl.exe'),'-DCMAKE_LINKER='+str(llvm/'lld-link.exe'),
             '-DCMAKE_AR='+str(llvm/'llvm-lib.exe'),'-DCMAKE_BUILD_TYPE=Release','-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL',
             '-DCMAKE_CXX_COMPILER_TARGET='+('i686' if target=='x86' else 'x86_64')+'-pc-windows-msvc']+options
         executable=folder

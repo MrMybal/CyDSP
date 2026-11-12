@@ -65,4 +65,6 @@ et les validations matérielles restantes. Les tests macOS/Linux sont reportés
 
 Ajouts DAW du 12 novembre : [contrats et périmètre](docs/DawIntegration.md), avec DSP, synthèse/presets, lecture, périphériques/MIDI et fichiers/codecs. La validation macOS/Linux reste différée.
 
-Corrections du rapport d’intégration : métadonnées WAV publiques, capacités/identités/horloges audio, MIDI multiport/SysEx, proxy PCM et politiques de sources. Le module [Plugins](docs/Plugins.md) fournit des hôtes CLAP/VST3, des éditeurs natifs et un worker séparé. Les formats supplémentaires et les modes spécifiques utilisent des fournisseurs explicites ; la migration de CyDAW et la validation physique restent distinctes.
+Corrections du rapport d’intégration : métadonnées WAV publiques, capacités/identités/horloges audio, MIDI multiport/SysEx, proxy PCM et politiques de sources. Le module [Plugins](docs/Plugins.md) fournit des hôtes CLAP/VST3/LV2/JSFX, des éditeurs natifs et un worker séparé. Les formats supplémentaires et les modes spécifiques utilisent des fournisseurs explicites ; la migration de CyDAW et la validation physique restent distinctes.
+
+Hébergement LV2/JSFX : adaptateurs CyDSP originaux, automation/MIDI/état, bus et worker LV2, éditeurs et canvas natifs Windows. Les dépendances conservent leurs notices ; voir les [contrats Plugins](docs/Plugins.md) et les [licences](docs/Licensing.md).

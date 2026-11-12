@@ -1346,6 +1346,2584 @@
       "scope": "Pinned unmodified interface headers and minimal ABI implementation files only; original CyDSP host/export/editor adapters use private SDK types. No external plugin or GUI framework code.",
       "noticePath": "third_party/licenses/vst3-interfaces.txt",
       "copyrights": []
+    },
+    {
+      "name": "lv2",
+      "repository": "https://github.com/lv2/lv2",
+      "revision": "3c57dae600a5ad8d05acd53ee3490f7d91cb7be6",
+      "license": "ISC",
+      "noticePath": "third_party/licenses/lv2.txt",
+      "copyrights": [],
+      "adaptedFiles": [],
+      "scope": "Private original CyDSP LV2 hosting dependencies.",
+      "files": [
+        {
+          "upstreamPath": "COPYING",
+          "archivePath": "third_party/lv2/COPYING",
+          "sha256": "1e6bb175e193608b767ff25a4ed68b82c4db599491cf0d2694435cf60e9a4841",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/COPYING"
+        },
+        {
+          "upstreamPath": "include/lv2/atom/atom.h",
+          "archivePath": "third_party/lv2/include/lv2/atom/atom.h",
+          "sha256": "5c8a759858aa7d438a5474ef1c6304de5ce201e3f7b584e26ccb9f8dda965be2",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/atom/atom.h"
+        },
+        {
+          "upstreamPath": "include/lv2/atom/forge.h",
+          "archivePath": "third_party/lv2/include/lv2/atom/forge.h",
+          "sha256": "7382ef7a5a9642cc4e5c003c4f9d258546a89e5b17d27add5377a77de628bfeb",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/atom/forge.h"
+        },
+        {
+          "upstreamPath": "include/lv2/atom/util.h",
+          "archivePath": "third_party/lv2/include/lv2/atom/util.h",
+          "sha256": "97254a55831fbcaeca7f65257d3a4a1f56adab87522587b2525c02ba24ef1dab",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/atom/util.h"
+        },
+        {
+          "upstreamPath": "include/lv2/buf-size/buf-size.h",
+          "archivePath": "third_party/lv2/include/lv2/buf-size/buf-size.h",
+          "sha256": "d773f5169547eb91581877fe03703df51b5908a1fb0961c609d6b83531f10db0",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/buf-size/buf-size.h"
+        },
+        {
+          "upstreamPath": "include/lv2/core/attributes.h",
+          "archivePath": "third_party/lv2/include/lv2/core/attributes.h",
+          "sha256": "ad5f04c7a581f5fca55948cf6752bc807a3714a6f84be5213daa8c37a2f03a00",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/core/attributes.h"
+        },
+        {
+          "upstreamPath": "include/lv2/core/lv2.h",
+          "archivePath": "third_party/lv2/include/lv2/core/lv2.h",
+          "sha256": "c71ee07fbb9267cacc7b9bc76954a32b2edd019611a300f3b2f5bb7f660ccdba",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/core/lv2.h"
+        },
+        {
+          "upstreamPath": "include/lv2/core/lv2_util.h",
+          "archivePath": "third_party/lv2/include/lv2/core/lv2_util.h",
+          "sha256": "2492f9768c8f7144f8cca05f06555d70393092c5cd01aa0e90524b5f7e208261",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/core/lv2_util.h"
+        },
+        {
+          "upstreamPath": "include/lv2/data-access/data-access.h",
+          "archivePath": "third_party/lv2/include/lv2/data-access/data-access.h",
+          "sha256": "5794ccdd0d61a2259bc1dd1bb5d69ba8961a5b1fb4a1b331ae243d6d6b2e0611",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/data-access/data-access.h"
+        },
+        {
+          "upstreamPath": "include/lv2/dynmanifest/dynmanifest.h",
+          "archivePath": "third_party/lv2/include/lv2/dynmanifest/dynmanifest.h",
+          "sha256": "311ae3a6a6fd2a57b1286a138c80472b8cbe07549361a4848f7d4339895ca82d",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/dynmanifest/dynmanifest.h"
+        },
+        {
+          "upstreamPath": "include/lv2/event/event-helpers.h",
+          "archivePath": "third_party/lv2/include/lv2/event/event-helpers.h",
+          "sha256": "1d1b41d11ca671da1379b504302c65ad0c5ff618baad317f513d1d48fae21845",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/event/event-helpers.h"
+        },
+        {
+          "upstreamPath": "include/lv2/event/event.h",
+          "archivePath": "third_party/lv2/include/lv2/event/event.h",
+          "sha256": "b64140bfbd2f61f758819ec145260055c174f98897a5ef94138d753ea3c628c2",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/event/event.h"
+        },
+        {
+          "upstreamPath": "include/lv2/instance-access/instance-access.h",
+          "archivePath": "third_party/lv2/include/lv2/instance-access/instance-access.h",
+          "sha256": "2dfc2c98901ea66f7b69ea45495d66d96dba054f8a0af71704a54d517c1e63ca",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/instance-access/instance-access.h"
+        },
+        {
+          "upstreamPath": "include/lv2/log/log.h",
+          "archivePath": "third_party/lv2/include/lv2/log/log.h",
+          "sha256": "01dc52ed92ec6cadefbf2f620e3f6d9333117feb6a983411a00bfe70f1bcd013",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/log/log.h"
+        },
+        {
+          "upstreamPath": "include/lv2/log/logger.h",
+          "archivePath": "third_party/lv2/include/lv2/log/logger.h",
+          "sha256": "1f4decc986bff5b874a027ecf6be16208033154ad4c792c3c651c9d111677b80",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/log/logger.h"
+        },
+        {
+          "upstreamPath": "include/lv2/midi/midi.h",
+          "archivePath": "third_party/lv2/include/lv2/midi/midi.h",
+          "sha256": "a1a4eb25779be7d2629974ab5eb5d83603de560004ff701d41d788591a5c431a",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/midi/midi.h"
+        },
+        {
+          "upstreamPath": "include/lv2/morph/morph.h",
+          "archivePath": "third_party/lv2/include/lv2/morph/morph.h",
+          "sha256": "99d2112dc04b4d31f1d592e3868bcc1b51fc2ad113cbe13beb08eed2b052c4be",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/morph/morph.h"
+        },
+        {
+          "upstreamPath": "include/lv2/options/options.h",
+          "archivePath": "third_party/lv2/include/lv2/options/options.h",
+          "sha256": "7afe8dd0f0b5accf19e2ee0660b01addd2a8c835df95f6cf78c186eafe76f6a9",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/options/options.h"
+        },
+        {
+          "upstreamPath": "include/lv2/parameters/parameters.h",
+          "archivePath": "third_party/lv2/include/lv2/parameters/parameters.h",
+          "sha256": "40761b68068d46dad9407b222c7bf191983292c83a8064649d7fd2bd52baed71",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/parameters/parameters.h"
+        },
+        {
+          "upstreamPath": "include/lv2/patch/patch.h",
+          "archivePath": "third_party/lv2/include/lv2/patch/patch.h",
+          "sha256": "047140f996333837ba7f7ec9fcaf3fc90d2bd8fb69ce5d5463100fe27813b978",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/patch/patch.h"
+        },
+        {
+          "upstreamPath": "include/lv2/port-groups/port-groups.h",
+          "archivePath": "third_party/lv2/include/lv2/port-groups/port-groups.h",
+          "sha256": "0aee45dc50404cd9a7322ea1887f310eb184bb7bd900282f7e7a78c639ec3d34",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/port-groups/port-groups.h"
+        },
+        {
+          "upstreamPath": "include/lv2/port-props/port-props.h",
+          "archivePath": "third_party/lv2/include/lv2/port-props/port-props.h",
+          "sha256": "c167a69794bc57bb06490dd45ffcf1bb89340341644339b49b769b056dd63a41",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/port-props/port-props.h"
+        },
+        {
+          "upstreamPath": "include/lv2/presets/presets.h",
+          "archivePath": "third_party/lv2/include/lv2/presets/presets.h",
+          "sha256": "b11e1b4bce83e942581e7d57a58c048acaeaf425848a91613f1951b4ab104179",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/presets/presets.h"
+        },
+        {
+          "upstreamPath": "include/lv2/resize-port/resize-port.h",
+          "archivePath": "third_party/lv2/include/lv2/resize-port/resize-port.h",
+          "sha256": "1e6384bf5cbbc9dbd3da918f598c1fbdf052ac2b22a125ea3673d80f54ba60a9",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/resize-port/resize-port.h"
+        },
+        {
+          "upstreamPath": "include/lv2/state/state.h",
+          "archivePath": "third_party/lv2/include/lv2/state/state.h",
+          "sha256": "e121b43a39abd0fd3512845e23e1f81d7b5c26ea12df29ea2d22c2cd73eafd22",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/state/state.h"
+        },
+        {
+          "upstreamPath": "include/lv2/time/time.h",
+          "archivePath": "third_party/lv2/include/lv2/time/time.h",
+          "sha256": "64f26469cd379fb590925f6da736f78be4c5069b4dbf51ddd9f16952e227b3ce",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/time/time.h"
+        },
+        {
+          "upstreamPath": "include/lv2/ui/ui.h",
+          "archivePath": "third_party/lv2/include/lv2/ui/ui.h",
+          "sha256": "bfbc70b209888644f589fb8b4ff5e13b4df3872c30d2fc8d4c9c3bb1e0d6a9bf",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/ui/ui.h"
+        },
+        {
+          "upstreamPath": "include/lv2/units/units.h",
+          "archivePath": "third_party/lv2/include/lv2/units/units.h",
+          "sha256": "67c1645055cbd30c7a8c358b8753ac3ba93371aa9a3b85da6ba930d568ee72ed",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/units/units.h"
+        },
+        {
+          "upstreamPath": "include/lv2/uri-map/uri-map.h",
+          "archivePath": "third_party/lv2/include/lv2/uri-map/uri-map.h",
+          "sha256": "21f454bd0a9303673e2607aafc62d9bed799227bcab9aac6cc1cc5f84b6ccbf4",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/uri-map/uri-map.h"
+        },
+        {
+          "upstreamPath": "include/lv2/urid/urid.h",
+          "archivePath": "third_party/lv2/include/lv2/urid/urid.h",
+          "sha256": "000dfd6fa775b9b9a6b70523f814fbc52b13944289071add77f39d94878beea9",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/urid/urid.h"
+        },
+        {
+          "upstreamPath": "include/lv2/worker/worker.h",
+          "archivePath": "third_party/lv2/include/lv2/worker/worker.h",
+          "sha256": "53652de5a74ff87f65d38cdd5369a4dc32eee9014e10965ca4fa2427eb072d8a",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/include/lv2/worker/worker.h"
+        },
+        {
+          "upstreamPath": "lv2/atom.lv2/atom.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/atom.lv2/atom.meta.ttl",
+          "sha256": "d1d2b7f4a71b776709eb4ee69bd8ea458f16cafc6d19d3f52345c5b5c2015884",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/atom.lv2/atom.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/atom.lv2/atom.ttl",
+          "archivePath": "third_party/lv2/lv2/atom.lv2/atom.ttl",
+          "sha256": "1923b6c21a83eb48585f65bb8750781b68393badf42fb1bf975bf3c6ad7056ed",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/atom.lv2/atom.ttl"
+        },
+        {
+          "upstreamPath": "lv2/atom.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/atom.lv2/manifest.ttl",
+          "sha256": "96acdc12127cc7813d6e81e2b6eb54812c65be69b6651b5bcef6670bc24d555d",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/atom.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/buf-size.lv2/buf-size.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/buf-size.lv2/buf-size.meta.ttl",
+          "sha256": "7c72afa48eb33e8253a12349b30ec2dce8a0e9d0a7cfdd4bb418cb6711ad277d",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/buf-size.lv2/buf-size.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/buf-size.lv2/buf-size.ttl",
+          "archivePath": "third_party/lv2/lv2/buf-size.lv2/buf-size.ttl",
+          "sha256": "470e2798fe30331d4b90532a6b6e5c16fc9f939a813b91093c8640bcff79a5a9",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/buf-size.lv2/buf-size.ttl"
+        },
+        {
+          "upstreamPath": "lv2/buf-size.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/buf-size.lv2/manifest.ttl",
+          "sha256": "344e38af949c64fef67258d14923ead603cab8b4873e6bf3e17d03656ddb075b",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/buf-size.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/core.lv2/lv2core.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/core.lv2/lv2core.meta.ttl",
+          "sha256": "7807832c7ec06923dcc01fd25f702edab7291f1aed78891d2b291010e665a24a",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/core.lv2/lv2core.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/core.lv2/lv2core.ttl",
+          "archivePath": "third_party/lv2/lv2/core.lv2/lv2core.ttl",
+          "sha256": "dcd7d06e1c0d8d2705ec705e6e36cb5dbb215c703b5610459c6fd19d77eb4912",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/core.lv2/lv2core.ttl"
+        },
+        {
+          "upstreamPath": "lv2/core.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/core.lv2/manifest.ttl",
+          "sha256": "627d4ee543f55b98832e81199b0a3615954894e44b0a931d02369bbf21d0404f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/core.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/core.lv2/meta.ttl",
+          "archivePath": "third_party/lv2/lv2/core.lv2/meta.ttl",
+          "sha256": "935b3f301b25f3950932195694296efc2c2bc77f08c8e3442eb3af763861795a",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/core.lv2/meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/core.lv2/people.ttl",
+          "archivePath": "third_party/lv2/lv2/core.lv2/people.ttl",
+          "sha256": "288600dbb0da3ac3db54aa8feff3a994e34fa5a315e0b1da98841b27d082707f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/core.lv2/people.ttl"
+        },
+        {
+          "upstreamPath": "lv2/data-access.lv2/data-access.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/data-access.lv2/data-access.meta.ttl",
+          "sha256": "9d6c73e10028963bcdeda6c28df8a9b0f38398e259ed9dc798a8b77d7a4280c5",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/data-access.lv2/data-access.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/data-access.lv2/data-access.ttl",
+          "archivePath": "third_party/lv2/lv2/data-access.lv2/data-access.ttl",
+          "sha256": "8b2973a30b9de39a5161b8847af9cf07e2f3aea60cf169ea5113dbae776c694c",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/data-access.lv2/data-access.ttl"
+        },
+        {
+          "upstreamPath": "lv2/data-access.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/data-access.lv2/manifest.ttl",
+          "sha256": "cb22b79357bb5417a4dc48f581da793799bd017b62f3b8fd3b5d22a243ae8dbd",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/data-access.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/dynmanifest.lv2/dynmanifest.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/dynmanifest.lv2/dynmanifest.meta.ttl",
+          "sha256": "c68ee1a61a20b8e6af5d260168b0911e67129fb6f3676866784ee809f5374fac",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/dynmanifest.lv2/dynmanifest.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/dynmanifest.lv2/dynmanifest.ttl",
+          "archivePath": "third_party/lv2/lv2/dynmanifest.lv2/dynmanifest.ttl",
+          "sha256": "7755c0780916496740cb14031cdaf1bdbf7b15d54428e18333030a67ba014c0f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/dynmanifest.lv2/dynmanifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/dynmanifest.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/dynmanifest.lv2/manifest.ttl",
+          "sha256": "7584fc38bb6766f45c8e8c2fc5e20d0a2e9192f2bf3b139fc10969d15ce6fcc8",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/dynmanifest.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/event.lv2/event.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/event.lv2/event.meta.ttl",
+          "sha256": "ef41585d8ba83331402812b92a69bbd45db2586b276fc542f0cb237877c49ed3",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/event.lv2/event.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/event.lv2/event.ttl",
+          "archivePath": "third_party/lv2/lv2/event.lv2/event.ttl",
+          "sha256": "fe7a8a99e20449f0b65c1b49305abfff2df08abc23017e91bb6bac6a8887890e",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/event.lv2/event.ttl"
+        },
+        {
+          "upstreamPath": "lv2/event.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/event.lv2/manifest.ttl",
+          "sha256": "f3ae897f6042efc93473253145f490706cb9a8543bee3a79053bfe786d966eec",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/event.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/instance-access.lv2/instance-access.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/instance-access.lv2/instance-access.meta.ttl",
+          "sha256": "e2e3a6c2fca954f8d5c52976fa2ba96a3a1cf60781d80b9abab7c71963ac1131",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/instance-access.lv2/instance-access.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/instance-access.lv2/instance-access.ttl",
+          "archivePath": "third_party/lv2/lv2/instance-access.lv2/instance-access.ttl",
+          "sha256": "d8b9e35480edc6c6f329df7184ef9951313f5bdc10e41c4c2982040b9fbf0d6b",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/instance-access.lv2/instance-access.ttl"
+        },
+        {
+          "upstreamPath": "lv2/instance-access.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/instance-access.lv2/manifest.ttl",
+          "sha256": "68cd966bf4b2ceef19594df7c7d29d0d325649a03a64a1b544db58fa9a612817",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/instance-access.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/log.lv2/log.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/log.lv2/log.meta.ttl",
+          "sha256": "b207eee619babb7eeb9fd1a2694b5cc77d987063add72ec50ee2dde47227ba07",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/log.lv2/log.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/log.lv2/log.ttl",
+          "archivePath": "third_party/lv2/lv2/log.lv2/log.ttl",
+          "sha256": "28682e4e0fb8bd0a9427345ff91d604ae7069bd2a36d8427c3e8c765c69c9345",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/log.lv2/log.ttl"
+        },
+        {
+          "upstreamPath": "lv2/log.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/log.lv2/manifest.ttl",
+          "sha256": "60537643f285cdeb2502ebeac4b6dfb0e6d21e7ae78484371ce00758822aa28c",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/log.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/midi.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/midi.lv2/manifest.ttl",
+          "sha256": "c4dee583a93008977bd44b3886c51024f1985e5af826a1fc19e73bd6dc406dc1",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/midi.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/midi.lv2/midi.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/midi.lv2/midi.meta.ttl",
+          "sha256": "e2416b7980d3ba368c7fbe797c4283914afa67cf426aa882600ee1e591386cc2",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/midi.lv2/midi.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/midi.lv2/midi.ttl",
+          "archivePath": "third_party/lv2/lv2/midi.lv2/midi.ttl",
+          "sha256": "f697fafdab183a3f8126a7fa04c8da6d8d011645de343c993f455b1001af38e3",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/midi.lv2/midi.ttl"
+        },
+        {
+          "upstreamPath": "lv2/morph.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/morph.lv2/manifest.ttl",
+          "sha256": "10a5bb1e6c6d77cbe1a29179f36c7a7d0fa68b837266f96be4950a95145b956f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/morph.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/morph.lv2/morph.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/morph.lv2/morph.meta.ttl",
+          "sha256": "c7c99035c11a26f0d51e82b62efb0a761ad284b4668e7e56dd1937c0e9f433d8",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/morph.lv2/morph.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/morph.lv2/morph.ttl",
+          "archivePath": "third_party/lv2/lv2/morph.lv2/morph.ttl",
+          "sha256": "bcbd0e9838212fa4606c5709c3e7d64fc5ea5b29fe30fba6dcb6d6be297083af",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/morph.lv2/morph.ttl"
+        },
+        {
+          "upstreamPath": "lv2/options.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/options.lv2/manifest.ttl",
+          "sha256": "96b3aca0241d5cfbae8d60948597cd0ce7d933ed41b6ccf3a6f64bd822ec9c02",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/options.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/options.lv2/options.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/options.lv2/options.meta.ttl",
+          "sha256": "8426abc5ce65ddbeff632615de375de136be3f25eb25e0d8aa824258fcd28282",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/options.lv2/options.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/options.lv2/options.ttl",
+          "archivePath": "third_party/lv2/lv2/options.lv2/options.ttl",
+          "sha256": "1136caaaebe1ce1f12d630a2d782e666c05ba208e41df4bd03adad6cb463ea21",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/options.lv2/options.ttl"
+        },
+        {
+          "upstreamPath": "lv2/parameters.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/parameters.lv2/manifest.ttl",
+          "sha256": "3771c6fab1b2414a30bf8037a11e8d7d022e21ec96a34bb5abcc75e8a3656b3b",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/parameters.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/parameters.lv2/parameters.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/parameters.lv2/parameters.meta.ttl",
+          "sha256": "abef203aabd39e69484889d9e829b9e6c89d7bc62940ca14aeb19f562b143094",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/parameters.lv2/parameters.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/parameters.lv2/parameters.ttl",
+          "archivePath": "third_party/lv2/lv2/parameters.lv2/parameters.ttl",
+          "sha256": "bc4a4efb660e62268c0eaf5328f82d81b8fc025ff91ded24b33fd122d7bb2099",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/parameters.lv2/parameters.ttl"
+        },
+        {
+          "upstreamPath": "lv2/patch.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/patch.lv2/manifest.ttl",
+          "sha256": "3bc5e91e64f9ee8842c0b87afbf370527d7b3559b170d2df34b904dac4877346",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/patch.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/patch.lv2/patch.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/patch.lv2/patch.meta.ttl",
+          "sha256": "1d0e0b47062073380e8251389d9d5a320d4f4d0b53e19e60580652e33d2e2f1f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/patch.lv2/patch.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/patch.lv2/patch.ttl",
+          "archivePath": "third_party/lv2/lv2/patch.lv2/patch.ttl",
+          "sha256": "287d9e8d5e5d8af0e2a7a83c7f190cb25753fccf44be1ffb63dca5c365024cdd",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/patch.lv2/patch.ttl"
+        },
+        {
+          "upstreamPath": "lv2/port-groups.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/port-groups.lv2/manifest.ttl",
+          "sha256": "f73c1b9881ed9e427388266f00092c94a2c654f125bcfdf31269f45e8a8232d2",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/port-groups.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/port-groups.lv2/port-groups.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/port-groups.lv2/port-groups.meta.ttl",
+          "sha256": "4b3d8171dfa4885e9d746cb0ef0e3e9149847c191cc098689cf2964bc14cacc5",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/port-groups.lv2/port-groups.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/port-groups.lv2/port-groups.ttl",
+          "archivePath": "third_party/lv2/lv2/port-groups.lv2/port-groups.ttl",
+          "sha256": "63b64316a23f23e4a02ed1ffca6df2f2a54889cd92d6ac714f1310cff308d408",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/port-groups.lv2/port-groups.ttl"
+        },
+        {
+          "upstreamPath": "lv2/port-props.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/port-props.lv2/manifest.ttl",
+          "sha256": "cee52037e4700b98357010473b98eeea0ac00897ce7d66ccbb65776bcc61e7bb",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/port-props.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/port-props.lv2/port-props.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/port-props.lv2/port-props.meta.ttl",
+          "sha256": "f653d7ef6804c06fc9f0b993b07ce996c04a7778528957aa63a47ee5cdaba118",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/port-props.lv2/port-props.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/port-props.lv2/port-props.ttl",
+          "archivePath": "third_party/lv2/lv2/port-props.lv2/port-props.ttl",
+          "sha256": "443f39869c798d24aa54a5a5814d9fc8450fa2763b7b1b6fefff24f73127ec3a",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/port-props.lv2/port-props.ttl"
+        },
+        {
+          "upstreamPath": "lv2/presets.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/presets.lv2/manifest.ttl",
+          "sha256": "d2a19e5f1be8e6ec552c61870d4efa46d047ad8bd267100fd192b62354472b84",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/presets.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/presets.lv2/presets.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/presets.lv2/presets.meta.ttl",
+          "sha256": "6051a751339479aa0475abb2a1e8b60bf587b1a1731c14df449bc88429500e58",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/presets.lv2/presets.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/presets.lv2/presets.ttl",
+          "archivePath": "third_party/lv2/lv2/presets.lv2/presets.ttl",
+          "sha256": "00ecb8c1096c5ee9c441c59d6701dadcca3bb1b2d755ff1067475576fe8a4ebb",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/presets.lv2/presets.ttl"
+        },
+        {
+          "upstreamPath": "lv2/resize-port.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/resize-port.lv2/manifest.ttl",
+          "sha256": "cc6ac9dd5fc94411d90874b382978ff1b58566858719677e1b6729167b2a961f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/resize-port.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/resize-port.lv2/resize-port.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/resize-port.lv2/resize-port.meta.ttl",
+          "sha256": "0bc96e7ce22ca70ac6de23dbeb0363eb13bd078b838fde5a479f7d5b2a7d72cb",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/resize-port.lv2/resize-port.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/resize-port.lv2/resize-port.ttl",
+          "archivePath": "third_party/lv2/lv2/resize-port.lv2/resize-port.ttl",
+          "sha256": "aec00cba923a58d010f6e4d71b9a3a2de1aa4da48bafe6f68992657bf708c5bc",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/resize-port.lv2/resize-port.ttl"
+        },
+        {
+          "upstreamPath": "lv2/state.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/state.lv2/manifest.ttl",
+          "sha256": "0d6e7c9bcc1ae6d366f0943efbe9836347ce5e26f0929ef5a670ae61238a3dbc",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/state.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/state.lv2/state.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/state.lv2/state.meta.ttl",
+          "sha256": "ef3cfa6d8d36d093988dc7641b56e38522171c7ace33d925ecc42ed5bd094937",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/state.lv2/state.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/state.lv2/state.ttl",
+          "archivePath": "third_party/lv2/lv2/state.lv2/state.ttl",
+          "sha256": "9bd743f69415d4c058d9abfda5c083a401341035937dd11b6902e2ad10eefde7",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/state.lv2/state.ttl"
+        },
+        {
+          "upstreamPath": "lv2/time.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/time.lv2/manifest.ttl",
+          "sha256": "aec768da25b0d9866dcfb157bee53950cb9472388aa3b927fa4e5f4ce0ebf7ca",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/time.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/time.lv2/time.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/time.lv2/time.meta.ttl",
+          "sha256": "a7f482b36653e821c0f42558211e621a41fe0083673d9b527a03a96527842a96",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/time.lv2/time.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/time.lv2/time.ttl",
+          "archivePath": "third_party/lv2/lv2/time.lv2/time.ttl",
+          "sha256": "076939fa3796d6768cbd5fb5d24d3a5ee6710e20172038175c5ac10a1eaff19f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/time.lv2/time.ttl"
+        },
+        {
+          "upstreamPath": "lv2/ui.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/ui.lv2/manifest.ttl",
+          "sha256": "b2b1d873a04551fba284eb3d40b0a4442ee7b252e9238c8a2909444500a92449",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/ui.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/ui.lv2/ui.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/ui.lv2/ui.meta.ttl",
+          "sha256": "7a71b69c2017a780cdd74ceece66bef73ff359b26673e0ad2ab7a90206b1f71a",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/ui.lv2/ui.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/ui.lv2/ui.ttl",
+          "archivePath": "third_party/lv2/lv2/ui.lv2/ui.ttl",
+          "sha256": "3c189ec4a43cc4792b80f44b5f7b93d5705a6935160274d8743a95f8ca3aa2a1",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/ui.lv2/ui.ttl"
+        },
+        {
+          "upstreamPath": "lv2/units.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/units.lv2/manifest.ttl",
+          "sha256": "7febec081e50c633fd321f9d4b651c4aa416b016202f342ef41ffa4bc6f35f8d",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/units.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/units.lv2/units.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/units.lv2/units.meta.ttl",
+          "sha256": "5d3fe0502091c63f78a275c309d5d4fb54c3311f6b7fdfa9841f3aa5ff2285a7",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/units.lv2/units.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/units.lv2/units.ttl",
+          "archivePath": "third_party/lv2/lv2/units.lv2/units.ttl",
+          "sha256": "a6680807b0522d93b5167345c4f3a8b31b8bc04dbf2106918c9fe99309deef78",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/units.lv2/units.ttl"
+        },
+        {
+          "upstreamPath": "lv2/uri-map.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/uri-map.lv2/manifest.ttl",
+          "sha256": "a4e3177cfcae6a003e716a3355e4738ca915d81ab3b2842f88b900586ac14128",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/uri-map.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/uri-map.lv2/uri-map.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/uri-map.lv2/uri-map.meta.ttl",
+          "sha256": "74f1d2dba3b34c565392fb855cabd2fdd11d49f188dd1ee606c38376a96d5b4f",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/uri-map.lv2/uri-map.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/uri-map.lv2/uri-map.ttl",
+          "archivePath": "third_party/lv2/lv2/uri-map.lv2/uri-map.ttl",
+          "sha256": "64131451b0822fefc69bdb816931755c66909fbf4a1edfc5ba4366a838a64805",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/uri-map.lv2/uri-map.ttl"
+        },
+        {
+          "upstreamPath": "lv2/urid.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/urid.lv2/manifest.ttl",
+          "sha256": "e436ae7a2b11ac00e4a682d3dd218dfaa66e23de7e291740b22cd310f3d6cd09",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/urid.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/urid.lv2/urid.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/urid.lv2/urid.meta.ttl",
+          "sha256": "9e9bb040042780cfbf502438c4c23a0b766f7ad6c0ac2bac12c80128ae453878",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/urid.lv2/urid.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/urid.lv2/urid.ttl",
+          "archivePath": "third_party/lv2/lv2/urid.lv2/urid.ttl",
+          "sha256": "f1fc579a1dfe49569afed768e3036983abe285b47d74ac20cfdf5cd219acd353",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/urid.lv2/urid.ttl"
+        },
+        {
+          "upstreamPath": "lv2/worker.lv2/manifest.ttl",
+          "archivePath": "third_party/lv2/lv2/worker.lv2/manifest.ttl",
+          "sha256": "c1d4f38138ce9a100dc92d830284bef1f537ec53fc3f2f2581760d85dd717554",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/worker.lv2/manifest.ttl"
+        },
+        {
+          "upstreamPath": "lv2/worker.lv2/worker.meta.ttl",
+          "archivePath": "third_party/lv2/lv2/worker.lv2/worker.meta.ttl",
+          "sha256": "c12bf422749482c02382f895fbab939e55276329070a0dc1d267bdb125302baa",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/worker.lv2/worker.meta.ttl"
+        },
+        {
+          "upstreamPath": "lv2/worker.lv2/worker.ttl",
+          "archivePath": "third_party/lv2/lv2/worker.lv2/worker.ttl",
+          "sha256": "60eb78c3322183f1cb0d13448a981fbf5a5c61654e5bd66a57cfced894a46e33",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/lv2/worker.lv2/worker.ttl"
+        },
+        {
+          "upstreamPath": "meson.build",
+          "archivePath": "third_party/lv2/meson.build",
+          "sha256": "f275a669befa59773164f0c7d68b4bd78f5cc73cf9ace8c1840596cf885d8d99",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/meson.build"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/lv2/README.md",
+          "sha256": "c2270b87c4281b3413b8dad9734222cc16afb0c44fc05700aef23d4a74e32fdf",
+          "url": "https://raw.githubusercontent.com/lv2/lv2/3c57dae600a5ad8d05acd53ee3490f7d91cb7be6/README.md"
+        }
+      ]
+    },
+    {
+      "name": "lilv",
+      "repository": "https://github.com/lv2/lilv",
+      "revision": "4b8f30055fa5cb4134a2eb45fc1555bc04289314",
+      "license": "ISC",
+      "noticePath": "third_party/licenses/lilv.txt",
+      "copyrights": [],
+      "adaptedFiles": [],
+      "scope": "Private original CyDSP LV2 hosting dependencies.",
+      "files": [
+        {
+          "upstreamPath": "COPYING",
+          "archivePath": "third_party/lilv/COPYING",
+          "sha256": "ae223adebe7cc1ee0716e0f926d1ecc8e42c6e4da7e1d7418c9c07fae244bbde",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/COPYING"
+        },
+        {
+          "upstreamPath": "include/lilv/lilv.h",
+          "archivePath": "third_party/lilv/include/lilv/lilv.h",
+          "sha256": "68c53a8023206291dafb22d6e099d554fa8b1b047f3f4ab601fd90f0b26990af",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/include/lilv/lilv.h"
+        },
+        {
+          "upstreamPath": "include/lilv/lilvmm.hpp",
+          "archivePath": "third_party/lilv/include/lilv/lilvmm.hpp",
+          "sha256": "a3a708c9a7b255d0103897239ec4c42aa61e99b13622251714579a56b3b33a5c",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/include/lilv/lilvmm.hpp"
+        },
+        {
+          "upstreamPath": "meson.build",
+          "archivePath": "third_party/lilv/meson.build",
+          "sha256": "bd9f2ca2cec3861a45de40ebd6e9e38e7036ff986e6b324857b16ac770f00122",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/meson.build"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/lilv/README.md",
+          "sha256": "e4eb0fff408589cd944f56bbcdd76ca5f9cab14b9f0e9b946c1fc7731530923b",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/README.md"
+        },
+        {
+          "upstreamPath": "src/.clang-tidy",
+          "archivePath": "third_party/lilv/src/.clang-tidy",
+          "sha256": "c45d60f603dccf4b3a17a1353d3ab9c3d6f6269d37d9bd1e22837723e95a2e9b",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/.clang-tidy"
+        },
+        {
+          "upstreamPath": "src/collections.c",
+          "archivePath": "third_party/lilv/src/collections.c",
+          "sha256": "2476ee602c8f89a5fca345891201709466817a14bfc8c91e72244cfb90c2f0eb",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/collections.c"
+        },
+        {
+          "upstreamPath": "src/dylib.c",
+          "archivePath": "third_party/lilv/src/dylib.c",
+          "sha256": "d21d2a0cbd2b2c6435ea021e28a3924157850db79d21baca18517dd7e587e3dd",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/dylib.c"
+        },
+        {
+          "upstreamPath": "src/dylib.h",
+          "archivePath": "third_party/lilv/src/dylib.h",
+          "sha256": "0eaebb94fa823ad7429fe8eaf96eaa271f50579b041b6ce79ebfa67e8c9d87b3",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/dylib.h"
+        },
+        {
+          "upstreamPath": "src/instance.c",
+          "archivePath": "third_party/lilv/src/instance.c",
+          "sha256": "867dc5525892be468023dca682deb6dccb6ee1e3ed59f3da44dcb2dcf4f18122",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/instance.c"
+        },
+        {
+          "upstreamPath": "src/lib.c",
+          "archivePath": "third_party/lilv/src/lib.c",
+          "sha256": "5902175fae701752f65bd53651b3ed54324e75ca669463f1131d74029bb6d054",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/lib.c"
+        },
+        {
+          "upstreamPath": "src/lilv_config.h",
+          "archivePath": "third_party/lilv/src/lilv_config.h",
+          "sha256": "2fee93a7201def917a48d575d83e5acb88f552fc638d641c7394524d4c5a931e",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/lilv_config.h"
+        },
+        {
+          "upstreamPath": "src/lilv_internal.h",
+          "archivePath": "third_party/lilv/src/lilv_internal.h",
+          "sha256": "de3e3b2820087cd7607301aabc6b1790c903282461d72553982b9f00ebcb67b1",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/lilv_internal.h"
+        },
+        {
+          "upstreamPath": "src/load_skimmer.c",
+          "archivePath": "third_party/lilv/src/load_skimmer.c",
+          "sha256": "357a0095ae539466ae6370ca080b23aec6d89838aedbcbf7a185287344af921e",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/load_skimmer.c"
+        },
+        {
+          "upstreamPath": "src/load_skimmer.h",
+          "archivePath": "third_party/lilv/src/load_skimmer.h",
+          "sha256": "646666502aedeb44182fe76d08f77be22aaf4962aa334fb17b6a40bbe0ec640e",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/load_skimmer.h"
+        },
+        {
+          "upstreamPath": "src/log.h",
+          "archivePath": "third_party/lilv/src/log.h",
+          "sha256": "400885b9ccff2341569dbc96c2fe6087d1df550d9d3f9642d5459ca0ebef4d36",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/log.h"
+        },
+        {
+          "upstreamPath": "src/node.c",
+          "archivePath": "third_party/lilv/src/node.c",
+          "sha256": "f96edfba6b77d6050e5ec82ad52bbb7fdae52ea8d4b41b4f0bd2dbe1dc77f2c1",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/node.c"
+        },
+        {
+          "upstreamPath": "src/node_hash.c",
+          "archivePath": "third_party/lilv/src/node_hash.c",
+          "sha256": "51b23c2a43eabb5278e7560f9726e1421729568c0a3e70d96fcb70f5bf44ab5c",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/node_hash.c"
+        },
+        {
+          "upstreamPath": "src/node_hash.h",
+          "archivePath": "third_party/lilv/src/node_hash.h",
+          "sha256": "95cf12eb68fa42d51bc405fe710944d9dca7249e7e3ba6e55f7ef6664d6fb9ac",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/node_hash.h"
+        },
+        {
+          "upstreamPath": "src/node_skimmer.c",
+          "archivePath": "third_party/lilv/src/node_skimmer.c",
+          "sha256": "4f7540c3f2b5d555864b28a98806835823f7fae59d0b8196ea5184ffa18808aa",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/node_skimmer.c"
+        },
+        {
+          "upstreamPath": "src/node_skimmer.h",
+          "archivePath": "third_party/lilv/src/node_skimmer.h",
+          "sha256": "068ac7dfe468f54328c1e2e9df4fc657a4b63c4ad3f9a9b03ef3cf8a7956397e",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/node_skimmer.h"
+        },
+        {
+          "upstreamPath": "src/plugin.c",
+          "archivePath": "third_party/lilv/src/plugin.c",
+          "sha256": "845e83a22794dd7ec1147021f01d20856a4646cf84fefecd9735be50051b8a4e",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/plugin.c"
+        },
+        {
+          "upstreamPath": "src/pluginclass.c",
+          "archivePath": "third_party/lilv/src/pluginclass.c",
+          "sha256": "d7cfb7d4b6a25e4be34a6eab03cebbcf6934ce4f13dd4a59891b91a562e5129a",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/pluginclass.c"
+        },
+        {
+          "upstreamPath": "src/port.c",
+          "archivePath": "third_party/lilv/src/port.c",
+          "sha256": "eba5411bbde5900b529de64f22ba2bc0425dc0c2f29762d69a474449b34bd019",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/port.c"
+        },
+        {
+          "upstreamPath": "src/query.c",
+          "archivePath": "third_party/lilv/src/query.c",
+          "sha256": "46d2ca6005cb44362d573a782554f17bb467b7f8ad74bcc6a5f2826d003cda7a",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/query.c"
+        },
+        {
+          "upstreamPath": "src/query.h",
+          "archivePath": "third_party/lilv/src/query.h",
+          "sha256": "de5f36e3b2c2eee6260fd5edfaafeee62e342ca21ed4e8129a0d41f94a2a116f",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/query.h"
+        },
+        {
+          "upstreamPath": "src/scalepoint.c",
+          "archivePath": "third_party/lilv/src/scalepoint.c",
+          "sha256": "cc49a785e67a3759c20c6d72c937e0572a72eeca4d61c515a7d1440c48e6bee7",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/scalepoint.c"
+        },
+        {
+          "upstreamPath": "src/state.c",
+          "archivePath": "third_party/lilv/src/state.c",
+          "sha256": "c4a66208b159f3ab20a9f0517206ff29889247f4572c823425cdedc353a31e50",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/state.c"
+        },
+        {
+          "upstreamPath": "src/string_util.c",
+          "archivePath": "third_party/lilv/src/string_util.c",
+          "sha256": "58edbeae6abe298b04400c72724a5f891106a493e46b62bd8782206b6bae358e",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/string_util.c"
+        },
+        {
+          "upstreamPath": "src/string_util.h",
+          "archivePath": "third_party/lilv/src/string_util.h",
+          "sha256": "3a93908d6927b6400f392441af13c5491a590f9e74e0395e778ef21dc950afcb",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/string_util.h"
+        },
+        {
+          "upstreamPath": "src/syntax_skimmer.c",
+          "archivePath": "third_party/lilv/src/syntax_skimmer.c",
+          "sha256": "46831189028f4bd8315fb5c08a5fc919c3923bcc61995cfcff794daba22b5fe5",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/syntax_skimmer.c"
+        },
+        {
+          "upstreamPath": "src/syntax_skimmer.h",
+          "archivePath": "third_party/lilv/src/syntax_skimmer.h",
+          "sha256": "e47231f9916c164d5cd74af6391ce0eec2d9bd6aed7f41f68a48a93ecfc6ae92",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/syntax_skimmer.h"
+        },
+        {
+          "upstreamPath": "src/sys_util.c",
+          "archivePath": "third_party/lilv/src/sys_util.c",
+          "sha256": "8e1341286839455fe09aeaefd2aeb7033ffc2f297a87817ad9d1a38e69da2b05",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/sys_util.c"
+        },
+        {
+          "upstreamPath": "src/sys_util.h",
+          "archivePath": "third_party/lilv/src/sys_util.h",
+          "sha256": "fd1c235af4f2cf3f45ec662735e2cefb0881023eeefe5c3f7f35e854ab82fa6a",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/sys_util.h"
+        },
+        {
+          "upstreamPath": "src/type_skimmer.c",
+          "archivePath": "third_party/lilv/src/type_skimmer.c",
+          "sha256": "ad5c86119427262ebddfa99efb66f263397525a88205f0854d32dde93d7bfaa4",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/type_skimmer.c"
+        },
+        {
+          "upstreamPath": "src/type_skimmer.h",
+          "archivePath": "third_party/lilv/src/type_skimmer.h",
+          "sha256": "945d65d8fb5c885b8816546927054b3444bcd2b21ef08372d6503712d07bb797",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/type_skimmer.h"
+        },
+        {
+          "upstreamPath": "src/ui.c",
+          "archivePath": "third_party/lilv/src/ui.c",
+          "sha256": "07e5f0d715f1221579b5ab00c1ad4691bc2dc817dec82d2a3e71b6c3437ce739",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/ui.c"
+        },
+        {
+          "upstreamPath": "src/uris.c",
+          "archivePath": "third_party/lilv/src/uris.c",
+          "sha256": "cf06912731427202fb9e1a1971395a9b127d92651aec9aa45bc8be63ab8ed240",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/uris.c"
+        },
+        {
+          "upstreamPath": "src/uris.h",
+          "archivePath": "third_party/lilv/src/uris.h",
+          "sha256": "ca845dfdd1e82c522bb9c2bde0c900f3c4a53dffd762c6e3712d19d9c773e6aa",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/uris.h"
+        },
+        {
+          "upstreamPath": "src/world.c",
+          "archivePath": "third_party/lilv/src/world.c",
+          "sha256": "4071024ef1db5c7b339c211abbb3da00e00e971fac7b4253084d38eccf252493",
+          "url": "https://raw.githubusercontent.com/lv2/lilv/4b8f30055fa5cb4134a2eb45fc1555bc04289314/src/world.c"
+        }
+      ]
+    },
+    {
+      "name": "serd",
+      "repository": "https://github.com/drobilla/serd",
+      "revision": "b621b0bc790d1e8102d3138ead16b974ddda8432",
+      "license": "ISC",
+      "noticePath": "third_party/licenses/serd.txt",
+      "copyrights": [],
+      "adaptedFiles": [],
+      "scope": "Private original CyDSP LV2 hosting dependencies.",
+      "files": [
+        {
+          "upstreamPath": "COPYING",
+          "archivePath": "third_party/serd/COPYING",
+          "sha256": "ae223adebe7cc1ee0716e0f926d1ecc8e42c6e4da7e1d7418c9c07fae244bbde",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/COPYING"
+        },
+        {
+          "upstreamPath": "include/serd/serd.h",
+          "archivePath": "third_party/serd/include/serd/serd.h",
+          "sha256": "f7488458bc47f5d2aadcaaee81114b9100e909ce2db0675db95e22a1d9efc7ba",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/include/serd/serd.h"
+        },
+        {
+          "upstreamPath": "meson.build",
+          "archivePath": "third_party/serd/meson.build",
+          "sha256": "2560615992f9661ed53f47fba8e8a484dee360d6b0de30bbc3c38842f0ffe5f2",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/meson.build"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/serd/README.md",
+          "sha256": "ae2e18049c778f349f7ccfa3734a4af405eb17558bc1ad024d5c8f50b0ac3a5a",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/README.md"
+        },
+        {
+          "upstreamPath": "src/.clang-tidy",
+          "archivePath": "third_party/serd/src/.clang-tidy",
+          "sha256": "59639382b881868e9792cc81bf4f00ec1228853e55026c35224065779c5af2eb",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/.clang-tidy"
+        },
+        {
+          "upstreamPath": "src/attributes.h",
+          "archivePath": "third_party/serd/src/attributes.h",
+          "sha256": "e620d5a76accc06c4d9d643db13c7699559a0311a781386b4edf0fc89f2adfb1",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/attributes.h"
+        },
+        {
+          "upstreamPath": "src/base64.c",
+          "archivePath": "third_party/serd/src/base64.c",
+          "sha256": "3fd3a20f710da36be2db650401826e14b43f6c1313d20d352001f2cde0672b04",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/base64.c"
+        },
+        {
+          "upstreamPath": "src/base64.h",
+          "archivePath": "third_party/serd/src/base64.h",
+          "sha256": "4df0f2f30592a5f60476de35ddb74ba117a28fb59a7c7243a1c83307ff3262a2",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/base64.h"
+        },
+        {
+          "upstreamPath": "src/byte_sink.h",
+          "archivePath": "third_party/serd/src/byte_sink.h",
+          "sha256": "e5d2b7a50829ba6ada531e06e7f3f7b68f611d3eae0dbd69567195b1809488ba",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/byte_sink.h"
+        },
+        {
+          "upstreamPath": "src/byte_source.c",
+          "archivePath": "third_party/serd/src/byte_source.c",
+          "sha256": "34d20b9ddd0da6dba8b56997792f074021c9b18390fcf74c68bfd89a2f306803",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/byte_source.c"
+        },
+        {
+          "upstreamPath": "src/byte_source.h",
+          "archivePath": "third_party/serd/src/byte_source.h",
+          "sha256": "cb9808204112103e2cd5ceb979e98eb11b80fa6452f2cab66f7aa247fc94b85e",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/byte_source.h"
+        },
+        {
+          "upstreamPath": "src/env.c",
+          "archivePath": "third_party/serd/src/env.c",
+          "sha256": "90129f34f2fbd5ef1cc3ea480267d37189acaebdd52d977fad41e8dc73b8af81",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/env.c"
+        },
+        {
+          "upstreamPath": "src/n3.c",
+          "archivePath": "third_party/serd/src/n3.c",
+          "sha256": "8a4c40b34fb41b9d0f15a25a7b6d3994126f1d3ee2b74a5dee565b6e69f63d0f",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/n3.c"
+        },
+        {
+          "upstreamPath": "src/node.c",
+          "archivePath": "third_party/serd/src/node.c",
+          "sha256": "ce8a23714c867494c6f6b85474df40867401a0b005ad57d100764894db811455",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/node.c"
+        },
+        {
+          "upstreamPath": "src/ntriples.h",
+          "archivePath": "third_party/serd/src/ntriples.h",
+          "sha256": "5e9a5e57089061c9233cdcc4293b972e6d2b89c82180e0c42d213afd1c383593",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/ntriples.h"
+        },
+        {
+          "upstreamPath": "src/read_utf8.c",
+          "archivePath": "third_party/serd/src/read_utf8.c",
+          "sha256": "00911344ef260251a4f51dbeb1ab553289e598dd65459e5c97b171385c2c1fe4",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/read_utf8.c"
+        },
+        {
+          "upstreamPath": "src/read_utf8.h",
+          "archivePath": "third_party/serd/src/read_utf8.h",
+          "sha256": "90a73b90dd1ce7968817d9d13bcd7a39e3fb8c91e55efcd3fe509655f1d7d493",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/read_utf8.h"
+        },
+        {
+          "upstreamPath": "src/reader.c",
+          "archivePath": "third_party/serd/src/reader.c",
+          "sha256": "054f66fcfc5890556153ca025af931446746450e1be0908b8a7068c2024354b6",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/reader.c"
+        },
+        {
+          "upstreamPath": "src/reader.h",
+          "archivePath": "third_party/serd/src/reader.h",
+          "sha256": "35537e4ca269edf9df63e8530080a5d37850c6b2178c3fdd4dd2f17413623e07",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/reader.h"
+        },
+        {
+          "upstreamPath": "src/serd_config.h",
+          "archivePath": "third_party/serd/src/serd_config.h",
+          "sha256": "8de73d3364acd255dc1a7314ed4871857a370bbef1c5d1a34da80d4543570082",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/serd_config.h"
+        },
+        {
+          "upstreamPath": "src/serd_internal.h",
+          "archivePath": "third_party/serd/src/serd_internal.h",
+          "sha256": "28663262df3c66ebda59b359aac5d0bdd87e9fcecf80e23f2422d39bc02050aa",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/serd_internal.h"
+        },
+        {
+          "upstreamPath": "src/serdi.c",
+          "archivePath": "third_party/serd/src/serdi.c",
+          "sha256": "e07d92c24bb27a6340796cde6d97bb74db9b1864a3bbbf9a17f79873200470bd",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/serdi.c"
+        },
+        {
+          "upstreamPath": "src/stack.h",
+          "archivePath": "third_party/serd/src/stack.h",
+          "sha256": "796d9b43203756052b845de210345b7f85a225a9c595730e5ec64920be619b80",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/stack.h"
+        },
+        {
+          "upstreamPath": "src/string.c",
+          "archivePath": "third_party/serd/src/string.c",
+          "sha256": "256c2989dedd20553df73a4ce0dc1b3f8d5a411b0dffce09149c05e456ebac43",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/string.c"
+        },
+        {
+          "upstreamPath": "src/string_utils.h",
+          "archivePath": "third_party/serd/src/string_utils.h",
+          "sha256": "e490720fa9fd4a6a7c605c5454c98617ebd2a2fbdbd5070d49f3c037bf0b91a4",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/string_utils.h"
+        },
+        {
+          "upstreamPath": "src/system.c",
+          "archivePath": "third_party/serd/src/system.c",
+          "sha256": "197fb93495577f6067505d40c119b62202d0754a0311afd4d82fb3eb92f4b2aa",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/system.c"
+        },
+        {
+          "upstreamPath": "src/system.h",
+          "archivePath": "third_party/serd/src/system.h",
+          "sha256": "23685c92063a088f0ed7c56a7b89fe0cde60309890db9a486a01c17d2b037efd",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/system.h"
+        },
+        {
+          "upstreamPath": "src/try.h",
+          "archivePath": "third_party/serd/src/try.h",
+          "sha256": "28d9d985dfb3df718b028800147dd99938ff02102fb392016a3fa19f87822205",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/try.h"
+        },
+        {
+          "upstreamPath": "src/turtle.h",
+          "archivePath": "third_party/serd/src/turtle.h",
+          "sha256": "3505f1515edaedb4afa31d8d0f1c7e7bdaa95a21de742ff986fb8de17e66990a",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/turtle.h"
+        },
+        {
+          "upstreamPath": "src/uri.c",
+          "archivePath": "third_party/serd/src/uri.c",
+          "sha256": "d9c865b1a2754521e0132de399d5aebe245279b54e6f9b8e060964051dc89fe7",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/uri.c"
+        },
+        {
+          "upstreamPath": "src/uri_utils.h",
+          "archivePath": "third_party/serd/src/uri_utils.h",
+          "sha256": "42b066843cf02e6c8520a4ddb649f976ca494c94b7a97d9ff40e39654a6b7ee9",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/uri_utils.h"
+        },
+        {
+          "upstreamPath": "src/warnings.h",
+          "archivePath": "third_party/serd/src/warnings.h",
+          "sha256": "be4b5a885a912e0a8878dfa9cffbba16fcdf27a2f8f30e3cdfcf9ad7879fd662",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/warnings.h"
+        },
+        {
+          "upstreamPath": "src/writer.c",
+          "archivePath": "third_party/serd/src/writer.c",
+          "sha256": "86501e3c49f611f5b3de0499765e1caec1f1039dca44052760923877bbec48d0",
+          "url": "https://raw.githubusercontent.com/drobilla/serd/b621b0bc790d1e8102d3138ead16b974ddda8432/src/writer.c"
+        }
+      ]
+    },
+    {
+      "name": "sord",
+      "repository": "https://github.com/drobilla/sord",
+      "revision": "4b5232bb91e7f2f1b84df384494d073fabbcd312",
+      "license": "ISC",
+      "noticePath": "third_party/licenses/sord.txt",
+      "copyrights": [],
+      "adaptedFiles": [],
+      "scope": "Private original CyDSP LV2 hosting dependencies.",
+      "files": [
+        {
+          "upstreamPath": "COPYING",
+          "archivePath": "third_party/sord/COPYING",
+          "sha256": "ae223adebe7cc1ee0716e0f926d1ecc8e42c6e4da7e1d7418c9c07fae244bbde",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/COPYING"
+        },
+        {
+          "upstreamPath": "include/sord/sord.h",
+          "archivePath": "third_party/sord/include/sord/sord.h",
+          "sha256": "5f8dc0348074b9fdadc3b022f9104fd7b2eb927768676d7e5ab77b9d6fa3a917",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/include/sord/sord.h"
+        },
+        {
+          "upstreamPath": "include/sord/sordmm.hpp",
+          "archivePath": "third_party/sord/include/sord/sordmm.hpp",
+          "sha256": "9405e4fb40cf2c996c77e3a5b456af3b869e6e583f941d976f5df4ece73387d4",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/include/sord/sordmm.hpp"
+        },
+        {
+          "upstreamPath": "meson.build",
+          "archivePath": "third_party/sord/meson.build",
+          "sha256": "e5ca81a3d231acd9ddf09c2a205e4ceb49bd90ee8188b9fc9331a228e90c0192",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/meson.build"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/sord/README.md",
+          "sha256": "4d80d650f93a0dda33976200795727d0be42b240328dcfa6121db6d3910b1d00",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/README.md"
+        },
+        {
+          "upstreamPath": "src/.clang-tidy",
+          "archivePath": "third_party/sord/src/.clang-tidy",
+          "sha256": "500512820eec88041670183db8008c7462cbdb6e0dc056cf2c53200d0a5efe69",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/.clang-tidy"
+        },
+        {
+          "upstreamPath": "src/sord.c",
+          "archivePath": "third_party/sord/src/sord.c",
+          "sha256": "382e9bf85ab43c55092ec3905fe8d739dc0a4c7a10b0839a314763fe02977168",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/sord.c"
+        },
+        {
+          "upstreamPath": "src/sord_config.h",
+          "archivePath": "third_party/sord/src/sord_config.h",
+          "sha256": "ae083ed76f773b149979a3ae32e02c39ff13e67256524206833c25efc652ddec",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/sord_config.h"
+        },
+        {
+          "upstreamPath": "src/sord_internal.h",
+          "archivePath": "third_party/sord/src/sord_internal.h",
+          "sha256": "881f25797483ec73546a8833f35a3b020502dab1b2e19800a8fec5647bc576ea",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/sord_internal.h"
+        },
+        {
+          "upstreamPath": "src/sord_validate.c",
+          "archivePath": "third_party/sord/src/sord_validate.c",
+          "sha256": "8df5b4c211fe1c1c7ceecfac8d1832c788e20839b32e5c19ced686b77497346c",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/sord_validate.c"
+        },
+        {
+          "upstreamPath": "src/sordi.c",
+          "archivePath": "third_party/sord/src/sordi.c",
+          "sha256": "ee2fe6251edb7a592ac05c5929a77f66e6e8a18b656ad5bb5735101f34200570",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/sordi.c"
+        },
+        {
+          "upstreamPath": "src/syntax.c",
+          "archivePath": "third_party/sord/src/syntax.c",
+          "sha256": "1ee4e7ffb441c59a83bbae6c2b7291382136ebd83a962b78d6e903a92cdf57b1",
+          "url": "https://raw.githubusercontent.com/drobilla/sord/4b5232bb91e7f2f1b84df384494d073fabbcd312/src/syntax.c"
+        }
+      ]
+    },
+    {
+      "name": "sratom",
+      "repository": "https://github.com/lv2/sratom",
+      "revision": "9e8ee84eed502e6030ce8bb49694fd28542b08fc",
+      "license": "ISC",
+      "noticePath": "third_party/licenses/sratom.txt",
+      "copyrights": [],
+      "adaptedFiles": [],
+      "scope": "Private original CyDSP LV2 hosting dependencies.",
+      "files": [
+        {
+          "upstreamPath": "COPYING",
+          "archivePath": "third_party/sratom/COPYING",
+          "sha256": "1d968c655ecad113e128dbf4d4deabd9e30b931b42943b6a681c9cf11d7da5d4",
+          "url": "https://raw.githubusercontent.com/lv2/sratom/9e8ee84eed502e6030ce8bb49694fd28542b08fc/COPYING"
+        },
+        {
+          "upstreamPath": "include/sratom/sratom.h",
+          "archivePath": "third_party/sratom/include/sratom/sratom.h",
+          "sha256": "df7a300ba842425aad046c63d22b784c96112615bbd3bb8cf346df725dc8b9c0",
+          "url": "https://raw.githubusercontent.com/lv2/sratom/9e8ee84eed502e6030ce8bb49694fd28542b08fc/include/sratom/sratom.h"
+        },
+        {
+          "upstreamPath": "meson.build",
+          "archivePath": "third_party/sratom/meson.build",
+          "sha256": "a1a633e610ebdd037ee9acea3dde121eb0c369bfe36ca5b8bd12ef3f20b43550",
+          "url": "https://raw.githubusercontent.com/lv2/sratom/9e8ee84eed502e6030ce8bb49694fd28542b08fc/meson.build"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/sratom/README.md",
+          "sha256": "1a82e28642360ac257ce32fdc4946bd2bd5ebdec0e72d62f823c47670c0c3cdc",
+          "url": "https://raw.githubusercontent.com/lv2/sratom/9e8ee84eed502e6030ce8bb49694fd28542b08fc/README.md"
+        },
+        {
+          "upstreamPath": "src/.clang-tidy",
+          "archivePath": "third_party/sratom/src/.clang-tidy",
+          "sha256": "9c304236a7c4e83c082484c02c4e2d28c40db74a9bbd9d8bc79eeded921077ca",
+          "url": "https://raw.githubusercontent.com/lv2/sratom/9e8ee84eed502e6030ce8bb49694fd28542b08fc/src/.clang-tidy"
+        },
+        {
+          "upstreamPath": "src/sratom.c",
+          "archivePath": "third_party/sratom/src/sratom.c",
+          "sha256": "16721ccc4538e35888d0bf0ec7a31dd1fa76565580b45eb4e7aee932d9f40991",
+          "url": "https://raw.githubusercontent.com/lv2/sratom/9e8ee84eed502e6030ce8bb49694fd28542b08fc/src/sratom.c"
+        }
+      ]
+    },
+    {
+      "name": "zix",
+      "repository": "https://github.com/drobilla/zix",
+      "revision": "17d632393f5addb6fa24dda2927b96515407cca7",
+      "license": "ISC",
+      "noticePath": "third_party/licenses/zix.txt",
+      "copyrights": [],
+      "adaptedFiles": [],
+      "scope": "Private original CyDSP LV2 hosting dependencies.",
+      "files": [
+        {
+          "upstreamPath": "COPYING",
+          "archivePath": "third_party/zix/COPYING",
+          "sha256": "1314cc14fb947491491c517c533ac7de4f6798585f922a472358082c25ac1881",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/COPYING"
+        },
+        {
+          "upstreamPath": "include/zix/allocator.h",
+          "archivePath": "third_party/zix/include/zix/allocator.h",
+          "sha256": "fa4c60a2d0f9b47da4436a6ac5326baf62a2fad3378f8efd23f0e8eb25a57b13",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/allocator.h"
+        },
+        {
+          "upstreamPath": "include/zix/attributes.h",
+          "archivePath": "third_party/zix/include/zix/attributes.h",
+          "sha256": "58ffe43a2ec9165ef68562d093b1274ff4373b5545c4dac01f72783d18dab8e9",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/attributes.h"
+        },
+        {
+          "upstreamPath": "include/zix/btree.h",
+          "archivePath": "third_party/zix/include/zix/btree.h",
+          "sha256": "1ed589adb2a65b5878694b216949a357479ab70b7506ef7e43339517ab72bdbb",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/btree.h"
+        },
+        {
+          "upstreamPath": "include/zix/bump_allocator.h",
+          "archivePath": "third_party/zix/include/zix/bump_allocator.h",
+          "sha256": "9de455b595927abc0d0f9762e05edde1838b60e6581ef094489a4febd3e6bbab",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/bump_allocator.h"
+        },
+        {
+          "upstreamPath": "include/zix/digest.h",
+          "archivePath": "third_party/zix/include/zix/digest.h",
+          "sha256": "f4bd9f23ebe096a44be61764b1e900232eec2394ad980b8e056ab1f104ffbaf0",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/digest.h"
+        },
+        {
+          "upstreamPath": "include/zix/environment.h",
+          "archivePath": "third_party/zix/include/zix/environment.h",
+          "sha256": "f204160c0d47942a3caa610a17d8de464e9017b678b9734d0f7eb94f808211f4",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/environment.h"
+        },
+        {
+          "upstreamPath": "include/zix/filesystem.h",
+          "archivePath": "third_party/zix/include/zix/filesystem.h",
+          "sha256": "b2b9b176862be77221b067cde5a208202fb1b87f7941c7a37132a443aac893b1",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/filesystem.h"
+        },
+        {
+          "upstreamPath": "include/zix/hash.h",
+          "archivePath": "third_party/zix/include/zix/hash.h",
+          "sha256": "f5d483fb19fa7806930d039db7feec37076b0527b10db3be7693861205c08335",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/hash.h"
+        },
+        {
+          "upstreamPath": "include/zix/path.h",
+          "archivePath": "third_party/zix/include/zix/path.h",
+          "sha256": "6347f4bf8201f783bd4fe87f913d9bb23b5fbe1fa274aa86a5df28b82e56bdbd",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/path.h"
+        },
+        {
+          "upstreamPath": "include/zix/ring.h",
+          "archivePath": "third_party/zix/include/zix/ring.h",
+          "sha256": "40dfde419628d2d5e6d0f66167526f10eada9a0ca75df1a684ab86de762a34f1",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/ring.h"
+        },
+        {
+          "upstreamPath": "include/zix/sem.h",
+          "archivePath": "third_party/zix/include/zix/sem.h",
+          "sha256": "e8c71e3fdc6f3dba8bac27fd12d1aa5c3b5640530aabef4980de06991bc4ec9b",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/sem.h"
+        },
+        {
+          "upstreamPath": "include/zix/status.h",
+          "archivePath": "third_party/zix/include/zix/status.h",
+          "sha256": "406bfefd0b1ecbf35e9462ee6949d0f7b3450c350e85b707c49cdd370c7e0bc9",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/status.h"
+        },
+        {
+          "upstreamPath": "include/zix/string_view.h",
+          "archivePath": "third_party/zix/include/zix/string_view.h",
+          "sha256": "c448b57a80371d341054a2dda52fc98f5c2a4619088b2e44efc980407ccf8f53",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/string_view.h"
+        },
+        {
+          "upstreamPath": "include/zix/thread.h",
+          "archivePath": "third_party/zix/include/zix/thread.h",
+          "sha256": "278134e28c44ba596a5375925d85da22752fc18db596b7aa358d83813e0b5b80",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/thread.h"
+        },
+        {
+          "upstreamPath": "include/zix/tree.h",
+          "archivePath": "third_party/zix/include/zix/tree.h",
+          "sha256": "b1574c0d008a5724b9e529aa841135c5fce4888f2b74c18516f0172467821313",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/tree.h"
+        },
+        {
+          "upstreamPath": "include/zix/warnings.h",
+          "archivePath": "third_party/zix/include/zix/warnings.h",
+          "sha256": "35cca7e02361c2849ebce0e41db6cc12953a6b3f0c78a32be733f0f3295b989e",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/warnings.h"
+        },
+        {
+          "upstreamPath": "include/zix/zix.h",
+          "archivePath": "third_party/zix/include/zix/zix.h",
+          "sha256": "3b69116a9833d331ba44c7f5ad55cce355be5b3f8cf42a00026935773da34fac",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/include/zix/zix.h"
+        },
+        {
+          "upstreamPath": "meson.build",
+          "archivePath": "third_party/zix/meson.build",
+          "sha256": "000f5615dd0ce8d0b06962298c55bac74976f3c7449450fca5fd44495bd51677",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/meson.build"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/zix/README.md",
+          "sha256": "ef018e7494aa90eb06b438dd677f46503582fadd9876540c0845e279640a33f6",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/README.md"
+        },
+        {
+          "upstreamPath": "src/.clang-tidy",
+          "archivePath": "third_party/zix/src/.clang-tidy",
+          "sha256": "45df66acbbfbddf9570cc7cddf18597aa1765dc64ed4f5691592765620b990ef",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/.clang-tidy"
+        },
+        {
+          "upstreamPath": "src/allocator.c",
+          "archivePath": "third_party/zix/src/allocator.c",
+          "sha256": "04c7d720e54967fdb1a3f3adfdd97fc4f6d8c55e14ec22cc744ebb0731db14c0",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/allocator.c"
+        },
+        {
+          "upstreamPath": "src/btree.c",
+          "archivePath": "third_party/zix/src/btree.c",
+          "sha256": "99b7f39a233a0ba88380622dc8ad481d822c56ddaa9d00ddc419138ceebfe45c",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/btree.c"
+        },
+        {
+          "upstreamPath": "src/bump_allocator.c",
+          "archivePath": "third_party/zix/src/bump_allocator.c",
+          "sha256": "265b0a4c079b3a99805414fdc73985b22546907cd3dcc7e34eb9265a730f8037",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/bump_allocator.c"
+        },
+        {
+          "upstreamPath": "src/darwin/sem_darwin.c",
+          "archivePath": "third_party/zix/src/darwin/sem_darwin.c",
+          "sha256": "ac150c945d407cfa84b64e14c7b30b1bea9cf0f674074e86ddb6974a4e19465e",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/darwin/sem_darwin.c"
+        },
+        {
+          "upstreamPath": "src/digest.c",
+          "archivePath": "third_party/zix/src/digest.c",
+          "sha256": "1d76265ce0e1ee28c41a7da4600e2806481791f7f40e429c0774ac05334bae89",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/digest.c"
+        },
+        {
+          "upstreamPath": "src/errno_status.c",
+          "archivePath": "third_party/zix/src/errno_status.c",
+          "sha256": "f8ded9afc542309d6bf00fb8b2635454d537a653a5eba9b9a6c54633427a2991",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/errno_status.c"
+        },
+        {
+          "upstreamPath": "src/errno_status.h",
+          "archivePath": "third_party/zix/src/errno_status.h",
+          "sha256": "d8d469077cd549d9dca924917f6902b559356f19d7e85f52ca44c19abed2a8ca",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/errno_status.h"
+        },
+        {
+          "upstreamPath": "src/filesystem.c",
+          "archivePath": "third_party/zix/src/filesystem.c",
+          "sha256": "ac049dbd9f2018199e54c06d4311d99415ad21469b02864fa4f382c7afc9501c",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/filesystem.c"
+        },
+        {
+          "upstreamPath": "src/hash.c",
+          "archivePath": "third_party/zix/src/hash.c",
+          "sha256": "2eb77beea1b44bb4631301dce22696016d0f31591c9c4f343efec898037eaff3",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/hash.c"
+        },
+        {
+          "upstreamPath": "src/index_range.h",
+          "archivePath": "third_party/zix/src/index_range.h",
+          "sha256": "cb47f83d49f58b5bfae3dafbf68ad640386352f66beb019fb51634559414f575",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/index_range.h"
+        },
+        {
+          "upstreamPath": "src/path.c",
+          "archivePath": "third_party/zix/src/path.c",
+          "sha256": "f39ee59a60c6500136b00654b563f20f34d2a82466a6ddea70f0b491e584e361",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/path.c"
+        },
+        {
+          "upstreamPath": "src/path_iter.h",
+          "archivePath": "third_party/zix/src/path_iter.h",
+          "sha256": "cbfb68860afad943fab474d13a4ac3e8052bdd3c0e80e65053d384266eb3bc20",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/path_iter.h"
+        },
+        {
+          "upstreamPath": "src/posix/environment_posix.c",
+          "archivePath": "third_party/zix/src/posix/environment_posix.c",
+          "sha256": "10948006cfd66c946a266b61c4bcbc4e1e584549acd37fe0c865a72c8e5b8ee2",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/posix/environment_posix.c"
+        },
+        {
+          "upstreamPath": "src/posix/filesystem_posix.c",
+          "archivePath": "third_party/zix/src/posix/filesystem_posix.c",
+          "sha256": "6fff8bfd703fa3d87a72e655dc6e7030570d13cb0656b5ad94be4476d4d57fe9",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/posix/filesystem_posix.c"
+        },
+        {
+          "upstreamPath": "src/posix/sem_posix.c",
+          "archivePath": "third_party/zix/src/posix/sem_posix.c",
+          "sha256": "036d99cdc75316acd10fe3aa236e148a5d6a9cb492589a51c8c3ae447e6d0591",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/posix/sem_posix.c"
+        },
+        {
+          "upstreamPath": "src/posix/system_posix.c",
+          "archivePath": "third_party/zix/src/posix/system_posix.c",
+          "sha256": "63415a5fdaeba6bc36d1556d06986dd88581bbba67840985ce2d966ad3550d59",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/posix/system_posix.c"
+        },
+        {
+          "upstreamPath": "src/posix/thread_posix.c",
+          "archivePath": "third_party/zix/src/posix/thread_posix.c",
+          "sha256": "154ea36e457b07624b26bb0acab7b84e66fdd7a9f490bc42a4f8571c3de856ee",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/posix/thread_posix.c"
+        },
+        {
+          "upstreamPath": "src/qualifiers.h",
+          "archivePath": "third_party/zix/src/qualifiers.h",
+          "sha256": "81286a198314baa9798b02c6293dd6ddd2aca378b8b44ce829087fee432f5299",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/qualifiers.h"
+        },
+        {
+          "upstreamPath": "src/ring.c",
+          "archivePath": "third_party/zix/src/ring.c",
+          "sha256": "388f7a1b000f858cdc95a573bf9b899bb536129dd68c0cc87ca3a913d6719cd8",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/ring.c"
+        },
+        {
+          "upstreamPath": "src/status.c",
+          "archivePath": "third_party/zix/src/status.c",
+          "sha256": "71ee8aec2db3cc32ce5ae1b31796771c802a6823e6c3039e60fd01f4f27a265d",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/status.c"
+        },
+        {
+          "upstreamPath": "src/string_view.c",
+          "archivePath": "third_party/zix/src/string_view.c",
+          "sha256": "b005a3900908b61d219896b68f66521bba33fee3b10da835b039068c7b3fac01",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/string_view.c"
+        },
+        {
+          "upstreamPath": "src/system.c",
+          "archivePath": "third_party/zix/src/system.c",
+          "sha256": "97cf22a0107c24fafb0f9c1258723043ce5cb40fa5c818c8f3255061d0dff020",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/system.c"
+        },
+        {
+          "upstreamPath": "src/system.h",
+          "archivePath": "third_party/zix/src/system.h",
+          "sha256": "1cf1ef0e9f6311ed3d3bfca6db68f0e4dad59e823b3918832ce4362fe71072e0",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/system.h"
+        },
+        {
+          "upstreamPath": "src/tree.c",
+          "archivePath": "third_party/zix/src/tree.c",
+          "sha256": "0f6009103f939aa6c05650711765c9748a37687eee917e651d2c8dec657fb3c4",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/tree.c"
+        },
+        {
+          "upstreamPath": "src/win32/.clang-tidy",
+          "archivePath": "third_party/zix/src/win32/.clang-tidy",
+          "sha256": "867632009902974baf1cf3c711e620e8cad480376e2c45c461adffa0093359a1",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/.clang-tidy"
+        },
+        {
+          "upstreamPath": "src/win32/environment_win32.c",
+          "archivePath": "third_party/zix/src/win32/environment_win32.c",
+          "sha256": "7368094ec7bfd5c9cb99da048751be0c313e77612fa56b05ed6ffa5c71c79592",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/environment_win32.c"
+        },
+        {
+          "upstreamPath": "src/win32/filesystem_win32.c",
+          "archivePath": "third_party/zix/src/win32/filesystem_win32.c",
+          "sha256": "182c93c4566687566ecaf082361653897499b24b4eff0c3c10b8ad6f087dd9ce",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/filesystem_win32.c"
+        },
+        {
+          "upstreamPath": "src/win32/sem_win32.c",
+          "archivePath": "third_party/zix/src/win32/sem_win32.c",
+          "sha256": "43ab3928c6888340a0a0d47e22cb9c711b10a37b1465c199ab45e9aad3fc5d81",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/sem_win32.c"
+        },
+        {
+          "upstreamPath": "src/win32/system_win32.c",
+          "archivePath": "third_party/zix/src/win32/system_win32.c",
+          "sha256": "bdde1099e30089ddd04a94f3094f9b654caa3224f58e341591b88c8fbf9a66fd",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/system_win32.c"
+        },
+        {
+          "upstreamPath": "src/win32/thread_win32.c",
+          "archivePath": "third_party/zix/src/win32/thread_win32.c",
+          "sha256": "c58b4baea3c66c84874cc24c2a452d553311b77864d5af401f28fb648e6db9a3",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/thread_win32.c"
+        },
+        {
+          "upstreamPath": "src/win32/win32_util.c",
+          "archivePath": "third_party/zix/src/win32/win32_util.c",
+          "sha256": "89991a7f82c3a4ee20a87bc7495566edfe8d053ab0e4ce300f3d7302741e49aa",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/win32_util.c"
+        },
+        {
+          "upstreamPath": "src/win32/win32_util.h",
+          "archivePath": "third_party/zix/src/win32/win32_util.h",
+          "sha256": "8b773e5a2102900c7d9320e9cae01e3cf6c91563f61a74a9e773a9ef5ad4fcac",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/win32/win32_util.h"
+        },
+        {
+          "upstreamPath": "src/zix_config.h",
+          "archivePath": "third_party/zix/src/zix_config.h",
+          "sha256": "85cfa2d08a611980a5662175c928347c488be117845a2ee61945e485e99070ea",
+          "url": "https://raw.githubusercontent.com/drobilla/zix/17d632393f5addb6fa24dda2927b96515407cca7/src/zix_config.h"
+        }
+      ]
+    },
+    {
+      "name": "ysfx",
+      "repository": "https://github.com/jpcima/ysfx",
+      "revision": "8077347ccf4115567aed81400281dca57acbb0cc",
+      "license": "Apache-2.0 AND Zlib AND MIT AND ISC AND (GPL-2.0-or-later WITH Bison-exception-2.2)",
+      "noticePath": "third_party/licenses/ysfx.txt",
+      "copyrights": [],
+      "adaptedFiles": [
+        "src/detail/JsfxRuntime.cpp",
+        "src/detail/JsfxPlatformMutex.h",
+        "src/detail/JsfxEelApi.cpp"
+      ],
+      "scope": "Private JSFX compiler/runtime only, no JUCE/plugin application. Embedded WDL/EEL2, dr_libs and stb retain their notices. Original runtime adaptation fixes sparse-slider state serialization; keeps original notices. Generated EEL2 parser retains the Bison 2.2 exception permitting non-GPL larger applications; exception and GPL text included in the notice. Private Android API24 mutex adaptation only requests priority inheritance on platforms where that pthread API is available.",
+      "files": [
+        {
+          "upstreamPath": "cmake.wdl.txt",
+          "archivePath": "third_party/ysfx/cmake.wdl.txt",
+          "sha256": "d3fcfabcf68e7b7cf7d21fc6f9e8ba747b2068e2e5086baf3185b23ef2c8e1bd",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/cmake.wdl.txt"
+        },
+        {
+          "upstreamPath": "cmake.ysfx.txt",
+          "archivePath": "third_party/ysfx/cmake.ysfx.txt",
+          "sha256": "e3e5532e5fb0b12f189b47af21394c0630cc9610b0b1b3f58677014bf775bc70",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/cmake.ysfx.txt"
+        },
+        {
+          "upstreamPath": "include/ysfx.h",
+          "archivePath": "third_party/ysfx/include/ysfx.h",
+          "sha256": "f2ddea8e3376af1b34d400b27390c4d360af25a1319043ab24bed8d7e706f176",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/include/ysfx.h"
+        },
+        {
+          "upstreamPath": "LICENSE",
+          "archivePath": "third_party/ysfx/LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/LICENSE"
+        },
+        {
+          "upstreamPath": "MAINTENANCE.md",
+          "archivePath": "third_party/ysfx/MAINTENANCE.md",
+          "sha256": "95c68d0ba558a4a4f658cbc47f7977a107fd6de3b627260b4b079fe4690bd636",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/MAINTENANCE.md"
+        },
+        {
+          "upstreamPath": "README.md",
+          "archivePath": "third_party/ysfx/README.md",
+          "sha256": "984aac78eca8107ba6a67b9bed8d1e01447d387f44f8f1d8d5229a977ee48506",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/README.md"
+        },
+        {
+          "upstreamPath": "sources/base64/Base64.hpp",
+          "archivePath": "third_party/ysfx/sources/base64/Base64.hpp",
+          "sha256": "aea10e3f6cbc35b670c6f2d04b2a5d214ec691641fef4b022cb0d5e95e345adc",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/base64/Base64.hpp"
+        },
+        {
+          "upstreamPath": "sources/eel2-gas/LICENSE.txt",
+          "archivePath": "third_party/ysfx/sources/eel2-gas/LICENSE.txt",
+          "sha256": "ed157477c6ce5163779a3a4bd92eb100ef1d4de6fa78e997acd0c87147b75c2c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/eel2-gas/LICENSE.txt"
+        },
+        {
+          "upstreamPath": "sources/eel2-gas/sources/asm-nseel-x64-sse.S",
+          "archivePath": "third_party/ysfx/sources/eel2-gas/sources/asm-nseel-x64-sse.S",
+          "sha256": "601a5fdb5f3d0a5466334af592c75330e5671e6b65a5acac3a257f6fd1aeba0e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/eel2-gas/sources/asm-nseel-x64-sse.S"
+        },
+        {
+          "upstreamPath": "sources/eel2-gas/sources/ref-hash-sha512.txt",
+          "archivePath": "third_party/ysfx/sources/eel2-gas/sources/ref-hash-sha512.txt",
+          "sha256": "01d77f5eb1b12847c835a37587b9b73c05149ad7a014450487ce963581b70d7e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/eel2-gas/sources/ref-hash-sha512.txt"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_bmp.cpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_bmp.cpp",
+          "sha256": "57eb75e7915e61b3e261b4d0acb3056783675226e27f750dddafa0c33d88ca49",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_bmp.cpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_generic.hpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_generic.hpp",
+          "sha256": "66a55023257b9f16243ab5287a17d772e2e390d7dc1ef4f9c1106aa2e2a5e34f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_generic.hpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_gif.cpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_gif.cpp",
+          "sha256": "29517c7c00392fd72ab091c65fcd0bfa4a02de95e449b7038a4246d982db1624",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_gif.cpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_jpg.cpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_jpg.cpp",
+          "sha256": "182bc91db7403e08bf8aaebf4ad1536cfcbd72f13820a0d8995826c4da9ea68f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_jpg.cpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_loaders.cpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_loaders.cpp",
+          "sha256": "1615325167b18bd3370c619b9da97d67abf8f9b83cea5e9b913578b1cb47abf3",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_loaders.cpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_loaders.hpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_loaders.hpp",
+          "sha256": "a165bbe18a2bc63ceb02e57c1c6c48ed51f8c4f11290f472b3c556f12ec8932b",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_loaders.hpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_png.cpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_png.cpp",
+          "sha256": "db45f3e0fd7ca4b29e8ab81c76f8736176ab74f71d3cf9bb528159671a450e0a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_png.cpp"
+        },
+        {
+          "upstreamPath": "sources/lice_stb/lice_stb_write.cpp",
+          "archivePath": "third_party/ysfx/sources/lice_stb/lice_stb_write.cpp",
+          "sha256": "a5a200ba072e5988ec9348df84de31e9a26275226ada166d52c572f48efe58bc",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/lice_stb/lice_stb_write.cpp"
+        },
+        {
+          "upstreamPath": "sources/utility/sync_bitset.hpp",
+          "archivePath": "third_party/ysfx/sources/utility/sync_bitset.hpp",
+          "sha256": "7a102ea8decaf223348e4c004a822da3ed7180065ef5f5b391906a84e90dc78c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/utility/sync_bitset.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx.cpp",
+          "sha256": "ceacf5c87071b899e754f44d5e4712df39aa875c40cfa7adc070b9f15eae196f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx.hpp",
+          "sha256": "2a15d08c4569d84076fbcc902693dd4e8bcd67618396c753987f903ecfd8672b",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_eel.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_eel.cpp",
+          "sha256": "e27929e6f317d04b1b128c92326ff26ec97dc5c0f0545e14c63d6626edd46d7b",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_eel.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_eel.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_eel.hpp",
+          "sha256": "71c246661c0011ae131ff0f55085e483e5153af1053cbac4be1d43822e005754",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_eel.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_file.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_file.cpp",
+          "sha256": "e8b05388ac4d6854a412acf12346dd3a285c4568882f382335fbc7230a89e915",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_file.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_file.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_file.hpp",
+          "sha256": "8c095eeb7ec5c54d38f983db07f0b503164e89135c342d407b14d44afd0921b1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_file.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_gfx.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_gfx.cpp",
+          "sha256": "2e451a5de503163e13988495769575bd4debc11f458bc8e85d8bf5d48a73ec23",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_gfx.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_gfx.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_gfx.hpp",
+          "sha256": "8b36fd387089a1c88f2f4991b4a455dad3977d9ef909d30bec71106e78b3995f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_gfx.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_gfx_dummy.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_gfx_dummy.hpp",
+          "sha256": "7219154eb9084b221aabcfac7137793d4a65abb8c857b604507717fa6a8f5235",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_gfx_dummy.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_gfx_lice.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_gfx_lice.hpp",
+          "sha256": "5190b048509ce6790900b2fb5fd82e357a6865baed829e2fd84bff83fb6d5abb",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_gfx_lice.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_reaper.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_reaper.cpp",
+          "sha256": "b80ed10909f134c6a18bdc29ce5680737dc8f8b8ab892fbcac8128d80cb10b86",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_reaper.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_api_reaper.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_api_reaper.hpp",
+          "sha256": "88591dad9d6be1fcad494ca84a2a33c6b2e88afccf4b6b1e0558837f25dd8d6a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_api_reaper.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_audio_flac.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_audio_flac.cpp",
+          "sha256": "f42b8aaeafdede2c688410b6cadc33d713a6c0cc6fc0608a60fac52f4aefc84e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_audio_flac.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_audio_flac.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_audio_flac.hpp",
+          "sha256": "27078e92f648b7e629e9bf9f9b0cc4ea596364f746e4c137d84b947e60fc087d",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_audio_flac.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_audio_wav.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_audio_wav.cpp",
+          "sha256": "0d48341a863eec3736bf7d60e39d9de7069a767bce75a1792ddcfd958a61a07a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_audio_wav.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_audio_wav.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_audio_wav.hpp",
+          "sha256": "718692a42b336628cbf379f72c84186b77b49a26688c6ead02fe33ce6d877ae9",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_audio_wav.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_config.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_config.cpp",
+          "sha256": "5ce427d3f93dcb0bc9ddd664cbd138545fbf8e0a76ce7f8a96e17f86819b47ba",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_config.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_config.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_config.hpp",
+          "sha256": "56f777b3ed687708cdc8345fe798af4644d6658bedbcdbff71efc7a0ded0dcea",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_config.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_eel_utils.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_eel_utils.cpp",
+          "sha256": "8979269d69c7b6ec680e1f1243e200ca0be4b328e27c1b86abfb5cad207cd6fe",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_eel_utils.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_eel_utils.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_eel_utils.hpp",
+          "sha256": "431342658cd9691879dc5aaa880a91d3ae4e950758f2f35ff1a9793498d7b907",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_eel_utils.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_midi.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_midi.cpp",
+          "sha256": "776e294afc59b98ff8b8863ed998befda5fc2815e1177538257a5c158ce43619",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_midi.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_midi.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_midi.hpp",
+          "sha256": "76fffee758293909b79fc15ed07d94693b030ce409873314e2fde5848008474a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_midi.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_parse.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_parse.cpp",
+          "sha256": "79548aca5af93ed1f797f2f183f1d8b18e42fbf0a26c0a7dd47ba8e300a29561",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_parse.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_parse.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_parse.hpp",
+          "sha256": "1cd9add7dbc26b142c2cab444ed0630042812200b9ef7e706bb53ec0705b12a6",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_parse.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_parse_menu.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_parse_menu.cpp",
+          "sha256": "5c9eef55c7052484f56cc91421d020ca57c0301c051cad6dcb9885697a816f8f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_parse_menu.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_parse_menu.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_parse_menu.hpp",
+          "sha256": "0b69c10641a3ea944715389c73176de48a499fa50598751f953b830f804bc606",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_parse_menu.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_preset.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_preset.cpp",
+          "sha256": "0aa6236083dc369795ab642a5da5f883946c309ed97f7ba82d742880c8670fa6",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_preset.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_preset.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_preset.hpp",
+          "sha256": "1a471bee63d46b97f4890bcff55f9076a3d730c4d63dd1c637ac307ccc747de2",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_preset.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_reader.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_reader.cpp",
+          "sha256": "abb028319ca0b686485d2dc196135f616472fbd15858344c23daac61bc62415a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_reader.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_reader.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_reader.hpp",
+          "sha256": "dc252fff185da44c337b72a33a440cee3c72d30ef00958feef3806dff6e9dc5e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_reader.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_utils.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_utils.cpp",
+          "sha256": "e717050626c874d3519fdf2ea74534308a559fce0cdc3fd7a0241044c84caf81",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_utils.cpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_utils.hpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_utils.hpp",
+          "sha256": "1a81250be091f062ec3dc091818c69af45a7816992d2f96421f75aaf19b6a327",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_utils.hpp"
+        },
+        {
+          "upstreamPath": "sources/ysfx_utils_fts.cpp",
+          "archivePath": "third_party/ysfx/sources/ysfx_utils_fts.cpp",
+          "sha256": "8a0818be0a869ca820fd809b2dd24e3769eba2b363e7173ba00cb57cff504c4a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/sources/ysfx_utils_fts.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/dr_libs/dr_flac.h",
+          "archivePath": "third_party/ysfx/thirdparty/dr_libs/dr_flac.h",
+          "sha256": "42a92848af4665e032e67a48a6ee0a8a577ca5adf4e1ff758d8ab1d8e9abdb71",
+          "url": "https://raw.githubusercontent.com/mackron/dr_libs/f13cbcfd06afe7287f99b1bb5982cefdf3d6a974/dr_flac.h?parent=8077347ccf4115567aed81400281dca57acbb0cc"
+        },
+        {
+          "upstreamPath": "thirdparty/dr_libs/dr_wav.h",
+          "archivePath": "third_party/ysfx/thirdparty/dr_libs/dr_wav.h",
+          "sha256": "6c001cfc88477ecc18bdd01c449beafc267807f37cd8d542abe8fd20a382492e",
+          "url": "https://raw.githubusercontent.com/mackron/dr_libs/f13cbcfd06afe7287f99b1bb5982cefdf3d6a974/dr_wav.h?parent=8077347ccf4115567aed81400281dca57acbb0cc"
+        },
+        {
+          "upstreamPath": "thirdparty/dr_libs/LICENSE",
+          "archivePath": "third_party/ysfx/thirdparty/dr_libs/LICENSE",
+          "sha256": "dd1c647e6f767f8ff4b2dfae0fed314726600a01e0cf1ef556afddd5fa96ff15",
+          "url": "https://raw.githubusercontent.com/mackron/dr_libs/f13cbcfd06afe7287f99b1bb5982cefdf3d6a974/LICENSE?parent=8077347ccf4115567aed81400281dca57acbb0cc"
+        },
+        {
+          "upstreamPath": "thirdparty/stb/LICENSE",
+          "archivePath": "third_party/ysfx/thirdparty/stb/LICENSE",
+          "sha256": "bebfe904b14301657e4e5d655c811d51fd31b97c455b9cc2d8600d6bac6cff63",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/stb/LICENSE"
+        },
+        {
+          "upstreamPath": "thirdparty/stb/stb_image.h",
+          "archivePath": "third_party/ysfx/thirdparty/stb/stb_image.h",
+          "sha256": "91f435e0fc6a620018b878b9859c74dff60d28046f87e649191ad6f35a98c722",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/stb/stb_image.h"
+        },
+        {
+          "upstreamPath": "thirdparty/stb/stb_image_write.h",
+          "archivePath": "third_party/ysfx/thirdparty/stb/stb_image_write.h",
+          "sha256": "cbd5f0ad7a9cf4468affb36354a1d2338034f2c12473cf1a8e32053cb6914a05",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/stb/stb_image_write.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/assocarray.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/assocarray.h",
+          "sha256": "38300de15e13b99d1c98054b6dd2be43095bc77a3bdfacdd39c5765b0b496e57",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/assocarray.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/denormal.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/denormal.h",
+          "sha256": "54e76d7b634e6797ec36a5f8bed7c200726ef6691445149f38ce2732f92d74f1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/denormal.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/dirscan.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/dirscan.h",
+          "sha256": "6029dd22998167e0220e10d8759d7ce0c36aa6624b6f7fcb5ebec3acd4d8d20a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/dirscan.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/asm-nseel-aarch64-gcc.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/asm-nseel-aarch64-gcc.c",
+          "sha256": "3e8364044367b8b12c5cb34c7fdd1865dc73728ae3d082a3d1ce96113050c751",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/asm-nseel-aarch64-gcc.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/asm-nseel-arm-gcc.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/asm-nseel-arm-gcc.c",
+          "sha256": "5c18f6044a87ede40fa3ade630a38bae58b707f80547f1e66fd1814ac9c7d223",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/asm-nseel-arm-gcc.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/asm-nseel-ppc-gcc.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/asm-nseel-ppc-gcc.c",
+          "sha256": "7d0cf67841297aca359f44288cb5154069acebe0e17e9ef289887ca0a3791a6e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/asm-nseel-ppc-gcc.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/asm-nseel-x64-sse.asm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/asm-nseel-x64-sse.asm",
+          "sha256": "e13af1db6643321bf2781ac78494a25fa9cd0b68971b1ac85b41b312b775fe22",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/asm-nseel-x64-sse.asm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/asm-nseel-x86-gcc.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/asm-nseel-x86-gcc.c",
+          "sha256": "32bd4794642faca8a1d8afb5f42a265752e7417be97a272235920da45722c9a4",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/asm-nseel-x86-gcc.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/asm-nseel-x86-msvc.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/asm-nseel-x86-msvc.c",
+          "sha256": "6cdf7ac85bf5cba69792e42de2673e98239e4f97e78bf60a60f1c3885854628a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/asm-nseel-x86-msvc.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel2.l",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel2.l",
+          "sha256": "7958d1a9a095cb2d22568091aae4ec18be3f24dc01af37efa8f8b7a407606fd8",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel2.l"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel2.y",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel2.y",
+          "sha256": "f191a95759b99f88fd8f381f4a40148b3f7551f05463e5c3341073bc73b038b2",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel2.y"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_atomic.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_atomic.h",
+          "sha256": "6444d92a0373a15416a464a77b75c12e28847d96595882496cc22375e20761bf",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_atomic.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_eval.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_eval.h",
+          "sha256": "33a3b502330ea907590d47ac1d27fc0c9bfbbc634f9239e336ef4b15982957f7",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_eval.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_fft.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_fft.h",
+          "sha256": "107bf4ce83c3c140a755263b84c03bcc0be114b2e44887b88aa6dcaf2dafd320",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_fft.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_files.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_files.h",
+          "sha256": "488c9df54e8d612ca595b62f91e1924ada24d5365a3fbf9f1cf073994cd90dcd",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_files.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_import.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_import.h",
+          "sha256": "ca5c8ea00c257223767582641fa64c6d5858ce68250d99fd060d443403d72f52",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_import.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_lice.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_lice.h",
+          "sha256": "3a543d8d4340f3fe83f1855900b52e2e33257df86421c49b293440245d1ab195",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_lice.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_mdct.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_mdct.h",
+          "sha256": "ecc52d871a6fc7cab7627f4d008982c5709343f81d70f5c6fb42e557840eae12",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_mdct.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_misc.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_misc.h",
+          "sha256": "5284f66f1acd8e69d68c76e742f299b896238d3881e9cd7de56731602f866033",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_misc.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_net.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_net.h",
+          "sha256": "590ffdd98f9abdbb6912d325474b329236da29f28a060d26fca947f198f11e4b",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_net.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eel_strings.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eel_strings.h",
+          "sha256": "35c1aa1d89a687198b14c391b5ecad2a3cf1c36654e3ea1315ecfe4785c92b76",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eel_strings.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/eelscript.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/eelscript.h",
+          "sha256": "4ad32b8f7133e15bdf7012c9e5d214e4d5f4c9296df7bfa2d56477e02f79127a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/eelscript.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/glue_aarch64.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/glue_aarch64.h",
+          "sha256": "32a7f3dc6b785c25e93c993b245f2e943f4fee34e9a44bed89fe0344ffa3ff83",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/glue_aarch64.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/glue_arm.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/glue_arm.h",
+          "sha256": "23dd511b6ed6c787304e6c510495e7dc2562675bf97442eb861868cf62fad405",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/glue_arm.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/glue_port.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/glue_port.h",
+          "sha256": "f9251218db7fe9e93838c624ccb104c6053b250b4dec47253493530fe5119b87",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/glue_port.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/glue_ppc.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/glue_ppc.h",
+          "sha256": "5cf402fc752493e69ee055ab218ba030818c49ed4dbf84340b732f21ea915279",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/glue_ppc.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/glue_x86.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/glue_x86.h",
+          "sha256": "81e0f02827e32d64b6067eaadaf10855d9ce8469269c641690ff5cbcc2c1fe4c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/glue_x86.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/glue_x86_64_sse.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/glue_x86_64_sse.h",
+          "sha256": "3ff4c5d1a0fff1ab8eed07bc534affe85432d2232bffd389b0f50acdb280243f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/glue_x86_64_sse.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/ns-eel-addfuncs.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/ns-eel-addfuncs.h",
+          "sha256": "c0800e63802e59b24f6ce34caaf73100a48d12d7b4200f6f1f21732621188978",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/ns-eel-addfuncs.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/ns-eel-func-ref.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/ns-eel-func-ref.h",
+          "sha256": "a31e94ffc2aa9cc486b32ca122b8864830b5fede594dba1bb45200f10ac1145c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/ns-eel-func-ref.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/ns-eel-int.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/ns-eel-int.h",
+          "sha256": "749408d383e3ded8e7410ef2b73f49f35817ce64f2b0d63a02278af3dabebfae",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/ns-eel-int.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/ns-eel.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/ns-eel.h",
+          "sha256": "f5a7dea6143e7d1315c619e1379a1a8c0dd19fcab8d2740f2460690b81050e3a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/ns-eel.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-caltab.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-caltab.c",
+          "sha256": "043ee9aa17eed49efce66c850e7ee3d9089f7eaa5887a60bb272203f25001f0f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-caltab.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-cfunc.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-cfunc.c",
+          "sha256": "837924b1ac24e71d0791762b3c98f6748903723b2202370b5fb9ed9ca79d1607",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-cfunc.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-compiler.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-compiler.c",
+          "sha256": "12c064370d4a5d027a4d47748c965df329f21eacb7004f08b1500fb750ff91b1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-compiler.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-eval.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-eval.c",
+          "sha256": "b18aa4c8a83c9b623200b1bf6b0663be7d71b7ce7c958beaac6399194727a7a9",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-eval.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-lextab.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-lextab.c",
+          "sha256": "043ee9aa17eed49efce66c850e7ee3d9089f7eaa5887a60bb272203f25001f0f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-lextab.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-ram.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-ram.c",
+          "sha256": "8cbd8aab9d9bea10d9516ad4d8dae27f41089d7d7c3e3e2c48e389d79e01dcac",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-ram.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/nseel-yylex.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/nseel-yylex.c",
+          "sha256": "96cf2ad921b3a5df54345e0bd3eff25333ea996925b706c77966137d5acaa4d0",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/nseel-yylex.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/y.tab.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/y.tab.c",
+          "sha256": "c1dcca027ad99e7e7cd306a9771390e93428e440657ef12ca1ad5cd9c8cf07be",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/y.tab.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/eel2/y.tab.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/eel2/y.tab.h",
+          "sha256": "e3af9f349c1c667a903bbd8b2e204158b68bf06f6c37c7daa58ce615f2bc298f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/eel2/y.tab.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/fft.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/fft.c",
+          "sha256": "d9637a57978153f38355e3a7c6dd13efbaddd90eb52df23d42f68944180804fd",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/fft.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/fft.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/fft.h",
+          "sha256": "3f9475f3b5619665c99e4aa5ec0bae3260d416c6e535d8835821611d83257bac",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/fft.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/has_strings.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/has_strings.h",
+          "sha256": "4381c44bcdab18ee4081cf1c3722caded0362e577cc6302bda5eae811556a75e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/has_strings.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/heapbuf.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/heapbuf.h",
+          "sha256": "31005d8c31f7e91841c421608946247d2224261a131defe5fa355db1148c3e82",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/heapbuf.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice.cpp",
+          "sha256": "e688e9f153452f55b15e3279fa0e65e28419b7521fc1d0708cc756ecceac2ca8",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice.h",
+          "sha256": "594ddd29d057dba1b5ba066e70fc4c62b8b8133fef306062b30bbfa1fb883162",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_arc.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_arc.cpp",
+          "sha256": "9b216c5e1dbdec60fa63d9617e36370567a9930757f507ce3ef4b69d70265cdb",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_arc.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_bezier.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_bezier.h",
+          "sha256": "ac434b9eb07e21cbfcced1de681a560053d49006edad8ae24019da7523108f57",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_bezier.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_colorspace.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_colorspace.cpp",
+          "sha256": "96082cb53ca8e8aaedf617ccd61897057fe8890b4c803979e23c7741f101e445",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_colorspace.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_combine.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_combine.h",
+          "sha256": "d1ab6cc3570d732d5f50704de3bb3de3489c027149c0456d018b4746ddc82308",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_combine.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_extended.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_extended.h",
+          "sha256": "ad48e6d20793c3b5f29fa265dc980229d81243e1ce4b9f0e46cd47aa9ae7e770",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_extended.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_image.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_image.cpp",
+          "sha256": "f566e72527a467f680dd6913b64897859e2a4912108f33b71a1e3204e7487d9b",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_image.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_import.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_import.h",
+          "sha256": "cc4bc1ef9ebaa664074db409c56dcfd3f5e17c768c53580e17c9b108e0782656",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_import.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_line.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_line.cpp",
+          "sha256": "9d958c63ad7e8bd4175d0c41aa5b95baae2ef6283b7de6b48412d0bf95288c87",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_line.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_palette.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_palette.cpp",
+          "sha256": "d064251ce5ee89b72ce91993d604221e2d91f23f8498533161fc42c79034c4b5",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_palette.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_texgen.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_texgen.cpp",
+          "sha256": "bcfb56dd9a6b92016ab470ab3d8e3e411f82bf3324294f70aa5436d5fddc02f7",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_texgen.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_text.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_text.cpp",
+          "sha256": "2f93f3b229ca94ee7d1951a7fc86d48dd2cab881d9f6c92f92980103905951d1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_text.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_text.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_text.h",
+          "sha256": "1913520f6e0a0ebc65d18544e7cd7d8514b67a3e9eae00b5e404f6d365068a6e",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_text.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lice/lice_textnew.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lice/lice_textnew.cpp",
+          "sha256": "f948cab7730d26bfd3ac37ccf8011d5381670a3dbb52a4cfd43c172f2e3aaaa9",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lice/lice_textnew.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/lineparse.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/lineparse.h",
+          "sha256": "4fc40b54122505ac22899325ef26ec95d84c675eff04119ccca5c79f09ba5f4d",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/lineparse.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/mergesort.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/mergesort.h",
+          "sha256": "52843c9b8ed779402cb2e75ba1a38cb5283693e6bb4f86cd0b682178efaed166",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/mergesort.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/mutex.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/mutex.h",
+          "sha256": "2182f53d688bd57df5151454ecfbc19d81ab79100809559afc49d5e273e072d0",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/mutex.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/ptrlist.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/ptrlist.h",
+          "sha256": "12abeb864e3b01f49530faebe48bd236b31db58d0ef359091c9ea0de40ef62c6",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/ptrlist.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/queue.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/queue.h",
+          "sha256": "a64b59e0cdd024a6bf024767e1183774bdc468e783ebf0d9f7745919f1f4defc",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/queue.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-appstub-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-appstub-generic.cpp",
+          "sha256": "a6e1d43f69ffcdcd2125b15e7eea3e8df23b3fc36d32589cda8c513d3408bdd9",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-appstub-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-appstub.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-appstub.mm",
+          "sha256": "5a97c37c28c9c97d8f0b23dd407ebe42305b3428d6f991287e3155de89f993f2",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-appstub.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-dlg-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-dlg-generic.cpp",
+          "sha256": "290d9a5796da212441d5f4143ca28fa6c3558757c861c66c90e3106ec0eeb834",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-dlg-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-dlg.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-dlg.mm",
+          "sha256": "cbabefd0cbbb66f0bef2b6d6363c46a599e2fc835ab8a7137dd8bad3e7ac8a96",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-dlg.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-dlggen.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-dlggen.h",
+          "sha256": "0a20a6eb1eb6442bcfb0a8b8a49bb198e704c09e083570918d46d03ec580f19f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-dlggen.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-functions.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-functions.h",
+          "sha256": "038f173335a269418ec75b2c67131ba4d818c2cbb9d84c6ae10b2d824ee0815d",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-functions.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-gdi-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-gdi-generic.cpp",
+          "sha256": "e19532d66499eedaf82de5f8f0e0dc605b0f3e68ec4d334052bd60987f569220",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-gdi-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-gdi-internalpool.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-gdi-internalpool.h",
+          "sha256": "453f34fa7fa0d1008c2ec555abd6e3a49c571d3811394957150f7b88e7195ed1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-gdi-internalpool.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-gdi-lice.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-gdi-lice.cpp",
+          "sha256": "01e16d4cb9587117cd05f4a3b6152e5c52e23cc92e4afb18c8970a184ecff19c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-gdi-lice.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-gdi.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-gdi.mm",
+          "sha256": "fcf51511b2e7101712d98525764bbf2028d55ee6be07494f557eec9a3ea5166c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-gdi.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-generic-gdk.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-generic-gdk.cpp",
+          "sha256": "3dab30f03a16c6d97de890432f2f5360f8c101f36feaebdcf4fa2e7ece478483",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-generic-gdk.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-generic-headless.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-generic-headless.cpp",
+          "sha256": "15fc6c35b7bb0772ebe6f42387d1aa32e598e805082a2305d1658cfa3461b319",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-generic-headless.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-ini.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-ini.cpp",
+          "sha256": "3d7df3b985da995fe19168f3374559d57b8f90a26e8abd38c142a7a0f786dc93",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-ini.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-internal.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-internal.h",
+          "sha256": "1abeae42b102fccedfd646d693fd44c88d1caa92bd0e15059d8ffb755996cd09",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-internal.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-kb-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-kb-generic.cpp",
+          "sha256": "5ddae632c6ec8c9e32e81cfe52a53bf5d8920bfdb62edf18fb91bac7f9b4bb48",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-kb-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-kb.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-kb.mm",
+          "sha256": "4b675de75d6b446db6b7c06812f06f33d1b42baee9588e22032dadf1a7457c49",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-kb.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-menu-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-menu-generic.cpp",
+          "sha256": "c969b03574e69f0a3cc7b70918bef5c72ed136ac57829495c74461bd7d20b0a1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-menu-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-menu.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-menu.mm",
+          "sha256": "8f958ffb93ee828bd79cc95f2978d7a27e79ad8fb8fdc188e547e845424148fa",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-menu.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-menugen.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-menugen.h",
+          "sha256": "7a366f7e3b4e0bc2f1ad4373504e0b5b4d363e6bcc8bc10743ef93a56be40840",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-menugen.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-misc-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-misc-generic.cpp",
+          "sha256": "48544ef9dc38ca86bbf5e009e2d175136269ae62a0b496b0ecf2066b4b279f67",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-misc-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-misc.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-misc.mm",
+          "sha256": "a03dd59a4c01013388dab169e5f8c31e474f073332bfada663193c7ff3caabdb",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-misc.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-miscdlg-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-miscdlg-generic.cpp",
+          "sha256": "c2a15ce7a6578e0e17559549f54aefea9fd6788df5100ef08875ced367ea1725",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-miscdlg-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-miscdlg.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-miscdlg.mm",
+          "sha256": "734a1b06d9ce58a292b920e4aeeff21abfdaf06e380650851c71b00d019149e0",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-miscdlg.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-modstub-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-modstub-generic.cpp",
+          "sha256": "d127126110ce1e61da59cc0c76aa9b1fc86f5388a8c96517a208b204e5273a3a",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-modstub-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-modstub.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-modstub.mm",
+          "sha256": "2a2a7b767b0def2ea89e0d48b87b9c878a4fa71a5b50f2b333def1dd5ea13d8f",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-modstub.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-types.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-types.h",
+          "sha256": "6a7b9331d3b530ed5eadf6ef23785a4eb2dad56b714667da5fd4b1eb3a70b914",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-types.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-win32.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-win32.h",
+          "sha256": "036778c91541ef6f3258228043bce435338a387781d60204ea1fc364c1750330",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-win32.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-wnd-generic.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-wnd-generic.cpp",
+          "sha256": "2326c9fd025b09e9c80ffa7f780e776e9e9641dfec0131f06c8fcb14146955d1",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-wnd-generic.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell-wnd.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell-wnd.mm",
+          "sha256": "41875485fea52e55a05cf63088c15ea9df5111c0d2d1a09be11d89cd444917ad",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell-wnd.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell.cpp",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell.cpp",
+          "sha256": "c09b7e8313be335610225d6d4e74a2cea88bf41d9aceeaaafd37ece91e245d2c",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell.cpp"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swell.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swell.h",
+          "sha256": "498e6c29335a70627de8c207a146c27b593e13556d25b83056e82d2d685e52fc",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swell.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swellappmain.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swellappmain.h",
+          "sha256": "98276732c093cf601b22282900ac0acf16fc8698717f681f66a055acafc975ca",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swellappmain.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/swell/swellappmain.mm",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/swell/swellappmain.mm",
+          "sha256": "ec86c12fd1bfbe712a957d48b5200dd714282bd0a035664e513109d2f91cea50",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/swell/swellappmain.mm"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/wdlatomic.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/wdlatomic.h",
+          "sha256": "ef508aecd9beb5a48698efd751194051dc2e6cd8a65719ed9f5715a8162465dc",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/wdlatomic.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/wdlcstring.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/wdlcstring.h",
+          "sha256": "75da8ce18cbbe6e8ce0461e8ff29ed65d4c3d7277b0b8aa48613067c7a3679ff",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/wdlcstring.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/wdlstring.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/wdlstring.h",
+          "sha256": "839020b9bb966ed93a87c4bc43c49e42bfe501e250f96a70d04ba599aa8baf61",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/wdlstring.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/wdltypes.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/wdltypes.h",
+          "sha256": "1ce3a2eec0dd048e22f85082ca83aa9967e37eac56e9883c543d3abe9831a394",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/wdltypes.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/wdlutf8.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/wdlutf8.h",
+          "sha256": "7a1368416581e122b51818f7326a545b911f8b37a1fc5931d4e14acc70e57baf",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/wdlutf8.h"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/win32_utf8.c",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/win32_utf8.c",
+          "sha256": "1663ff5e47a47d2638d83f3064342c7f699b91a6cd6e959543083b85b4565ae9",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/win32_utf8.c"
+        },
+        {
+          "upstreamPath": "thirdparty/WDL/source/WDL/win32_utf8.h",
+          "archivePath": "third_party/ysfx/thirdparty/WDL/source/WDL/win32_utf8.h",
+          "sha256": "94918b9c6cf6027553f4d58e572c8d099c3317f7298a63ec21e1818324e60331",
+          "url": "https://raw.githubusercontent.com/jpcima/ysfx/8077347ccf4115567aed81400281dca57acbb0cc/thirdparty/WDL/source/WDL/win32_utf8.h"
+        }
+      ]
     }
   ]
 }

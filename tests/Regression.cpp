@@ -196,6 +196,7 @@ void midiInputContractsRegression();
 void deviceContractsRegression();
 #endif
 #if defined(CYDSP_TEST_PLUGINS)
+void openPluginRegression(const std::filesystem::path&);
 void pluginRegression(const std::filesystem::path&);
 void vstPluginRegression(const std::filesystem::path&);
 void pluginWorkerRegression(const std::filesystem::path&);
@@ -232,6 +233,7 @@ int main(int, char** argv) {
 #endif
 #if defined(CYDSP_TEST_PLUGINS)
         pluginRegression(std::filesystem::path(argv[0]).parent_path());
+        openPluginRegression(std::filesystem::absolute(argv[0]).parent_path());
         vstPluginRegression(std::filesystem::path(argv[0]).parent_path());
         pluginWorkerRegression(std::filesystem::path(argv[0]).parent_path());
 #else

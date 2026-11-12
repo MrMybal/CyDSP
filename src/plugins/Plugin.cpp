@@ -472,6 +472,10 @@ Status createPluginProvider(PluginFormat format, std::unique_ptr<PluginProvider>
             next = detail::makeClapProvider();
         else if (format == PluginFormat::vst3)
             next = detail::makeVst3Provider();
+        else if (format == PluginFormat::lv2)
+            next = detail::makeLv2Provider();
+        else if (format == PluginFormat::jsfx)
+            next = detail::makeJsfxProvider();
         else
             return Status::unsupported_format;
         if (!next)

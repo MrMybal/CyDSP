@@ -23,9 +23,9 @@ are integration evidence; no CyDAW/JUCE implementation is copied or modified.
   SysEx capacity and backpressure, epochs/disconnect releases/fragmented messages.
 - [x] Plugin core: multibus processing/events/parameters/gestures/state/latency/tails,
   original editor lifecycle/resize/DPI/thread contracts and native-window embedding.
-- [x] Plugin formats: pinned permissive CLAP/VST3 host adapters with explicit
+- [x] Plugin formats: pinned commercially compatible CLAP/VST3/LV2/JSFX host adapters with explicit
   capabilities, native editor lifecycle and platform bundle-loading source.
-  AU/AAX/LV2/JSFX retain the explicit external provider boundary; no built-in
+  AU/AAX retain the explicit external provider boundary; no built-in
   adapter or separately licensed SDK grant is claimed.
 - [x] Plugin worker: original bounded IPC protocol/client/server entry points,
   separate-process lifecycle and crash/disconnect recovery; no false isolation claim.
@@ -48,10 +48,10 @@ digest. Windows x64 MSVC/Clang, x86, scalar and AddressSanitizer execute the nat
 suite. Quest 3 ARM64 and ARM32 execute the in-process suites and measurements.
 Four Android ABIs compile/link. Four Windows production configurations build
 static libraries only; all73 public headers and the installed static consumer
-compile. The ISA audit inspects666 objects and confirms local AVX-512/SVE flags
+compile. The [ISA audit](Validation.md) records the current object count and confirms local AVX-512/SVE flags
 without fused floating-point instructions leaking into the portable paths.
 
-Original CLAP/VST3 modules verify multibus audio, sample automation, events,
+Original CLAP/VST3/LV2/JSFX modules verify multibus audio, sample automation, events,
 state, lifecycle and prepared host allocation behavior. Windows additionally
 checks actual native child editors, resize/DPI/focus/key/wheel, VST3 UI gesture
 recording, final-value retention after4096 automation points and a real separate
@@ -84,9 +84,16 @@ Production tests and measurements remain opt-in. See [Plugin contracts](Plugins.
 [DAW contracts](DawIntegration.md), [Validation](Validation.md) and
 [Measurements](Measurements.md) before adapting an application.
 
-AU/AAX/LV2/JSFX need external providers; no built-in adapter is claimed.
+LV2 and JSFX hosting are now built in; see [Plugin contracts](Plugins.md).
+AU remains unimplemented. AAX hosting requires rights clarification with Avid.
 Beats/texture source policies likewise require an application-specific provider.
 APP-001/003/004 are application shell/model/routing migrations in the supplied
 report; CyDAW remains untouched. Desktop Linux/macOS, Windows ARM64 execution,
 native SVE, physical audio/MIDI2 and compatibility with real third-party plugins
 remain separate acceptance work.
+
+
+LV2/JSFX follow-up adds native providers, sample automation/MIDI/state, a distinct
+LV2 sidechain and native Windows editor management (including the JSFX @gfx canvas).
+The same separate worker can host both formats. No CyDAW or CyCode source changes
+are part of this addition.

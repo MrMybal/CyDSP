@@ -44,7 +44,8 @@ integration_markers=(
     'PASS integration MIDI selection/multiport/SysEx/epochs/voice releases',
     'PASS integration source policies/time-pitch curves/repitch/prime/tails/providers',
     'PASS plugin CLAP ABI/multibus/automation/state/editor/lifecycle/realtime',
-    'PASS plugin VST3 ABI/controller/messages/multibus/state/editor/realtime')
+    'PASS plugin VST3 ABI/controller/messages/multibus/state/editor/realtime',
+    'PASS plugin LV2/JSFX audio/MIDI/automation/state/worker/realtime')
 for name,report in reports.items():
     if name.startswith(('build/native-','build/device-')):
         for marker in integration_markers:
@@ -58,7 +59,7 @@ component_count=len(json.loads((ROOT/'third_party/manifest.json').read_text())['
 summary={'timeUtc':datetime.now(timezone.utc).isoformat(),'sourceSha256':digest,
          'status':'passed_available_targets','requestedScopeComplete':False,'implementedLibraryScopeComplete':True,'applicationMigrationComplete':False,'nativeRuntimeExecuted':True,
          'reports':paths,'unverified':['desktop Linux/GCC (deferred by owner)','macOS/Apple Clang (deferred by owner)',
-         'Windows ARM64 application linking/runtime','physical MIDI2/AMidi hardware and Apple native transport/codec compilation/runtime','SVE native execution and multiple vector lengths','physical audio I/O, listening acceptance and all possible rate/frequency combinations','CyDAW shell/model/routing migration (outside CyDSP)','application-specific beats/texture providers; built-in AU/AAX/LV2/JSFX adapters','macOS/Linux desktop plugin/worker/editor runtime and native Android service worker'],
+         'Windows ARM64 application linking/runtime','physical MIDI2/AMidi hardware and Apple native transport/codec compilation/runtime','SVE native execution and multiple vector lengths','physical audio I/O, listening acceptance and all possible rate/frequency combinations','CyDAW shell/model/routing migration (outside CyDSP)','application-specific beats/texture providers; AU implementation and AAX hosting rights','macOS/Linux desktop plugin/worker/editor runtime and native Android service worker'],
          'untouched':['CyCode','CyDAW_Project','GitHub Actions','antivirus settings'],'installedDeviceApplication':False}
 
 static=reports['build/validation.json']
@@ -92,7 +93,7 @@ Current compiler-input SHA-256: {digest}
 All {static['publicHeaders']} public headers compile individually. {static['staticAssertSites']}
 static_assert sites pass under MSVC and Clang. Source checks cover {sourceCount} owned C++
 files, local includes, Python syntax, documentation links, build/ISA policy and all
-{component_count} pinned permissive component archives/notices. Final compiler build logs have no
+{component_count} pinned commercially compatible component archives/notices. Final compiler build logs have no
 warnings. An additional audit disassembles {objects} production objects across all
 eight target archives, verifies per-file wide-ISA isolation and finds no fused FP
 instructions. The instruction audit is generated locally in `build/simd-validation.json`. SVE is compiled and
@@ -152,9 +153,9 @@ remain provider policies, not claimed native matches for CyDAW algorithms.
 Long60-second AAC/WMA proxy fixtures compare exact near-EOF PCM, seek time,
 bounded copy storage and sampled process private-memory increase.
 
-Original CLAP/VST3 shared modules verify the ABI, multibus/sidechain, automation,
+Original CLAP/VST3/LV2 shared modules and JSFX scripts verify the ABI, multibus/sidechain, automation,
 copied events, component/controller states, lifecycle and host allocation audit.
-Windows tests actual child editors, resize/DPI, focus/keys/wheel and a separate
+Windows tests actual child editors (including the JSFX canvas), resize/DPI, focus/keys/wheel and a separate
 process worker: IPC, one-block pipeline, late-result silence, abrupt plugin exit
 and restart. Android runs in-process module tests; standalone Android process
 workers require an application service and are explicitly skipped.

@@ -402,8 +402,9 @@ callback lifetime, transactional mutation and remaining platform acceptance.
 
 ## Independent plugin hosting
 
-CyDSP::Plugins is an optional static host layer; pinned CLAP/VST3 declarations are
-private. PluginInstance owns format-neutral multibus/event/state/editor contracts.
+CyDSP::Plugins is an optional static host layer; pinned format declarations, LV2 discovery and the JSFX runtime are
+private. LV2 float staging reuses VectorOps; JSFX local VM memory is prepared on
+control. The original JSFX canvas is Windows-only in this increment. PluginInstance owns format-neutral multibus/event/state/editor contracts.
 The application owns its native parent window, event loop and serialized control
 and audio lifetimes. Host-side prepared processing retains memory; arbitrary
 foreign plugin allocation or behavior cannot be guaranteed. Native editor creation,

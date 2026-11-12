@@ -51,7 +51,7 @@ See the [processing examples](examples/Processing.cpp) and [module contracts](do
 
 ---
 
-The optional [Plugins module](docs/Plugins.md) hosts CLAP/VST3 with native editors and a separate worker process. The [integration remediation](docs/IntegrationRemediation.md) also covers metadata, devices, MIDI and sources.
+The optional [Plugins module](docs/Plugins.md) hosts CLAP/VST3/LV2/JSFX with native editors and a separate worker process. The [integration remediation](docs/IntegrationRemediation.md) also covers metadata, devices, MIDI and sources.
 
 ## Installation
 
@@ -141,6 +141,8 @@ The [architecture guide](docs/Architecture.md) describes dispatch and platform b
 
 | [CLAP](https://github.com/free-audio/clap) | [MIT](third_party/licenses/clap.txt) | Private interfaces; original host and ABI fixture. |
 | [VST3 interfaces](https://github.com/steinbergmedia/vst3_pluginterfaces) | [MIT](third_party/licenses/vst3-interfaces.txt) | Original host, controller and native editor adapters. |
+| [LV2/Lilv](https://github.com/lv2/lilv) | ISC | Private host, RDF and Atom dependencies; original CyDSP adapter. |
+| [ysfx](https://github.com/jpcima/ysfx) | Apache 2.0 and embedded notices | JSFX runtime; original host/canvas, no JUCE wrapper; Bison parser exception retained. |
 
 Retain CyDSP's LICENSE and the complete upstream notices. The [provenance manifest](third_party/manifest.json) pins revisions, archived files and adaptation scope; [licensing details](docs/Licensing.md) explain their distribution. This table is an index of those components and their terms.
 

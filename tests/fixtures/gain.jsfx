@@ -1,0 +1,32 @@
+desc:CyDSP original JSFX fixture
+author:CyDSP
+options:maxmem=65536
+slider1:0.5<0,2,0.01>Gain
+slider8:0.25<0,1,0.01>Bias
+in_pin:left
+in_pin:right
+out_pin:left
+out_pin:right
+@init
+history=0;
+@slider
+gain=slider1;
+@block
+while(midirecv(offset,msg1,msg2,msg3)) (
+  midisend(offset,msg1,msg2,msg3);
+);
+@sample
+spl0=spl0*gain+slider8;
+spl1=spl1*gain+slider8;
+history+=1;
+@serialize
+file_var(0,history);
+@gfx 320 200
+gfx_r=0.2;gfx_g=0.4;gfx_b=0.6;gfx_a=1;
+gfx_rect(0,0,gfx_w,gfx_h);
+gfx_x=8;gfx_y=8;gfx_drawstr("CyDSP original JSFX");
+key=gfx_getchar();
+key==97 ? (
+  slider8=0.75;
+  slider_automate(slider8);
+);

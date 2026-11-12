@@ -124,10 +124,10 @@ application work.
 
 ## Format availability and validation
 
-Built-in adapters: CLAP and current MIT VST3 interfaces. The public
-PluginProvider/PluginBackend boundary also accepts application-owned AU, AAX,
-LV2 or JSFX adapters without borrowing JUCE types. No built-in support for those
-formats is claimed. AAX/ASIO/VST2 SDKs are not bundled; their separate access terms
+Built-in adapters: CLAP, current MIT VST3 interfaces, LV2 and JSFX. The public
+PluginProvider/PluginBackend boundary also accepts application-owned AU adapters.
+AAX hosting rights require separate confirmation from Avid; no built-in AU/AAX
+support is claimed. AAX/ASIO/VST2 SDKs are not bundled; their separate access terms
 are not granted by CyDSP MIT. Plugin exports already provided by an application
 remain separate from this host API.
 
@@ -148,3 +148,97 @@ Parameter descriptions retain native units. Audio-to-controller parameter mirror
 use atomic32 mailboxes per parameter, preserving the final value when the UI
 pumps slowly. An original fixture checks 4096 automation points in-process and UI gestures
 both in-process and across the worker mailbox.
+
+
+## LV2 hosting
+
+Select PluginFormat::lv2. scan takes an absolute bundle directory containing
+manifest.ttl; it loads only that explicit bundle using the private Lilv/Serd/Sord/
+Sratom/Zix stack. No global plugin-path scan or dynamic-manifest execution is
+implicit. Descriptor IDs are native plugin URIs; one bundle may contain several
+plugins. Unknown required features, required unsupported port types and unsupported
+Atom buffer formats cause an explicit unsupported status.
+
+Audio groups use port-groups metadata, separately for inputs/outputs. Ungrouped
+ports form one bus in their direction; port order is native LV2 index order.
+Sidechain buses remain distinct. Control parameter IDs are native port indices,
+with plain values, integer/toggled flags, read-only outputs and sample-rate-scaled
+ranges. Native processing is float32; the public double entry point deliberately
+converts through prepared float storage. It is not native double LV2 precision.
+Float copies reuse CyDSP VectorOps and backend selection during activation.
+
+The implemented features are URID map/unmap, options, bounded variable blocks and
+the worker schedule/interface. URIDs retain stable names/IDs in4096 fixed slots,
+with1023-byte names; exhaustion/concurrent slot reservation can return the LV2
+mapping failure ID0. There is no mutex/spin/allocation in the mapper.
+Atom Sequence ports handle MIDI/SysEx and frame/beat/tempo/signature time Position.
+MIDI buses remain distinct and output events are copied and sorted stably by frame.
+Parameter automation splits the processing block at exact offsets, since ordinary
+LV2 scalar control ports carry a single value per run call. @block-like semantics
+therefore follow those sub-blocks. Mid-block transport events and tempo-increment
+ramps return unsupported_format; supply block transport and split at changes.
+
+Each Atom port has64 KiB of prepared storage. Worker requests/responses use separate
+bounded SPSC queues (16 slots,64 KiB/message), one non-audio worker and run-context
+responses/end_run. Accepted work drains before instance destruction; responses
+are delivered before deactivation. No plugin worker job runs inline in the audio
+client. Arbitrary foreign work/process functions can still block or misbehave.
+
+State uses Lilv's native Turtle representation and includes scalar ports plus
+the plugin's state extension. It checks the plugin URI on restore. State files
+are not silently packaged: external asset paths remain external, and state:makePath
+is not advertised. Required file-creation features are rejected rather than
+claiming self-contained presets. Foreign state mutation is not transactional.
+
+Native WindowsUI/CocoaUI/X11UI classes can use the embedding boundary; GTK/Qt
+widget-toolkit wrapping via Suil is not included. UI parent, resize, URID, port map,
+touch gestures, options/DPI, instance/data access and idle are supplied, and unknown
+required UI features are rejected. Control edits/gestures cross a bounded queue;
+audio-to-UI scalar values use atomic32 snapshots. Optional runtime DPI depends on
+the UI's options interface. The application still owns its parent and event loop.
+Windows native child/editor/resize and cross-process embedding are executed tests;
+Cocoa/X11 paths await their corresponding platform acceptance.
+
+## JSFX hosting
+
+Select PluginFormat::jsfx. scan/create take an absolute source-file path; use the
+descriptor ID returned by scan (currently jsfx). The private ysfx compiler/runtime
+loads imports and guesses Effects/Data roots from that path. No REAPER license,
+REAPER process or JUCE plugin wrapper is used. This is EEL2, not JavaScript.
+Scripts/imports are executable code and are not a security sandbox.
+
+The runtime uses the portable EEL bytecode backend on every target in this
+increment. No native JIT performance/architecture coverage is claimed. Declared
+local memory is limited to8 million double samples (64 MiB), prepared before
+processing. Script strings, files, shared gmem and other foreign operations may
+allocate, lock or perform I/O; the host cannot make arbitrary scripts realtime-safe.
+Missing/unsupported native features are not emulated as full REAPER behavior.
+
+Audio uses the declared input/output pins, float and double entry points, plus
+16 MIDI buses and bounded MIDI/SysEx buffers. Slider IDs0..63 correspond to source
+slider1..slider64, with plain native values, ranges/enumerations and initial
+visibility. Automation splits cycles at sample offsets, so @block runs per segment;
+timed MIDI offsets are rebased and output events are copied/sorted. Transport is
+set before each segment; mid-block transport events and tempo-increment ramps
+return unsupported_format. PDC latency uses an atomic published snapshot; tail
+duration remains unknown. Reset returns unsupported_format because @init may
+allocate or access files; stop/deactivate/reactivate is a control operation.
+
+The version1 CyJSFX state envelope stores sliders (including sparse indices) and
+@serialize data with strict lengths, ranges and duplicate checks. The caller binds
+state to the selected script/import set; the envelope is not a script archive.
+An adapted runtime fixes upstream sparse-slider serialization and Android API24
+priority-inheritance availability. Pristine upstream files remain pinned.
+
+On Windows, @gfx is compiled and rendered through a private LICE BGRA canvas in an
+owned native child window. Resize/DPI/show/focus, mouse/wheel/keys and popup menus
+are supported through the existing editor API; call pumpMainThread for rendering
+and UI automation handoff. Canvas dimensions are physical pixels, bounded to4096
+per axis. File-drop/cursor-shape callbacks are not supplied. Other platforms expose
+the audio/MIDI/state engine and generic parameter metadata; @gfx editor creation is
+currently unsupported there. No cross-platform custom GUI support is claimed.
+
+The original fixtures check float/double reference audio, a separate LV2 sidechain,
+sample automation,12 KiB copied SysEx, LV2 background work, state restoration,
+sparse JSFX sliders, prepared allocation auditing, native Windows editors/JSFX
+canvas edits and separate-process audio/state/editor RPC for both formats.

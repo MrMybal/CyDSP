@@ -52,7 +52,7 @@ Les [exemples de traitement](examples/Processing.cpp) et les [contrats des modul
 
 Les modules optionnels ajoutent les périphériques audio/MIDI, les fichiers audio et le traitement de durée/hauteur. Voir la [couverture détaillée](docs/Coverage.md) pour les fonctions disponibles et les limites.
 
-Le module optionnel [Plugins](docs/Plugins.md) gère CLAP/VST3, les éditeurs natifs et un worker en processus séparé. Les [corrections d’intégration](docs/IntegrationRemediation.md) couvrent aussi les métadonnées, périphériques, MIDI et sources.
+Le module optionnel [Plugins](docs/Plugins.md) gère CLAP/VST3/LV2/JSFX, les éditeurs natifs et un worker en processus séparé. Les [corrections d’intégration](docs/IntegrationRemediation.md) couvrent aussi les métadonnées, périphériques, MIDI et sources.
 
 ## Installation
 
@@ -141,6 +141,8 @@ Le [guide d'architecture](docs/Architecture.md) décrit la sélection CPU et les
 
 | [CLAP](https://github.com/free-audio/clap) | [MIT](third_party/licenses/clap.txt) | Interfaces privées ; hôte et plugin de test originaux. |
 | [Interfaces VST3](https://github.com/steinbergmedia/vst3_pluginterfaces) | [MIT](third_party/licenses/vst3-interfaces.txt) | Hôte, contrôleur et éditeur natif originaux. |
+| [LV2/Lilv](https://github.com/lv2/lilv) | ISC | Dépendances privées pour l’hébergement, RDF et Atom ; adaptateur CyDSP original. |
+| [ysfx](https://github.com/jpcima/ysfx) | Apache 2.0 et notices intégrées | Moteur JSFX ; hôte/canvas originaux, sans wrapper JUCE ; exception du parseur Bison conservée. |
 
 Conserver le fichier LICENSE de CyDSP et les notices amont complètes. Le [manifeste de provenance](third_party/manifest.json) épingle les révisions, les archives et le périmètre des adaptations ; les [détails de licence](docs/Licensing.md) expliquent leur distribution. Le tableau constitue un index de ces composants et de leurs conditions.
 

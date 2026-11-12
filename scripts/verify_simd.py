@@ -17,13 +17,13 @@ def inspect(label,folder,arm=False,ninja=False):
         objects=[];current='';flags={}
         for line in text.splitlines():
             if line.startswith('build '):current=line.replace('\\','/')
-            elif line.startswith('  FLAGS =') and any('CMakeFiles/'+target+'.dir/' in current for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins')):
+            elif line.startswith('  FLAGS =') and any('CMakeFiles/'+target+'.dir/' in current for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins','CyDSPPluginRuntime')):
                 obj=current[6:].split(': ',1)[0];flags[obj]=line
                 if '-mavx512' in line:require('/Avx512.cpp.' in obj,'AVX-512 flags leaked: '+obj)
                 if '+sve' in line or '-msve-vector-bits' in line:require('/Sve.cpp.' in obj,'SVE flags leaked: '+obj)
                 objects.append(folder/obj)
         require(objects,'Missing object rules: '+label)
-    else:objects=[p for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins') for p in (folder/(target+'.dir/Release')).glob('*.obj')]
+    else:objects=[p for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins','CyDSPPluginRuntime') for p in (folder/(target+'.dir/Release')).rglob('*.obj')]
     require(len(objects)>=26,'Incomplete archive objects: '+label)
     kernels=[]
     for path in objects:
@@ -31,7 +31,13 @@ def inspect(label,folder,arm=False,ninja=False):
         result=subprocess.run([str(OBJDUMP),'-d','--no-show-raw-insn',*(['--mattr=+sve'] if arm and 'arm64' in label else []),str(path)],cwd=ROOT,capture_output=True,text=True,check=True)
         code=result.stdout
         instructions=re.findall(r'^\s*[0-9a-f]+:\s+([a-z][a-z0-9.]*)',code,re.M)
-        require(instructions,'No decoded instructions: '+str(path))
+        if not instructions:
+            sections=subprocess.run([str(OBJDUMP),'-h',str(path)],cwd=ROOT,capture_output=True,text=True,check=True).stdout
+            text_sections=[int(fields[2],16) for line in sections.splitlines()
+                           if len(fields:=line.split())>=5 and fields[0].isdigit() and 'TEXT' in fields[4:]]
+            require('Sections:' in sections and all(size==0 for size in text_sections),'Nonempty undecoded code section: '+str(path))
+            continue  # A table-only or platform-disabled translation unit has no code.
+
         fused=[op for op in instructions if re.match(r'^(?:vfmadd|vfmsub|vfnmadd|vfnmsub|fmadd|fmsub|fnmadd|fnmsub|fmla|fmls)',op)]
         require(not fused,'Unexpected fused FP instruction: '+str(path)+' '+str(fused[:4]))
         if arm:

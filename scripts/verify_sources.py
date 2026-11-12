@@ -32,11 +32,11 @@ manifest = json.loads((ROOT / 'third_party/manifest.json').read_text(encoding='u
 require(manifest['schemaVersion'] == 1, 'Unknown manifest schema')
 for component in manifest['components']:
     name = component['name']
-    require(component['license'] in ('MIT', 'MIT-0', 'ISC AND BSD-3-Clause AND LicenseRef-minimp3-Public-Domain'), 'Unexpected third-party license: ' + name)
+    require(component['license'] in ('MIT', 'MIT-0', 'ISC', 'Apache-2.0 AND Zlib AND MIT AND ISC AND (GPL-2.0-or-later WITH Bison-exception-2.2)', 'ISC AND BSD-3-Clause AND LicenseRef-minimp3-Public-Domain'), 'Unexpected third-party license: ' + name)
     require(bool(re.fullmatch(r'[0-9a-f]{40}', component['revision'])), 'Unpinned revision: ' + name)
     require(bool(component['scope']), 'Missing adaptation scope: ' + name)
     notice = project_file(component['noticePath']).read_text(encoding='utf-8')
-    require(('Permission is hereby granted' in notice or 'Permission to use, copy, modify' in notice) and 'THE SOFTWARE IS PROVIDED' in notice,
+    require(('Apache License' in notice or 'Permission is hereby granted' in notice or 'Permission to use, copy, modify' in notice) and 'THE SOFTWARE IS PROVIDED' in notice,
             'Incomplete permissive notice: ' + name)
     if name == 'choc':
         require(all(x in notice for x in ('Josh Coalson', 'Xiph.org Foundation', 'Jutta Degener', 'public domain worldwide')), 'Missing embedded codec notice')
@@ -92,7 +92,7 @@ for line in cmake.splitlines():
         require('set_source_files_properties(src/math/Avx2.cpp' in line,
                 'AVX2 option must be local to the AVX2 source')
 for path in (ROOT / 'src').rglob('*.cpp'):
-    require(path.relative_to(ROOT).as_posix() in cmake, 'Implementation absent from CMake: ' + str(path))
+    require(path.relative_to(ROOT).as_posix() in cmake + ''.join(p.read_text() for p in (ROOT/'cmake').glob('*.cmake')), 'Implementation absent from CMake: ' + str(path))
 presets = json.loads((ROOT / 'CMakePresets.json').read_text(encoding='utf-8'))
 for preset in presets['configurePresets']:
     require(preset.get('cacheVariables', {}).get('CYDSP_BUILD_TESTS', 'OFF') == 'OFF',
@@ -109,4 +109,4 @@ require('set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)' in toolchain,
 require(not (ROOT / '.github/workflows').exists(), 'No GitHub Actions authorized')
 if errors:
     raise SystemExit('\n'.join(errors))
-print(f'PASS: {count} C++ sources/headers; {len(manifest["components"])} pinned permissive components; includes, Python, JSON and build policy')
+print(f'PASS: {count} C++ sources/headers; {len(manifest["components"])} pinned commercially compatible components; includes, Python, JSON and build policy')
