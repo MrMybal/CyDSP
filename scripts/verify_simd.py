@@ -1,5 +1,6 @@
 """Inspect compiled object code and per-file flags; never execute a CyDSP program."""
 from datetime import datetime,timezone
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -7,6 +8,7 @@ import re
 import subprocess
 from reporting import source_digest
 ROOT=Path(__file__).resolve().parents[1]
+p=argparse.ArgumentParser(description=__doc__);p.add_argument('--build-dir',type=Path,required=True);p.add_argument('--arm',action='store_true');p.add_argument('--ninja',action='store_true');a=p.parse_args()
 OBJDUMP=Path(r'C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\bin\llvm-objdump.exe')
 report={'sourceSha256':source_digest(),'timeUtc':datetime.now(timezone.utc).isoformat(),'status':'running','executesProjectCode':False,'checks':[]}
 def require(value,message):
@@ -17,13 +19,13 @@ def inspect(label,folder,arm=False,ninja=False):
         objects=[];current='';flags={}
         for line in text.splitlines():
             if line.startswith('build '):current=line.replace('\\','/')
-            elif line.startswith('  FLAGS =') and any('CMakeFiles/'+target+'.dir/' in current for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins','CyDSPPluginRuntime')):
+            elif line.startswith('  FLAGS =') and any('CMakeFiles/'+target+'.dir/' in current for target in ('CyDSP','CyDSPStretch','CyAudioCoreEngine','CyAudioCoreFiles','CyAudioCoreDevices','CyAudioCoreSources','CyAudioCorePlugins','CyAudioCorePluginRuntime')):
                 obj=current[6:].split(': ',1)[0];flags[obj]=line
                 if '-mavx512' in line:require('/Avx512.cpp.' in obj,'AVX-512 flags leaked: '+obj)
                 if '+sve' in line or '-msve-vector-bits' in line:require('/Sve.cpp.' in obj,'SVE flags leaked: '+obj)
                 objects.append(folder/obj)
         require(objects,'Missing object rules: '+label)
-    else:objects=[p for target in ('CyDSP','CyDSPFiles','CyDSPDevices','CyDSPStretch','CyDSPSources','CyDSPPlugins','CyDSPPluginRuntime') for p in (folder/(target+'.dir/Release')).rglob('*.obj')]
+    else:objects=[p for base in (folder,folder/'cydsp') for target in ('CyDSP','CyDSPStretch','CyAudioCoreEngine','CyAudioCoreFiles','CyAudioCoreDevices','CyAudioCoreSources','CyAudioCorePlugins','CyAudioCorePluginRuntime') for p in (base/(target+'.dir/Release')).rglob('*.obj')]
     require(len(objects)>=26,'Incomplete archive objects: '+label)
     kernels=[]
     for path in objects:
@@ -53,10 +55,7 @@ def inspect(label,folder,arm=False,ninja=False):
             kernels.append({'implementation':stem,'objectSha256':hashlib.sha256(path.read_bytes()).hexdigest()})
     report['checks'].append({'target':label,'objectsInspected':len(objects),'fusedFpInstructions':0,'kernels':kernels,'isaIsolation':True})
 try:
-    for name in ['windows-x64','windows-x86','windows-x64-scalar']:inspect(name,ROOT/'build'/name)
-    inspect('windows-arm64-clang',ROOT/'build/windows-arm64-clang',True,True)
-    for abi in ['arm64-v8a','armeabi-v7a','x86','x86_64']:
-        inspect('android-'+abi,ROOT/'build'/('android-'+abi),abi in ['arm64-v8a','armeabi-v7a'],True)
+    inspect('arm64' if a.arm else 'x64',a.build_dir.resolve(),a.arm,a.ninja)
     report['status']='passed'
 except Exception as error:report.update(status='failed',error=str(error))
 (ROOT/'build/simd-validation.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')

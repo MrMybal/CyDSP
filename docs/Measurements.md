@@ -1,3 +1,5 @@
+> Historical measurements of the monolithic snapshot. Revalidate the split version before comparing performance.
+
 # Native measurements
 
 2026-11-12. Explicit Release validation runs; strict floating-point policy, no

@@ -11,12 +11,14 @@ ROOT=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--compiler',choices=['msvc','clang'],default='msvc')
 p.add_argument('--arch',choices=['x64','x86','scalar'],default='x64')
+p.add_argument('--build-dir',type=Path)
 p.add_argument('--measure',action='store_true')
 p.add_argument('--sanitize',action='store_true')
 p.add_argument('--cmake',default=r'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe')
 a=p.parse_args()
 tag=a.arch+('-clang' if a.compiler=='clang' else '')+('-asan' if a.sanitize else '')
 folder=ROOT/'build'/('native-'+tag+('-ninja' if a.compiler=='clang' else ''))
+if a.build_dir: folder=a.build_dir.resolve()
 logs=ROOT/'build/native-logs';logs.mkdir(parents=True,exist_ok=True)
 report={'sourceSha256':source_digest(),'compilerToolset':a.compiler,'timeUtc':datetime.now(timezone.utc).isoformat(),'architecture':a.arch,'addressSanitizer':a.sanitize,'system':platform.platform(),'status':'running'}
 try:
@@ -36,7 +38,7 @@ def run(name,command,timeout=240):
         raise RuntimeError(name+' exit '+str(result.returncode)+' ('+hex(result.returncode & 0xffffffff)+'): '+result.stdout[-6000:])
     return result.stdout
 try:
-    options=['-DCYDSP_ENABLE_SIMD='+('OFF' if a.arch=='scalar' else 'ON'),'-DCYDSP_BUILD_TESTS=ON','-DCYDSP_COMPILE_CHECKS=OFF',
+    options=['-DCYDSP_ENABLE_SIMD='+('OFF' if a.arch=='scalar' else 'ON'),'-DCYDSP_BUILD_TESTS=ON','-DCYDSP_COMPILE_CHECKS=ON',
         '-DCYDSP_BUILD_MEASUREMENTS='+('ON' if a.measure else 'OFF'),'-DCYDSP_SANITIZE_ADDRESS='+('ON' if a.sanitize else 'OFF')]
     if a.compiler=='clang':
         vs=Path('C:/Program Files/Microsoft Visual Studio/2022/Community')

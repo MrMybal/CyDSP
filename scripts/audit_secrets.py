@@ -16,9 +16,8 @@ scanner = a.gitleaks.resolve(strict=True)
 folder = ROOT/'build/security'/('expansion-'+uuid.uuid4().hex)
 candidate = folder/'candidate'
 candidate.mkdir(parents=True)
-raw = subprocess.check_output(['git','--no-optional-locks','-c',
-    'safe.directory='+ROOT.as_posix(),'ls-files','--cached','--others','--exclude-standard','-z'],cwd=ROOT)
-paths = sorted(set(raw.decode('utf-8').rstrip('\0').split('\0')))
+paths = sorted(p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*') if p.is_file() and not any(part in ('build','.git','__pycache__','out','.vs','comparisons') for part in p.relative_to(ROOT).parts))
+
 digest = hashlib.sha256()
 count = 0
 for name in paths:

@@ -11,6 +11,7 @@ p.add_argument('--llvm', type=Path, default=Path(r'C:\Program Files\Microsoft Vi
 p.add_argument('--ninja', type=Path, default=Path(r'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja\ninja.exe'))
 p.add_argument('--msvc', type=Path, default=Path(r'C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.40.33807'))
 p.add_argument('--sdk', type=Path, default=Path(r'C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0'))
+p.add_argument('--build-dir', type=Path)
 p.add_argument('--compile-checks', action='store_true')
 a = p.parse_args()
 include = [a.msvc / 'include', *(a.sdk / name for name in ('ucrt', 'shared', 'um', 'winrt'))]
@@ -21,7 +22,7 @@ if not all(path.is_file() for path in (a.cmake, a.ninja, compiler, archiver, lin
     p.error('Installed LLVM/CMake/Ninja and MSVC/SDK headers required; pass paths explicitly')
 environment = os.environ.copy()
 environment['INCLUDE'] = ';'.join(map(str, include))
-folder = ROOT / 'build/windows-arm64-clang'
+folder = a.build_dir.resolve() if a.build_dir else ROOT / 'build/windows-arm64-clang'
 configure = [str(a.cmake), '-S', str(ROOT), '-B', str(folder), '-G', 'Ninja',
              '-DCMAKE_CXX_COMPILER=' + str(compiler), '-DCMAKE_AR=' + str(archiver),
              '-DCMAKE_LINKER=' + str(linker), '-DCMAKE_MAKE_PROGRAM=' + str(a.ninja),

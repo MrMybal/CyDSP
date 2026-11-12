@@ -198,97 +198,7 @@ template <Sample T> void synthesis() {
     ok(loopSample.setLoop(0, 8, 2));
     require(loopSample.value(0, 6) == T{-1} && loopSample.value(0, 7) == T{0},
             "loop linear crossfade");
-    Synthesizer<T> synth;
-    ok(synth.prepare({48000, 1024, 1}, 4));
-    ok(synth.setWavetable(&table));
-    SynthParameters params;
-    params.envelope = {0, 0, 1, 0};
-    params.gain = 1;
-    params.stealFadeFrames = 0;
-    ok(synth.setParameters(params));
-    ok(synth.setMpeZones(0, 0));
-    MidiBuffer events;
-    ok(events.prepare(4, 16));
-    const auto note = midiNoteOn(1, 69, 127);
-    ok(events.add(0, note.bytes()));
-    struct Audit {
-        Synthesizer<T>* synth;
-        AudioBuffer<T>* out;
-        MidiBuffer* events;
-        Status status = Status::ok;
-    } audit{&synth, &out, &events};
-    runRealtimeAudit(
-        [](void* ptr) noexcept {
-            auto& a = *static_cast<Audit*>(ptr);
-            a.status = a.synth->process(a.out->block(), a.events);
-            a.synth->reset();
-        },
-        &audit);
-    ok(audit.status);
 }
-#if defined(CYDSP_TEST_IO)
-void instruments() {
-    const std::string_view fixture =
-        R"({"format":"CyDSPInstrument","version":1,"name":"Known","source":0,"voices":1,"mpeLower":0,"mpeUpper":0,"rootNote":60,"loopStart":0,"loopEnd":0,"crossfadeFrames":0,"sample":"","cycle":[],"parameters":{"waveform":0,"gain":0.25,"pan":0,"pressureToGain":0,"stealFadeFrames":0,"sampleInterpolation":1,"attack":0,"decay":0,"sustain":1,"release":0}})";
-    InstrumentPreset known;
-    ok(parseInstrumentPreset(fixture, known));
-    require(known.name == "Known" && known.parameters.gain == .25 && known.voices == 1,
-            "independent instrument fixture");
-    InstrumentPreset preset;
-    preset.name = "CyDSP piano";
-    preset.voices = 8;
-    preset.parameters.envelope = {0, 0, 1, .01};
-    preset.source = InstrumentSource::wavetable;
-    preset.cycle.resize(256);
-    for (std::size_t i = 0; i < 256; ++i)
-        preset.cycle[i] = std::sin(2 * std::numbers::pi * double(i) / 256);
-    std::string json;
-    ok(serializeInstrumentPreset(preset, json));
-    InstrumentPreset copy;
-    ok(parseInstrumentPreset(json, copy));
-    require(copy.name == preset.name && copy.cycle == preset.cycle && copy.voices == 8,
-            "versioned instrument roundtrip");
-    auto unknown = json;
-    const auto at = unknown.find(R"("version")");
-    require(at != std::string::npos, "serialized version");
-    const auto number = unknown.find_first_of("0123456789", at);
-    unknown.replace(number, 1, "2");
-    require(parseInstrumentPreset(unknown, copy) == Status::unsupported_format &&
-                copy.name == preset.name,
-            "version rejection preserves preset");
-    std::string deep(40, '[');
-    deep += "0";
-    deep.append(40, ']');
-    require(parseInstrumentPreset(deep, copy) == Status::invalid_argument, "bounded preset JSON");
-    Instrument<float> instrument;
-    ok(instrument.prepare({48000, 128, 2}, copy));
-    auto* previous = instrument.synthesizer();
-    copy.voices = 0;
-    require(instrument.prepare({48000, 128, 2}, copy) == Status::invalid_argument &&
-                instrument.synthesizer() == previous,
-            "instrument transactional preparation");
-    AudioBuffer<float> out;
-    ok(out.resize(2, 128));
-    MidiBuffer notes;
-    ok(notes.prepare(4, 16));
-    const auto on = midiNoteOn(1, 69, 127);
-    ok(notes.add(0, on.bytes()));
-    struct Audit {
-        Instrument<float>* i;
-        AudioBuffer<float>* out;
-        MidiBuffer* notes;
-        Status status = Status::ok;
-    } audit{&instrument, &out, &notes};
-    runRealtimeAudit(
-        [](void* ptr) noexcept {
-            auto& a = *static_cast<Audit*>(ptr);
-            a.status = a.i->process(a.out->block(), a.notes);
-            a.i->reset();
-        },
-        &audit);
-    ok(audit.status);
-}
-#endif
 void gates() {
     Dynamics<double> gate;
     ok(gate.prepare({1000, 16, 1}, DynamicsMode::noiseGate));
@@ -341,8 +251,5 @@ void dawExpansionRegression() {
     oversampling<double>();
     synthesis<float>();
     synthesis<double>();
-#if defined(CYDSP_TEST_IO)
-    instruments();
-#endif
-    std::cout << "PASS DAW expansion DSP/wavetable/sampler/presets/realtime\n";
+    std::cout << "PASS DAW expansion DSP/wavetable/sampler/realtime\n";
 }

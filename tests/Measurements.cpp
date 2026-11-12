@@ -834,24 +834,6 @@ template <class T> void dawMeasurements() {
         require(sinc.process(input.block(), 64.375, output.block()) == Status::ok);
         sink = output.block().channel(0)[127];
     });
-    for (std::size_t voices : {16u, 64u}) {
-        Synthesizer<T> synth;
-        require(synth.prepare({48000, 128, 2}, voices, backend) == Status::ok);
-        SynthParameters p;
-        p.envelope = {0, 0, 1, .1};
-        require(synth.setParameters(p) == Status::ok);
-        MidiBuffer notes;
-        require(notes.prepare(voices, voices * 3) == Status::ok);
-        for (std::size_t i = 0; i < voices; ++i) {
-            const auto note = midiNoteOn(1, 36 + static_cast<unsigned>(i), 100);
-            require(notes.add(0, note.bytes()) == Status::ok);
-        }
-        require(synth.process(output.block(), &notes) == Status::ok);
-        bench("polyphonicSynth128", type, backend, voices, 2, [&] {
-            require(synth.process(output.block()) == Status::ok);
-            sink = output.block().channel(0)[127];
-        });
-    }
 #if defined(CYDSP_MEASURE_STRETCH)
     signalsmith::stretch::SignalsmithStretch<T> original(1);
     detail::StretchAlgorithm<T> integrated(1);

@@ -325,93 +325,17 @@ unused old-partition job list. The temporary filter time buffer is released duri
 prepare. Configured hybrid/nonuniform/scheduled modes retain their distinct cost
 profiles and the previous MatrixConvolver overload still chooses nonuniform.
 
-## Optional system and file modules
+## Project boundary
 
-`CyDSP::CyDSP` contains portable signal processing and MIDI protocol/SMF code.
-`CyDSP::Files`, `CyDSP::Devices` and `CyDSP::Stretch` are separate static targets,
-enabled by default and independently removable with `CYDSP_BUILD_FILES`,
-`CYDSP_BUILD_DEVICES`, `CYDSP_BUILD_STRETCH`. Their dependencies are compiled privately;
-no vendor types occur in the installed public API. Public headers remain usable when
-a module is disabled, but calling that module requires its corresponding target.
-All dependencies are vendored at verified revisions; configuration never downloads.
+CyDSP is the standalone numerical layer, namespace `cydsp`, with no dependency on
+CyAudioCore, device discovery, file codecs, MIDI protocols or plugin SDKs. Its DSP
+graph composes processors. It retains Wavetable, WavetableOscillator, SampleData,
+prepared sample interpolation/mips and the optional Stretch algorithm.
 
-File/stream operations, device discovery/open/start/stop/close and physical MIDI
-sending are worker/control-thread services. They may allocate, lock and perform I/O.
-The process/reset contract applies to prepared signal processors, MIDI buffers,
-parser and queue operations. RtMidi's own input thread may allocate packet vectors;
-CyDSP's bridge copies into a bounded SPSC queue. This is not a guarantee that an OS
-backend is globally allocation-free. The audio callback bridge uses retained planar
-float buffers, bounds each callback slice, clears outputs first and silences a slice
-when the user's callback reports an error. No OS setting or floating-point mode is
-changed by the adapter. Device lifecycle must never be called from its callback.
+CyAudioCore consumes the installed public API. It owns sources/transport,
+MIDI/MPE/UMP/MIDI-CI, polyphonic instrument orchestration, devices, files and
+plugin hosting/isolation. Applications choose their GUI independently.
 
-File decoding belongs ahead of the audio callback in a worker/read-ahead pipeline.
-The current reader itself performs synchronous I/O and is not an audio source that
-can be placed directly in the graph. Midi2Device owns bounded timed worker queues;
-legacy MidiOutput still needs a host worker. The functional inventory records the
-remaining integration gaps explicitly.
-
-## Integrated audio services
-
-Stretch adapts the MIT algorithm/STFT into owned private sources and replaces its
-FFT implementation with CyDSP prepared SIMD stages, packed half-bin transforms
-and compact radix-3 composition. The sampler shares oscillator/ADSR, channel
-mapping and vector mixing. Audio device callbacks share layout conversion rather
-than duplicate planar loops. Drivers/codecs remain private unchanged dependencies
-where platform and format maintenance belongs; see Licensing.md.
-
-Core synthesis/UMP/MPE/memory source/transport/tempo need no optional backend.
-CyDSP::Sources links Files and owns decoding/encoding workers, retained page/block
-pools and SPSC exchange. Audio readAt/push transfer ownership of slots, never free
-a plan and never perform file I/O. Seeks use epochs so completed old work is ignored.
-Workers may allocate in codecs. Source/recorder close/destruction join only on the
-control thread after callbacks stop. This refines the general process/reset rule:
-synchronous file APIs and worker lifecycle are explicitly non-real-time.
-
-Transport has one command producer and audio consumer; source info is immutable.
-Its UI snapshot uses lock-free 32-bit atomic fields and a bounded seqlock retry,
-avoiding a potentially locked 64-bit atomic on compatibility ARM32/x86. SPSC
-participants and worker-owned reader/writer state are separate; prefill is a
-control operation allowed only while the audio consumer is idle.
-
-## Native UMP and MIDI-CI ownership
-
-The owned native transport implementations live in CyDSP::Devices and perform OS
-I/O on a dedicated worker. Separate bounded single-producer queues isolate audio
-UMP publication from control SysEx/CI publication; one consumer receives UMP.
-MidiCiDevice and UmpEndpointNegotiator live in the portable core and use retained
-prepared storage plus borrowed callbacks. Their owner serializes processing and
-poll calls; native timing is converted into the public steady-nanosecond domain.
-See [Native MIDI 2](Midi2.md) for platform gates, scopes and hardware acceptance.
-
-## Prepared MIDI-CI property service
-
-CiPropertyStore composes MidiCiDevice with generated ResourceList/DeviceInfo/
-ChannelList/JSONSchema, custom fixed resId instances, full/partial SET, paginated
-lists and acknowledged notify/full/partial subscriptions. A retained JSON tree/
-pointer workspace performs bounded edits and list selection. All resource/reply
-payloads and workspaces are allocated during preparation.
-
-CiPropertyClient composes the same core with a bounded TTL cache, per-entry
-generations, transaction slots and ACK FIFO. Older GETs cannot replace newer
-pushed data. Store/client callbacks stay on the serialized control owner and
-communicate with audio through existing prepared queues. Unicode/JSON/header
-validation and PE Notify semantics share the portable core.
-See [Property Exchange](CiProperty.md) for baseline recovery, routing, capacities,
-callback lifetime, transactional mutation and remaining platform acceptance.
-
-## Independent plugin hosting
-
-CyDSP::Plugins is an optional static host layer; pinned format declarations, LV2 discovery and the JSFX runtime are
-private. LV2 float staging reuses VectorOps; JSFX local VM memory is prepared on
-control. The original JSFX canvas is Windows-only in this increment. PluginInstance owns format-neutral multibus/event/state/editor contracts.
-The application owns its native parent window, event loop and serialized control
-and audio lifetimes. Host-side prepared processing retains memory; arbitrary
-foreign plugin allocation or behavior cannot be guaranteed. Native editor creation,
-embedding, resizing, DPI and parameter gestures remain outside the audio callback.
-
-PluginWorker adds an explicit caller-supplied child executable and bounded shared
-memory. Its client audio path exchanges one block without waiting. Control owns
-startup, state, editor RPC and exit detection; stale replies are discarded.
-This is crash isolation, with a fixed pipeline latency, rather than a security
-sandbox. Exact format/platform boundaries are in [Plugin contracts](Plugins.md).
+The prepared aliases for AudioBlock/AudioBuffer/Status/ProcessSpec in CyAudioCore
+are the same CyDSP types. No conversion layer or second SIMD dispatcher is added.
+See [migration](Migration.fr.md) for the breaking package/header changes.

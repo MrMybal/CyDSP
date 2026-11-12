@@ -36,10 +36,9 @@ if not re.fullmatch(r'/data/local/tmp/cydsp-[a-f0-9]{12}-[a-z0-9-]+-[a-f0-9]{8}'
 report={'sourceSha256':digest,'model':model,'abi':a.abi,'sdk':invoke([*base,'shell','getprop','ro.build.version.sdk']).strip(),
         'timeUtc':datetime.now(timezone.utc).isoformat(),'status':'running','nativeRuntimeExecuted':True,'installedApplication':False}
 logs=ROOT/'build/device-logs';logs.mkdir(parents=True,exist_ok=True)
-files=['cydsp_tests','cydsp_fixture.clap','cydsp_vst_fixture.vst3','gain.jsfx','cydsp_fixture.lv2/fixture.so','cydsp_fixture.lv2/manifest.ttl','cydsp_fixture.lv2/plugin.ttl']+(['cydsp_measurements'] if a.measure else [])
+files=['cydsp_tests']+(['cydsp_measurements'] if a.measure else [])
 try:
     invoke([*base,'shell','mkdir',remote])
-    invoke([*base,'shell','mkdir',remote+'/cydsp_fixture.lv2'])
     for name in files:
         if not (folder/name).is_file():raise RuntimeError('Missing executable '+name)
         invoke([*base,'push',str(folder/name),remote+'/'+name])
@@ -55,7 +54,6 @@ finally:
     try:
         # Only delete the exact filenames placed in this unique directory; never recurse.
         invoke([*base,'shell','rm','-f',*[remote+'/'+name for name in files]])
-        invoke([*base,'shell','rmdir',remote+'/cydsp_fixture.lv2'])
         invoke([*base,'shell','rmdir',remote]);report['temporaryFilesRemoved']=True
     except Exception as error:report['cleanupError']=str(error)
     destination=ROOT/'build'/('device-'+a.abi+'.json');destination.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
