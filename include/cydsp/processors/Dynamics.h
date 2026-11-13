@@ -36,6 +36,10 @@ template <Sample T> class Dynamics {
     [[nodiscard]] Status setParameters(const DynamicsParameters&) noexcept;
     void reset() noexcept;
     [[nodiscard]] Status process(AudioBlock<const T>, AudioBlock<T>) noexcept;
+    // External detector: mono broadcast or one channel per program channel.
+    // Sidechain must be disjoint from output unless it is the program block.
+    [[nodiscard]] Status process(AudioBlock<const T> program, AudioBlock<const T> sidechain,
+                                 AudioBlock<T>) noexcept;
     [[nodiscard]] double gainReductionDb() const noexcept;
     [[nodiscard]] std::size_t latencyFrames() const noexcept;
 

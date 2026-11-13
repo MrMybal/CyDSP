@@ -866,6 +866,87 @@ template <class T> void dawMeasurements() {
 #endif
 }
 
+template <class T> void granulationAndAnalysisMeasurements() {
+    const auto* type = std::same_as<T, float> ? "float" : "double";
+    const ProcessSpec spec{48000, 128, 2};
+    AudioBuffer<T> input, source, output;
+    require(input.resize(2, 128) == Status::ok && source.resize(1, 8192) == Status::ok &&
+            output.resize(2, 128) == Status::ok);
+    for (std::size_t i = 0; i < 8192; ++i)
+        source.block().channel(0)[i] = T(.2 * std::sin(.13 * double(i)));
+    for (std::size_t ch = 0; ch < 2; ++ch)
+        for (std::size_t i = 0; i < 128; ++i)
+            input.block().channel(ch)[i] = T(.2 * std::sin(.13 * double(i) + double(ch)));
+    SampleData<T> data;
+    require(data.prepare(source.block(), 48000) == Status::ok);
+    for (auto backend : {CpuBackend::scalar, CpuBackend::sse2, CpuBackend::avx2, CpuBackend::avx512,
+                         CpuBackend::neon, CpuBackend::sve}) {
+        VectorOps ops;
+        if (VectorOps::create(backend, ops) != Status::ok)
+            continue;
+        for (std::size_t voices : {8u, 32u}) {
+            Granulator<T> granulator;
+            require(granulator.prepare(spec, data, voices, backend) == Status::ok);
+            GrainParameters grain;
+            grain.durationMs = 60000; // All voices remain active throughout warmup/timing.
+            grain.pitchRatio = 1.5;
+            grain.gain = .05;
+            for (std::size_t voice = 0; voice < voices; ++voice) {
+                grain.positionSeconds = double(voice * 97) / 48000;
+                grain.pan = 2 * double(voice) / double(voices - 1) - 1;
+                require(granulator.trigger(grain) == Status::ok);
+            }
+            bench("granulator128", type, backend, voices, 2, [&] {
+                require(granulator.process(output.block()) == Status::ok);
+                sink = output.block().channel(0)[127];
+            });
+            require(granulator.activeGrains() == voices);
+        }
+        SpectrumAnalyzer<T> spectrum;
+        SpectrumConfig sc;
+        sc.fftFrames = 2048;
+        sc.hopFrames = 512;
+        require(spectrum.prepare(spec, sc, backend) == Status::ok);
+        bench("spectrum2048Hop512", type, backend, sc.fftFrames, 2, [&] {
+            require(spectrum.process(input.block()) == Status::ok);
+            sink = spectrum.magnitudes(0)[0];
+        });
+        ConstantQAnalyzer<T> cq;
+        ConstantQConfig cc;
+        cc.minimumHz = 220;
+        cc.bins = 48;
+        cc.hopFrames = 512;
+        require(cq.prepare(spec, cc, backend) == Status::ok);
+        // Fill the longest kernel before timing steady-state hops.
+        for (std::size_t at = 0; at < cq.windowFrames(0); at += 128)
+            require(cq.process(input.block()) == Status::ok);
+        bench("constantQ48Hop512", type, backend, cc.bins, 2, [&] {
+            require(cq.process(input.block()) == Status::ok);
+            sink = cq.magnitudes(0)[0];
+        });
+        TruePeakMeter<T> peak;
+        require(peak.prepare(spec, 4, 64, backend) == Status::ok);
+        bench("truePeak4x64", type, backend, 64, 2, [&] {
+            require(peak.process(input.block()) == Status::ok);
+            sink = peak.truePeak(0);
+        });
+    }
+    LevelMeter<T> level;
+    require(level.prepare(spec, 2048) == Status::ok);
+    bench("levelMeter2048", type, CpuBackend::scalar, 2048, 2, [&] {
+        require(level.process(input.block()) == Status::ok);
+        sink = level.levels(0).rms;
+    });
+    LoudnessMeter<T> loudness;
+    LoudnessConfig lc;
+    lc.maximumGatingBlocks = 256;
+    require(loudness.prepare(spec, lc) == Status::ok);
+    bench("loudnessProcess128", type, CpuBackend::scalar, lc.maximumGatingBlocks, 2, [&] {
+        require(loudness.process(input.block()) == Status::ok);
+        sink = loudness.levels().momentaryLufs;
+    });
+}
+
 template <class T> void integrationMeasurements() {
     const auto* type = std::same_as<T, float> ? "float" : "double";
     const ProcessSpec spec{48000, 128, 2};
@@ -936,10 +1017,16 @@ template <class T> void integrationMeasurements() {
         << 10 * std::log10(linear / std::max(filtered, 1e-300)) << "}";
 }
 } // namespace
+void expansionMeasurements(void(*)());
+void advancedExpansionMeasurements(void(*)());
 int main() {
     try {
         std::cout << std::setprecision(12) << "[\n";
         capabilities();
+        advancedExpansionMeasurements(separator);
+        expansionMeasurements(separator);
+        granulationAndAnalysisMeasurements<float>();
+        granulationAndAnalysisMeasurements<double>();
         integrationMeasurements<float>();
         integrationMeasurements<double>();
         dawMeasurements<float>();

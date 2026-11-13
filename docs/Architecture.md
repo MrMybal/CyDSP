@@ -100,6 +100,19 @@ frames. It rejects all input/output overlap and reports both consumed and produc
 counts. FFT has span-based shape and overlap rules; real FFT requires disjoint
 input/output storage. See Modules.md for these specific contracts.
 
+## Granulation and analysis composition
+
+Granulator borrows prepared SampleData, uses its harmonic mips/loop reader and
+prepares envelope tables with makeWindow. Mono reads/envelopes are shared across
+stereo outputs; accumulation uses VectorOps. Fixed grain pools and scratch are
+allocated only at preparation. Analyzer windows, FFT plans, filter states, kernels,
+peak queues and histories follow the same lifecycle. Spectrum and CQT retain only
+the latest completed frame, without creating background threads or UI snapshots.
+Loudness uses existing double biquads and exact, bounded gating-energy arrays;
+process returns would_block transactionally at capacity. Its integrated and LRA
+queries are allocation-free history scans/sorts, not bounded callback work.
+All access remains owner-serialized. See [the API guide](GranulationAndAnalysis.md).
+
 ## Voice-parallel IIR and transitions
 
 BiquadBank uses one voice per planar channel. Coefficients are stored in five
@@ -339,3 +352,20 @@ plugin hosting/isolation. Applications choose their GUI independently.
 The prepared aliases for AudioBlock/AudioBuffer/Status/ProcessSpec in CyAudioCore
 are the same CyDSP types. No conversion layer or second SIMD dispatcher is added.
 See [migration](Migration.fr.md) for the breaking package/header changes.
+
+## Expanded numerical modules
+
+The ten-lot extension remains in the static numerical target, with public headers
+under control, spectral, spatial, synthesis, processors and analysis. It composes
+existing FFT, vector, buffer, convolution, resampling and filter primitives.
+Shared HistorySinc interpolation serves live grains and pitch effects; PolyBLEP
+math is shared with the original oscillators. Mutable state is per instance.
+Applications supply scene geometry, HRIR data and processor contexts. No reverse
+dependency on CyAudioCore or consuming applications is introduced. See the
+[extension contracts](ExpansionGuide.fr.md).
+
+## Second advanced extension
+
+Shared prepared HRTFs, order-7 HOA, SourceBatch, diffraction, IR analysis, HPSS,
+spectral pitch/harmony, physical contacts, AEC and quality graph transitions are
+documented in the [advanced API guide](AdvancedExpansionGuide.fr.md).

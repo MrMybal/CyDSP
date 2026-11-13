@@ -36,3 +36,15 @@ a separate per-file and dependency review; a repository label alone is insuffici
 Audio devices, file codecs, MIDI system declarations and plugin runtimes now belong
 to CyAudioCore. CyDSP contains only the five MIT numerical adaptations listed above.
 Each original notice and pinned upstream file remains with its owning project.
+
+## Ten-lot numerical extension
+
+The DSP/3D expansion uses original CyDSP implementations and the existing MIT
+numerical primitives. No additional dependency, HRTF dataset, application/plugin
+source or copyleft code was imported. Public mathematical papers and standards
+are references for equations, not bundled software. Host-supplied HRIR/IR/sample
+data remains the host’s licensing responsibility.
+
+The second advanced extension adds original MIT CyDSP algorithms and reuses the
+existing five pinned adaptations; no new third-party source or HRTF dataset is
+imported. See [the advanced guide](AdvancedExpansionGuide.fr.md).

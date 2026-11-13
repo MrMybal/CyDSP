@@ -16,6 +16,48 @@ option(CYDSP_ENABLE_AVX512 "Build optional x64 AVX-512 kernels" ON)
 option(CYDSP_ENABLE_SVE "Build optional ARM64 Linux/Android scalable SVE kernels" ON)
 option(CYDSP_COMPILE_CHECKS "Compile regression sources without linking/running programs" OFF)
 add_library(CyDSP STATIC
+    src/synthesis/SourceBatch.cpp
+    src/spatial/Diffraction.cpp
+    src/analysis/ImpulseAnalysis.cpp
+    src/spectral/HarmonicPercussive.cpp
+    src/spectral/SpectralPitch.cpp
+    src/synthesis/ContactExciter.cpp
+    src/processors/EchoCanceller.cpp
+    src/control/Quality.cpp
+    src/analysis/Diagnostics.cpp
+    src/processors/Restoration.cpp
+    src/processors/AdaptiveFilter.cpp
+    src/processors/Multirate.cpp
+    src/synthesis/PhysicalModels.cpp
+    src/processors/PitchEffects.cpp
+    src/analysis/MusicalAnalyzer.cpp
+    src/synthesis/AdvancedSynthesis.cpp
+    src/synthesis/LiveGranulator.cpp
+    src/spectral/SpectralEffects.cpp
+    src/processors/AdvancedEffects.cpp
+    src/processors/AdvancedDynamics.cpp
+    src/spatial/HybridReverb.cpp
+    src/spatial/SpatialRendering.cpp
+    src/spatial/AcousticRooms.cpp
+    src/spatial/FdnReverb.cpp
+    src/spatial/AcousticPaths.cpp
+    src/spatial/SpatialMath.cpp
+    src/processors/BandGain.cpp
+    src/processors/MultiBusGraph.cpp
+    src/processors/FilterBank.cpp
+    src/processors/Hilbert.cpp
+    src/processors/Diffusion.cpp
+    src/processors/AdvancedFilterDesign.cpp
+    src/spectral/Stft.cpp
+    src/core/CircularHistory.cpp
+    src/control/Parameters.cpp
+    src/processors/MultiTapDelay.cpp
+    src/synthesis/Granulator.cpp
+    src/analysis/LevelMeter.cpp
+    src/analysis/TruePeakMeter.cpp
+    src/analysis/SpectrumAnalyzer.cpp
+    src/analysis/ConstantQAnalyzer.cpp
+    src/analysis/LoudnessMeter.cpp
     src/processors/SincInterpolator.cpp
     src/synthesis/SampleData.cpp
     src/synthesis/Wavetable.cpp
@@ -142,6 +184,21 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfig.cmake ${CMAKE_CURRENT_BINA
 install(DIRECTORY third_party/licenses/ DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP/licenses)
 install(FILES LICENSE third_party/manifest.json docs/Licensing.md DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP)
 set(cydsp_test_sources
+ tests/AdvancedExpansionContracts.cpp
+ tests/AdvancedExpansionRegression.cpp
+ tests/ExpansionContracts.cpp
+ tests/RestorationDiagnosticsRegression.cpp
+ tests/MusicalPhysicalRegression.cpp
+ tests/CreativeRegression.cpp
+ tests/AdvancedDynamicsRegression.cpp
+ tests/SpatialRenderingRegression.cpp
+ tests/AcousticRegression.cpp
+ tests/SpatialFoundationRegression.cpp
+ tests/MultiBusGraphRegression.cpp
+ tests/AdvancedFoundationRegression.cpp
+ tests/FoundationRegression.cpp
+ tests/GranulationRegression.cpp
+ tests/AudioAnalysisRegression.cpp
  tests/AdvancedRegression.cpp
  tests/CompletionRegression.cpp
  tests/Contracts.cpp
@@ -176,22 +233,24 @@ if(CYDSP_COMPILE_CHECKS)
  endforeach()
  add_library(cydsp_header_checks OBJECT ${header_sources})
  target_link_libraries(cydsp_header_checks PRIVATE CyDSP::CyDSP)
- add_library(cydsp_contract_checks OBJECT ${cydsp_test_sources} examples/Processing.cpp)
+ add_library(cydsp_contract_checks OBJECT ${cydsp_test_sources} examples/Processing.cpp examples/GranulationAndAnalysis.cpp examples/SpatialAndDaw.cpp examples/AdvancedAudio.cpp)
  target_link_libraries(cydsp_contract_checks PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_contract_checks PRIVATE src)
  target_compile_definitions(cydsp_contract_checks PRIVATE CYDSP_HAS_SSE2=${cydsp_sse2} CYDSP_HAS_AVX2=${cydsp_avx2} CYDSP_HAS_NEON=${cydsp_neon} CYDSP_HAS_AVX512=${cydsp_avx512} CYDSP_HAS_SVE=${cydsp_sve})
- add_library(cydsp_measurement_checks OBJECT tests/Measurements.cpp tests/FocusedMeasurements.cpp)
+ add_library(cydsp_measurement_checks OBJECT tests/Measurements.cpp tests/ExpansionMeasurements.cpp tests/AdvancedExpansionMeasurements.cpp)
+ add_library(cydsp_focused_measurement_checks OBJECT tests/FocusedMeasurements.cpp)
+ target_link_libraries(cydsp_focused_measurement_checks PRIVATE CyDSP::CyDSP)
  target_link_libraries(cydsp_measurement_checks PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_measurement_checks PRIVATE src)
 endif()
 if(CYDSP_BUILD_MEASUREMENTS)
  add_executable(cydsp_focused_measurements tests/FocusedMeasurements.cpp)
  target_link_libraries(cydsp_focused_measurements PRIVATE CyDSP::CyDSP)
- add_executable(cydsp_measurements tests/Measurements.cpp)
+ add_executable(cydsp_measurements tests/Measurements.cpp tests/ExpansionMeasurements.cpp tests/AdvancedExpansionMeasurements.cpp)
  target_link_libraries(cydsp_measurements PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_measurements PRIVATE src)
 endif()
-foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_measurements cydsp_focused_measurements cydsp_measurement_checks)
+foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_measurements cydsp_focused_measurements cydsp_measurement_checks cydsp_focused_measurement_checks)
  if(TARGET ${t})
   if(MSVC)
    target_compile_options(${t} PRIVATE /W4 /permissive- /fp:strict /utf-8)

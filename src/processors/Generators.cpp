@@ -1,4 +1,5 @@
 #include "cydsp/processors/Generators.h"
+#include "detail/OscillatorMath.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -74,21 +75,7 @@ double Adsr::next() noexcept {
     }
     return value_;
 }
-namespace {
-double blep(double phase, double step) noexcept {
-    if (step <= 0)
-        return 0;
-    if (phase < step) {
-        const double x = phase / step;
-        return x + x - x * x - 1;
-    }
-    if (phase > 1 - step) {
-        const double x = (phase - 1) / step;
-        return x * x + x + x + 1;
-    }
-    return 0;
-}
-} // namespace
+
 template <Sample T> Status Oscillator<T>::prepare(const ProcessSpec& spec) noexcept {
     if (!spec.isValid())
         return Status::invalid_spec;
@@ -122,13 +109,14 @@ template <Sample T> T Oscillator<T>::next() noexcept {
         value = 1 - 4 * std::abs(phase_ - 0.5);
         break;
     case Waveform::saw:
-        value = 2 * phase_ - 1 - blep(phase_, increment_);
+        value = 2 * phase_ - 1 - detail::polyBlep(phase_, increment_);
         break;
     case Waveform::square: {
         double p = phase_ + 0.5;
         if (p >= 1)
             p -= 1;
-        value = (phase_ < 0.5 ? 1.0 : -1.0) + blep(phase_, increment_) - blep(p, increment_);
+        value = (phase_ < 0.5 ? 1.0 : -1.0) + detail::polyBlep(phase_, increment_) -
+                detail::polyBlep(p, increment_);
         break;
     }
     case Waveform::whiteNoise:

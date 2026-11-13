@@ -1,4 +1,5 @@
 #include "cydsp/processors/Dynamics.h"
+#include "detail/Analysis.h"
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
@@ -182,12 +183,36 @@ template <Sample T> std::size_t Dynamics<T>::latencyFrames() const noexcept {
 }
 template <Sample T>
 Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
+    return process(in, in, out);
+}
+template <Sample T>
+Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
+                            AudioBlock<T> out) noexcept {
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
     auto status = validateProcessBlocks(s.spec, in, out);
     if (status != Status::ok)
         return status;
+    status = detail::validateAnalysis(s.spec, in);
+    if (status != Status::ok)
+        return status;
+    if (side.channels() != 1 && side.channels() != s.spec.channels)
+        return Status::channel_mismatch;
+    auto detectorSpec = s.spec;
+    detectorSpec.channels = side.channels();
+    status = detail::validateAnalysis(detectorSpec, side);
+    if (status != Status::ok)
+        return status;
+    if (side.frames() != in.frames())
+        return Status::invalid_argument;
+    const bool same = side.channelData() == in.channelData() &&
+                      side.frameOffset() == in.frameOffset() && side.channels() == in.channels();
+    if (!same) {
+        status = validateDisjointBlocks(side, out);
+        if (status != Status::ok)
+            return status;
+    }
     if (!in.frames())
         return Status::ok;
     const auto holdFrames = s.mode == DynamicsMode::noiseGate
@@ -202,11 +227,14 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept 
             s.delayFrames ? (s.head + s.delayCapacity - s.delayFrames) % s.delayCapacity : 0;
         double linked = 0;
         if (s.p.linkedChannels)
-            for (std::size_t ch = 0; ch < in.channels(); ++ch)
-                linked = std::max(linked, std::abs(static_cast<double>(in.channel(ch)[i])));
+            for (std::size_t ch = 0; ch < side.channels(); ++ch)
+                linked = std::max(linked, std::abs(static_cast<double>(side.channel(ch)[i])));
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
             const double x = in.channel(ch)[i],
-                         magnitude = s.p.linkedChannels ? linked : std::abs(x);
+                         magnitude =
+                             s.p.linkedChannels
+                                 ? linked
+                                 : std::abs(double(side.channel(side.channels() == 1 ? 0 : ch)[i]));
             const double detector =
                 s.p.detector == DetectorMode::rms ? magnitude * magnitude : magnitude;
             double ahead = detector;

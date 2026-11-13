@@ -17,11 +17,13 @@
 
 <h1 align="center">CyDSP</h1>
 
-A C++20 audio DSP library for developers of DAWs, effects, synthesizers and audio applications. It provides filters, FFT, convolution, resampling and synthesis with a common float/double API and CPU dispatch for x64 and ARM64.
+A C++20 audio DSP library for developers of DAWs, effects, synthesizers and audio applications. It provides filters, FFT, convolution, resampling, granular synthesis and audio analysis with a common float/double API and CPU dispatch for x64 and ARM64.
 
 > **IN DEVELOPMENT · 0.2.0**
 >
 > Source distribution; no binary release is published. Read the [version notes and platform limitations](VERSION.md).
+
+The second extension adds shared HRTF preparation, HOA order 7, batched sources, diffraction, IR diagnostics, harmonic/percussive separation, spectral pitch, physical contacts, AEC and prepared quality profiles. See the [API guide](docs/AdvancedExpansionGuide.fr.md) and [validation results](docs/AdvancedExpansionValidation.fr.md).
 
 ## About CyDSP
 
@@ -35,7 +37,9 @@ CyDSP is the numerical processing layer. Audio devices, MIDI, audio file I/O, pl
 - **Transforms and convolution:** complex/real FFT, STFT, FIR, partitioned and nonuniform convolution, shared MIMO processing and prepared impulse-response transitions.
 - **Sample-rate processing:** fixed and variable resampling, prepared interpolation, FIR/half-band FIR/IIR oversampling and window generation.
 - **Effects and routing:** gain ramps, channel matrices, DSP graphs, delay, panning, dry/wet mixing, waveshaping, chorus, phaser and reverb.
-- **Numerical synthesis:** oscillators, envelopes, harmonic-mip wavetables, sample data and anti-aliasing playback primitives.
+- **Numerical synthesis:** oscillators, envelopes, harmonic-mip wavetables, sample data and anti-aliasing playback primitives; bounded manual grains and seeded granular clouds.
+- **Audio analysis:** sliding peak/RMS/DC/correlation, 4x/8x true-peak estimates, streaming spectra and spectral features, Mel/log bands, constant-Q analysis and bounded-history LUFS/LRA metering. See the [API guide](docs/GranulationAndAnalysis.md).
+- **Spatial audio and advanced processing:** acoustic paths/rooms, binaural HRIR, VBAP, Ambisonics, sidechains/PDC, multiband dynamics, live grains, FM/PM, physical synthesis, musical analysis and restoration. See the [ten-lot integration guide (French)](docs/ExpansionGuide.fr.md) for APIs and limits.
 - **CPU backends:** scalar, SSE2, AVX2, AVX-512, NEON and optional SVE, selected during preparation according to compiled support and CPU/OS capabilities. Callers can request an explicit backend.
 - **Optional Stretch module:** a separate static target for time stretching, pitch shifting and formant processing using the CyDSP numerical core.
 
@@ -54,7 +58,7 @@ target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
 
-Public headers live under `cydsp/`; `cydsp/CyDSP.h` is the umbrella header. See the [processing example](examples/Processing.cpp), [module contracts](docs/Modules.md) and [migration guide](docs/Migration.fr.md) for integration.
+Public headers live under `cydsp/`; `cydsp/CyDSP.h` is the umbrella header. See the [processing example](examples/Processing.cpp), [granulation/analysis example](examples/GranulationAndAnalysis.cpp), [module contracts](docs/Modules.md) and [migration guide](docs/Migration.fr.md) for integration.
 
 ## Source, build and required libraries
 

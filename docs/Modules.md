@@ -8,6 +8,26 @@ owner-side serialization of prepare, parameter edits, process and destruction.
 AsyncConvolver explicitly allows one producer stageImpulse call concurrently with
 one audio consumer; its prepare/reset/destruction still require both to be quiescent.
 
+## Ten-lot DSP and spatial extension
+
+The [integration guide (French)](ExpansionGuide.fr.md) maps every new API to its
+preparation, shapes, timing, coordinate conventions and numerical limitations.
+It covers shared histories/parameters, public STFT/filter design, multibus graphs,
+acoustics/binaural/VBAP/HOA, advanced dynamics/effects, live grains/FM/PM,
+musical/physical synthesis and restoration/diagnostics. The original module
+contracts below still apply; specialized multirate and spatial shapes have the
+explicit exceptions in their headers.
+
+## Granulation and analysis
+
+Granulator, LevelMeter, TruePeakMeter, SpectrumAnalyzer, SpectralBands,
+ConstantQAnalyzer and LoudnessMeter are part of the core target. The
+[granulation and analysis guide](GranulationAndAnalysis.md) defines source lifetime,
+voice overflow, scheduling, amplitude/PSD normalization, window delays, channel
+weights and exact loudness-history capacity. Analysis explicitly rejects non-finite
+input before state changes. Querying integrated loudness or LRA scans retained
+history and belongs outside critical callbacks, serialized with processing.
+
 ## Blocks and storage
 
 ProcessSpec contains sampleRate, maxBlockFrames and channels. All must be positive;
@@ -637,3 +657,9 @@ level for the ratio and interpolates without allocation. Loop boundaries are
 exclusive and optional loop crossfades retain their existing behavior. MIDI voice
 allocation, instruments/presets, source workers and transport now belong to CyAudioCore.
 See [migration](Migration.fr.md) for headers, namespaces and package integration.
+
+## Second advanced extension
+
+Shared prepared HRTFs, order-7 HOA, SourceBatch, diffraction, IR analysis, HPSS,
+spectral pitch/harmony, physical contacts, AEC and quality graph transitions are
+documented in the [advanced API guide](AdvancedExpansionGuide.fr.md).

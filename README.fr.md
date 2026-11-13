@@ -17,11 +17,13 @@
 
 <h1 align="center">CyDSP</h1>
 
-Bibliothèque C++20 de calcul DSP audio pour les développeurs de DAW, d’effets, de synthétiseurs et d’applications audio. Elle fournit filtres, FFT, convolution, rééchantillonnage et synthèse avec une API commune float/double et une sélection du code adapté aux CPU x64 et ARM64.
+Bibliothèque C++20 de calcul DSP audio pour les développeurs de DAW, d’effets, de synthétiseurs et d’applications audio. Elle fournit filtres, FFT, convolution, rééchantillonnage, synthèse granulaire et analyse audio avec une API commune float/double et une sélection du code adapté aux CPU x64 et ARM64.
 
 > **EN DÉVELOPPEMENT · 0.2.0**
 >
 > Distribution sous forme de sources ; aucune release binaire publiée. Consulter les [notes de version et limites des plateformes](VERSION.fr.md).
+
+La deuxième extension ajoute HRTF partagées, HOA ordre 7, sources groupées, diffraction, diagnostic IR, séparation harmonique/percussive, pitch spectral, contacts physiques, AEC et profils de qualité préparés. Voir le [guide des API](docs/AdvancedExpansionGuide.fr.md) et les [résultats de validation](docs/AdvancedExpansionValidation.fr.md).
 
 ## À propos de CyDSP
 
@@ -35,7 +37,9 @@ CyDSP fournit la couche de calcul numérique. Les périphériques audio, le MIDI
 - **Transformées et convolution** : FFT complexe/réelle, STFT, FIR, convolution partitionnée et non uniforme, traitement MIMO partagé et transitions préparées de réponses impulsionnelles.
 - **Fréquences d’échantillonnage** : rééchantillonnage fixe et variable, interpolation préparée, suréchantillonnage FIR/FIR demi-bande/IIR et génération de fenêtres.
 - **Effets et routage** : rampes de gain, matrices de canaux, graphes DSP, délai, panoramique, mélange sec/traité, mise en forme d’onde, chorus, phaser et réverbération.
-- **Synthèse numérique** : oscillateurs, enveloppes, tables d’ondes à bandes harmoniques, données de samples et primitives de lecture avec réduction du repliement spectral.
+- **Synthèse numérique** : oscillateurs, enveloppes, tables d’ondes à bandes harmoniques, données de samples et primitives de lecture avec réduction du repliement spectral ; grains manuels et nuages granulaires reproductibles à nombre de voix borné.
+- **Analyse audio** : crête/RMS/DC/corrélation sur fenêtre glissante, estimation true peak 4x/8x, spectres continus et caractéristiques spectrales, bandes Mel/log, analyse constant-Q et mesure LUFS/LRA à historique borné. Voir le [guide des API](docs/GranulationAndAnalysis.md).
+- **Audio spatial et traitements avancés** : chemins/pièces acoustiques, HRIR binaurales, VBAP, Ambisonics, sidechains/PDC, dynamique multibande, grains live, FM/PM, synthèse physique, analyse musicale et restauration. Voir le [guide des dix lots](docs/ExpansionGuide.fr.md) pour les API et limites.
 - **Backends CPU** : scalaire, SSE2, AVX2, AVX-512, NEON et SVE optionnel ; sélection à la préparation selon le code compilé et les capacités CPU/OS. Un backend explicite peut être demandé.
 - **Module Stretch optionnel** : cible statique distincte pour l’étirement temporel, la transposition et les formants, utilisant le socle numérique CyDSP.
 
@@ -54,7 +58,7 @@ target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
 
-Les en-têtes publics se trouvent sous `cydsp/` ; `cydsp/CyDSP.h` les regroupe. Consulter l’[exemple de traitement](examples/Processing.cpp), les [contrats des modules](docs/Modules.md) et le [guide de migration](docs/Migration.fr.md) pour l’intégration.
+Les en-têtes publics se trouvent sous `cydsp/` ; `cydsp/CyDSP.h` les regroupe. Consulter l’[exemple de traitement](examples/Processing.cpp), l’[exemple granulation/analyse](examples/GranulationAndAnalysis.cpp), les [contrats des modules](docs/Modules.md) et le [guide de migration](docs/Migration.fr.md) pour l’intégration.
 
 ## Sources, compilation et bibliothèques nécessaires
 

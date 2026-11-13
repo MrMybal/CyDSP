@@ -1,3 +1,64 @@
+# Ten-lot DSP / spatial expansion — 2026-11-13
+
+The latest extension results, exact source digest, CPU costs and numerical errors
+are in [ExpansionValidation.fr.md](ExpansionValidation.fr.md). The
+[API guide](ExpansionGuide.fr.md) defines the supported configurations and limits.
+The older measurements and validation snapshots below are retained as history;
+their hashes and coverage must not be attributed to the current extension.
+
+---
+
+# Granulation and audio-analysis measurements — 2026-11-12
+
+Feature-source SHA-256: `9047361b0fbc9ba1372504c7cfecc9a8e9a06cdd4ea168dc1d7b1643f5262148`.
+All rows process **128 stereo float frames at 48 kHz per complete public call**.
+Times are **microseconds per call**, not speedup ratios. x64 uses AMD Ryzen 9 7900X,
+MSVC 19.40.33821.0 Release with AVX-512 kernels where applicable; Android uses
+Quest 3 ARM64/NEON. Levels and loudness have no explicit SIMD backend selection.
+Each operation receives 24 warmup calls and 400 individually timed calls. No CPU
+frequency lock/affinity or global floating-point changes are applied. These are
+separate observations on each platform, not a controlled CPU comparison.
+
+| Operation | x64 mean us | x64 p95 us | Quest mean us | Quest p95 us |
+| --- | ---: | ---: | ---: | ---: |
+| Granulator, 8 active grains | 29.648 | 29.800 | 26.628 | 26.615 |
+| Granulator, 32 active grains | 117.135 | 118.800 | 111.286 | 179.844 |
+| Levels, 2048-frame window | 3.980 | 4.000 | 6.147 | 6.198 |
+| True peak, 4x / 64 taps | 8.087 | 8.200 | 22.675 | 22.448 |
+| Spectrum, N=2048 / hop=512 | 7.088 | 26.200 | 22.969 | 84.739 |
+| Constant-Q, 48 bins / hop=512 | 6.651 | 24.500 | 28.264 | 108.385 |
+| Loudness process, 256-entry capacity | 2.718 | 2.800 | 5.127 | 5.105 |
+
+Granulation borrows a prepared 8192-sample mono source, uses band-limited reading
+at ratio 1.5, Hann envelopes, fixed positions and spread pans, and renders all
+8/32 active grains for the entire run. Preparation, cloud triggering and source-mip
+construction are excluded. Mono sampling/envelope work is shared across stereo
+outputs, followed by selected VectorOps accumulation. The maximum block size is
+128, and 60-second grain duration prevents voices ending during timing.
+
+Analysis reads a repeated 128-frame sinusoidal input block. FFT and constant-Q
+means amortize work across the 512-frame hop: some calls only collect input, while
+others calculate a new frame. Their p95 includes those analysis calls. Constant-Q
+uses 220 Hz minimum and 12 bins/octave, with its longest kernel filled before timing.
+The loudness row measures processing/current-level access only, not integrated
+history scans or LRA sorting. Its short-term window is not yet full during this
+short timing run. Reported p95 values are individual-call observations, not worst
+case real-time guarantees; outliers can make a mean exceed p95.
+
+The harness also records double and every available forced backend: 44 new feature
+performance cases on x64 and 24 on Quest. The complete suites retain 774 and 526
+records respectively, including existing quality/performance records. Original
+raw JSON is kept in `build/granulation-analysis-2026-11-12/`. Reproduce with the
+native/device `--measure` runners described in [Validation.md](Validation.md).
+Numerical and realtime evidence and limitations are recorded there; API units,
+storage, latency and capacity rules are in [GranulationAndAnalysis.md](GranulationAndAnalysis.md).
+
+The before/after optimization study below belongs to its earlier source snapshot;
+its ratios are retained as historical measurements and are not claims about every
+operation added here.
+
+---
+
 # CyDSP 0.2.0 measurements and optimizations
 
 2026-11-12. Baseline: split commit `350523c`; measured on AMD Ryzen 9 7900X,
@@ -344,3 +405,6 @@ Each timing is a 128-frame stereo callback, float, mean microseconds. These are 
 Sampler rejection is 10log10(linear-output power / filtered-mip-output power) for a0.35-cycles/sample sine read at2x, excluding boundaries. Higher positive dB means stronger alias reduction. This one out-of-band tone does not establish full-band transparency. Wavetable banks and mip samples are prepared before timing; device/file I/O is excluded. IIR delay is frequency dependent, and half-band FIR has a longer fixed delay than the original FIR mode; see the integration contracts.
 
 </details>
+
+Current second-extension evidence: [advanced validation](AdvancedExpansionValidation.fr.md).
+Earlier measurements above retain their original source hashes.
