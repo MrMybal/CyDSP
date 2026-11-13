@@ -127,6 +127,19 @@ template <Sample T> Status DryWetMixer<T>::pushDrySamples(AudioBlock<const T> in
     auto status = validateProcessBlocks(s.spec, in, block);
     if (status != Status::ok)
         return status;
+    // A zero-capacity delay has no movable history. Avoid two integer modulo
+    // operations per frame in the common zero-latency parallel-effects path.
+    if (s.ring == 1) {
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            const auto source = in.channel(ch);
+            std::copy(source.begin(), source.end(), block.channel(ch).begin());
+            if (!source.empty())
+                s.history[ch] = source.back();
+        }
+        s.pending = in.frames();
+        s.hasDry = true;
+        return Status::ok;
+    }
     for (std::size_t i = 0; i < in.frames(); ++i) {
         const auto read = (s.position + s.ring - s.latency) % s.ring;
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {

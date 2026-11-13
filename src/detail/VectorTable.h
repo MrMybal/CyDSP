@@ -22,6 +22,10 @@ struct VectorTable {
     Kernels<float> f32;
     Kernels<double> f64;
     double (*dotMixed)(const float*, const double*, std::size_t) noexcept;
+    // Optional double-precision, time-parallel ADAA wavefolder. Disjoint driven
+    // input/output, finite input clamped to +/-1e6; previous is the driven sample.
+    void (*adaaFold)(const double*, double*, std::size_t, double, bool, double,
+                     double) noexcept = nullptr;
 };
 struct VectorAccess {
     template <class T> static const Kernels<T>& kernels(const VectorOps& ops) noexcept {

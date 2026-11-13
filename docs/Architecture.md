@@ -117,7 +117,8 @@ All access remains owner-serialized. See [the API guide](GranulationAndAnalysis.
 
 BiquadBank uses one voice per planar channel. Coefficients are stored in five
 contiguous per-voice fields and state in two fields. Up to 64 frames are packed
-into private frame-major scratch. SIMD runs across voices; each lane keeps its own
+into private frame-major scratch for banks above two voices. Mono/stereo use
+planar register histories to avoid packing overhead. SIMD runs across larger banks; each lane keeps its own
 coefficients and recurrence history. Each vector group retains its coefficients
 and state while processing a tile, then writes state back before the next tile.
 SSE2, AVX2, AVX-512, NEON and SVE provide float/double implementations; ARM32 double falls back
@@ -369,3 +370,26 @@ dependency on CyAudioCore or consuming applications is introduced. See the
 Shared prepared HRTFs, order-7 HOA, SourceBatch, diffraction, IR analysis, HPSS,
 spectral pitch/harmony, physical contacts, AEC and quality graph transitions are
 documented in the [advanced API guide](AdvancedExpansionGuide.fr.md).
+
+## Integration hotspot paths
+
+Linked zero-lookahead compression/limiting shares one detector/curve only when
+retained per-channel envelopes are equal. Linking previously independent histories
+retains the general path. Above the soft knee, the equivalent linear power law
+uses square roots for common ratios; the final dB observer is evaluated once per
+block. minimumAppliedGain reports the minimum detector gain including makeup in
+the last successful nonempty block, before limiter ceiling clipping. It allows
+consumers to meter attenuation without dividing output by near-zero program input.
+
+ADAA retains a lazy previous-primitive cache, invalidated on shape edits and after
+midpoint/direct segments. The stored driven sample survives drive/bias/AA edits.
+Wavefolder reduction uses bounded power-of-two floor arithmetic. Private AVX2 and
+AVX-512 translation units supply a double-precision time-parallel kernel with safe
+denominators, scalar tails and retained cross-tile input. Other backends use the
+scalar cached path. No ISPC runtime/compiler dependency is required by production.
+
+SmoothedBiquadCascade prepares scratch up to the caller's maximum block size and
+splits at transition boundaries; BiquadBank still limits larger SIMD packs to 64
+frames. MatrixConvolver snapshots a contiguous direct-head history per tile;
+ordered dot accumulation, scheduled tail work, routing and zero latency remain
+unchanged. The zero-capacity DryWetMixer delay copies planar dry samples directly.

@@ -41,6 +41,9 @@ template <Sample T> class Dynamics {
     [[nodiscard]] Status process(AudioBlock<const T> program, AudioBlock<const T> sidechain,
                                  AudioBlock<T>) noexcept;
     [[nodiscard]] double gainReductionDb() const noexcept;
+    // Minimum detector gain including makeup in the last nonempty successful block,
+    // before the limiter ceiling. Owner-serialized; no output/input division needed.
+    [[nodiscard]] double minimumAppliedGain() const noexcept;
     [[nodiscard]] std::size_t latencyFrames() const noexcept;
 
   private:

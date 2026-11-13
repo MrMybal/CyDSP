@@ -48,7 +48,7 @@ Status SmoothedBiquadCascade<T>::prepare(const ProcessSpec& spec, std::size_t ma
     auto status = VectorOps::create(backend, next.ops_);
     if (status != Status::ok)
         return status;
-    next.tile_ = std::min(spec.maxBlockFrames, std::size_t{64});
+    next.tile_ = spec.maxBlockFrames;
     const ProcessSpec internal{spec.sampleRate, next.tile_, spec.channels};
     try {
         for (auto& bank : next.banks_)

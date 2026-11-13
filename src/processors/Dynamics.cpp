@@ -92,7 +92,7 @@ template <Sample T> struct Dynamics<T>::State {
     std::uint64_t clock = 0;
     std::size_t delayCapacity = 0, delayFrames = 0, head = 0;
     double maximumLookAheadMs = 0;
-    double attack = 0, release = 0, makeup = 1, reduction = 0;
+    double attack = 0, release = 0, makeup = 1, reduction = 0, minimumGain = 1;
 };
 template <Sample T> Dynamics<T>::Dynamics() = default;
 template <Sample T> Dynamics<T>::~Dynamics() = default;
@@ -173,10 +173,14 @@ template <Sample T> void Dynamics<T>::reset() noexcept {
         state_->clock = 0;
         state_->head = 0;
         state_->reduction = 0;
+        state_->minimumGain = 1;
     }
 }
 template <Sample T> double Dynamics<T>::gainReductionDb() const noexcept {
     return state_ ? state_->reduction : 0;
+}
+template <Sample T> double Dynamics<T>::minimumAppliedGain() const noexcept {
+    return state_ ? state_->minimumGain : 1;
 }
 template <Sample T> std::size_t Dynamics<T>::latencyFrames() const noexcept {
     return state_ ? state_->delayFrames : 0;
@@ -215,6 +219,7 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
     }
     if (!in.frames())
         return Status::ok;
+    double minimumGain = std::numeric_limits<double>::infinity();
     const auto holdFrames = s.mode == DynamicsMode::noiseGate
                                 ? std::uint64_t(std::ceil(s.p.holdMs * s.spec.sampleRate / 1000))
                                 : 0;
@@ -222,6 +227,81 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
     const double slope = s.mode == DynamicsMode::limiter ? -1.0 : 1.0 / s.p.ratio - 1;
     const double ceiling =
         s.mode == DynamicsMode::limiter ? std::pow(10.0, s.p.thresholdDb / 20) : 1;
+    // With linked channels and equal retained envelopes, a zero-lookahead
+    // compressor/limiter has one detector and one transfer curve per frame.
+    // After unlinked operation the envelopes may differ: retain the general
+    // path until reset (no state discontinuity when linking is automated).
+    const bool linkedCurve =
+        s.p.linkedChannels && !s.delayFrames &&
+        (s.mode == DynamicsMode::compressor || s.mode == DynamicsMode::limiter) &&
+        std::all_of(s.values.begin(), s.values.end(),
+                    [&](double v) { return v == s.values.front(); });
+    if (linkedCurve) {
+        double envelopeState = s.values.front(), db = s.reduction, lastEnvelope = 0;
+        const double lowerKnee = std::pow(10.0, (s.p.thresholdDb - halfKnee) / 20);
+        const double upperKnee = std::pow(10.0, (s.p.thresholdDb + halfKnee) / 20);
+        const double threshold = std::pow(10.0, s.p.thresholdDb / 20);
+        for (std::size_t i = 0; i < in.frames(); ++i) {
+            double magnitude = 0;
+            for (std::size_t ch = 0; ch < side.channels(); ++ch)
+                magnitude = std::max(magnitude, std::abs(double(side.channel(ch)[i])));
+            const double detector =
+                s.p.detector == DetectorMode::rms ? magnitude * magnitude : magnitude;
+            envelopeState = advance(detector, envelopeState, s.attack, s.release);
+            const double envelope = s.p.detector == DetectorMode::rms
+                                        ? std::sqrt(std::max(0.0, envelopeState))
+                                        : envelopeState;
+            lastEnvelope = envelope;
+            db = 0;
+            double gain = 1;
+            // Above the soft knee the curve is a power of the linear ratio.
+            // Common ratios use square roots; the final dB meter is evaluated
+            // once below. This is the same curve, with ordinary FP rounding.
+            if (envelope > upperKnee * (1 + 1e-12)) {
+                const double t = threshold / envelope;
+                if (s.mode == DynamicsMode::limiter)
+                    gain = t;
+                else if (s.p.ratio == 2)
+                    gain = std::sqrt(t);
+                else if (s.p.ratio == 4) {
+                    const double root = std::sqrt(t);
+                    gain = root * std::sqrt(root);
+                } else
+                    gain = std::pow(t, 1 - 1 / s.p.ratio);
+            } else
+                // This conservative guard skips only levels strictly below the knee;
+                // the original log curve still decides all boundary cases.
+                if (std::max(1e-12, envelope) >= lowerKnee * (1 - 1e-12)) {
+                    const double over =
+                        20 * std::log10(std::max(1e-12, envelope)) - s.p.thresholdDb;
+                    if (s.p.kneeDb > 0 && std::abs(over) < halfKnee) {
+                        const double t = over + halfKnee;
+                        db = slope * t * t / (2 * s.p.kneeDb);
+                    } else if (over >= halfKnee)
+                        db = slope * over;
+                }
+            if (db != 0)
+                gain = std::pow(10.0, db / 20);
+            minimumGain = std::min(minimumGain, gain * s.makeup);
+            for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+                double value = double(in.channel(ch)[i]) * gain * s.makeup;
+                if (s.mode == DynamicsMode::limiter)
+                    value = std::clamp(value, -ceiling, ceiling);
+                out.channel(ch)[i] = static_cast<T>(value);
+            }
+        }
+        std::fill(s.values.begin(), s.values.end(), envelopeState);
+        const double over = 20 * std::log10(std::max(1e-12, lastEnvelope)) - s.p.thresholdDb;
+        db = 0;
+        if (s.p.kneeDb > 0 && std::abs(over) < halfKnee) {
+            const double t = over + halfKnee;
+            db = slope * t * t / (2 * s.p.kneeDb);
+        } else if (over >= halfKnee)
+            db = slope * over;
+        s.reduction = db;
+        s.minimumGain = minimumGain;
+        return Status::ok;
+    }
     for (std::size_t i = 0; i < in.frames(); ++i) {
         const auto readHead =
             s.delayFrames ? (s.head + s.delayCapacity - s.delayFrames) % s.delayCapacity : 0;
@@ -293,6 +373,7 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
             // avoiding the log10/pow round trip for every sample.
             const double gain = s.mode == DynamicsMode::noiseGate ? std::max(1e-8, s.gateGain[ch])
                                                                   : std::pow(10.0, db / 20);
+            minimumGain = std::min(minimumGain, gain * s.makeup);
             double value = delayed * gain * s.makeup;
             if (s.mode == DynamicsMode::limiter)
                 value = std::clamp(value, -ceiling, ceiling);
@@ -301,6 +382,7 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
         s.head = (s.head + 1) % s.delayCapacity;
         ++s.clock;
     }
+    s.minimumGain = minimumGain;
     // Observers are owner-serialized; only the final channel/frame is observable.
     // Empty blocks must preserve the previous meter value.
     if (s.mode == DynamicsMode::noiseGate && in.frames())

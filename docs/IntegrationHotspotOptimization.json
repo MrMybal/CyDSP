@@ -1,0 +1,3141 @@
+{
+  "status": "passed",
+  "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee",
+  "baselineProductionCommit": "fda6bd30c5b622795cc08e8bd2750188a6c5a0c0",
+  "method": "Alternating independent process pairs; median of process medians of nine 128-call batch means, 256-frame blocks at 48 kHz. No global CPU/FP state changes.",
+  "logicalCpu": 4,
+  "processPairs": 3,
+  "executablesSha256": {
+    "before": "92606dadc104e4842a0a0288f3998f30be0d89053d16ed6c8bc6d7d3ca2aa25b",
+    "after": "383fe330e7b66be3dd8f08b71f04049a3054b01797d4824747f82eba349d0b46"
+  },
+  "cases": [
+    {
+      "case": "compressor.1.independent.peak.f32",
+      "beforeUs": 6.93515625,
+      "afterUs": 8.9078125,
+      "speedupBeforeOverAfter": 0.7785476232239958,
+      "costChangePercent": 28.44429424355075,
+      "processMeansUs": {
+        "before": [
+          6.978125,
+          6.925,
+          6.93515625
+        ],
+        "after": [
+          9.05703125,
+          8.76484375,
+          8.9078125
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.independent.rms.f32",
+      "beforeUs": 8.19609375,
+      "afterUs": 9.99453125,
+      "speedupBeforeOverAfter": 0.8200578441335105,
+      "costChangePercent": 21.942617481650938,
+      "processMeansUs": {
+        "before": [
+          8.19609375,
+          8.24296875,
+          8.18125
+        ],
+        "after": [
+          10.1375,
+          9.80703125,
+          9.99453125
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.peak.f32",
+      "beforeUs": 7.1453125,
+      "afterUs": 3.534375,
+      "speedupBeforeOverAfter": 2.021662245800177,
+      "costChangePercent": -50.53575333479117,
+      "processMeansUs": {
+        "before": [
+          7.18046875,
+          7.090625,
+          7.1453125
+        ],
+        "after": [
+          3.59609375,
+          3.43203125,
+          3.534375
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.rms.f32",
+      "beforeUs": 8.55,
+      "afterUs": 5.88359375,
+      "speedupBeforeOverAfter": 1.4531934670030542,
+      "costChangePercent": -31.186038011695906,
+      "processMeansUs": {
+        "before": [
+          8.57890625,
+          8.53984375,
+          8.55
+        ],
+        "after": [
+          5.93671875,
+          5.82578125,
+          5.88359375
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.peak.f32",
+      "beforeUs": 13.96484375,
+      "afterUs": 17.53203125,
+      "speedupBeforeOverAfter": 0.7965331313221337,
+      "costChangePercent": 25.544055944055934,
+      "processMeansUs": {
+        "before": [
+          14.09609375,
+          13.7390625,
+          13.96484375
+        ],
+        "after": [
+          17.68359375,
+          17.53203125,
+          17.528125
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.rms.f32",
+      "beforeUs": 16.6390625,
+      "afterUs": 19.53515625,
+      "speedupBeforeOverAfter": 0.851749650069986,
+      "costChangePercent": 17.40539017748144,
+      "processMeansUs": {
+        "before": [
+          16.67578125,
+          16.59375,
+          16.6390625
+        ],
+        "after": [
+          19.6,
+          19.53515625,
+          19.46328125
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.peak.f32",
+      "beforeUs": 14.33359375,
+      "afterUs": 4.65078125,
+      "speedupBeforeOverAfter": 3.081975474550647,
+      "costChangePercent": -67.55327846514416,
+      "processMeansUs": {
+        "before": [
+          14.33359375,
+          14.325,
+          14.35703125
+        ],
+        "after": [
+          4.646875,
+          4.6671875,
+          4.65078125
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.rms.f32",
+      "beforeUs": 17.16328125,
+      "afterUs": 6.61640625,
+      "speedupBeforeOverAfter": 2.5940488841657814,
+      "costChangePercent": -61.45022531749284,
+      "processMeansUs": {
+        "before": [
+          17.42265625,
+          17.1453125,
+          17.16328125
+        ],
+        "after": [
+          6.61640625,
+          6.6125,
+          6.63984375
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.direct.f32",
+      "beforeUs": 4.71953125,
+      "afterUs": 4.30703125,
+      "speedupBeforeOverAfter": 1.0957736259749684,
+      "costChangePercent": -8.740274788942237,
+      "processMeansUs": {
+        "before": [
+          4.76171875,
+          4.71953125,
+          4.71953125
+        ],
+        "after": [
+          4.303125,
+          4.30703125,
+          4.34609375
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.adaa.f32",
+      "beforeUs": 15.81171875,
+      "afterUs": 8.64921875,
+      "speedupBeforeOverAfter": 1.828109475205492,
+      "costChangePercent": -45.29868076485993,
+      "processMeansUs": {
+        "before": [
+          15.81171875,
+          15.5765625,
+          16.05390625
+        ],
+        "after": [
+          8.64921875,
+          8.634375,
+          8.69765625
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.direct.f32",
+      "beforeUs": 4.01875,
+      "afterUs": 3.69140625,
+      "speedupBeforeOverAfter": 1.0886772486772487,
+      "costChangePercent": -8.14541213063763,
+      "processMeansUs": {
+        "before": [
+          4.01875,
+          4.02890625,
+          3.978125
+        ],
+        "after": [
+          3.653125,
+          3.73828125,
+          3.69140625
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.adaa.f32",
+      "beforeUs": 14.44375,
+      "afterUs": 7.934375,
+      "speedupBeforeOverAfter": 1.8204017329657345,
+      "costChangePercent": -45.06707053223712,
+      "processMeansUs": {
+        "before": [
+          14.4875,
+          14.44375,
+          14.290625
+        ],
+        "after": [
+          7.95,
+          7.89921875,
+          7.934375
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.direct.f32",
+      "beforeUs": 2.10546875,
+      "afterUs": 2.5921875,
+      "speedupBeforeOverAfter": 0.8122362869198312,
+      "costChangePercent": 23.116883116883113,
+      "processMeansUs": {
+        "before": [
+          2.10546875,
+          2.1890625,
+          2.10390625
+        ],
+        "after": [
+          2.6,
+          2.58984375,
+          2.5921875
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.adaa.f32",
+      "beforeUs": 5.30390625,
+      "afterUs": 3.9453125,
+      "speedupBeforeOverAfter": 1.3443564356435642,
+      "costChangePercent": -25.61496538518191,
+      "processMeansUs": {
+        "before": [
+          5.3390625,
+          5.303125,
+          5.30390625
+        ],
+        "after": [
+          3.9453125,
+          3.92890625,
+          3.97734375
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.direct.f32",
+      "beforeUs": 3.790625,
+      "afterUs": 3.478125,
+      "speedupBeforeOverAfter": 1.0898472596585804,
+      "costChangePercent": -8.24402308326463,
+      "processMeansUs": {
+        "before": [
+          3.7796875,
+          3.790625,
+          3.80859375
+        ],
+        "after": [
+          3.47578125,
+          3.49453125,
+          3.478125
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.adaa.f32",
+      "beforeUs": 7.80234375,
+      "afterUs": 2.084375,
+      "speedupBeforeOverAfter": 3.7432533733133435,
+      "costChangePercent": -73.28527085210774,
+      "processMeansUs": {
+        "before": [
+          7.821875,
+          7.7546875,
+          7.80234375
+        ],
+        "after": [
+          2.0828125,
+          2.084375,
+          2.0921875
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.4.f32",
+      "beforeUs": 10.07578125,
+      "afterUs": 4.48828125,
+      "speedupBeforeOverAfter": 2.2449086161879896,
+      "costChangePercent": -55.454756920213995,
+      "processMeansUs": {
+        "before": [
+          10.13984375,
+          10.07578125,
+          10.0703125
+        ],
+        "after": [
+          4.48828125,
+          4.48515625,
+          4.5
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.4.f32",
+      "beforeUs": 4.47421875,
+      "afterUs": 4.47421875,
+      "speedupBeforeOverAfter": 1.0,
+      "costChangePercent": 0.0,
+      "processMeansUs": {
+        "before": [
+          4.475,
+          4.47421875,
+          4.4734375
+        ],
+        "after": [
+          4.47421875,
+          4.471875,
+          4.47578125
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.8.f32",
+      "beforeUs": 20.18046875,
+      "afterUs": 8.95,
+      "speedupBeforeOverAfter": 2.2548009776536313,
+      "costChangePercent": -55.650187758894354,
+      "processMeansUs": {
+        "before": [
+          20.18046875,
+          20.1125,
+          20.21640625
+        ],
+        "after": [
+          8.946875,
+          8.95,
+          8.9671875
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.8.f32",
+      "beforeUs": 8.9296875,
+      "afterUs": 8.9453125,
+      "speedupBeforeOverAfter": 0.9982532751091703,
+      "costChangePercent": 0.17497812773403787,
+      "processMeansUs": {
+        "before": [
+          9.0328125,
+          8.92734375,
+          8.9296875
+        ],
+        "after": [
+          8.97265625,
+          8.93203125,
+          8.9453125
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.scalar.f32",
+      "beforeUs": 1.6328125,
+      "afterUs": 1.1234375,
+      "speedupBeforeOverAfter": 1.4534075104311543,
+      "costChangePercent": -31.196172248803823,
+      "processMeansUs": {
+        "before": [
+          1.64609375,
+          1.6328125,
+          1.63203125
+        ],
+        "after": [
+          1.1234375,
+          1.12265625,
+          1.1234375
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.avx512.f32",
+      "beforeUs": 2.46328125,
+      "afterUs": 1.12265625,
+      "speedupBeforeOverAfter": 2.1941544885177455,
+      "costChangePercent": -54.424357754519505,
+      "processMeansUs": {
+        "before": [
+          2.57890625,
+          2.46328125,
+          2.459375
+        ],
+        "after": [
+          1.12265625,
+          1.11875,
+          1.12265625
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p32.nonuniform.f32",
+      "beforeUs": 20.2984375,
+      "afterUs": 18.38828125,
+      "speedupBeforeOverAfter": 1.103878999022815,
+      "costChangePercent": -9.410361019167112,
+      "processMeansUs": {
+        "before": [
+          20.37265625,
+          20.21640625,
+          20.2984375
+        ],
+        "after": [
+          18.45859375,
+          18.175,
+          18.38828125
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p32.scheduled.f32",
+      "beforeUs": 25.884375,
+      "afterUs": 23.66015625,
+      "speedupBeforeOverAfter": 1.0940069341258047,
+      "costChangePercent": -8.592901122781594,
+      "processMeansUs": {
+        "before": [
+          26.1265625,
+          25.6859375,
+          25.884375
+        ],
+        "after": [
+          23.66015625,
+          23.80234375,
+          23.596875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p64.nonuniform.f32",
+      "beforeUs": 16.846875,
+      "afterUs": 15.265625,
+      "speedupBeforeOverAfter": 1.1035823950870012,
+      "costChangePercent": -9.386013726581343,
+      "processMeansUs": {
+        "before": [
+          16.9890625,
+          16.846875,
+          16.69765625
+        ],
+        "after": [
+          15.265625,
+          15.33984375,
+          14.9890625
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p64.scheduled.f32",
+      "beforeUs": 18.46171875,
+      "afterUs": 16.7078125,
+      "speedupBeforeOverAfter": 1.104975217431965,
+      "costChangePercent": -9.500232745122927,
+      "processMeansUs": {
+        "before": [
+          18.53125,
+          18.46171875,
+          18.4515625
+        ],
+        "after": [
+          16.7078125,
+          16.64453125,
+          16.8375
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.nonuniform.f32",
+      "beforeUs": 15.49609375,
+      "afterUs": 14.08984375,
+      "speedupBeforeOverAfter": 1.099805932908234,
+      "costChangePercent": -9.074867658179986,
+      "processMeansUs": {
+        "before": [
+          15.49609375,
+          15.26015625,
+          15.5140625
+        ],
+        "after": [
+          14.52265625,
+          14.01171875,
+          14.08984375
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.f32",
+      "beforeUs": 16.359375,
+      "afterUs": 15.0921875,
+      "speedupBeforeOverAfter": 1.083963143182524,
+      "costChangePercent": -7.745940783190064,
+      "processMeansUs": {
+        "before": [
+          16.359375,
+          16.62578125,
+          16.1125
+        ],
+        "after": [
+          15.0078125,
+          15.24296875,
+          15.0921875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p256.nonuniform.f32",
+      "beforeUs": 17.840625,
+      "afterUs": 16.3390625,
+      "speedupBeforeOverAfter": 1.091900162570527,
+      "costChangePercent": -8.416535295148009,
+      "processMeansUs": {
+        "before": [
+          18.0171875,
+          17.840625,
+          17.47265625
+        ],
+        "after": [
+          16.3390625,
+          15.99140625,
+          16.42109375
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p256.scheduled.f32",
+      "beforeUs": 17.82265625,
+      "afterUs": 16.35703125,
+      "speedupBeforeOverAfter": 1.0896021397525912,
+      "costChangePercent": -8.223381405339081,
+      "processMeansUs": {
+        "before": [
+          17.603125,
+          17.82265625,
+          18.31484375
+        ],
+        "after": [
+          16.35703125,
+          16.2578125,
+          16.74765625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p32.nonuniform.f32",
+      "beforeUs": 28.89921875,
+      "afterUs": 29.27109375,
+      "speedupBeforeOverAfter": 0.9872954866949583,
+      "costChangePercent": 1.2867994917682646,
+      "processMeansUs": {
+        "before": [
+          28.89921875,
+          28.6640625,
+          29.56796875
+        ],
+        "after": [
+          29.27109375,
+          29.23671875,
+          29.4828125
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p32.scheduled.f32",
+      "beforeUs": 40.4296875,
+      "afterUs": 38.79453125,
+      "speedupBeforeOverAfter": 1.0421491431218157,
+      "costChangePercent": -4.0444444444444505,
+      "processMeansUs": {
+        "before": [
+          40.4296875,
+          41.43515625,
+          40.425
+        ],
+        "after": [
+          38.79453125,
+          38.715625,
+          39.0578125
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p64.nonuniform.f32",
+      "beforeUs": 23.2796875,
+      "afterUs": 20.7765625,
+      "speedupBeforeOverAfter": 1.1204783033767016,
+      "costChangePercent": -10.752399489898657,
+      "processMeansUs": {
+        "before": [
+          22.62265625,
+          23.87578125,
+          23.2796875
+        ],
+        "after": [
+          20.7765625,
+          20.746875,
+          20.9203125
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p64.scheduled.f32",
+      "beforeUs": 27.03671875,
+      "afterUs": 25.39296875,
+      "speedupBeforeOverAfter": 1.06473248623204,
+      "costChangePercent": -6.079694859421492,
+      "processMeansUs": {
+        "before": [
+          26.7859375,
+          27.03671875,
+          27.4015625
+        ],
+        "after": [
+          24.99296875,
+          25.5921875,
+          25.39296875
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p128.nonuniform.f32",
+      "beforeUs": 21.51796875,
+      "afterUs": 20.0359375,
+      "speedupBeforeOverAfter": 1.0739686500818841,
+      "costChangePercent": -6.887412409686677,
+      "processMeansUs": {
+        "before": [
+          21.60078125,
+          21.25625,
+          21.51796875
+        ],
+        "after": [
+          19.559375,
+          20.05703125,
+          20.0359375
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p128.scheduled.f32",
+      "beforeUs": 23.85234375,
+      "afterUs": 22.60625,
+      "speedupBeforeOverAfter": 1.0551216477743988,
+      "costChangePercent": -5.224198355769549,
+      "processMeansUs": {
+        "before": [
+          23.81015625,
+          23.85234375,
+          23.91953125
+        ],
+        "after": [
+          22.2265625,
+          23.27578125,
+          22.60625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p256.nonuniform.f32",
+      "beforeUs": 25.53984375,
+      "afterUs": 23.37890625,
+      "speedupBeforeOverAfter": 1.0924310776942356,
+      "costChangePercent": -8.461044324125899,
+      "processMeansUs": {
+        "before": [
+          25.53984375,
+          25.21484375,
+          26.1265625
+        ],
+        "after": [
+          23.37890625,
+          23.3109375,
+          23.51953125
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p256.scheduled.f32",
+      "beforeUs": 27.26484375,
+      "afterUs": 24.78046875,
+      "speedupBeforeOverAfter": 1.1002553674453797,
+      "costChangePercent": -9.112008940084237,
+      "processMeansUs": {
+        "before": [
+          27.528125,
+          26.58828125,
+          27.26484375
+        ],
+        "after": [
+          24.38984375,
+          24.78046875,
+          25.41015625
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p32.nonuniform.f32",
+      "beforeUs": 26.34453125,
+      "afterUs": 24.57265625,
+      "speedupBeforeOverAfter": 1.0721075891011986,
+      "costChangePercent": -6.725779188043046,
+      "processMeansUs": {
+        "before": [
+          27.3921875,
+          26.1,
+          26.34453125
+        ],
+        "after": [
+          24.57265625,
+          24.77890625,
+          24.37734375
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p32.scheduled.f32",
+      "beforeUs": 33.59453125,
+      "afterUs": 31.959375,
+      "speedupBeforeOverAfter": 1.0511635865845312,
+      "costChangePercent": -4.867328666775195,
+      "processMeansUs": {
+        "before": [
+          33.59453125,
+          33.15,
+          33.946875
+        ],
+        "after": [
+          31.959375,
+          31.2671875,
+          32.1578125
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p64.nonuniform.f32",
+      "beforeUs": 22.9484375,
+      "afterUs": 20.70234375,
+      "speedupBeforeOverAfter": 1.1084946601758556,
+      "costChangePercent": -9.787567236331451,
+      "processMeansUs": {
+        "before": [
+          23.55625,
+          22.9484375,
+          22.6546875
+        ],
+        "after": [
+          20.4484375,
+          20.70234375,
+          21.0203125
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p64.scheduled.f32",
+      "beforeUs": 26.99453125,
+      "afterUs": 24.53203125,
+      "speedupBeforeOverAfter": 1.100378968822649,
+      "costChangePercent": -9.122218041848761,
+      "processMeansUs": {
+        "before": [
+          26.54296875,
+          27.2390625,
+          26.99453125
+        ],
+        "after": [
+          24.53203125,
+          25.81484375,
+          24.3234375
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p128.nonuniform.f32",
+      "beforeUs": 21.88359375,
+      "afterUs": 20.3140625,
+      "speedupBeforeOverAfter": 1.0772632874394277,
+      "costChangePercent": -7.172182356931211,
+      "processMeansUs": {
+        "before": [
+          22.09765625,
+          21.30703125,
+          21.88359375
+        ],
+        "after": [
+          20.3984375,
+          20.23828125,
+          20.3140625
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p128.scheduled.f32",
+      "beforeUs": 24.0359375,
+      "afterUs": 24.25,
+      "speedupBeforeOverAfter": 0.991172680412371,
+      "costChangePercent": 0.8905935123187936,
+      "processMeansUs": {
+        "before": [
+          24.2,
+          23.93046875,
+          24.0359375
+        ],
+        "after": [
+          24.92265625,
+          24.25,
+          24.078125
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p256.nonuniform.f32",
+      "beforeUs": 23.22265625,
+      "afterUs": 21.76875,
+      "speedupBeforeOverAfter": 1.0667886879127189,
+      "costChangePercent": -6.260723296888138,
+      "processMeansUs": {
+        "before": [
+          23.6484375,
+          22.86171875,
+          23.22265625
+        ],
+        "after": [
+          21.796875,
+          21.3671875,
+          21.76875
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p256.scheduled.f32",
+      "beforeUs": 25.69375,
+      "afterUs": 24.60390625,
+      "speedupBeforeOverAfter": 1.0442955577429904,
+      "costChangePercent": -4.24166869374848,
+      "processMeansUs": {
+        "before": [
+          25.69375,
+          25.23203125,
+          25.81015625
+        ],
+        "after": [
+          25.07109375,
+          24.503125,
+          24.60390625
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.peak.f32",
+      "beforeUs": 54.225,
+      "afterUs": 68.99921875,
+      "speedupBeforeOverAfter": 0.7858784632978182,
+      "costChangePercent": 27.24613877362838,
+      "processMeansUs": {
+        "before": [
+          54.49375,
+          54.225,
+          54.109375
+        ],
+        "after": [
+          68.74765625,
+          68.99921875,
+          70.3671875
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.rms.f32",
+      "beforeUs": 64.96953125,
+      "afterUs": 76.83671875,
+      "speedupBeforeOverAfter": 0.845553171803032,
+      "costChangePercent": 18.26577361984585,
+      "processMeansUs": {
+        "before": [
+          65.64453125,
+          64.96953125,
+          64.92890625
+        ],
+        "after": [
+          76.83671875,
+          76.803125,
+          76.8953125
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.peak.f32",
+      "beforeUs": 54.67890625,
+      "afterUs": 16.4125,
+      "speedupBeforeOverAfter": 3.3315403655750186,
+      "costChangePercent": -69.98385460572375,
+      "processMeansUs": {
+        "before": [
+          54.64140625,
+          54.67890625,
+          54.85390625
+        ],
+        "after": [
+          16.38671875,
+          16.4125,
+          16.42265625
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.rms.f32",
+      "beforeUs": 64.85703125,
+      "afterUs": 18.928125,
+      "speedupBeforeOverAfter": 3.4264900115568766,
+      "costChangePercent": -70.81561607863449,
+      "processMeansUs": {
+        "before": [
+          64.79609375,
+          64.85703125,
+          64.8796875
+        ],
+        "after": [
+          18.90625,
+          18.99609375,
+          18.928125
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.independent.peak.f64",
+      "beforeUs": 6.85390625,
+      "afterUs": 8.79765625,
+      "speedupBeforeOverAfter": 0.7790604742030015,
+      "costChangePercent": 28.359740111706365,
+      "processMeansUs": {
+        "before": [
+          6.859375,
+          6.79296875,
+          6.85390625
+        ],
+        "after": [
+          8.81484375,
+          8.796875,
+          8.79765625
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.independent.rms.f64",
+      "beforeUs": 8.2921875,
+      "afterUs": 9.78515625,
+      "speedupBeforeOverAfter": 0.8474251497005989,
+      "costChangePercent": 18.00452232899943,
+      "processMeansUs": {
+        "before": [
+          8.390625,
+          8.22421875,
+          8.2921875
+        ],
+        "after": [
+          9.78515625,
+          9.78515625,
+          9.81015625
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.peak.f64",
+      "beforeUs": 7.3765625,
+      "afterUs": 3.4890625,
+      "speedupBeforeOverAfter": 2.114196148678907,
+      "costChangePercent": -52.700699004448204,
+      "processMeansUs": {
+        "before": [
+          7.5578125,
+          7.21796875,
+          7.3765625
+        ],
+        "after": [
+          3.4890625,
+          3.48984375,
+          3.44375
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.rms.f64",
+      "beforeUs": 8.50390625,
+      "afterUs": 5.85859375,
+      "speedupBeforeOverAfter": 1.4515268702493667,
+      "costChangePercent": -31.107028020211303,
+      "processMeansUs": {
+        "before": [
+          8.640625,
+          8.50390625,
+          8.471875
+        ],
+        "after": [
+          5.85390625,
+          5.86015625,
+          5.85859375
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.peak.f64",
+      "beforeUs": 13.80390625,
+      "afterUs": 17.465625,
+      "speedupBeforeOverAfter": 0.7903471103954196,
+      "costChangePercent": 26.52668515479086,
+      "processMeansUs": {
+        "before": [
+          13.80390625,
+          13.80078125,
+          13.82421875
+        ],
+        "after": [
+          17.45390625,
+          17.62578125,
+          17.465625
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.rms.f64",
+      "beforeUs": 16.2890625,
+      "afterUs": 19.49140625,
+      "speedupBeforeOverAfter": 0.8357048378692532,
+      "costChangePercent": 19.659472422062365,
+      "processMeansUs": {
+        "before": [
+          16.58984375,
+          16.2890625,
+          16.1984375
+        ],
+        "after": [
+          19.49140625,
+          19.7171875,
+          19.44609375
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.peak.f64",
+      "beforeUs": 14.1671875,
+      "afterUs": 4.6578125,
+      "speedupBeforeOverAfter": 3.0415967796041596,
+      "costChangePercent": -67.1225322598434,
+      "processMeansUs": {
+        "before": [
+          14.14140625,
+          14.1671875,
+          14.19453125
+        ],
+        "after": [
+          4.6578125,
+          4.71796875,
+          4.6203125
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.rms.f64",
+      "beforeUs": 17.0546875,
+      "afterUs": 6.7015625,
+      "speedupBeforeOverAfter": 2.544882256936349,
+      "costChangePercent": -60.705451213925784,
+      "processMeansUs": {
+        "before": [
+          17.05703125,
+          17.0546875,
+          16.99140625
+        ],
+        "after": [
+          6.64296875,
+          6.7015625,
+          8.4546875
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.direct.f64",
+      "beforeUs": 4.60546875,
+      "afterUs": 4.2578125,
+      "speedupBeforeOverAfter": 1.081651376146789,
+      "costChangePercent": -7.548770144189987,
+      "processMeansUs": {
+        "before": [
+          4.5953125,
+          4.63671875,
+          4.60546875
+        ],
+        "after": [
+          4.25078125,
+          4.2578125,
+          4.26328125
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.adaa.f64",
+      "beforeUs": 15.54296875,
+      "afterUs": 8.5015625,
+      "speedupBeforeOverAfter": 1.8282484837346076,
+      "costChangePercent": -45.302839909525005,
+      "processMeansUs": {
+        "before": [
+          15.5109375,
+          15.54296875,
+          16.03359375
+        ],
+        "after": [
+          8.5015625,
+          8.496875,
+          8.57265625
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.direct.f64",
+      "beforeUs": 3.91640625,
+      "afterUs": 3.48671875,
+      "speedupBeforeOverAfter": 1.1232354918216447,
+      "costChangePercent": -10.971474167165374,
+      "processMeansUs": {
+        "before": [
+          3.9375,
+          3.91640625,
+          3.87578125
+        ],
+        "after": [
+          3.48671875,
+          3.48359375,
+          3.50390625
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.adaa.f64",
+      "beforeUs": 13.6,
+      "afterUs": 7.74765625,
+      "speedupBeforeOverAfter": 1.7553695674094987,
+      "costChangePercent": -43.03193933823529,
+      "processMeansUs": {
+        "before": [
+          13.6,
+          13.74609375,
+          13.48125
+        ],
+        "after": [
+          7.775,
+          7.74765625,
+          7.690625
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.direct.f64",
+      "beforeUs": 2.05078125,
+      "afterUs": 2.5265625,
+      "speedupBeforeOverAfter": 0.8116883116883118,
+      "costChangePercent": 23.2,
+      "processMeansUs": {
+        "before": [
+          2.01015625,
+          2.0796875,
+          2.05078125
+        ],
+        "after": [
+          2.52109375,
+          2.5265625,
+          2.52890625
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.adaa.f64",
+      "beforeUs": 5.140625,
+      "afterUs": 3.91875,
+      "speedupBeforeOverAfter": 1.3118022328548644,
+      "costChangePercent": -23.768996960486323,
+      "processMeansUs": {
+        "before": [
+          5.140625,
+          5.128125,
+          5.3421875
+        ],
+        "after": [
+          3.91328125,
+          3.91875,
+          3.92734375
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.direct.f64",
+      "beforeUs": 3.709375,
+      "afterUs": 3.35546875,
+      "speedupBeforeOverAfter": 1.1054714784633295,
+      "costChangePercent": -9.540859309182814,
+      "processMeansUs": {
+        "before": [
+          3.6765625,
+          3.709375,
+          3.7109375
+        ],
+        "after": [
+          3.35546875,
+          3.32421875,
+          3.3625
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.adaa.f64",
+      "beforeUs": 7.79375,
+      "afterUs": 2.08828125,
+      "speedupBeforeOverAfter": 3.732136176580621,
+      "costChangePercent": -73.2056936647955,
+      "processMeansUs": {
+        "before": [
+          7.75390625,
+          7.79375,
+          7.96875
+        ],
+        "after": [
+          2.08828125,
+          2.0828125,
+          2.090625
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.4.f64",
+      "beforeUs": 9.90703125,
+      "afterUs": 4.4875,
+      "speedupBeforeOverAfter": 2.2076949860724233,
+      "costChangePercent": -54.70388770601687,
+      "processMeansUs": {
+        "before": [
+          9.99140625,
+          9.90703125,
+          9.8984375
+        ],
+        "after": [
+          4.48515625,
+          4.4890625,
+          4.4875
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.4.f64",
+      "beforeUs": 4.47265625,
+      "afterUs": 4.471875,
+      "speedupBeforeOverAfter": 1.0001747030048918,
+      "costChangePercent": -0.017467248908298316,
+      "processMeansUs": {
+        "before": [
+          4.47578125,
+          4.4703125,
+          4.47265625
+        ],
+        "after": [
+          4.471875,
+          4.4796875,
+          4.471875
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.8.f64",
+      "beforeUs": 19.903125,
+      "afterUs": 8.9421875,
+      "speedupBeforeOverAfter": 2.2257557225231523,
+      "costChangePercent": -55.07143978646569,
+      "processMeansUs": {
+        "before": [
+          19.83984375,
+          19.903125,
+          20.03046875
+        ],
+        "after": [
+          8.94453125,
+          8.9421875,
+          8.940625
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.8.f64",
+      "beforeUs": 8.9265625,
+      "afterUs": 8.9328125,
+      "speedupBeforeOverAfter": 0.9993003323421373,
+      "costChangePercent": 0.07001575354457223,
+      "processMeansUs": {
+        "before": [
+          8.92421875,
+          8.9265625,
+          8.92890625
+        ],
+        "after": [
+          8.9328125,
+          8.93515625,
+          8.925
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.scalar.f64",
+      "beforeUs": 1.58828125,
+      "afterUs": 1.121875,
+      "speedupBeforeOverAfter": 1.4157381615598887,
+      "costChangePercent": -29.365469749139205,
+      "processMeansUs": {
+        "before": [
+          1.58828125,
+          1.58828125,
+          1.58515625
+        ],
+        "after": [
+          1.121875,
+          1.12109375,
+          1.121875
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.avx512.f64",
+      "beforeUs": 2.4,
+      "afterUs": 1.12265625,
+      "speedupBeforeOverAfter": 2.1377870563674324,
+      "costChangePercent": -53.22265625,
+      "processMeansUs": {
+        "before": [
+          2.48359375,
+          2.4,
+          2.39765625
+        ],
+        "after": [
+          1.12265625,
+          1.1203125,
+          1.12265625
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.nonuniform.f64",
+      "beforeUs": 20.96171875,
+      "afterUs": 19.546875,
+      "speedupBeforeOverAfter": 1.0723820943245403,
+      "costChangePercent": -6.7496552495248,
+      "processMeansUs": {
+        "before": [
+          20.99453125,
+          20.96171875,
+          20.84296875
+        ],
+        "after": [
+          19.06171875,
+          20.2953125,
+          19.546875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.f64",
+      "beforeUs": 23.77265625,
+      "afterUs": 21.99765625,
+      "speedupBeforeOverAfter": 1.080690414461768,
+      "costChangePercent": -7.466561503828595,
+      "processMeansUs": {
+        "before": [
+          23.77265625,
+          23.90625,
+          23.659375
+        ],
+        "after": [
+          21.99765625,
+          21.69140625,
+          22.3859375
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.peak.f64",
+      "beforeUs": 54.53828125,
+      "afterUs": 69.03828125,
+      "speedupBeforeOverAfter": 0.7899715963742941,
+      "costChangePercent": 26.586829778395327,
+      "processMeansUs": {
+        "before": [
+          54.60546875,
+          53.084375,
+          54.53828125
+        ],
+        "after": [
+          69.03828125,
+          68.93046875,
+          70.9734375
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.rms.f64",
+      "beforeUs": 64.81171875,
+      "afterUs": 77.1828125,
+      "speedupBeforeOverAfter": 0.8397169868615503,
+      "costChangePercent": 19.087742137682472,
+      "processMeansUs": {
+        "before": [
+          64.81171875,
+          65.71875,
+          64.2265625
+        ],
+        "after": [
+          77.29453125,
+          77.17109375,
+          77.1828125
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.peak.f64",
+      "beforeUs": 54.590625,
+      "afterUs": 16.6484375,
+      "speedupBeforeOverAfter": 3.279023932426091,
+      "costChangePercent": -69.50311981223882,
+      "processMeansUs": {
+        "before": [
+          54.92734375,
+          54.590625,
+          54.5375
+        ],
+        "after": [
+          16.6015625,
+          16.6484375,
+          16.65
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.rms.f64",
+      "beforeUs": 64.88046875,
+      "afterUs": 18.96015625,
+      "speedupBeforeOverAfter": 3.4219374510692653,
+      "costChangePercent": -70.77678904716606,
+      "processMeansUs": {
+        "before": [
+          65.0890625,
+          64.62578125,
+          64.88046875
+        ],
+        "after": [
+          18.91875,
+          18.96015625,
+          18.9890625
+        ]
+      }
+    }
+  ],
+  "renderComparison": {
+    "samples": 1003520,
+    "maxAbsoluteError": 1.6653345369377348e-16,
+    "sha256": [
+      "5dab88e970582c422388222050b4353bfda572743f6a340aca48c88f89c0cd33",
+      "485a5604cab63a033a548dcac76724c8de985fa4e219ebad899671a1cdfbc232"
+    ]
+  },
+  "validation": {
+    "MSVC x64": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee"
+    },
+    "clang-cl x64": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee"
+    },
+    "AddressSanitizer x64": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee"
+    },
+    "Scalaire x64": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee"
+    },
+    "Quest 3 ARM64": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee"
+    },
+    "Paquet install\u00e9": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee"
+    },
+    "Isolation SIMD": {
+      "status": "passed",
+      "sourceSha256": "70e61288883a792d668f593c2b9ce8ca03b9aab54b0007a7205585549ae7f9ee",
+      "objectsInspected": 85
+    }
+  },
+  "ispcExperiment": {
+    "compiler": "ISPC experiment",
+    "target": "avx2-i32x8",
+    "maxError": 0,
+    "cppUs": 1.98594,
+    "ispcUs": 1.92383
+  },
+  "ispcCompilerVersion": "1.24.0 (LLVM 18.1.6)",
+  "unrealIntegration": {
+    "engine": "5.5.4",
+    "compiler": "MSVC 14.38",
+    "configuration": "Editor Development Win64",
+    "scenarios": 66,
+    "independentRuns": 6,
+    "integrationTestsPassed": 13,
+    "failed": 0,
+    "referenceFloatOptions": "/fp:fast",
+    "cyDSPFloatOptions": "/fp:precise",
+    "sourceManifestSha256": "7F459737C407B462C651736708EBA2A82F681798E2A2183AA181ECB95398FB4B",
+    "results": [
+      {
+        "name": "Bypass",
+        "group": "control",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 1.4228515625000098,
+        "V2_spread_percent": 6.355525051476225,
+        "V2_callback_p95_us": 2.5999999999999996,
+        "V2_one_core_percent": 0.026678466796875182,
+        "V2_pass1_us": 1.352539062500001,
+        "V2_pass2_us": 1.4429687500000101,
+        "V2_pass3_us": 1.4228515625000098,
+        "CyDSP_us": 1.3982421875000073,
+        "CyDSP_spread_percent": 9.735996647577116,
+        "CyDSP_callback_p95_us": 2.5999999999999996,
+        "CyDSP_one_core_percent": 0.026217041015625137,
+        "CyDSP_pass1_us": 1.4330078125000103,
+        "CyDSP_pass2_us": 1.2968750000000007,
+        "CyDSP_pass3_us": 1.3982421875000073,
+        "speedup_V2_over_CyDSP": 1.0176002234949033,
+        "CyDSP_cost_change_percent": -1.7295813315032493
+      },
+      {
+        "name": "EQ4",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 12.552539062500024,
+        "V2_spread_percent": 0.30496818061575504,
+        "V2_callback_p95_us": 23.599999999999998,
+        "V2_one_core_percent": 0.23536010742187546,
+        "V2_pass1_us": 12.588281250000016,
+        "V2_pass2_us": 12.550000000000027,
+        "V2_pass3_us": 12.552539062500024,
+        "CyDSP_us": 8.202734374999963,
+        "CyDSP_spread_percent": 5.664555455021175,
+        "CyDSP_callback_p95_us": 15.499999999999998,
+        "CyDSP_one_core_percent": 0.1538012695312493,
+        "CyDSP_pass1_us": 8.24003906249996,
+        "CyDSP_pass2_us": 7.775390625000003,
+        "CyDSP_pass3_us": 8.202734374999963,
+        "speedup_V2_over_CyDSP": 1.5302871565312732,
+        "CyDSP_cost_change_percent": -34.65278750252886
+      },
+      {
+        "name": "EQ8",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 20.59785156250005,
+        "V2_spread_percent": 0.6684935663421274,
+        "V2_callback_p95_us": 38.599999999999994,
+        "V2_one_core_percent": 0.38620971679687593,
+        "V2_pass1_us": 20.67656250000004,
+        "V2_pass2_us": 20.59785156250005,
+        "V2_pass3_us": 20.538867187500024,
+        "CyDSP_us": 12.285546875000053,
+        "CyDSP_spread_percent": 4.987122825983584,
+        "CyDSP_callback_p95_us": 22.999999999999996,
+        "CyDSP_one_core_percent": 0.230354003906251,
+        "CyDSP_pass1_us": 12.302734375000037,
+        "CyDSP_pass2_us": 11.690039062499997,
+        "CyDSP_pass3_us": 12.285546875000053,
+        "speedup_V2_over_CyDSP": 1.6765921592318178,
+        "CyDSP_cost_change_percent": -40.355202397094544
+      },
+      {
+        "name": "AdvancedFilter",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 13.85332031250006,
+        "V2_spread_percent": 0.850145920568583,
+        "V2_callback_p95_us": 25.9,
+        "V2_one_core_percent": 0.25974975585937615,
+        "V2_pass1_us": 13.872265625000066,
+        "V2_pass2_us": 13.754492187500048,
+        "V2_pass3_us": 13.85332031250006,
+        "CyDSP_us": 10.208593750000002,
+        "CyDSP_spread_percent": 3.9909696181221146,
+        "CyDSP_callback_p95_us": 19.099999999999998,
+        "CyDSP_one_core_percent": 0.19141113281250005,
+        "CyDSP_pass1_us": 10.208593750000002,
+        "CyDSP_pass2_us": 9.82734375,
+        "CyDSP_pass3_us": 10.234765625000014,
+        "speedup_V2_over_CyDSP": 1.35702533098646,
+        "CyDSP_cost_change_percent": -26.30940799954915
+      },
+      {
+        "name": "AdvancedFilter.Automation",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 15.65605468749997,
+        "V2_spread_percent": 0.5825920982047941,
+        "V2_callback_p95_us": 32.9,
+        "V2_one_core_percent": 0.29355102539062444,
+        "V2_pass1_us": 15.73574218749999,
+        "V2_pass2_us": 15.65605468749997,
+        "V2_pass3_us": 15.644531249999995,
+        "CyDSP_us": 12.817187499999992,
+        "CyDSP_spread_percent": 3.6282457637449927,
+        "CyDSP_callback_p95_us": 29.099999999999998,
+        "CyDSP_one_core_percent": 0.24032226562499986,
+        "CyDSP_pass1_us": 12.817187499999992,
+        "CyDSP_pass2_us": 12.382226562499977,
+        "CyDSP_pass3_us": 12.847265624999979,
+        "speedup_V2_over_CyDSP": 1.2214890893575505,
+        "CyDSP_cost_change_percent": -18.13271123641752
+      },
+      {
+        "name": "LadderFilter",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 26.257617187500042,
+        "V2_spread_percent": 0.5058056070041762,
+        "V2_callback_p95_us": 49.3,
+        "V2_one_core_percent": 0.49233032226562584,
+        "V2_pass1_us": 26.344335937500084,
+        "V2_pass2_us": 26.211523437500016,
+        "V2_pass3_us": 26.257617187500042,
+        "CyDSP_us": 11.515039062499998,
+        "CyDSP_spread_percent": 2.919076615160008,
+        "CyDSP_callback_p95_us": 21.7,
+        "CyDSP_one_core_percent": 0.21590698242187495,
+        "CyDSP_pass1_us": 11.515039062499998,
+        "CyDSP_pass2_us": 11.206835937500038,
+        "CyDSP_pass3_us": 11.542968750000016,
+        "speedup_V2_over_CyDSP": 2.280289024204085,
+        "CyDSP_cost_change_percent": -56.145910040985214
+      },
+      {
+        "name": "LinearPhaseEQ127",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 43.23652343749996,
+        "V2_spread_percent": 0.21231326596524733,
+        "V2_callback_p95_us": 81.3,
+        "V2_one_core_percent": 0.8106848144531242,
+        "V2_pass1_us": 43.24550781249998,
+        "V2_pass2_us": 43.23652343749996,
+        "V2_pass3_us": 43.153710937499994,
+        "CyDSP_us": 15.799414062500064,
+        "CyDSP_spread_percent": 2.0619831134957116,
+        "CyDSP_callback_p95_us": 29.799999999999997,
+        "CyDSP_one_core_percent": 0.2962390136718762,
+        "CyDSP_pass1_us": 15.824609375000051,
+        "CyDSP_pass2_us": 15.498828125000033,
+        "CyDSP_pass3_us": 15.799414062500064,
+        "speedup_V2_over_CyDSP": 2.7365903106572746,
+        "CyDSP_cost_change_percent": -63.45817654525643
+      },
+      {
+        "name": "Compressor",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 6.331249999999972,
+        "V2_spread_percent": 1.3573543928927134,
+        "V2_callback_p95_us": 11.899999999999999,
+        "V2_one_core_percent": 0.11871093749999947,
+        "V2_pass1_us": 6.331249999999972,
+        "V2_pass2_us": 6.342187499999975,
+        "V2_pass3_us": 6.256249999999955,
+        "CyDSP_us": 12.071484375000008,
+        "CyDSP_spread_percent": 7.348801087273219,
+        "CyDSP_callback_p95_us": 22.799999999999997,
+        "CyDSP_one_core_percent": 0.22634033203125015,
+        "CyDSP_pass1_us": 12.183789062500027,
+        "CyDSP_pass2_us": 11.29667968750001,
+        "CyDSP_pass3_us": 12.071484375000008,
+        "speedup_V2_over_CyDSP": 0.5244798239653081,
+        "CyDSP_cost_change_percent": 90.66510365251823
+      },
+      {
+        "name": "TransientShaper",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 5.424023437499974,
+        "V2_spread_percent": 1.1738864282878334,
+        "V2_callback_p95_us": 10.2,
+        "V2_one_core_percent": 0.10170043945312451,
+        "V2_pass1_us": 5.472460937499965,
+        "V2_pass2_us": 5.408789062500001,
+        "V2_pass3_us": 5.424023437499974,
+        "CyDSP_us": 8.294531250000006,
+        "CyDSP_spread_percent": 6.579071300744087,
+        "CyDSP_callback_p95_us": 15.499999999999998,
+        "CyDSP_one_core_percent": 0.1555224609375001,
+        "CyDSP_pass1_us": 8.342773437499996,
+        "CyDSP_pass2_us": 7.797070312499996,
+        "CyDSP_pass3_us": 8.294531250000006,
+        "speedup_V2_over_CyDSP": 0.6539276631816862,
+        "CyDSP_cost_change_percent": 52.922112995571744
+      },
+      {
+        "name": "Saturation",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 16.302929687500033,
+        "V2_spread_percent": 1.5226845251643426,
+        "V2_callback_p95_us": 30.9,
+        "V2_one_core_percent": 0.30567993164062557,
+        "V2_pass1_us": 16.51308593750004,
+        "V2_pass2_us": 16.264843750000054,
+        "V2_pass3_us": 16.302929687500033,
+        "CyDSP_us": 13.739062500000024,
+        "CyDSP_spread_percent": 11.02581598999205,
+        "CyDSP_callback_p95_us": 25.9,
+        "CyDSP_one_core_percent": 0.25760742187500046,
+        "CyDSP_pass1_us": 13.760742187500014,
+        "CyDSP_pass2_us": 12.24589843750001,
+        "CyDSP_pass3_us": 13.739062500000024,
+        "speedup_V2_over_CyDSP": 1.18661150915501,
+        "CyDSP_cost_change_percent": -15.726419954235627
+      },
+      {
+        "name": "Waveshaper",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 4.913671874999981,
+        "V2_spread_percent": 1.0135940853803818,
+        "V2_callback_p95_us": 9.399999999999999,
+        "V2_one_core_percent": 0.09213134765624964,
+        "V2_pass1_us": 4.956835937499981,
+        "V2_pass2_us": 4.9070312499999815,
+        "V2_pass3_us": 4.913671874999981,
+        "CyDSP_us": 12.429687500000032,
+        "CyDSP_spread_percent": 6.114079195474663,
+        "CyDSP_callback_p95_us": 23.4,
+        "CyDSP_one_core_percent": 0.2330566406250006,
+        "CyDSP_pass1_us": 12.455078125000028,
+        "CyDSP_pass2_us": 11.695117187500012,
+        "CyDSP_pass3_us": 12.429687500000032,
+        "speedup_V2_over_CyDSP": 0.39531741043368696,
+        "CyDSP_cost_change_percent": 152.96128468081886
+      },
+      {
+        "name": "Wavefolder",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 7.1708984374999805,
+        "V2_spread_percent": 1.007762494892999,
+        "V2_callback_p95_us": 13.6,
+        "V2_one_core_percent": 0.13445434570312464,
+        "V2_pass1_us": 7.197851562499977,
+        "V2_pass2_us": 7.125585937499984,
+        "V2_pass3_us": 7.1708984374999805,
+        "CyDSP_us": 5.6439453124999925,
+        "CyDSP_spread_percent": 13.1743779631101,
+        "CyDSP_callback_p95_us": 10.6,
+        "CyDSP_one_core_percent": 0.10582397460937486,
+        "CyDSP_pass1_us": 5.786328124999973,
+        "CyDSP_pass2_us": 5.042773437499989,
+        "CyDSP_pass3_us": 5.6439453124999925,
+        "speedup_V2_over_CyDSP": 1.2705471156175363,
+        "CyDSP_cost_change_percent": -21.293749148849137
+      },
+      {
+        "name": "DeHum",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 11.508007812500004,
+        "V2_spread_percent": 1.0437704723272914,
+        "V2_callback_p95_us": 21.9,
+        "V2_one_core_percent": 0.2157751464843751,
+        "V2_pass1_us": 11.609179687500003,
+        "V2_pass2_us": 11.48906250000001,
+        "V2_pass3_us": 11.508007812500004,
+        "CyDSP_us": 10.93164062500004,
+        "CyDSP_spread_percent": 8.338395569055288,
+        "CyDSP_callback_p95_us": 20.5,
+        "CyDSP_one_core_percent": 0.20496826171875077,
+        "CyDSP_pass1_us": 10.93164062500004,
+        "CyDSP_pass2_us": 10.035156249999998,
+        "CyDSP_pass3_us": 10.94667968750005,
+        "speedup_V2_over_CyDSP": 1.0527246739324603,
+        "CyDSP_cost_change_percent": -5.008401079411096
+      },
+      {
+        "name": "SpectralGate",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 14.056445312500028,
+        "V2_spread_percent": 1.017104586697172,
+        "V2_callback_p95_us": 27.599999999999998,
+        "V2_one_core_percent": 0.2635583496093755,
+        "V2_pass1_us": 14.056445312500028,
+        "V2_pass2_us": 14.01757812500003,
+        "V2_pass3_us": 14.160546875000048,
+        "CyDSP_us": 9.670312499999994,
+        "CyDSP_spread_percent": 1.3653255776379178,
+        "CyDSP_callback_p95_us": 18.9,
+        "CyDSP_one_core_percent": 0.18131835937499988,
+        "CyDSP_pass1_us": 9.670312499999994,
+        "CyDSP_pass2_us": 9.556640625000002,
+        "CyDSP_pass3_us": 9.688671875000018,
+        "speedup_V2_over_CyDSP": 1.4535668120859626,
+        "CyDSP_cost_change_percent": -31.203712709639053
+      },
+      {
+        "name": "SpectralBlur",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 16.342968750000068,
+        "V2_spread_percent": 0.4744490654428403,
+        "V2_callback_p95_us": 32.099999999999994,
+        "V2_one_core_percent": 0.30643066406250125,
+        "V2_pass1_us": 16.283203125000053,
+        "V2_pass2_us": 16.360742187500044,
+        "V2_pass3_us": 16.342968750000068,
+        "CyDSP_us": 12.05664062500001,
+        "CyDSP_spread_percent": 6.512230682002277,
+        "CyDSP_callback_p95_us": 25.999999999999996,
+        "CyDSP_one_core_percent": 0.22606201171875018,
+        "CyDSP_pass1_us": 12.05664062500001,
+        "CyDSP_pass2_us": 11.42441406250002,
+        "CyDSP_pass3_us": 12.209570312500022,
+        "speedup_V2_over_CyDSP": 1.3555159565851334,
+        "CyDSP_cost_change_percent": -26.227353123954543
+      },
+      {
+        "name": "SpectralFreeze.Held",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 18.071289062500046,
+        "V2_spread_percent": 3.971899486625305,
+        "V2_callback_p95_us": 35.599999999999994,
+        "V2_one_core_percent": 0.3388366699218759,
+        "V2_pass1_us": 18.071289062500046,
+        "V2_pass2_us": 17.98261718750008,
+        "V2_pass3_us": 18.700390625000093,
+        "CyDSP_us": 16.097460937500042,
+        "CyDSP_spread_percent": 3.6132445188608355,
+        "CyDSP_callback_p95_us": 33.9,
+        "CyDSP_one_core_percent": 0.3018273925781258,
+        "CyDSP_pass1_us": 16.097460937500042,
+        "CyDSP_pass2_us": 15.961718750000056,
+        "CyDSP_pass3_us": 16.54335937500004,
+        "speedup_V2_over_CyDSP": 1.122617357648115,
+        "CyDSP_cost_change_percent": -10.922453390975406
+      },
+      {
+        "name": "StereoDelay",
+        "group": "composite",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 5.721484374999964,
+        "V2_spread_percent": 2.130129036663001,
+        "V2_callback_p95_us": 10.899999999999999,
+        "V2_one_core_percent": 0.10727783203124931,
+        "V2_pass1_us": 5.823632812499995,
+        "V2_pass2_us": 5.721484374999964,
+        "V2_pass3_us": 5.701757812499984,
+        "CyDSP_us": 6.010937499999952,
+        "CyDSP_spread_percent": 18.066025474395303,
+        "CyDSP_callback_p95_us": 11.399999999999999,
+        "CyDSP_one_core_percent": 0.1127050781249991,
+        "CyDSP_pass1_us": 6.098632812499971,
+        "CyDSP_pass2_us": 5.012695312499999,
+        "CyDSP_pass3_us": 6.010937499999952,
+        "speedup_V2_over_CyDSP": 0.9518455939693283,
+        "CyDSP_cost_change_percent": 5.059056462073963
+      },
+      {
+        "name": "Chorus",
+        "group": "control",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 6.780859374999968,
+        "V2_spread_percent": 0.16417996428373102,
+        "V2_callback_p95_us": 13.1,
+        "V2_one_core_percent": 0.1271411132812494,
+        "V2_pass1_us": 6.780859374999968,
+        "V2_pass2_us": 6.776562499999965,
+        "V2_pass3_us": 6.78769531249997,
+        "CyDSP_us": 6.385742187499994,
+        "CyDSP_spread_percent": 1.6485701177549015,
+        "CyDSP_callback_p95_us": 12.299999999999999,
+        "CyDSP_one_core_percent": 0.11973266601562489,
+        "CyDSP_pass1_us": 6.45058593749998,
+        "CyDSP_pass2_us": 6.345312499999987,
+        "CyDSP_pass3_us": 6.385742187499994,
+        "speedup_V2_over_CyDSP": 1.061874904419632,
+        "CyDSP_cost_change_percent": -5.826948556944178
+      },
+      {
+        "name": "FDNReverb",
+        "group": "composite",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 34.23085937500004,
+        "V2_spread_percent": 0.5409044744438876,
+        "V2_callback_p95_us": 64.5,
+        "V2_one_core_percent": 0.6418286132812507,
+        "V2_pass1_us": 34.38886718750004,
+        "V2_pass2_us": 34.23085937500004,
+        "V2_pass3_us": 34.20371093750007,
+        "CyDSP_us": 31.93769531250006,
+        "CyDSP_spread_percent": 1.7251606827260098,
+        "CyDSP_callback_p95_us": 60.099999999999994,
+        "CyDSP_one_core_percent": 0.5988317871093762,
+        "CyDSP_pass1_us": 32.35156250000014,
+        "CyDSP_pass2_us": 31.800585937500063,
+        "CyDSP_pass3_us": 31.93769531250006,
+        "speedup_V2_over_CyDSP": 1.0718011753842005,
+        "CyDSP_cost_change_percent": -6.699113327475359
+      },
+      {
+        "name": "HRTFMono.Q1.Static",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 25.32617187500008,
+        "V2_spread_percent": 0.41104341790674925,
+        "V2_callback_p95_us": 47.699999999999996,
+        "V2_one_core_percent": 0.47486572265625154,
+        "V2_pass1_us": 25.32617187500008,
+        "V2_pass2_us": 25.393750000000026,
+        "V2_pass3_us": 25.289648437500087,
+        "CyDSP_us": 10.650781250000026,
+        "CyDSP_spread_percent": 3.8894593999853266,
+        "CyDSP_callback_p95_us": 19.9,
+        "CyDSP_one_core_percent": 0.1997021484375005,
+        "CyDSP_pass1_us": 10.687304687499985,
+        "CyDSP_pass2_us": 10.273046874999984,
+        "CyDSP_pass3_us": 10.650781250000026,
+        "speedup_V2_over_CyDSP": 2.377869874569062,
+        "CyDSP_cost_change_percent": -57.945554098866396
+      },
+      {
+        "name": "HRTFMono.Q1.Moving",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 25.379687500000102,
+        "V2_spread_percent": 0.7503232161545362,
+        "V2_callback_p95_us": 47.599999999999994,
+        "V2_one_core_percent": 0.4758691406250019,
+        "V2_pass1_us": 25.379687500000102,
+        "V2_pass2_us": 25.386132812500026,
+        "V2_pass3_us": 25.195703125000055,
+        "CyDSP_us": 14.840234375000035,
+        "CyDSP_spread_percent": 2.2018372772497523,
+        "CyDSP_callback_p95_us": 27.999999999999996,
+        "CyDSP_one_core_percent": 0.27825439453125067,
+        "CyDSP_pass1_us": 15.066796875000028,
+        "CyDSP_pass2_us": 14.740039062500045,
+        "CyDSP_pass3_us": 14.840234375000035,
+        "speedup_V2_over_CyDSP": 1.7101945197546815,
+        "CyDSP_cost_change_percent": -41.527119374499875
+      },
+      {
+        "name": "HRTFMono.Q2.Static",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 25.27050781250002,
+        "V2_spread_percent": 0.45445762646335375,
+        "V2_callback_p95_us": 47.599999999999994,
+        "V2_one_core_percent": 0.47382202148437536,
+        "V2_pass1_us": 25.27050781250002,
+        "V2_pass2_us": 25.341992187500033,
+        "V2_pass3_us": 25.22714843750011,
+        "CyDSP_us": 14.278515625000074,
+        "CyDSP_spread_percent": 2.585287117336283,
+        "CyDSP_callback_p95_us": 26.7,
+        "CyDSP_one_core_percent": 0.26772216796875137,
+        "CyDSP_pass1_us": 14.422460937500025,
+        "CyDSP_pass2_us": 14.05332031250005,
+        "CyDSP_pass3_us": 14.278515625000074,
+        "speedup_V2_over_CyDSP": 1.7698273739501469,
+        "CyDSP_cost_change_percent": -43.497314217258335
+      },
+      {
+        "name": "HRTFMono.Q2.Moving",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 25.463085937500068,
+        "V2_spread_percent": 0.9357909351003997,
+        "V2_callback_p95_us": 47.8,
+        "V2_one_core_percent": 0.4774328613281263,
+        "V2_pass1_us": 25.468164062500062,
+        "V2_pass2_us": 25.463085937500068,
+        "V2_pass3_us": 25.22988281250011,
+        "CyDSP_us": 19.52695312500006,
+        "CyDSP_spread_percent": 2.3835243753626925,
+        "CyDSP_callback_p95_us": 36.8,
+        "CyDSP_one_core_percent": 0.3661303710937511,
+        "CyDSP_pass1_us": 19.52695312500006,
+        "CyDSP_pass2_us": 19.39375000000004,
+        "CyDSP_pass3_us": 19.859179687500063,
+        "speedup_V2_over_CyDSP": 1.3039968793134484,
+        "CyDSP_cost_change_percent": -23.312699910256086
+      },
+      {
+        "name": "HRTFStereo.Q2.Moving",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 25.284960937500113,
+        "V2_spread_percent": 0.21782958311128806,
+        "V2_callback_p95_us": 47.49999999999999,
+        "V2_one_core_percent": 0.4740930175781271,
+        "V2_pass1_us": 25.331445312500083,
+        "V2_pass2_us": 25.284960937500113,
+        "V2_pass3_us": 25.276367187500075,
+        "CyDSP_us": 19.494335937500047,
+        "CyDSP_spread_percent": 1.9086072677360713,
+        "CyDSP_callback_p95_us": 36.8,
+        "CyDSP_one_core_percent": 0.3655187988281259,
+        "CyDSP_pass1_us": 19.57363281250006,
+        "CyDSP_pass2_us": 19.201562500000048,
+        "CyDSP_pass3_us": 19.494335937500047,
+        "speedup_V2_over_CyDSP": 1.297041408261617,
+        "CyDSP_cost_change_percent": -22.901459149228877
+      },
+      {
+        "name": "Convolution.Stereo.8192",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 8.949218749999991,
+        "V2_spread_percent": 2.4181580096026014,
+        "V2_callback_p95_us": 17.5,
+        "V2_one_core_percent": 0.16779785156249985,
+        "V2_pass1_us": 9.031640624999984,
+        "V2_pass2_us": 8.815234375000001,
+        "V2_pass3_us": 8.949218749999991,
+        "CyDSP_us": 18.49980468750002,
+        "CyDSP_spread_percent": 2.5095281833634657,
+        "CyDSP_callback_p95_us": 36.099999999999994,
+        "CyDSP_one_core_percent": 0.34687133789062535,
+        "CyDSP_pass1_us": 18.49980468750002,
+        "CyDSP_pass2_us": 18.160546875000044,
+        "CyDSP_pass3_us": 18.624804687500053,
+        "speedup_V2_over_CyDSP": 0.4837466611767428,
+        "CyDSP_cost_change_percent": 106.71977302488038
+      },
+      {
+        "name": "Convolution.Stereo.65536",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 41.29980468750008,
+        "V2_spread_percent": 1.2489655009340128,
+        "V2_callback_p95_us": 82,
+        "V2_one_core_percent": 0.7743713378906265,
+        "V2_pass1_us": 41.34433593750004,
+        "V2_pass2_us": 40.82851562500004,
+        "V2_pass3_us": 41.29980468750008,
+        "CyDSP_us": 26.741601562500076,
+        "CyDSP_spread_percent": 3.8475864940070896,
+        "CyDSP_callback_p95_us": 53.599999999999994,
+        "CyDSP_one_core_percent": 0.5014050292968765,
+        "CyDSP_pass1_us": 26.741601562500076,
+        "CyDSP_pass2_us": 26.071484375000068,
+        "CyDSP_pass3_us": 27.10039062500001,
+        "speedup_V2_over_CyDSP": 1.5444028133832892,
+        "CyDSP_cost_change_percent": -35.25005320280905
+      },
+      {
+        "name": "Convolution.TrueStereo.16384",
+        "group": "effect",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 22.24062500000004,
+        "V2_spread_percent": 0.43733314598835926,
+        "V2_callback_p95_us": 43.99999999999999,
+        "V2_one_core_percent": 0.4170117187500007,
+        "V2_pass1_us": 22.293554687500055,
+        "V2_pass2_us": 22.24062500000004,
+        "V2_pass3_us": 22.19628906250008,
+        "CyDSP_us": 25.736914062500066,
+        "CyDSP_spread_percent": 2.9254854939933543,
+        "CyDSP_callback_p95_us": 51.699999999999996,
+        "CyDSP_one_core_percent": 0.4825671386718763,
+        "CyDSP_pass1_us": 25.736914062500066,
+        "CyDSP_pass2_us": 25.27636718750007,
+        "CyDSP_pass3_us": 26.029296875000046,
+        "speedup_V2_over_CyDSP": 0.8641527475279451,
+        "CyDSP_cost_change_percent": 15.72028242236907
+      },
+      {
+        "name": "Chain.ChannelStrip",
+        "group": "chain",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 31.765039062500108,
+        "V2_spread_percent": 15.225317732126701,
+        "V2_callback_p95_us": 59.49999999999999,
+        "V2_one_core_percent": 0.595594482421877,
+        "V2_pass1_us": 36.38710937499995,
+        "V2_pass2_us": 31.765039062500108,
+        "V2_pass3_us": 31.55078125000015,
+        "CyDSP_us": 33.62558593750004,
+        "CyDSP_spread_percent": 8.212565998501367,
+        "CyDSP_callback_p95_us": 63.099999999999994,
+        "CyDSP_one_core_percent": 0.6304797363281257,
+        "CyDSP_pass1_us": 33.73828125000009,
+        "CyDSP_pass2_us": 30.976757812500107,
+        "CyDSP_pass3_us": 33.62558593750004,
+        "speedup_V2_over_CyDSP": 0.9446687151130054,
+        "CyDSP_cost_change_percent": 5.857215762710588
+      },
+      {
+        "name": "Chain.SpectralColour",
+        "group": "chain",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 29.947460937500093,
+        "V2_spread_percent": 11.64995989069357,
+        "V2_callback_p95_us": 57.8,
+        "V2_one_core_percent": 0.5615148925781267,
+        "V2_pass1_us": 33.41503906249997,
+        "V2_pass2_us": 29.947460937500093,
+        "V2_pass3_us": 29.926171875000087,
+        "CyDSP_us": 23.884765625000068,
+        "CyDSP_spread_percent": 6.817401259301736,
+        "CyDSP_callback_p95_us": 45.599999999999994,
+        "CyDSP_one_core_percent": 0.44783935546875125,
+        "CyDSP_pass1_us": 23.884765625000068,
+        "CyDSP_pass2_us": 22.607226562500067,
+        "CyDSP_pass3_us": 24.23554687500009,
+        "speedup_V2_over_CyDSP": 1.2538310573227578,
+        "CyDSP_cost_change_percent": -20.244438502325057
+      },
+      {
+        "name": "Chain.Master",
+        "group": "chain",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 1,
+        "graph_block_frames": 480,
+        "V2_us": 70.29804687500003,
+        "V2_spread_percent": 2.5230186204942684,
+        "V2_callback_p95_us": 132.79999999999998,
+        "V2_one_core_percent": 1.3180883789062505,
+        "V2_pass1_us": 71.28125000000004,
+        "V2_pass2_us": 70.29804687500003,
+        "V2_pass3_us": 69.5076171875,
+        "CyDSP_us": 40.60410156250007,
+        "CyDSP_spread_percent": 5.5903758183297025,
+        "CyDSP_callback_p95_us": 76.5,
+        "CyDSP_one_core_percent": 0.7613269042968763,
+        "CyDSP_pass1_us": 40.60410156250007,
+        "CyDSP_pass2_us": 38.36718750000002,
+        "CyDSP_pass3_us": 40.63710937500006,
+        "speedup_V2_over_CyDSP": 1.7313040843126009,
+        "CyDSP_cost_change_percent": -42.24007157026715
+      },
+      {
+        "name": "HRTFMono.Q1.Moving.16Voices",
+        "group": "polyphony",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 16,
+        "graph_block_frames": 480,
+        "V2_us": 408.55097656249916,
+        "V2_spread_percent": 1.0110523042326405,
+        "V2_callback_p95_us": 774.1999999999999,
+        "V2_one_core_percent": 7.660330810546859,
+        "V2_pass1_us": 408.7626953124992,
+        "V2_pass2_us": 408.55097656249916,
+        "V2_pass3_us": 404.6320312499991,
+        "CyDSP_us": 240.90839843749987,
+        "CyDSP_spread_percent": 1.676840020397904,
+        "CyDSP_callback_p95_us": 460.09999999999997,
+        "CyDSP_one_core_percent": 4.517032470703123,
+        "CyDSP_pass1_us": 241.2998046874997,
+        "CyDSP_pass2_us": 237.26015625000005,
+        "CyDSP_pass3_us": 240.90839843749987,
+        "speedup_V2_over_CyDSP": 1.6958768528299841,
+        "CyDSP_cost_change_percent": -41.03345426696189
+      },
+      {
+        "name": "HRTFMono.Q2.Moving.16Voices",
+        "group": "polyphony",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 16,
+        "graph_block_frames": 480,
+        "V2_us": 406.83808593749905,
+        "V2_spread_percent": 1.2367673526448237,
+        "V2_callback_p95_us": 772.9999999999999,
+        "V2_one_core_percent": 7.6282141113281074,
+        "V2_pass1_us": 406.83808593749905,
+        "V2_pass2_us": 409.8244140624992,
+        "V2_pass3_us": 404.79277343749914,
+        "CyDSP_us": 315.5591796874996,
+        "CyDSP_spread_percent": 0.8190445656056048,
+        "CyDSP_callback_p95_us": 600.4,
+        "CyDSP_one_core_percent": 5.916734619140617,
+        "CyDSP_pass1_us": 315.5591796874996,
+        "CyDSP_pass2_us": 313.38046874999924,
+        "CyDSP_pass3_us": 315.96503906249933,
+        "speedup_V2_over_CyDSP": 1.2892608173858024,
+        "CyDSP_cost_change_percent": -22.436175325046214
+      },
+      {
+        "name": "HRTFMono.Q1.Moving.64Voices",
+        "group": "polyphony",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 64,
+        "graph_block_frames": 480,
+        "V2_us": 1649.3591796874982,
+        "V2_spread_percent": 1.1908981222467228,
+        "V2_callback_p95_us": 3142.9999999999995,
+        "V2_one_core_percent": 30.92548461914059,
+        "V2_pass1_us": 1649.3591796874982,
+        "V2_pass2_us": 1658.1505859375015,
+        "V2_pass3_us": 1638.5083984374992,
+        "CyDSP_us": 977.7417968750004,
+        "CyDSP_spread_percent": 7.128691392274721,
+        "CyDSP_callback_p95_us": 1854.1,
+        "CyDSP_one_core_percent": 18.33265869140626,
+        "CyDSP_pass1_us": 977.7417968750004,
+        "CyDSP_pass2_us": 959.8943359375004,
+        "CyDSP_pass3_us": 1029.5945312500007,
+        "speedup_V2_over_CyDSP": 1.686906691479367,
+        "CyDSP_cost_change_percent": -40.71989843593366
+      },
+      {
+        "name": "HRTFMono.Q2.Moving.64Voices",
+        "group": "polyphony",
+        "rate": 48000,
+        "frames": 256,
+        "voices": 64,
+        "graph_block_frames": 480,
+        "V2_us": 1653.1607421875005,
+        "V2_spread_percent": 0.7965210582048701,
+        "V2_callback_p95_us": 3145.4999999999995,
+        "V2_one_core_percent": 30.996763916015638,
+        "V2_pass1_us": 1653.1607421875005,
+        "V2_pass2_us": 1656.0984375,
+        "V2_pass3_us": 1642.9306640625007,
+        "CyDSP_us": 1278.5740234375003,
+        "CyDSP_spread_percent": 4.469319229079116,
+        "CyDSP_callback_p95_us": 2433.3999999999996,
+        "CyDSP_one_core_percent": 23.973262939453132,
+        "CyDSP_pass1_us": 1278.5740234375003,
+        "CyDSP_pass2_us": 1261.9349609374983,
+        "CyDSP_pass3_us": 1319.078515625001,
+        "speedup_V2_over_CyDSP": 1.292972258065206,
+        "CyDSP_cost_change_percent": -22.658820112939438
+      },
+      {
+        "name": "Bypass",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 0.7414062500000008,
+        "V2_spread_percent": 1.6332982086406396,
+        "V2_callback_p95_us": 2.5,
+        "V2_one_core_percent": 0.02554376220703128,
+        "V2_pass1_us": 0.7414062500000008,
+        "V2_pass2_us": 0.7443359375000014,
+        "V2_pass3_us": 0.7322265625000016,
+        "CyDSP_us": 0.7312500000000021,
+        "CyDSP_spread_percent": 9.642094017094148,
+        "CyDSP_callback_p95_us": 2.4,
+        "CyDSP_one_core_percent": 0.02519384765625007,
+        "CyDSP_pass1_us": 0.7314453125000011,
+        "CyDSP_pass2_us": 0.6609375,
+        "CyDSP_pass3_us": 0.7312500000000021,
+        "speedup_V2_over_CyDSP": 1.013888888888887,
+        "CyDSP_cost_change_percent": -1.369863013698458
+      },
+      {
+        "name": "Bypass",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 2.8292968749999994,
+        "V2_spread_percent": 1.8500621289524186,
+        "V2_callback_p95_us": 4.699999999999999,
+        "V2_one_core_percent": 0.024369529724121087,
+        "V2_pass1_us": 2.806640624999999,
+        "V2_pass2_us": 2.8292968749999994,
+        "V2_pass3_us": 2.8589843750000083,
+        "CyDSP_us": 2.771875000000005,
+        "CyDSP_spread_percent": 15.177564825253258,
+        "CyDSP_callback_p95_us": 4.699999999999999,
+        "CyDSP_one_core_percent": 0.023874938964843793,
+        "CyDSP_pass1_us": 2.771875000000005,
+        "CyDSP_pass2_us": 2.506250000000009,
+        "CyDSP_pass3_us": 2.9269531249999985,
+        "speedup_V2_over_CyDSP": 1.0207158962795921,
+        "CyDSP_cost_change_percent": -2.029545768327845
+      },
+      {
+        "name": "Bypass",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 0.6503906250000008,
+        "V2_spread_percent": 1.021021021021047,
+        "V2_callback_p95_us": 4.6,
+        "V2_one_core_percent": 0.04877929687500006,
+        "V2_pass1_us": 0.6505859375000008,
+        "V2_pass2_us": 0.6439453125000006,
+        "V2_pass3_us": 0.6503906250000008,
+        "CyDSP_us": 0.6451171875000011,
+        "CyDSP_spread_percent": 12.110202845897838,
+        "CyDSP_callback_p95_us": 4.6,
+        "CyDSP_one_core_percent": 0.048383789062500085,
+        "CyDSP_pass1_us": 0.6451171875000011,
+        "CyDSP_pass2_us": 0.5910156250000002,
+        "CyDSP_pass3_us": 0.6691406250000014,
+        "speedup_V2_over_CyDSP": 1.0081743869209803,
+        "CyDSP_cost_change_percent": -0.8108108108107581
+      },
+      {
+        "name": "Bypass",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 2.521679687499998,
+        "V2_spread_percent": 3.284021377120242,
+        "V2_callback_p95_us": 4.699999999999999,
+        "V2_one_core_percent": 0.04728149414062496,
+        "V2_pass1_us": 2.521679687499998,
+        "V2_pass2_us": 2.4695312499999975,
+        "V2_pass3_us": 2.5523437499999964,
+        "CyDSP_us": 2.4667968750000004,
+        "CyDSP_spread_percent": 10.81551860649247,
+        "CyDSP_callback_p95_us": 4.6,
+        "CyDSP_one_core_percent": 0.046252441406250004,
+        "CyDSP_pass1_us": 2.4667968750000004,
+        "CyDSP_pass2_us": 2.3513671874999966,
+        "CyDSP_pass3_us": 2.6181640624999964,
+        "speedup_V2_over_CyDSP": 1.0222486144101337,
+        "CyDSP_cost_change_percent": -2.176438695685756
+      },
+      {
+        "name": "EQ4",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 6.282812499999991,
+        "V2_spread_percent": 1.0382989306142794,
+        "V2_callback_p95_us": 21.499999999999996,
+        "V2_one_core_percent": 0.2164625244140622,
+        "V2_pass1_us": 6.32519531249999,
+        "V2_pass2_us": 6.282812499999991,
+        "V2_pass3_us": 6.25996093749999,
+        "CyDSP_us": 4.116796874999985,
+        "CyDSP_spread_percent": 8.563431065566045,
+        "CyDSP_callback_p95_us": 14.1,
+        "CyDSP_one_core_percent": 0.14183651733398386,
+        "CyDSP_pass1_us": 4.116796874999985,
+        "CyDSP_pass2_us": 3.92988281249999,
+        "CyDSP_pass3_us": 4.282421874999991,
+        "speedup_V2_over_CyDSP": 1.5261410000948887,
+        "CyDSP_cost_change_percent": -34.475254911713634
+      },
+      {
+        "name": "EQ4",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 25.055664062499897,
+        "V2_spread_percent": 0.5651479128505235,
+        "V2_callback_p95_us": 42.699999999999996,
+        "V2_one_core_percent": 0.21581148147582918,
+        "V2_pass1_us": 25.147656249999986,
+        "V2_pass2_us": 25.00605468749993,
+        "V2_pass3_us": 25.055664062499897,
+        "CyDSP_us": 16.486914062500063,
+        "CyDSP_spread_percent": 8.137372205702878,
+        "CyDSP_callback_p95_us": 28.099999999999998,
+        "CyDSP_one_core_percent": 0.1420064277648931,
+        "CyDSP_pass1_us": 16.486914062500063,
+        "CyDSP_pass2_us": 15.64980468749997,
+        "CyDSP_pass3_us": 16.99140624999997,
+        "speedup_V2_over_CyDSP": 1.519730373283724,
+        "CyDSP_cost_change_percent": -34.198854113886526
+      },
+      {
+        "name": "EQ4",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 6.230078124999975,
+        "V2_spread_percent": 1.3605868706501916,
+        "V2_callback_p95_us": 46.099999999999994,
+        "V2_one_core_percent": 0.4672558593749981,
+        "V2_pass1_us": 6.235351562499974,
+        "V2_pass2_us": 6.150585937499975,
+        "V2_pass3_us": 6.230078124999975,
+        "CyDSP_us": 4.042968749999986,
+        "CyDSP_spread_percent": 8.792270531400801,
+        "CyDSP_callback_p95_us": 29.7,
+        "CyDSP_one_core_percent": 0.30322265624999895,
+        "CyDSP_pass1_us": 4.042968749999986,
+        "CyDSP_pass2_us": 3.8386718749999877,
+        "CyDSP_pass3_us": 4.19414062499998,
+        "speedup_V2_over_CyDSP": 1.5409661835748785,
+        "CyDSP_cost_change_percent": -35.105649257006675
+      },
+      {
+        "name": "EQ4",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 24.655468750000132,
+        "V2_spread_percent": 0.7549352007352653,
+        "V2_callback_p95_us": 46.4,
+        "V2_one_core_percent": 0.46229003906250243,
+        "V2_pass1_us": 24.84042968750015,
+        "V2_pass2_us": 24.655468750000132,
+        "V2_pass3_us": 24.654296875000117,
+        "CyDSP_us": 15.988281250000027,
+        "CyDSP_spread_percent": 10.437332030295593,
+        "CyDSP_callback_p95_us": 29.999999999999996,
+        "CyDSP_one_core_percent": 0.2997802734375005,
+        "CyDSP_pass1_us": 15.988281250000027,
+        "CyDSP_pass2_us": 15.194140625000022,
+        "CyDSP_pass3_us": 16.86289062500002,
+        "speedup_V2_over_CyDSP": 1.5420962619105847,
+        "CyDSP_cost_change_percent": -35.15320510789339
+      },
+      {
+        "name": "EQ8",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 10.307226562500004,
+        "V2_spread_percent": 23.729937657514427,
+        "V2_callback_p95_us": 35.4,
+        "V2_one_core_percent": 0.3551161651611329,
+        "V2_pass1_us": 12.744140625000028,
+        "V2_pass2_us": 10.29824218750001,
+        "V2_pass3_us": 10.307226562500004,
+        "CyDSP_us": 6.169140624999978,
+        "CyDSP_spread_percent": 9.507376685873384,
+        "CyDSP_callback_p95_us": 21.099999999999998,
+        "CyDSP_one_core_percent": 0.21254617309570234,
+        "CyDSP_pass1_us": 6.169140624999978,
+        "CyDSP_pass2_us": 5.828124999999987,
+        "CyDSP_pass3_us": 6.414648437499978,
+        "speedup_V2_over_CyDSP": 1.670771860951061,
+        "CyDSP_cost_change_percent": -40.147423872056024
+      },
+      {
+        "name": "EQ8",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 41.234375000000014,
+        "V2_spread_percent": 1.5450928381962894,
+        "V2_callback_p95_us": 70.5,
+        "V2_one_core_percent": 0.3551632690429689,
+        "V2_pass1_us": 41.8453125,
+        "V2_pass2_us": 41.208203125,
+        "V2_pass3_us": 41.234375000000014,
+        "CyDSP_us": 24.707812500000188,
+        "CyDSP_spread_percent": 8.872446721052716,
+        "CyDSP_callback_p95_us": 42.3,
+        "CyDSP_one_core_percent": 0.21281533813476727,
+        "CyDSP_pass1_us": 24.707812500000188,
+        "CyDSP_pass2_us": 23.37460937499997,
+        "CyDSP_pass3_us": 25.56679687500009,
+        "speedup_V2_over_CyDSP": 1.668880035413888,
+        "CyDSP_cost_change_percent": -40.07957559681654
+      },
+      {
+        "name": "EQ8",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 10.192773437500009,
+        "V2_spread_percent": 1.9334316975491894,
+        "V2_callback_p95_us": 75.89999999999999,
+        "V2_one_core_percent": 0.7644580078125006,
+        "V2_pass1_us": 10.302343750000011,
+        "V2_pass2_us": 10.192773437500009,
+        "V2_pass3_us": 10.105273437500012,
+        "CyDSP_us": 6.09941406249998,
+        "CyDSP_spread_percent": 9.340676934900307,
+        "CyDSP_callback_p95_us": 45.3,
+        "CyDSP_one_core_percent": 0.45745605468749845,
+        "CyDSP_pass1_us": 6.09941406249998,
+        "CyDSP_pass2_us": 5.739257812499976,
+        "CyDSP_pass3_us": 6.308984374999977,
+        "speedup_V2_over_CyDSP": 1.6711069838931831,
+        "CyDSP_cost_change_percent": -40.159426677142065
+      },
+      {
+        "name": "EQ8",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 40.71972656250006,
+        "V2_spread_percent": 1.1257404609444168,
+        "V2_callback_p95_us": 76.5,
+        "V2_one_core_percent": 0.7634948730468761,
+        "V2_pass1_us": 41.04277343750002,
+        "V2_pass2_us": 40.71972656250006,
+        "V2_pass3_us": 40.58437500000002,
+        "CyDSP_us": 24.209765625000102,
+        "CyDSP_spread_percent": 9.367991351630117,
+        "CyDSP_callback_p95_us": 45.4,
+        "CyDSP_one_core_percent": 0.45393310546875193,
+        "CyDSP_pass1_us": 24.209765625000102,
+        "CyDSP_pass2_us": 22.816210937500056,
+        "CyDSP_pass3_us": 25.084179687499986,
+        "speedup_V2_over_CyDSP": 1.681954596059824,
+        "CyDSP_cost_change_percent": -40.545362975753484
+      },
+      {
+        "name": "LinearPhaseEQ127",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 21.745117187500057,
+        "V2_spread_percent": 1.7963802937080426,
+        "V2_callback_p95_us": 74.39999999999999,
+        "V2_one_core_percent": 0.749187240600588,
+        "V2_pass1_us": 21.745117187500057,
+        "V2_pass2_us": 21.807226562500055,
+        "V2_pass3_us": 21.416601562500084,
+        "CyDSP_us": 7.985742187499977,
+        "CyDSP_spread_percent": 4.003717563039548,
+        "CyDSP_callback_p95_us": 27.499999999999996,
+        "CyDSP_one_core_percent": 0.2751337738037102,
+        "CyDSP_pass1_us": 7.985742187499977,
+        "CyDSP_pass2_us": 7.791406249999979,
+        "CyDSP_pass3_us": 8.111132812499974,
+        "speedup_V2_over_CyDSP": 2.7229926382468905,
+        "CyDSP_cost_change_percent": -63.27569946557706
+      },
+      {
+        "name": "LinearPhaseEQ127",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 86.74257812499987,
+        "V2_spread_percent": 0.7909988696802063,
+        "V2_callback_p95_us": 148.29999999999998,
+        "V2_one_core_percent": 0.7471382217407214,
+        "V2_pass1_us": 86.94257812500005,
+        "V2_pass2_us": 86.74257812499987,
+        "V2_pass3_us": 86.25644531249984,
+        "CyDSP_us": 31.83554687500003,
+        "CyDSP_spread_percent": 2.8632253156480463,
+        "CyDSP_callback_p95_us": 54.599999999999994,
+        "CyDSP_one_core_percent": 0.2742085189819339,
+        "CyDSP_pass1_us": 31.83554687500003,
+        "CyDSP_pass2_us": 31.255078124999997,
+        "CyDSP_pass3_us": 32.1666015625,
+        "speedup_V2_over_CyDSP": 2.724708278629179,
+        "CyDSP_cost_change_percent": -63.29882329630138
+      },
+      {
+        "name": "LinearPhaseEQ127",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 21.329296875000097,
+        "V2_spread_percent": 0.7261505778071868,
+        "V2_callback_p95_us": 158.7,
+        "V2_one_core_percent": 1.5996972656250072,
+        "V2_pass1_us": 21.329296875000097,
+        "V2_pass2_us": 21.340625000000117,
+        "V2_pass3_us": 21.185742187500093,
+        "CyDSP_us": 7.6582031249999725,
+        "CyDSP_spread_percent": 3.2160163223667175,
+        "CyDSP_callback_p95_us": 57.199999999999996,
+        "CyDSP_one_core_percent": 0.5743652343749979,
+        "CyDSP_pass1_us": 7.6582031249999725,
+        "CyDSP_pass2_us": 7.449414062499975,
+        "CyDSP_pass3_us": 7.695703124999972,
+        "speedup_V2_over_CyDSP": 2.7851568477429454,
+        "CyDSP_cost_change_percent": -64.09537937475991
+      },
+      {
+        "name": "LinearPhaseEQ127",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 85.30546874999986,
+        "V2_spread_percent": 0.6408495205648694,
+        "V2_callback_p95_us": 162.79999999999998,
+        "V2_one_core_percent": 1.5994775390624973,
+        "V2_pass1_us": 85.30546874999986,
+        "V2_pass2_us": 85.36953124999985,
+        "V2_pass3_us": 84.82285156249986,
+        "CyDSP_us": 30.411523437500126,
+        "CyDSP_spread_percent": 2.505346580436231,
+        "CyDSP_callback_p95_us": 57.599999999999994,
+        "CyDSP_one_core_percent": 0.5702160644531273,
+        "CyDSP_pass1_us": 30.541601562500112,
+        "CyDSP_pass2_us": 29.77968750000014,
+        "CyDSP_pass3_us": 30.411523437500126,
+        "speedup_V2_over_CyDSP": 2.805037666899995,
+        "CyDSP_cost_change_percent": -64.34985484151603
+      },
+      {
+        "name": "Compressor",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 3.2121093749999887,
+        "V2_spread_percent": 2.1160160525355343,
+        "V2_callback_p95_us": 10.999999999999998,
+        "V2_one_core_percent": 0.11066720581054648,
+        "V2_pass1_us": 3.237304687499991,
+        "V2_pass2_us": 3.1693359374999925,
+        "V2_pass3_us": 3.2121093749999887,
+        "CyDSP_us": 6.100195312499986,
+        "CyDSP_spread_percent": 7.73540806198588,
+        "CyDSP_callback_p95_us": 20.9,
+        "CyDSP_one_core_percent": 0.2101707916259761,
+        "CyDSP_pass1_us": 6.100195312499986,
+        "CyDSP_pass2_us": 5.648242187499968,
+        "CyDSP_pass3_us": 6.120117187499977,
+        "speedup_V2_over_CyDSP": 0.5265584477956001,
+        "CyDSP_cost_change_percent": 89.91244071506772
+      },
+      {
+        "name": "Compressor",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 12.69316406250004,
+        "V2_spread_percent": 1.7202911261903875,
+        "V2_callback_p95_us": 21.599999999999998,
+        "V2_one_core_percent": 0.10932979202270542,
+        "V2_pass1_us": 12.871679687499975,
+        "V2_pass2_us": 12.6533203125,
+        "V2_pass3_us": 12.69316406250004,
+        "CyDSP_us": 24.316210937499882,
+        "CyDSP_spread_percent": 7.922151985156891,
+        "CyDSP_callback_p95_us": 41.5,
+        "CyDSP_one_core_percent": 0.20944236373901268,
+        "CyDSP_pass1_us": 24.316210937499882,
+        "CyDSP_pass2_us": 22.56249999999988,
+        "CyDSP_pass3_us": 24.488867187499963,
+        "speedup_V2_over_CyDSP": 0.5220041928047656,
+        "CyDSP_cost_change_percent": 91.56934250411454
+      },
+      {
+        "name": "Compressor",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 3.0968749999999927,
+        "V2_spread_percent": 1.658678102926338,
+        "V2_callback_p95_us": 22.799999999999997,
+        "V2_one_core_percent": 0.23226562499999945,
+        "V2_pass1_us": 3.129687499999993,
+        "V2_pass2_us": 3.078320312499993,
+        "V2_pass3_us": 3.0968749999999927,
+        "CyDSP_us": 5.976367187499979,
+        "CyDSP_spread_percent": 8.48720546423088,
+        "CyDSP_callback_p95_us": 44.49999999999999,
+        "CyDSP_one_core_percent": 0.44822753906249846,
+        "CyDSP_pass1_us": 6.00449218749998,
+        "CyDSP_pass2_us": 5.49726562499998,
+        "CyDSP_pass3_us": 5.976367187499979,
+        "speedup_V2_over_CyDSP": 0.5181868688519239,
+        "CyDSP_cost_change_percent": 92.98057517658907
+      },
+      {
+        "name": "Compressor",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 12.217382812500025,
+        "V2_spread_percent": 1.6737806340223427,
+        "V2_callback_p95_us": 22.9,
+        "V2_one_core_percent": 0.22907592773437546,
+        "V2_pass1_us": 12.354882812500005,
+        "V2_pass2_us": 12.217382812500025,
+        "V2_pass3_us": 12.150390625000005,
+        "CyDSP_us": 23.871875000000067,
+        "CyDSP_spread_percent": 7.950157088624165,
+        "CyDSP_callback_p95_us": 44.8,
+        "CyDSP_one_core_percent": 0.44759765625000125,
+        "CyDSP_pass1_us": 23.871875000000067,
+        "CyDSP_pass2_us": 21.976171875000045,
+        "CyDSP_pass3_us": 23.87402343750005,
+        "speedup_V2_over_CyDSP": 0.5117898285115849,
+        "CyDSP_cost_change_percent": 95.3927069844773
+      },
+      {
+        "name": "SpectralBlur",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 8.205859374999994,
+        "V2_spread_percent": 1.199600133289134,
+        "V2_callback_p95_us": 28.499999999999996,
+        "V2_one_core_percent": 0.28271749877929664,
+        "V2_pass1_us": 8.273828124999987,
+        "V2_pass2_us": 8.205859374999994,
+        "V2_pass3_us": 8.175390624999968,
+        "CyDSP_us": 5.775195312499993,
+        "CyDSP_spread_percent": 3.1959146403329077,
+        "CyDSP_callback_p95_us": 20.299999999999997,
+        "CyDSP_one_core_percent": 0.19897352600097634,
+        "CyDSP_pass1_us": 5.775195312499993,
+        "CyDSP_pass2_us": 5.715429687499982,
+        "CyDSP_pass3_us": 5.899999999999989,
+        "speedup_V2_over_CyDSP": 1.4208799756501749,
+        "CyDSP_cost_change_percent": -29.62107868805639
+      },
+      {
+        "name": "SpectralBlur",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 32.74863281249987,
+        "V2_spread_percent": 1.117651619520866,
+        "V2_callback_p95_us": 56.49999999999999,
+        "V2_one_core_percent": 0.2820731849670399,
+        "V2_pass1_us": 32.88535156249997,
+        "V2_pass2_us": 32.519335937500124,
+        "V2_pass3_us": 32.74863281249987,
+        "CyDSP_us": 23.240429687500168,
+        "CyDSP_spread_percent": 8.661159247337624,
+        "CyDSP_callback_p95_us": 40.099999999999994,
+        "CyDSP_one_core_percent": 0.20017635726928856,
+        "CyDSP_pass1_us": 23.240429687500168,
+        "CyDSP_pass2_us": 22.738867187500055,
+        "CyDSP_pass3_us": 24.751757812499974,
+        "speedup_V2_over_CyDSP": 1.4091233790790743,
+        "CyDSP_cost_change_percent": -29.033893351940186
+      },
+      {
+        "name": "SpectralBlur",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 8.052539062499976,
+        "V2_spread_percent": 1.232142424021835,
+        "V2_callback_p95_us": 59.89999999999999,
+        "V2_one_core_percent": 0.6039404296874982,
+        "V2_pass1_us": 8.091015624999969,
+        "V2_pass2_us": 7.991796874999976,
+        "V2_pass3_us": 8.052539062499976,
+        "CyDSP_us": 5.7072265624999785,
+        "CyDSP_spread_percent": 4.086102460559158,
+        "CyDSP_callback_p95_us": 42.199999999999996,
+        "CyDSP_one_core_percent": 0.4280419921874984,
+        "CyDSP_pass1_us": 5.7072265624999785,
+        "CyDSP_pass2_us": 5.582421874999979,
+        "CyDSP_pass3_us": 5.815624999999977,
+        "speedup_V2_over_CyDSP": 1.4109373395845466,
+        "CyDSP_cost_change_percent": -29.12513036940023
+      },
+      {
+        "name": "SpectralBlur",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 32.228906250000115,
+        "V2_spread_percent": 0.729643904685682,
+        "V2_callback_p95_us": 60.39999999999999,
+        "V2_one_core_percent": 0.6042919921875022,
+        "V2_pass1_us": 32.36191406250011,
+        "V2_pass2_us": 32.126757812500124,
+        "V2_pass3_us": 32.228906250000115,
+        "CyDSP_us": 22.768750000000047,
+        "CyDSP_spread_percent": 3.4938580839967237,
+        "CyDSP_callback_p95_us": 42.699999999999996,
+        "CyDSP_one_core_percent": 0.4269140625000009,
+        "CyDSP_pass1_us": 22.768750000000047,
+        "CyDSP_pass2_us": 22.47187500000011,
+        "CyDSP_pass3_us": 23.267382812500117,
+        "speedup_V2_over_CyDSP": 1.4154886082898732,
+        "CyDSP_cost_change_percent": -29.353016750297055
+      },
+      {
+        "name": "HRTFMono.Q2.Moving",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 12.753710937500017,
+        "V2_spread_percent": 1.1347800119450568,
+        "V2_callback_p95_us": 43.8,
+        "V2_one_core_percent": 0.43940519714355525,
+        "V2_pass1_us": 12.786328125000036,
+        "V2_pass2_us": 12.753710937500017,
+        "V2_pass3_us": 12.641601562500036,
+        "CyDSP_us": 9.77500000000001,
+        "CyDSP_spread_percent": 1.6803868286444525,
+        "CyDSP_callback_p95_us": 33.699999999999996,
+        "CyDSP_one_core_percent": 0.3367792968750003,
+        "CyDSP_pass1_us": 9.77500000000001,
+        "CyDSP_pass2_us": 9.678906250000008,
+        "CyDSP_pass3_us": 9.843164062500003,
+        "speedup_V2_over_CyDSP": 1.3047274616368292,
+        "CyDSP_cost_change_percent": -23.35564097459382
+      },
+      {
+        "name": "HRTFMono.Q2.Moving",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 51.09628906249997,
+        "V2_spread_percent": 1.271725793442837,
+        "V2_callback_p95_us": 87.1,
+        "V2_one_core_percent": 0.44010670852661105,
+        "V2_pass1_us": 51.33906249999997,
+        "V2_pass2_us": 51.09628906249997,
+        "V2_pass3_us": 50.689257812500045,
+        "CyDSP_us": 39.116601562500016,
+        "CyDSP_spread_percent": 2.8490540601266616,
+        "CyDSP_callback_p95_us": 67.39999999999999,
+        "CyDSP_one_core_percent": 0.3369222908020021,
+        "CyDSP_pass1_us": 39.116601562500016,
+        "CyDSP_pass2_us": 38.79648437499999,
+        "CyDSP_pass3_us": 39.91093749999997,
+        "speedup_V2_over_CyDSP": 1.306255835667599,
+        "CyDSP_cost_change_percent": -23.44531808434589
+      },
+      {
+        "name": "HRTFMono.Q2.Moving",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 12.584960937500027,
+        "V2_spread_percent": 1.8390626212462273,
+        "V2_callback_p95_us": 93.19999999999999,
+        "V2_one_core_percent": 0.943872070312502,
+        "V2_pass1_us": 12.643164062500038,
+        "V2_pass2_us": 12.584960937500027,
+        "V2_pass3_us": 12.411718750000036,
+        "CyDSP_us": 9.589062499999999,
+        "CyDSP_spread_percent": 0.9491608277660355,
+        "CyDSP_callback_p95_us": 71.89999999999999,
+        "CyDSP_one_core_percent": 0.7191796874999999,
+        "CyDSP_pass1_us": 9.589062499999999,
+        "CyDSP_pass2_us": 9.525976562499995,
+        "CyDSP_pass3_us": 9.616992187499998,
+        "speedup_V2_over_CyDSP": 1.31242871109663,
+        "CyDSP_cost_change_percent": -23.805385271979684
+      },
+      {
+        "name": "HRTFMono.Q2.Moving",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 50.36328125,
+        "V2_spread_percent": 0.6794384549756979,
+        "V2_callback_p95_us": 95.3,
+        "V2_one_core_percent": 0.9443115234375,
+        "V2_pass1_us": 50.36328125,
+        "V2_pass2_us": 50.53339843749992,
+        "V2_pass3_us": 50.191210937499854,
+        "CyDSP_us": 38.91445312500001,
+        "CyDSP_spread_percent": 0.39549894098635274,
+        "CyDSP_callback_p95_us": 73.5,
+        "CyDSP_one_core_percent": 0.7296459960937501,
+        "CyDSP_pass1_us": 38.763867187499955,
+        "CyDSP_pass2_us": 38.91777343749996,
+        "CyDSP_pass3_us": 38.91445312500001,
+        "speedup_V2_over_CyDSP": 1.2942050370905729,
+        "CyDSP_cost_change_percent": -22.732490498720214
+      },
+      {
+        "name": "Convolution.Stereo.65536",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 19.164062500000064,
+        "V2_spread_percent": 1.1088463106399844,
+        "V2_callback_p95_us": 75,
+        "V2_one_core_percent": 0.6602618408203147,
+        "V2_pass1_us": 19.221484375000074,
+        "V2_pass2_us": 19.164062500000064,
+        "V2_pass3_us": 19.008984375000082,
+        "CyDSP_us": 13.058984375000026,
+        "CyDSP_spread_percent": 4.184738715563435,
+        "CyDSP_callback_p95_us": 48.4,
+        "CyDSP_one_core_percent": 0.44992282104492276,
+        "CyDSP_pass1_us": 13.26640625000003,
+        "CyDSP_pass2_us": 12.719921875000024,
+        "CyDSP_pass3_us": 13.058984375000026,
+        "speedup_V2_over_CyDSP": 1.4675002243426778,
+        "CyDSP_cost_change_percent": -31.85690990623735
+      },
+      {
+        "name": "Convolution.Stereo.65536",
+        "group": "matrix",
+        "rate": 44100,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 440,
+        "V2_us": 76.903125,
+        "V2_spread_percent": 0.9755069283596134,
+        "V2_callback_p95_us": 116.1,
+        "V2_one_core_percent": 0.6623882446289062,
+        "V2_pass1_us": 77.56406250000006,
+        "V2_pass2_us": 76.81386718750001,
+        "V2_pass3_us": 76.903125,
+        "CyDSP_us": 51.9123046875,
+        "CyDSP_spread_percent": 4.91890244590682,
+        "CyDSP_callback_p95_us": 89.39999999999999,
+        "CyDSP_one_core_percent": 0.4471352806091309,
+        "CyDSP_pass1_us": 53.587695312500024,
+        "CyDSP_pass2_us": 51.034179687499986,
+        "CyDSP_pass3_us": 51.9123046875,
+        "speedup_V2_over_CyDSP": 1.4814045622312269,
+        "CyDSP_cost_change_percent": -32.496495184688534
+      },
+      {
+        "name": "Convolution.Stereo.65536",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 128,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 38.23847656250004,
+        "V2_spread_percent": 1.8106966457418683,
+        "V2_callback_p95_us": 302,
+        "V2_one_core_percent": 2.867885742187503,
+        "V2_pass1_us": 38.38691406250004,
+        "V2_pass2_us": 37.69453125000006,
+        "V2_pass3_us": 38.23847656250004,
+        "CyDSP_us": 17.525585937500065,
+        "CyDSP_spread_percent": 3.367843888957111,
+        "CyDSP_callback_p95_us": 130.89999999999998,
+        "CyDSP_one_core_percent": 1.3144189453125048,
+        "CyDSP_pass1_us": 18.063867187500083,
+        "CyDSP_pass2_us": 17.525585937500065,
+        "CyDSP_pass3_us": 17.47363281250006,
+        "speedup_V2_over_CyDSP": 2.181865798887781,
+        "CyDSP_cost_change_percent": -54.167666933972015
+      },
+      {
+        "name": "Convolution.Stereo.65536",
+        "group": "matrix",
+        "rate": 96000,
+        "frames": 512,
+        "voices": 1,
+        "graph_block_frames": 960,
+        "V2_us": 151.94980468750032,
+        "V2_spread_percent": 1.366610838540111,
+        "V2_callback_p95_us": 306,
+        "V2_one_core_percent": 2.849058837890631,
+        "V2_pass1_us": 153.9808593750002,
+        "V2_pass2_us": 151.90429687500028,
+        "V2_pass3_us": 151.94980468750032,
+        "CyDSP_us": 70.74296875,
+        "CyDSP_spread_percent": 3.0725778842862073,
+        "CyDSP_callback_p95_us": 140,
+        "CyDSP_one_core_percent": 1.3264306640625,
+        "CyDSP_pass1_us": 72.7494140625,
+        "CyDSP_pass2_us": 70.57578124999999,
+        "CyDSP_pass3_us": 70.74296875,
+        "speedup_V2_over_CyDSP": 2.147913882784292,
+        "CyDSP_cost_change_percent": -53.44319863030436
+      }
+    ]
+  }
+}

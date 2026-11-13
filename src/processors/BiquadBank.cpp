@@ -92,6 +92,28 @@ Status BiquadBank<T>::process(AudioBlock<const T> input, AudioBlock<T> output) n
     const auto status = validateProcessBlocks(spec_, input, output);
     if (status != Status::ok)
         return status;
+    // Mono/stereo do not fill a SIMD voice group. Keep planar histories in
+    // registers instead of packing/scattering every short tile.
+    if (voices() <= 2) {
+        const auto n = voices();
+        for (std::size_t ch = 0; ch < n; ++ch) {
+            const auto b0 = coefficients_[ch], b1 = coefficients_[n + ch],
+                       b2 = coefficients_[2 * n + ch], a1 = coefficients_[3 * n + ch],
+                       a2 = coefficients_[4 * n + ch];
+            auto z1 = states_[ch], z2 = states_[n + ch];
+            const auto source = input.channel(ch);
+            auto destination = output.channel(ch);
+            for (std::size_t i = 0; i < input.frames(); ++i) {
+                const auto sample = detail::biquadSample(source[i], z1, z2, b0, b1, b2, a1, a2);
+                destination[i] = sample.output;
+                z1 = sample.z1;
+                z2 = sample.z2;
+            }
+            states_[ch] = z1;
+            states_[n + ch] = z2;
+        }
+        return Status::ok;
+    }
     const auto& table = detail::VectorAccess::table(ops_);
     for (std::size_t offset = 0; offset < input.frames();) {
         const auto count = std::min(tileFrames_, input.frames() - offset);

@@ -165,6 +165,7 @@ template <class T> void fft() {
 }
 } // namespace
 // This source is compiled as an OBJECT by --compile-checks; it is not linked/run.
+void hotspotRegression();
 void advancedRegression();
 void filtersRegression();
 void routingRegression();
@@ -193,7 +194,7 @@ void expandedRegression();
 void stretchFftRegression();
 int main() {
  try {
-  advancedExpansionContracts(); advancedExpansionRegression(); expansionContracts(); restorationDiagnosticsRegression(); musicalPhysicalRegression(); creativeRegression(); advancedDynamicsRegression(); spatialRenderingRegression(); acousticRegression(); spatialFoundationRegression(); multiBusGraphRegression(); advancedFoundationRegression(); foundationRegression(); granulationRegression(); audioAnalysisRegression(); performanceRegression(); dawExpansionRegression(); stretchFftRegression(); expandedRegression();
+  hotspotRegression(); advancedExpansionContracts(); advancedExpansionRegression(); expansionContracts(); restorationDiagnosticsRegression(); musicalPhysicalRegression(); creativeRegression(); advancedDynamicsRegression(); spatialRenderingRegression(); acousticRegression(); spatialFoundationRegression(); multiBusGraphRegression(); advancedFoundationRegression(); foundationRegression(); granulationRegression(); audioAnalysisRegression(); performanceRegression(); dawExpansionRegression(); stretchFftRegression(); expandedRegression();
   variableSincRealtimeRegression(); realtimeRegression(); schedulingRegression();
   matrixSchedulingRegression(); optimizationRegression(); completionRegression();
   routingRegression(); filtersRegression(); advancedRegression();

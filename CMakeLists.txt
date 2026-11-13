@@ -190,6 +190,7 @@ set(cydsp_test_sources
  tests/RestorationDiagnosticsRegression.cpp
  tests/MusicalPhysicalRegression.cpp
  tests/CreativeRegression.cpp
+ tests/HotspotRegression.cpp
  tests/AdvancedDynamicsRegression.cpp
  tests/SpatialRenderingRegression.cpp
  tests/AcousticRegression.cpp
@@ -244,13 +245,15 @@ if(CYDSP_COMPILE_CHECKS)
  target_include_directories(cydsp_measurement_checks PRIVATE src)
 endif()
 if(CYDSP_BUILD_MEASUREMENTS)
+ add_executable(cydsp_hotspot_measurements tests/HotspotMeasurements.cpp)
+ target_link_libraries(cydsp_hotspot_measurements PRIVATE CyDSP::CyDSP)
  add_executable(cydsp_focused_measurements tests/FocusedMeasurements.cpp)
  target_link_libraries(cydsp_focused_measurements PRIVATE CyDSP::CyDSP)
  add_executable(cydsp_measurements tests/Measurements.cpp tests/ExpansionMeasurements.cpp tests/AdvancedExpansionMeasurements.cpp)
  target_link_libraries(cydsp_measurements PRIVATE CyDSP::CyDSP)
  target_include_directories(cydsp_measurements PRIVATE src)
 endif()
-foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_measurements cydsp_focused_measurements cydsp_measurement_checks cydsp_focused_measurement_checks)
+foreach(t IN ITEMS cydsp_hotspot_measurements cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_measurements cydsp_focused_measurements cydsp_measurement_checks cydsp_focused_measurement_checks)
  if(TARGET ${t})
   if(MSVC)
    target_compile_options(${t} PRIVATE /W4 /permissive- /fp:strict /utf-8)
@@ -260,7 +263,7 @@ foreach(t IN ITEMS cydsp_tests cydsp_contract_checks cydsp_header_checks cydsp_m
  endif()
 endforeach()
 if(CYDSP_SANITIZE_ADDRESS)
- foreach(t IN ITEMS CyDSP CyDSPStretch cydsp_tests cydsp_measurements cydsp_focused_measurements)
+ foreach(t IN ITEMS CyDSP CyDSPStretch cydsp_hotspot_measurements cydsp_tests cydsp_measurements cydsp_focused_measurements)
   if(TARGET ${t})
    if(MSVC)
     target_compile_options(${t} PRIVATE /fsanitize=address /Zi)

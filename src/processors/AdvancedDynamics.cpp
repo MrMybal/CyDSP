@@ -4,6 +4,7 @@
 #include "cydsp/processors/FilterBank.h"
 #include "cydsp/processors/Oversampler.h"
 #include "detail/Analysis.h"
+#include "detail/VectorTable.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -18,6 +19,12 @@ bool validSaturation(const SaturationParameters& p) noexcept {
            p.hysteresisWidth >= 0 && p.hysteresisWidth <= 4 && isFinite(p.hysteresisAmount) &&
            p.hysteresisAmount >= 0 && p.hysteresisAmount <= 4;
 }
+// The driven input is clamped to +/-1e6. This power-of-two reduction
+// is exact there and avoids the scalar libm remainder call. The +/-2 tie
+// selects the same triangle value and even primitive on either side.
+double foldedPhase(double x) noexcept {
+    return x - 4 * std::floor(x * .25 + .5);
+}
 double shape(AdaaShape type, double x) noexcept {
     switch (type) {
     case AdaaShape::atan:
@@ -27,7 +34,7 @@ double shape(AdaaShape type, double x) noexcept {
     case AdaaShape::hardClip:
         return std::clamp(x, -1., 1.);
     case AdaaShape::wavefolder: {
-        const double r = std::remainder(x, 4.);
+        const double r = foldedPhase(x);
         return std::abs(r) <= 1 ? r : std::copysign(2 - std::abs(r), r);
     }
     default:
@@ -44,7 +51,7 @@ double primitive(AdaaShape type, double x) noexcept {
     case AdaaShape::hardClip:
         return a <= 1 ? .5 * x * x : a - .5;
     case AdaaShape::wavefolder: {
-        const double r = std::abs(std::remainder(x, 4.));
+        const double r = std::abs(foldedPhase(x));
         return r <= 1 ? .5 * r * r : 2 * r - .5 * r * r - 1;
     }
     default:
@@ -67,8 +74,10 @@ struct SectionState {
 template <Sample T> struct AdaaSaturator<T>::State {
     ProcessSpec spec;
     SaturationParameters p;
-    std::vector<double> previous, memory;
-    std::vector<unsigned char> active;
+    VectorOps ops;
+    std::array<double, 64> foldInput{}, foldOutput{};
+    std::vector<double> previous, memory, previousPrimitive;
+    std::vector<unsigned char> active, primitiveValid;
 };
 template <Sample T> AdaaSaturator<T>::AdaaSaturator() = default;
 template <Sample T> AdaaSaturator<T>::~AdaaSaturator() = default;
@@ -81,8 +90,13 @@ template <Sample T> Status AdaaSaturator<T>::prepare(const ProcessSpec& spec) no
     try {
         auto s = std::make_unique<State>();
         s->spec = spec;
+        const auto status = VectorOps::create(CpuBackend::automatic, s->ops);
+        if (status != Status::ok)
+            return status;
         s->previous.resize(spec.channels);
         s->memory.resize(spec.channels);
+        s->previousPrimitive.resize(spec.channels);
+        s->primitiveValid.resize(spec.channels);
         s->active.resize(spec.channels);
         state_.swap(s);
         return Status::ok;
@@ -95,6 +109,10 @@ template <Sample T> Status AdaaSaturator<T>::setParameters(const SaturationParam
         return Status::not_prepared;
     if (!validSaturation(p))
         return Status::invalid_argument;
+    // The primitive depends on the shape; the stored driven sample remains valid
+    // across drive/bias/AA edits and must not be reset by automation.
+    if (state_->p.shape != p.shape)
+        std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(), 0);
     state_->p = p;
     return Status::ok;
 }
@@ -111,26 +129,72 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
         return status;
     const auto& p = s.p;
     const double dc = shape(p.shape, p.bias);
-    for (std::size_t ch = 0; ch < in.channels(); ++ch)
+    const auto fold = detail::VectorAccess::table(s.ops).adaaFold;
+    if (p.shape == AdaaShape::wavefolder && p.antialias && fold && in.frames() >= 4) {
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            auto previous = s.previous[ch];
+            bool active = s.active[ch] != 0;
+            for (std::size_t offset = 0; offset < in.frames();) {
+                const auto count = std::min(s.foldInput.size(), in.frames() - offset);
+                for (std::size_t i = 0; i < count; ++i)
+                    s.foldInput[i] = std::clamp(
+                        double(in.channel(ch)[offset + i]) * p.drive + p.bias, -1e6, 1e6);
+                fold(s.foldInput.data(), s.foldOutput.data(), count, previous, active, dc,
+                     p.outputGain);
+                for (std::size_t i = 0; i < count; ++i)
+                    out.channel(ch)[offset + i] = T(s.foldOutput[i]);
+                previous = s.foldInput[count - 1];
+                active = true;
+                offset += count;
+            }
+            s.previous[ch] = previous;
+            s.active[ch] = active;
+            s.primitiveValid[ch] = 0;
+        }
+        return Status::ok;
+    }
+    for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+        auto previous = s.previous[ch], previousPrimitive = s.previousPrimitive[ch];
+        bool active = s.active[ch] != 0, primitiveValid = s.primitiveValid[ch] != 0;
+        auto memory = s.memory[ch];
+        const auto input = in.channel(ch);
+        auto output = out.channel(ch);
         for (std::size_t i = 0; i < in.frames(); ++i) {
-            const double x = std::clamp(double(in.channel(ch)[i]) * p.drive + p.bias, -1e6, 1e6);
+            const double x = std::clamp(double(input[i]) * p.drive + p.bias, -1e6, 1e6);
             double y;
             if (p.shape == AdaaShape::hysteresis) {
-                s.memory[ch] =
-                    std::clamp(s.memory[ch], x - p.hysteresisWidth, x + p.hysteresisWidth);
-                y = std::tanh(x + p.hysteresisAmount * s.memory[ch]) - std::tanh(p.bias);
-            } else if (p.antialias && s.active[ch]) {
-                const double previous = s.previous[ch], delta = x - previous;
-                y = std::abs(delta) > 1e-5 * std::max({1., std::abs(x), std::abs(previous)})
-                        ? (primitive(p.shape, x) - primitive(p.shape, previous)) / delta
-                        : shape(p.shape, .5 * (x + previous));
+                memory = std::clamp(memory, x - p.hysteresisWidth, x + p.hysteresisWidth);
+                y = std::tanh(x + p.hysteresisAmount * memory) - dc;
+                primitiveValid = false;
+            } else if (p.antialias && active) {
+                const double delta = x - previous;
+                if (std::abs(delta) > 1e-5 * std::max({1., std::abs(x), std::abs(previous)})) {
+                    const auto currentPrimitive = primitive(p.shape, x);
+                    if (!primitiveValid)
+                        previousPrimitive = primitive(p.shape, previous);
+                    y = (currentPrimitive - previousPrimitive) / delta;
+                    previousPrimitive = currentPrimitive;
+                    primitiveValid = true;
+                } else {
+                    y = shape(p.shape, .5 * (x + previous));
+                    // Avoid evaluating an expensive primitive for a constant segment.
+                    primitiveValid = false;
+                }
                 y -= dc;
-            } else
+            } else {
                 y = shape(p.shape, x) - dc;
-            s.previous[ch] = x;
-            s.active[ch] = 1;
-            out.channel(ch)[i] = T(y * p.outputGain);
+                primitiveValid = false;
+            }
+            previous = x;
+            active = true;
+            output[i] = T(y * p.outputGain);
         }
+        s.previous[ch] = previous;
+        s.previousPrimitive[ch] = previousPrimitive;
+        s.primitiveValid[ch] = primitiveValid;
+        s.active[ch] = active;
+        s.memory[ch] = memory;
+    }
     return Status::ok;
 }
 template <Sample T> void AdaaSaturator<T>::reset() noexcept {
@@ -138,6 +202,7 @@ template <Sample T> void AdaaSaturator<T>::reset() noexcept {
         std::fill(state_->previous.begin(), state_->previous.end(), 0);
         std::fill(state_->memory.begin(), state_->memory.end(), 0);
         std::fill(state_->active.begin(), state_->active.end(), 0);
+        std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(), 0);
     }
 }
 

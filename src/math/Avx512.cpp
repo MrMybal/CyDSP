@@ -1,3 +1,4 @@
+#include "detail/AdaaAvx.h"
 #include "detail/Scalar.h"
 #include "detail/VectorTable.h"
 #include <array>
@@ -484,7 +485,7 @@ const VectorTable& avx512Table() noexcept {
          biquadBankF32, gainChainF32, fftStageF32},
         {multiplyF64, complexMacF64, butterflyF64, copyF64, scaleF64, addScaledF64, fillF64, dotF64,
          biquadBankF64, gainChainF64, fftStageF64},
-        dotMixed};
+        dotMixed, adaaFoldAvx2};
     return table;
 }
 } // namespace cydsp::detail

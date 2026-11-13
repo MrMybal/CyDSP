@@ -467,7 +467,7 @@ Status MatrixConvolver<T>::prepare(const ProcessSpec& spec, std::size_t outputs,
     if (status != Status::ok)
         return status;
     std::size_t history{};
-    if (!detail::checkedMultiply(2 * early, spec.channels, history))
+    if (!detail::checkedMultiply(early + next.tile_, spec.channels, history))
         return Status::invalid_argument;
     try {
         next.headHistory_.resize(history);
@@ -567,21 +567,27 @@ Status MatrixConvolver<T>::process(AudioBlock<const T> input, AudioBlock<T> outp
             for (std::size_t ch = 0; ch < outputs_; ++ch)
                 (void)ops_.addScaled(scratch.channel(ch), out.channel(ch), T{1});
         }
-        for (std::size_t f = 0; f < count; ++f) {
-            const auto next = write_ + 1 == headSize_ ? 0 : write_ + 1;
-            for (std::size_t ch = 0; ch < spec_.channels; ++ch) {
-                auto* history = headHistory_.data() + ch * 2 * headSize_;
-                history[write_] = history[write_ + headSize_] = saved.channel(ch)[f];
-            }
-            for (const auto& route : routes_) {
-                const auto* data = headHistory_.data() + route.input * 2 * headSize_ + next +
-                                   headSize_ - route.coefficients.size();
-                T value{};
-                value = detail::VectorAccess::kernels<T>(ops_).dot(data, route.coefficients.data(),
-                                                                   route.coefficients.size());
-                out.channel(route.output)[f] += value;
-            }
-            write_ = next;
+        // One contiguous history window per tile. Each dot reads the same ordered
+        // samples as the mirrored ring, without per-frame modulo/route bookkeeping.
+        const auto stride = headSize_ + tile_;
+        for (std::size_t ch = 0; ch < spec_.channels; ++ch) {
+            auto* history = headHistory_.data() + ch * stride;
+            std::copy_n(saved.channel(ch).data(), count, history + headSize_);
+        }
+        const auto dot = detail::VectorAccess::kernels<T>(ops_).dot;
+        for (const auto& route : routes_) {
+            const auto* data = headHistory_.data() + route.input * stride + headSize_ + 1 -
+                               route.coefficients.size();
+            auto destination = out.channel(route.output);
+            for (std::size_t f = 0; f < count; ++f)
+                destination[f] +=
+                    dot(data + f, route.coefficients.data(), route.coefficients.size());
+        }
+        for (std::size_t ch = 0; ch < spec_.channels; ++ch) {
+            auto* history = headHistory_.data() + ch * stride;
+            // Forward copy is valid for this leftward overlapping shift.
+            for (std::size_t f = 0; f < headSize_; ++f)
+                history[f] = history[count + f];
         }
         offset += count;
     }
