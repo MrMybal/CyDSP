@@ -17,52 +17,69 @@
 
 <h1 align="center">CyDSP</h1>
 
-A C++20 audio DSP library for developers of DAWs, effects, synthesizers and audio applications. It provides filters, FFT, convolution, resampling, granular synthesis and audio analysis with a common float/double API and CPU dispatch for x64 and ARM64.
+A C++20 audio DSP library for DAWs, effects, synthesizers and game audio. Build processing chains, render many sound sources and work with spatial audio through a common float/double API, prepared storage and SIMD backends for x64 and ARM64.
 
 > **IN DEVELOPMENT · 0.2.0**
 >
-> Source distribution; no binary release is published. Read the [version notes and platform limitations](VERSION.md).
-
-The second extension adds shared HRTF preparation, HOA order 7, batched sources, diffraction, IR diagnostics, harmonic/percussive separation, spectral pitch, physical contacts, AEC and prepared quality profiles. See the [API guide](docs/AdvancedExpansionGuide.fr.md) and [validation results](docs/AdvancedExpansionValidation.fr.md).
+> Available as source; no binary release is published. Read the [version notes and platform limitations](VERSION.md).
 
 ## About CyDSP
 
-Build a processing chain from planar `AudioBlock` views, owning `AudioBuffer` storage and a shared `ProcessSpec`. Prepare buffers and algorithms before the audio callback; `process` and `reset` retain their prepared storage. Parameters and lifecycle changes follow the ownership rules in the [architecture guide](docs/Architecture.md).
+CyDSP provides the numerical building blocks for audio applications: filters and dynamics, synthesis and sampling, spectral processing, analysis, restoration and 3D sound. Combine planar `AudioBlock` views, aligned `AudioBuffer` storage and a shared `ProcessSpec`; prepare algorithms and memory before the audio callback. Processing and reset retain prepared storage, with no allocation, lock or I/O in those paths. Lifecycle and parameter ownership are documented in the [architecture guide](docs/Architecture.md).
 
-CyDSP is the numerical processing layer. Audio devices, MIDI, audio file I/O, playback transport and plugin hosting belong to **CyAudioCore**, which uses CyDSP. Applications can use CyDSP independently and connect it to their own audio engine and user interface.
+Prepared tables, samples and HRTFs can be shared across sources. Graphs support explicit sidechains, latency compensation between branches and transitions between prepared states. Economy, high-quality realtime and offline profiles supply a common preparation policy.
+
+Audio devices, MIDI, audio file I/O, playback transport, plugin hosting and user interfaces belong to the consuming audio engine or **CyAudioCore**. CyDSP can be used independently in a DAW, game, effect or synthesizer.
 
 ## Features
 
-- **Filters and dynamics:** biquads and cascades, Butterworth/Chebyshev/elliptic/Bessel designs, voice-parallel banks, compressor, expander, gate with hold/hysteresis/look-ahead, and limiter.
-- **Transforms and convolution:** complex/real FFT, STFT, FIR, partitioned and nonuniform convolution, shared MIMO processing and prepared impulse-response transitions.
-- **Sample-rate processing:** fixed and variable resampling, prepared interpolation, FIR/half-band FIR/IIR oversampling and window generation.
-- **Effects and routing:** gain ramps, channel matrices, DSP graphs, delay, panning, dry/wet mixing, waveshaping, chorus, phaser and reverb.
-- **Numerical synthesis:** oscillators, envelopes, harmonic-mip wavetables, sample data and anti-aliasing playback primitives; bounded manual grains and seeded granular clouds.
-- **Audio analysis:** sliding peak/RMS/DC/correlation, 4x/8x true-peak estimates, streaming spectra and spectral features, Mel/log bands, constant-Q analysis and bounded-history LUFS/LRA metering. See the [API guide](docs/GranulationAndAnalysis.md).
-- **Spatial audio and advanced processing:** acoustic paths/rooms, binaural HRIR, VBAP, Ambisonics, sidechains/PDC, multiband dynamics, live grains, FM/PM, physical synthesis, musical analysis and restoration. See the [ten-lot integration guide (French)](docs/ExpansionGuide.fr.md) for APIs and limits.
-- **CPU backends:** scalar, SSE2, AVX2, AVX-512, NEON and optional SVE, selected during preparation according to compiled support and CPU/OS capabilities. Callers can request an explicit backend.
-- **Optional Stretch module:** a separate static target for time stretching, pitch shifting and formant processing using the CyDSP numerical core.
+| Area | Available processing |
+| --- | --- |
+| **Filters and EQ** | Biquads/cascades, Butterworth, Chebyshev, elliptic and Bessel designs, FIR and linear-phase EQ, minimum-phase FIR conversion, TPT/ladder filters, dynamic EQ, complementary band splitting and LMS/NLMS adaptive filters. |
+| **Dynamics** | Compressor, expander, gate with hold/hysteresis/look-ahead, external sidechains, multiband compression, de-esser, transient shaping and oversampled true-peak limiting. |
+| **FFT and spectral processing** | Complex/real FFT, public STFT analysis/synthesis, spectral freeze, vocoder, morphing, spectral filtering, frequency shifting and harmonic/percussive separation with complementary reconstruction. |
+| **Convolution and IRs** | Direct, partitioned, nonuniform and shared MIMO convolution; prepared IR transitions; onset, early-reflection, clarity and band-decay/RT60 diagnostics, with nominal FDN matching. |
+| **Sample-rate processing** | Fixed/variable resampling, sinc and polynomial interpolation, fractional-delay/all-pass primitives, FIR/half-band FIR/IIR oversampling and window generation. |
+| **Delays and modulation** | Fractional and multitap delays, ping-pong/filtered echoes, chorus, phaser, flanger, vibrato, tremolo, autopan and wow/flutter. |
+| **Nonlinear effects** | Waveshaping, clipping, rectification, ADAA saturation, wavefolding, asymmetry, multiband saturation and a bounded hysteresis model. |
+| **Reverberation** | Schroeder, FDN networks, Dattorro-style plate, spring and hybrid IR/FDN reverbs, with diffusion, damping, freeze and shimmer controls where supported. |
+| **Synthesis** | Bandlimited oscillators/wavetables, audio-rate FM/PM, hard sync with oversampling, wavetable morphing, unison, ADSR/multisegment envelopes, noise and seeded LFOs. |
+| **Sampling and granulation** | Prepared sample banks, antialiasing playback, loop crossfades, manual grains and seeded clouds, live-input history, freeze, forward/reverse grains and multichannel routing. |
+| **Physical sound** | Karplus–Strong, string/tube waveguides, modal resonators and membrane/plate mode banks; impact, sliding, rolling and bowed contact exciters with explicit physical units. |
+| **Pitch and time** | Harmony/doubling and monophonic pitch correction; spectral pitch with formant retention, linked channel phases and transient protection; optional time/pitch/formant stretching through `CyDSP::Stretch`. |
+| **Audio and musical analysis** | Peak/RMS/DC, stereo correlation, crest factor, true peak, LUFS/LRA, spectrum/features, Mel/log bands, constant-Q, YIN fundamental/confidence, onsets, tempo/beats, chroma, MFCC and key estimates. |
+| **Restoration and diagnostics** | Spectral denoising, hum/click treatment and persistent-resonance attenuation; frequency/phase/group-delay responses, transfer/coherence, THD/THD+N, measurement signals and sweep deconvolution. |
+| **Acoustic echo cancellation** | Mono far-end reference, independent microphone NLMS paths, linked double-talk gating, adaptation controls and diagnostic metrics. |
+| **3D and spatial audio** | Distance/directivity, atmosphere/media, Doppler, acoustic paths, rooms/portals, analytic binaural, shared HRTF onset alignment/resampling/interpolation, VBAP, ACN/SN3D Ambisonics through order 7, binaural HOA and a thin-screen diffraction approximation. |
+| **Realtime infrastructure** | Source batches with SIMD sine recurrences and shared assets, vector mixing, buffers/ramps, sample-accurate parameter events, multibus graphs, sidechain/PDC alignment, graph crossfades and common quality profiles. |
+
+Scalar, SSE2, AVX2, AVX-512, NEON and optional SVE implementations are selected during preparation from compiled support and CPU/OS capabilities. Callers can request a supported backend explicitly. ISA-specific code stays in private implementation files.
+
+The [module index](docs/Modules.md), [DSP/spatial guide](docs/ExpansionGuide.fr.md) and [advanced API guide](docs/AdvancedExpansionGuide.fr.md) describe exact limits, ownership and latency. Several physical and musical models are approximations; select and assess them for the intended source and scene.
 
 ---
 
 ## Installation
 
-Use CMake 3.24+ and a C++20 compiler to build static libraries for the target ABI. The main target is `CyDSP::CyDSP`; `CyDSP::Stretch` adds the optional stretching module. Windows x64 and Android ARM64 have runtime validation; other platform limits are listed in the [version notes](VERSION.md).
+Use CMake 3.24+ and a C++20 compiler to build static libraries for the target ABI. The main target is `CyDSP::CyDSP`; `CyDSP::Stretch` adds the optional stretching module. Windows x64 and Android ARM64 have runtime coverage. Other target and SVE execution limits are listed in the [version notes](VERSION.md).
 
 After installing the CMake package, link it from your application:
 
 ```cmake
 find_package(CyDSP 0.2 CONFIG REQUIRED)
+
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # Optional time/pitch processing:
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
 
-Public headers live under `cydsp/`; `cydsp/CyDSP.h` is the umbrella header. See the [processing example](examples/Processing.cpp), [granulation/analysis example](examples/GranulationAndAnalysis.cpp), [module contracts](docs/Modules.md) and [migration guide](docs/Migration.fr.md) for integration.
+Public headers live under `cydsp/`; `cydsp/CyDSP.h` is the umbrella header. Start with the [processing example](examples/Processing.cpp), [granulation/analysis example](examples/GranulationAndAnalysis.cpp), [spatial/DAW example](examples/SpatialAndDaw.cpp) or [shared-HRTF/source-batch example](examples/AdvancedAudio.cpp). Existing consumers can follow the [migration guide](docs/Migration.fr.md).
 
 ## Source, build and required libraries
 
-The repository includes its pinned numerical dependencies; configuration does not download packages. From an authenticated checkout, the Windows x64 source build is:
+The repository includes five pinned MIT numerical adaptations and their complete notices. Configuration does not download dependencies. C++20 and CMake are required to use the library; Python is needed only for the repository's build/validation helper scripts.
+
+From an authenticated checkout, build and install the Windows x64 static libraries:
 
 ```sh
 git clone https://github.com/MrMybal/CyDSP.git
@@ -72,15 +89,13 @@ cmake --build build/release --config Release
 cmake --install build/release --config Release --prefix build/install
 ```
 
-Set `CMAKE_PREFIX_PATH` in your application to the chosen install prefix. Set `CYDSP_BUILD_STRETCH=OFF` when only the core is needed. Architecture flags apply to individual SIMD implementation files; the portable library does not require a global native-CPU build.
-
-Tests, measurements and examples are opt-in. Python is needed only for the repository's validation/build helper scripts, not for using the C++ library. Native validation commands and their actual coverage are documented separately in [Validation.md](docs/Validation.md).
+Set `CMAKE_PREFIX_PATH` in your application to the chosen install prefix. Set `CYDSP_BUILD_STRETCH=OFF` when only the core is needed. Tests, measurements and compile checks are opt-in; production builds create static libraries. The portable library does not require a global native-CPU architecture flag.
 
 ---
 
 ## License
 
-CyDSP uses the [MIT license](LICENSE), copyright © 2026 MrMybal CyberAlien. Adapted components retain their notices and pinned provenance. The table is an index; retain the complete [third-party notices](docs/Licensing.md).
+CyDSP uses the [MIT license](LICENSE), copyright © 2026 MrMybal CyberAlien. Commercial use in closed-source products is permitted under its terms. Retain the complete [third-party notices](docs/Licensing.md); the table below is an index. The Stretch adaptation is used only by the optional `CyDSP::Stretch` target.
 
 | Library · source | License · terms | Use / scope |
 | --- | --- | --- |
@@ -92,7 +107,7 @@ CyDSP uses the [MIT license](LICENSE), copyright © 2026 MrMybal CyberAlien. Ada
 
 ## References and links
 
-- [Modules and API contracts](docs/Modules.md) · [Architecture](docs/Architecture.md).
+- [Module index and API contracts](docs/Modules.md) · [Architecture](docs/Architecture.md).
+- [Granulation and analysis](docs/GranulationAndAnalysis.md) · [DSP/spatial integration](docs/ExpansionGuide.fr.md) · [Advanced APIs](docs/AdvancedExpansionGuide.fr.md).
 - [Migration to CyDSP 0.2.0](docs/Migration.fr.md) · [Version notes](VERSION.md).
-- [Performance measurements](docs/Measurements.md) · [Validation coverage](docs/Validation.md).
 - [Source repository](https://github.com/MrMybal/CyDSP) · [Issue tracker](https://github.com/MrMybal/CyDSP/issues).

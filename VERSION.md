@@ -4,6 +4,8 @@
 
 ## Changes
 
+- Add SIMD source batches and shared banks, HRTF preparation (onsets, alignment, conversion and interpolation), order-7 Ambisonics and binaural HOA, diffraction, detailed IR analysis, harmonic/percussive separation, spectral pitch/formants, physical contacts, echo cancellation with double-talk gating and quality profiles with prepared transitions. See the [advanced API guide](docs/AdvancedExpansionGuide.fr.md).
+
 - Ten-lot DSP/3D expansion: shared foundations, multibus/PDC graphs, propagation, acoustic rooms/reverbs, binaural/VBAP/HOA, advanced dynamics, effects/synthesis, musical/physical processing and restoration/diagnostics. Original MIT APIs; see [contracts and limits (French)](docs/ExpansionGuide.fr.md).
 
 - Add original granular synthesis and audio-analysis APIs: levels/correlation, true peak, spectra/features, Mel/log bands, constant-Q and LUFS/LRA. Reuse CyDSP numerical kernels and bounded prepared storage; see [contracts and limits](docs/GranulationAndAnalysis.md).
@@ -19,7 +21,7 @@ Windows x64 MSVC/clang-cl and Android ARM64 on Quest 3 have executed regression 
 
 CyDSP provides numerical processing. Audio devices, MIDI, file formats, transport and plugin interfaces belong to CyAudioCore. Existing applications must adapt to the 0.2.0 package and namespace boundary. Performance depends on CPU, backend, block dimensions and algorithm settings; measured gains do not apply to the entire library.
 
-No separate bug-by-bug release list is published. Report reproducible issues through the [issue tracker](https://github.com/MrMybal/CyDSP/issues).
 
-Second extension (0.2.0 development): [API/limits](docs/AdvancedExpansionGuide.fr.md),
-[validation](docs/AdvancedExpansionValidation.fr.md).
+HRTF datasets are supplied by the host. Diffraction uses a thin-screen approximation, echo cancellation assumes a linear path and aligned reference, and formant/transient/music processing needs source-specific assessment. The [advanced contracts](docs/AdvancedExpansionGuide.fr.md) detail these limits.
+
+No separate bug-by-bug release list is published. Report reproducible issues through the [issue tracker](https://github.com/MrMybal/CyDSP/issues).
