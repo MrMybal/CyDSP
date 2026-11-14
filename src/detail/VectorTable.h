@@ -25,15 +25,14 @@ template <class T> struct Kernels {
                        double) noexcept = nullptr;
     // Saturator tile stages. Drive: stage = {inputGain, inputBias, inputScale,
     // drive, bias} to clamped double. Publish: optional dry/wet mix and rounding.
-    void (*saturationDrive)(const T*, double*, std::size_t, const double*,
-                            bool) noexcept = nullptr;
+    void (*saturationDrive)(const T*, double*, std::size_t, const double*, bool) noexcept = nullptr;
     void (*saturationPublish)(const T*, const double*, T*, std::size_t, double, double,
                               bool) noexcept = nullptr;
     // out = |in|, or max(out, |in|) when accumulating a linked detector.
     void (*magnitude)(const T*, double*, std::size_t, bool) noexcept = nullptr;
     // clamp(in*gain*scale, +/-ceiling), then T(value) or dryGain*dry+wetGain*T(value).
-    void (*applyGains)(const T*, const double*, T*, std::size_t, double, double, const T*,
-                       double, double, bool) noexcept = nullptr;
+    void (*applyGains)(const T*, const double*, T*, std::size_t, double, double, const T*, double,
+                       double, bool) noexcept = nullptr;
     // Bit reversal fused with stages half=1,2: (natural, permuted, reverse table,
     // stage-contiguous twiddles, count >= 16, inverse). Buffers are disjoint.
     void (*fftHead)(const T*, T*, const std::size_t*, const T*, std::size_t,
@@ -44,6 +43,9 @@ template <class T> struct Kernels {
                            std::size_t) noexcept = nullptr;
     void (*realMergeRange)(const T*, const T*, T*, std::size_t, std::size_t,
                            std::size_t) noexcept = nullptr;
+    void (*convolutionEmit)(const T*, const T*, T*, T*, std::size_t, T) noexcept = nullptr;
+    void (*cubicDirect)(const T*, T*, std::size_t, const double*, double, double, double, double,
+                        bool) noexcept = nullptr;
 };
 struct CompressorCurve {
     double thresholdDb, ratio, kneeDb, lower, upper, threshold, slope;
@@ -82,6 +84,9 @@ struct VectorTable {
     void (*transientGain)(const double*, const double*, double*, std::size_t,
                           const double*) noexcept = nullptr;
     double (*minimum)(const double*, std::size_t) noexcept = nullptr;
+    void (*adaaCubic)(const double*, double*, std::size_t, double, bool, double,
+                      double) noexcept = nullptr;
+    void (*shapeCubic)(const double*, double*, std::size_t, double, double) noexcept = nullptr;
 };
 struct VectorAccess {
     template <class T> static const Kernels<T>& kernels(const VectorOps& ops) noexcept {

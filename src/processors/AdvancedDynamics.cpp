@@ -167,6 +167,21 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
     };
     const double dc = shape(p.shape, p.bias);
     const auto& table = detail::VectorAccess::table(s.ops);
+    const auto cubicDirect = detail::VectorAccess::kernels<T>(s.ops).cubicDirect;
+    if (!p.antialias && p.shape == AdaaShape::cubic && cubicDirect) {
+        const std::array<double, 5> stage{inputStage.gain, inputStage.bias, inputStage.scale,
+                                          p.drive, p.bias};
+        for (std::size_t ch = 0; ch < in.channels() && in.frames(); ++ch) {
+            const auto source = in.channel(ch);
+            const auto last = driven(source.back());
+            cubicDirect(source.data(), out.channel(ch).data(), in.frames(), stage.data(), dc,
+                        p.outputGain, dryGain, wetGain, Mixed);
+            s.previous[ch] = last;
+            s.active[ch] = 1;
+            s.primitiveValid[ch] = 0;
+        }
+        return Status::ok;
+    }
     if constexpr (!Mixed) {
         const auto direct = detail::VectorAccess::kernels<T>(s.ops).clipDirect;
         if (!p.antialias && p.shape == AdaaShape::hardClip && direct) {
@@ -185,8 +200,59 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
             return Status::ok;
         }
     }
-    using Secant = void (*)(const double*, double*, std::size_t, double, bool, double,
-                            double) noexcept;
+    // The play-memory recurrence retains its original sample order. Only its
+    // memoryless tanh law and the typed input/output passes are time-parallel.
+    if (p.shape == AdaaShape::hysteresis && table.shapeTanh) {
+        const auto& kernels = detail::VectorAccess::kernels<T>(s.ops);
+        const std::array<double, 5> stage{inputStage.gain, inputStage.bias, inputStage.scale,
+                                          p.drive, p.bias};
+        for (std::size_t ch = 0; ch < in.channels() && in.frames(); ++ch) {
+            const auto sourceBlock = in.channel(ch);
+            if (in.frames() >= 8 &&
+                std::all_of(sourceBlock.begin() + 1, sourceBlock.end(),
+                            [first = sourceBlock[0]](T v) { return v == first; })) {
+                const auto x = driven(sourceBlock[0]);
+                const auto memory =
+                    std::clamp(s.memory[ch], x - p.hysteresisWidth, x + p.hysteresisWidth);
+                const auto argument = x + p.hysteresisAmount * memory;
+                double wet{};
+                table.shapeTanh(&argument, &wet, 1, dc, p.outputGain);
+                std::fill(out.channel(ch).begin(), out.channel(ch).end(),
+                          publish(sourceBlock[0], wet));
+                s.previous[ch] = x;
+                s.memory[ch] = memory;
+                s.active[ch] = 1;
+                s.primitiveValid[ch] = 0;
+                continue;
+            }
+            auto memory = s.memory[ch];
+            double last = s.previous[ch];
+            const auto* source = in.channel(ch).data();
+            auto* destination = out.channel(ch).data();
+            for (std::size_t offset = 0; offset < in.frames();) {
+                const auto count = std::min(s.foldInput.size(), in.frames() - offset);
+                kernels.saturationDrive(source + offset, s.foldInput.data(), count, stage.data(),
+                                        Mixed);
+                for (std::size_t i = 0; i < count; ++i) {
+                    const auto x = s.foldInput[i];
+                    memory = std::clamp(memory, x - p.hysteresisWidth, x + p.hysteresisWidth);
+                    s.foldInput[i] = x + p.hysteresisAmount * memory;
+                    last = x;
+                }
+                table.shapeTanh(s.foldInput.data(), s.foldOutput.data(), count, dc, p.outputGain);
+                kernels.saturationPublish(source + offset, s.foldOutput.data(),
+                                          destination + offset, count, dryGain, wetGain, Mixed);
+                offset += count;
+            }
+            s.previous[ch] = last;
+            s.memory[ch] = memory;
+            s.active[ch] = 1;
+            s.primitiveValid[ch] = 0;
+        }
+        return Status::ok;
+    }
+    using Secant =
+        void (*)(const double*, double*, std::size_t, double, bool, double, double) noexcept;
     using Memoryless = void (*)(const double*, double*, std::size_t, double, double) noexcept;
     Secant secant = nullptr;
     Memoryless memoryless = nullptr;
@@ -199,6 +265,12 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
         // The vector kernel is exact to rounding, so both math policies share it.
         secant = table.adaaAtan;
         memoryless = table.shapeAtan;
+        break;
+    case AdaaShape::cubic:
+        // Two-lane NEON is faster with the cached scalar primitive on Quest 3.
+        // Keep the vector law available for direct verification; SVE stays VLA.
+        secant = table.backend == CpuBackend::neon ? nullptr : table.adaaCubic;
+        memoryless = table.shapeCubic;
         break;
     case AdaaShape::hardClip:
         secant = table.adaaClip;
@@ -260,8 +332,7 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
                     memoryless(s.foldInput.data(), s.foldOutput.data(), count, dc, p.outputGain);
                 if (kernels.saturationPublish)
                     kernels.saturationPublish(source + offset, s.foldOutput.data(),
-                                              destination + offset, count, dryGain, wetGain,
-                                              Mixed);
+                                              destination + offset, count, dryGain, wetGain, Mixed);
                 else
                     for (std::size_t i = 0; i < count; ++i)
                         destination[offset + i] = publish(source[offset + i], s.foldOutput[i]);
@@ -398,8 +469,7 @@ template <Sample T> void AdaaSaturator<T>::reset() noexcept {
     if (state_) {
         std::fill(state_->previous.begin(), state_->previous.end(), 0);
         std::fill(state_->memory.begin(), state_->memory.end(), 0);
-        std::fill(state_->active.begin(), state_->active.end(),
-                  static_cast<unsigned char>(0));
+        std::fill(state_->active.begin(), state_->active.end(), static_cast<unsigned char>(0));
         std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(),
                   static_cast<unsigned char>(0));
     }

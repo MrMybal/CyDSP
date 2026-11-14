@@ -23,8 +23,8 @@ template <class V> CYDSP_SIMD_INLINE typename V::Reg simdLog(typename V::Reg x) 
                   V::add(V::mul(V::mul(V::set(2), z), series),
                          V::mul(exponent, V::set(2.3190468138462996e-17))));
 }
-template <class V> CYDSP_SIMD_INLINE typename V::Reg simdClamp(typename V::Reg x, double low,
-                                                              double high) noexcept {
+template <class V>
+CYDSP_SIMD_INLINE typename V::Reg simdClamp(typename V::Reg x, double low, double high) noexcept {
     return V::min(V::max(x, V::set(low)), V::set(high));
 }
 // out[i] = f(a[i], b[i]) over n values. Whole groups read the caller's arrays;
@@ -32,12 +32,12 @@ template <class V> CYDSP_SIMD_INLINE typename V::Reg simdClamp(typename V::Reg x
 template <class V, class F>
 CYDSP_SIMD_INLINE void simdMap2(const double* a, const double* b, double* out, std::size_t n,
                                 F&& f) noexcept {
-    alignas(64) double first[V::width], second[V::width], result[V::width];
-    for (std::size_t i = 0; i < n; i += V::width) {
-        const bool whole = n - i >= V::width;
+    alignas(64) double first[V::maxWidth], second[V::maxWidth], result[V::maxWidth];
+    for (std::size_t i = 0; i < n; i += V::lanes()) {
+        const bool whole = n - i >= V::lanes();
         if (!whole) {
             const auto count = n - i;
-            for (std::size_t j = 0; j < V::width; ++j) {
+            for (std::size_t j = 0; j < V::lanes(); ++j) {
                 first[j] = a[i + std::min(j, count - 1)];
                 second[j] = b[i + std::min(j, count - 1)];
             }
@@ -55,11 +55,9 @@ CYDSP_SIMD_INLINE void simdMap2(const double* a, const double* b, double* out, s
 template <class V>
 CYDSP_SIMD_INLINE void simdLevelDb(const double* envelope, double* decibels,
                                    std::size_t n) noexcept {
-    simdMap2<V>(envelope, envelope, decibels, n,
-                [](typename V::Reg e, typename V::Reg) noexcept {
-                    return V::mul(simdLog<V>(V::max(e, V::set(1e-12))),
-                                  V::set(20 / std::numbers::ln10));
-                });
+    simdMap2<V>(envelope, envelope, decibels, n, [](typename V::Reg e, typename V::Reg) noexcept {
+        return V::mul(simdLog<V>(V::max(e, V::set(1e-12))), V::set(20 / std::numbers::ln10));
+    });
 }
 // The logarithm and the exponential are separate passes over a tile: each is a
 // short dependency chain, so consecutive vector groups overlap.
@@ -78,15 +76,14 @@ CYDSP_SIMD_INLINE void simdLevelCurve(const double* envelope, double* gains, std
 template <class V>
 CYDSP_SIMD_INLINE void simdExpanderGain(const double* envelope, double* gains, std::size_t n,
                                         double thresholdDb, double ratio) noexcept {
-    simdLevelCurve<V>(envelope, gains, n,
-                      [thresholdDb, ratio](typename V::Reg level, typename V::Reg) noexcept {
-                          const auto over = V::sub(level, V::set(thresholdDb));
-                          const auto decibels =
-                              V::select(V::lt(over, V::set(0)),
-                                        V::max(V::set(-160), V::mul(V::set(ratio - 1), over)),
-                                        V::set(0));
-                          return simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20)));
-                      });
+    simdLevelCurve<V>(
+        envelope, gains, n, [thresholdDb, ratio](typename V::Reg level, typename V::Reg) noexcept {
+            const auto over = V::sub(level, V::set(thresholdDb));
+            const auto decibels =
+                V::select(V::lt(over, V::set(0)),
+                          V::max(V::set(-160), V::mul(V::set(ratio - 1), over)), V::set(0));
+            return simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20)));
+        });
 }
 // Dynamic EQ band weight: 10^((static + range*clamp(over/24,0,1))/20) - 1.
 template <class V>
@@ -96,11 +93,10 @@ CYDSP_SIMD_INLINE void simdDynamicEqGain(const double* envelope, double* gains, 
     simdLevelCurve<V>(
         envelope, gains, n,
         [thresholdDb, staticGainDb, rangeDb](typename V::Reg level, typename V::Reg) noexcept {
-            const auto amount = simdClamp<V>(
-                V::div(V::sub(level, V::set(thresholdDb)), V::set(24)), 0, 1);
+            const auto amount =
+                simdClamp<V>(V::div(V::sub(level, V::set(thresholdDb)), V::set(24)), 0, 1);
             const auto decibels = V::add(V::set(staticGainDb), V::mul(V::set(rangeDb), amount));
-            return V::sub(simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20))),
-                          V::set(1));
+            return V::sub(simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20))), V::set(1));
         });
 }
 // Transient shaper gain from its fast/slow envelopes.
@@ -110,20 +106,19 @@ CYDSP_SIMD_INLINE void simdTransientGain(const double* fast, const double* slow,
                                          std::size_t n, const double* parameters) noexcept {
     const double attackAmount = parameters[0], sustainAmount = parameters[1],
                  maximumDb = parameters[2];
-    simdMap2<V>(fast, slow, gains, n,
-                [attackAmount, sustainAmount, maximumDb](typename V::Reg f,
-                                                         typename V::Reg s) noexcept {
-                    const auto floor = V::max(V::set(1e-12), f);
-                    const auto attack = simdClamp<V>(V::div(V::sub(f, s), floor), 0, 1);
-                    const auto sustain = V::mul(simdClamp<V>(V::div(s, floor), 0, 1),
-                                                V::sub(V::set(1), attack));
-                    const auto decibels = V::mul(
-                        V::set(maximumDb),
-                        simdClamp<V>(V::add(V::mul(V::set(attackAmount), attack),
-                                            V::mul(V::set(sustainAmount), sustain)),
-                                     -1, 1));
-                    return simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20)));
-                });
+    simdMap2<V>(
+        fast, slow, gains, n,
+        [attackAmount, sustainAmount, maximumDb](typename V::Reg f, typename V::Reg s) noexcept {
+            const auto floor = V::max(V::set(1e-12), f);
+            const auto attack = simdClamp<V>(V::div(V::sub(f, s), floor), 0, 1);
+            const auto sustain =
+                V::mul(simdClamp<V>(V::div(s, floor), 0, 1), V::sub(V::set(1), attack));
+            const auto decibels = V::mul(
+                V::set(maximumDb), simdClamp<V>(V::add(V::mul(V::set(attackAmount), attack),
+                                                       V::mul(V::set(sustainAmount), sustain)),
+                                                -1, 1));
+            return simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20)));
+        });
 }
 // Compressor/limiter transfer curve. Envelope is finite in [0,1e100], output is
 // disjoint; gain is always normal. Groups entirely below the knee are unity and
@@ -132,13 +127,12 @@ CYDSP_SIMD_INLINE void simdTransientGain(const double* fast, const double* slow,
 template <class V>
 CYDSP_SIMD_INLINE void simdCompressorGain(const double* envelope, double* gains, std::size_t n,
                                           const CompressorCurve& curve) noexcept {
-    constexpr auto w = V::width;
+    const auto w = V::lanes();
     const double half = curve.kneeDb * .5;
     const bool rooted = curve.limiter || curve.ratio == 2 || curve.ratio == 4;
-    const auto below = V::set(curve.lower * (1 - 1e-12)),
-               above = V::set(curve.upper * (1 + 1e-12));
-    alignas(64) double level[simdTile], padded[V::width], result[V::width];
-    bool general[simdTile / 4];
+    const auto below = V::set(curve.lower * (1 - 1e-12)), above = V::set(curve.upper * (1 + 1e-12));
+    alignas(64) double level[simdSlots<V>], padded[V::maxWidth], result[V::maxWidth];
+    bool general[simdTile / 2];
     for (std::size_t offset = 0; offset < n;) {
         const auto count = std::min(simdTile, n - offset);
         const auto emit = [&](std::size_t i, typename V::Reg value) noexcept {
@@ -170,8 +164,7 @@ CYDSP_SIMD_INLINE void simdCompressorGain(const double* envelope, double* gains,
                 emit(i, value);
             } else {
                 general[i / w] = true;
-                V::store(level + i,
-                         V::mul(simdLog<V>(env), V::set(20 / std::numbers::ln10)));
+                V::store(level + i, V::mul(simdLog<V>(env), V::set(20 / std::numbers::ln10)));
             }
         }
         for (std::size_t i = 0; i < count; i += w) {
@@ -181,9 +174,9 @@ CYDSP_SIMD_INLINE void simdCompressorGain(const double* envelope, double* gains,
             auto decibels = V::mul(V::max(over, V::set(0)), V::set(curve.slope));
             if (curve.kneeDb > 0) {
                 const auto t = V::max(V::add(over, V::set(half)), V::set(0));
-                decibels = V::select(V::le(V::set(half), over), decibels,
-                                     V::mul(V::mul(t, t),
-                                            V::set(curve.slope / (2 * curve.kneeDb))));
+                decibels =
+                    V::select(V::le(V::set(half), over), decibels,
+                              V::mul(V::mul(t, t), V::set(curve.slope / (2 * curve.kneeDb))));
             }
             emit(i, simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20))));
         }
@@ -193,14 +186,14 @@ CYDSP_SIMD_INLINE void simdCompressorGain(const double* envelope, double* gains,
 template <class V> CYDSP_SIMD_INLINE double simdMinimum(const double* x, std::size_t n) noexcept {
     double result = std::numeric_limits<double>::infinity();
     std::size_t i = 0;
-    if (n >= V::width) {
+    if (n >= V::lanes()) {
         auto low = V::load(x);
-        for (i = V::width; n - i >= V::width; i += V::width)
+        for (i = V::lanes(); n - i >= V::lanes(); i += V::lanes())
             low = V::min(low, V::load(x + i));
-        alignas(64) double lanes[V::width];
+        alignas(64) double lanes[V::maxWidth];
         V::store(lanes, low);
-        for (double lane : lanes)
-            result = std::min(result, lane);
+        for (std::size_t j = 0; j < V::lanes(); ++j)
+            result = std::min(result, lanes[j]);
     }
     for (; i < n; ++i)
         result = std::min(result, x[i]);
@@ -211,7 +204,7 @@ template <class V, class T>
 CYDSP_SIMD_INLINE void simdMagnitude(const T* in, double* out, std::size_t n,
                                      bool accumulate) noexcept {
     std::size_t i = 0;
-    for (; n - i >= V::width; i += V::width) {
+    for (; n - i >= V::lanes(); i += V::lanes()) {
         auto value = V::abs(V::fromSamples(in + i));
         if (accumulate)
             value = V::max(V::load(out + i), value);
@@ -226,11 +219,11 @@ CYDSP_SIMD_INLINE void simdMagnitude(const T* in, double* out, std::size_t n,
 // dry/wet mix dryGain*dry + wetGain*T(value). in/dry may alias out exactly.
 template <class V, class T>
 CYDSP_SIMD_INLINE void simdApplyGains(const T* in, const double* gains, T* out, std::size_t n,
-                                      double scale, double ceiling, const T* dry,
-                                      double dryGain, double wetGain, bool mixed) noexcept {
+                                      double scale, double ceiling, const T* dry, double dryGain,
+                                      double wetGain, bool mixed) noexcept {
     const auto upper = V::set(ceiling), lower = V::set(-ceiling), makeup = V::set(scale);
     std::size_t i = 0;
-    for (; n - i >= V::width; i += V::width) {
+    for (; n - i >= V::lanes(); i += V::lanes()) {
         auto value = V::min(
             V::max(V::mul(V::mul(V::fromSamples(in + i), V::load(gains + i)), makeup), lower),
             upper);

@@ -23,6 +23,7 @@ struct Case {
     std::string name;
     std::function<void()> run, reset;
     std::function<void(std::ofstream&)> dump;
+    std::size_t frames = 0;
 };
 std::vector<Case> cases;
 template <class T> struct Data {
@@ -70,7 +71,8 @@ void addCustom(std::string name, std::shared_ptr<Data<T>> d, F run, std::functio
                                  double v = x;
                                  f.write(reinterpret_cast<const char*>(&v), sizeof(v));
                              }
-                     }});
+                     },
+                     d->out.block().frames()});
 }
 template <class T, class P>
 void add(std::string name, std::shared_ptr<P> p, std::shared_ptr<Data<T>> d) {
@@ -87,7 +89,8 @@ void add(std::string name, std::shared_ptr<P> p, std::shared_ptr<Data<T>> d) {
                                  double v = x;
                                  f.write(reinterpret_cast<const char*>(&v), sizeof(v));
                              }
-                     }});
+                     },
+                     d->out.block().frames()});
 }
 template <class T> void programCases() {
     const ProcessSpec spec{48000, 256, 2};
@@ -96,7 +99,7 @@ template <class T> void programCases() {
         auto d = std::make_shared<Data<T>>(2);
         d->program(signal, .5);
         for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::hardClip,
-                           AdaaShape::wavefolder})
+                           AdaaShape::wavefolder, AdaaShape::hysteresis})
             for (auto math : {MathAccuracy::precise, MathAccuracy::fast}) {
                 if (math == MathAccuracy::fast && shape != AdaaShape::atan)
                     continue;
@@ -174,7 +177,9 @@ template <class T> void programCases() {
                 settings.lookAheadMs = variant == 2 ? 3 : 0;
                 ok(p->setParameters(settings));
                 add("program.compressor.r" + std::to_string(int(ratio)) +
-                        (variant == 0 ? ".linked" : variant == 1 ? ".independent" : ".lookahead"),
+                        (variant == 0   ? ".linked"
+                         : variant == 1 ? ".independent"
+                                        : ".lookahead"),
                     p, d);
             }
         for (auto mode : {DynamicsMode::limiter, DynamicsMode::expander, DynamicsMode::noiseGate}) {
@@ -186,10 +191,9 @@ template <class T> void programCases() {
             settings.attackMs = 1;
             settings.releaseMs = 80;
             ok(p->setParameters(settings));
-            add(std::string("program.dynamics.") +
-                    (mode == DynamicsMode::limiter    ? "limiter"
-                     : mode == DynamicsMode::expander ? "expander"
-                                                      : "gate"),
+            add(std::string("program.dynamics.") + (mode == DynamicsMode::limiter    ? "limiter"
+                                                    : mode == DynamicsMode::expander ? "expander"
+                                                                                     : "gate"),
                 p, d);
         }
     }
@@ -202,8 +206,8 @@ template <class T> void programCases() {
             auto p = std::make_shared<MatrixConvolver<T>>();
             std::vector<T> ir(length), ir2(length);
             for (std::size_t i = 0; i < length; ++i) {
-                ir[i] = T(std::exp(-6. * double(i) / double(length)) * .01 *
-                          std::cos(.3 * double(i)));
+                ir[i] =
+                    T(std::exp(-6. * double(i) / double(length)) * .01 * std::cos(.3 * double(i)));
                 ir2[i] = T(.8 * double(ir[i]));
             }
             ir[0] += T(1);
@@ -258,7 +262,7 @@ template <class T> void make() {
                     p, d);
             }
         for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::hardClip,
-                           AdaaShape::wavefolder})
+                           AdaaShape::wavefolder, AdaaShape::hysteresis})
             for (bool aa : {false, true}) {
                 auto p = std::make_shared<AdaaSaturator<T>>();
                 ok(p->prepare(spec));
@@ -270,7 +274,7 @@ template <class T> void make() {
                 add("saturator." + std::to_string(int(shape)) + (aa ? ".adaa" : ".direct"), p, d);
             }
         for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::hardClip,
-                           AdaaShape::wavefolder})
+                           AdaaShape::wavefolder, AdaaShape::hysteresis})
             for (bool silence : {false, true}) {
                 auto d = std::make_shared<Data<T>>(2);
                 for (std::size_t c = 0; c < 2; ++c)
@@ -422,8 +426,8 @@ int main(int argc, char** argv) {
             if (!first)
                 std::cout << ",\n";
             first = false;
-            std::cout << "{\"case\":\"" << c.name
-                      << "\",\"frames\":256,\"medianBatchMeanUs\":" << trials[4]
+            std::cout << "{\"case\":\"" << c.name << "\",\"frames\":" << c.frames
+                      << ",\"medianBatchMeanUs\":" << trials[4]
                       << ",\"worstBatchMeanUs\":" << trials[8] << "}";
         }
         std::cout << "\n]\n";

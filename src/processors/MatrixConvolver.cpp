@@ -78,11 +78,7 @@ struct MatrixConvolver<T>::ProgressiveTier {
         switch (phase) {
         case Phase::pack: {
             const auto end = std::min(p, cursor + quantum);
-            for (auto i = cursor; i < end; ++i) {
-                const auto real = 2 * i < p ? workInput[channel * p + 2 * i] : T{};
-                const auto imag = 2 * i + 1 < p ? workInput[channel * p + 2 * i + 1] : T{};
-                work[reverse[i]] = {real, imag};
-            }
+            detail::packRealChunk(workInput.data() + channel * p, work, reverse, p, cursor, end);
             cursor = end;
             if (cursor == p) {
                 cursor = fftCursor = 0;
@@ -169,24 +165,12 @@ struct MatrixConvolver<T>::ProgressiveTier {
             break;
         case Phase::emit: {
             const auto end = std::min(p, cursor + quantum);
-            const auto scale = T{1} / static_cast<T>(p);
+            detail::emitRealChunk(*kernels, work, data.overlap.data() + channel * p,
+                                  nextReady.data() + channel * p, p, cursor, end);
             auto* spectrum = data.sum.data() + channel * bins;
+            std::fill(spectrum + cursor, spectrum + end, std::complex<T>{});
             if (cursor == 0)
                 spectrum[p] = {};
-            if (p == 1) {
-                nextReady[channel] = work[0].real() + data.overlap[channel];
-                data.overlap[channel] = work[0].imag();
-                spectrum[0] = {};
-            } else
-                for (auto i = cursor; i < end; i += 2) {
-                    const auto first = work[i / 2] * scale, second = work[(i + p) / 2] * scale;
-                    const auto offset = channel * p + i;
-                    nextReady[offset] = first.real() + data.overlap[offset];
-                    nextReady[offset + 1] = first.imag() + data.overlap[offset + 1];
-                    data.overlap[offset] = second.real();
-                    data.overlap[offset + 1] = second.imag();
-                    spectrum[i] = spectrum[i + 1] = {};
-                }
             cursor = end;
             if (cursor == p) {
                 cursor = 0;
@@ -588,8 +572,8 @@ Status MatrixConvolver<T>::prepare(const ProcessSpec& spec, std::size_t outputs,
     const auto end = config.mode == ConvolutionMode::hybrid
                          ? std::numeric_limits<std::size_t>::max()
                          : late * (config.mode == ConvolutionMode::scheduled ? 2 : 1);
-    status = next.early_.prepare(routes, early, end, early, next.ops_.backend(), false,
-                                 spectralHead);
+    status =
+        next.early_.prepare(routes, early, end, early, next.ops_.backend(), false, spectralHead);
     if (status != Status::ok)
         return status;
     if (config.mode == ConvolutionMode::scheduled) {

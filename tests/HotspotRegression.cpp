@@ -52,13 +52,15 @@ double primitive(AdaaShape type, double x) {
     }
 }
 void wavefolderKernels() {
-    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512}) {
+    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512, CpuBackend::neon, CpuBackend::sve}) {
         VectorOps ops;
         if (VectorOps::create(backend, ops) == Status::unsupported_backend)
             continue;
-        for (auto type : {AdaaShape::wavefolder, AdaaShape::hardClip, AdaaShape::tanh}) {
+        for (auto type :
+             {AdaaShape::wavefolder, AdaaShape::hardClip, AdaaShape::tanh, AdaaShape::cubic}) {
             const auto fold =
                 type == AdaaShape::wavefolder ? detail::VectorAccess::table(ops).adaaFold
+                : type == AdaaShape::cubic    ? detail::VectorAccess::table(ops).adaaCubic
                 : type == AdaaShape::hardClip ? detail::VectorAccess::table(ops).adaaClip
                                               : detail::VectorAccess::table(ops).adaaTanh;
             require(fold != nullptr, "x64 ADAA kernel selected");
@@ -99,8 +101,8 @@ double exactTanhMean(double a, double b) {
     const double m = .5 * (a + b), h = .5 * (a - b);
     if (std::abs(h) <= 1)
         return std::atanh(std::tanh(m) * std::tanh(h)) / h;
-    return ((std::abs(a) - std::abs(b)) + (std::log1p(std::exp(-2 * std::abs(a))) -
-                                           std::log1p(std::exp(-2 * std::abs(b))))) /
+    return ((std::abs(a) - std::abs(b)) +
+            (std::log1p(std::exp(-2 * std::abs(a))) - std::log1p(std::exp(-2 * std::abs(b))))) /
            (a - b);
 }
 double exactAtanMean(double a, double b) {
@@ -169,10 +171,9 @@ template <class T> void saturation() {
                         y = exactAtanMean(x, previous[c]);
                     else
                         y = s.antialias && active[c]
-                                ? (std::abs(delta) > 1e-5 * std::max({1., std::abs(x),
-                                                                      std::abs(previous[c])})
-                                       ? (primitive(s.shape, x) -
-                                          primitive(s.shape, previous[c])) /
+                                ? (std::abs(delta) >
+                                           1e-5 * std::max({1., std::abs(x), std::abs(previous[c])})
+                                       ? (primitive(s.shape, x) - primitive(s.shape, previous[c])) /
                                              delta
                                        : shape(s.shape, .5 * (x + previous[c])))
                                 : shape(s.shape, x);
@@ -286,12 +287,14 @@ template <class T> void temporalFir(CpuBackend backend, const VectorOps& ops) {
     (void)backend;
 }
 void transferKernels() {
-    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512}) {
+    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512, CpuBackend::neon, CpuBackend::sve}) {
         VectorOps ops;
         if (VectorOps::create(backend, ops) != Status::ok)
             continue;
-        temporalFir<float>(backend, ops);
-        temporalFir<double>(backend, ops);
+        if (detail::VectorAccess::kernels<float>(ops).firHead) {
+            temporalFir<float>(backend, ops);
+            temporalFir<double>(backend, ops);
+        }
         const auto curve = detail::VectorAccess::table(ops).compressorGain;
         require(curve != nullptr, "linked transfer SIMD kernel selected");
         for (double threshold : {-160., -24., 24.})
@@ -328,7 +331,7 @@ void transferKernels() {
 void transcendentalEndpointAccuracy() {
     double maximum[2]{};
     unsigned tested = 0;
-    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512}) {
+    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512, CpuBackend::neon, CpuBackend::sve}) {
         VectorOps ops;
         if (VectorOps::create(backend, ops) != Status::ok)
             continue;
@@ -338,10 +341,10 @@ void transcendentalEndpointAccuracy() {
             const auto kernel = shape ? table.adaaAtan : table.adaaTanh;
             const auto exact = shape ? exactAtanMean : exactTanhMean;
             require(kernel != nullptr, "x64 transcendental ADAA kernel selected");
-            for (double initial : {-1e6, -32., -8., -2.4, -1., -.41, -.1, -1e-9, 0., 1e-300, .1,
-                                   .2, .67, 1., 1.5, 5.03, 8., 32., 1e6})
-                for (double delta : {0., 1e-300, 1e-15, 1e-9, 9.999e-6, 1.0001e-5, .009999,
-                                     .010001, .05, .1249, .1251, .26, 1., 3., 70.}) {
+            for (double initial : {-1e6, -32., -8., -2.4, -1., -.41, -.1, -1e-9, 0., 1e-300, .1, .2,
+                                   .67, 1., 1.5, 5.03, 8., 32., 1e6})
+                for (double delta : {0., 1e-300, 1e-15, 1e-9, 9.999e-6, 1.0001e-5, .009999, .010001,
+                                     .05, .1249, .1251, .26, 1., 3., 70.}) {
                     std::array<double, 67> input{}, output{};
                     double previous = initial;
                     for (std::size_t i = 0; i < input.size(); ++i) {
@@ -389,16 +392,16 @@ void transcendentalEndpointAccuracy() {
                 std::array<double, 70> x{}, output{};
                 output.fill(12345);
                 for (std::size_t i = 0; i < count; ++i)
-                    x[i + 1] = i % 11 == 0   ? -0.
-                               : i % 7 == 0  ? 1e6
-                               : i % 5 == 0  ? -1e-9
-                               : i % 3 == 0  ? .1 * std::sin(double(i))
-                                             : 9 * std::sin(double(i) * .7 + double(count));
+                    x[i + 1] = i % 11 == 0  ? -0.
+                               : i % 7 == 0 ? 1e6
+                               : i % 5 == 0 ? -1e-9
+                               : i % 3 == 0 ? .1 * std::sin(double(i))
+                                            : 9 * std::sin(double(i) * .7 + double(count));
                 direct(x.data() + 1, output.data() + 1, count, .25, .8);
                 for (std::size_t i = 0; i < count; ++i) {
                     const double v = x[i + 1];
-                    const double expected = shape ? 2 / std::numbers::pi * std::atan(v)
-                                                  : std::tanh(v);
+                    const double expected =
+                        shape ? 2 / std::numbers::pi * std::atan(v) : std::tanh(v);
                     require(std::abs(output[i + 1] - (expected - .25) * .8) < 1e-15,
                             "memoryless SIMD shape matches libm");
                 }
@@ -494,8 +497,7 @@ template <class T> void tileStages(const VectorOps& ops) {
         }
         for (bool staged : {false, true}) {
             wide.fill(12345);
-            kernels.saturationDrive(input.data() + 1, wide.data() + 1, count, stage.data(),
-                                    staged);
+            kernels.saturationDrive(input.data() + 1, wide.data() + 1, count, stage.data(), staged);
             for (std::size_t i = 0; i < count; ++i) {
                 double sample = double(input[i + 1]);
                 if (staged)
@@ -521,8 +523,8 @@ template <class T> void tileStages(const VectorOps& ops) {
                 kernels.applyGains(input.data() + 1, gains.data() + 1, output.data() + 1, count,
                                    1.4, ceiling, dry.data() + 1, .25, .75, mixed);
                 for (std::size_t i = 0; i < count; ++i) {
-                    const double value = std::clamp(
-                        double(input[i + 1]) * gains[i + 1] * 1.4, -ceiling, ceiling);
+                    const double value =
+                        std::clamp(double(input[i + 1]) * gains[i + 1] * 1.4, -ceiling, ceiling);
                     require(output[i + 1] ==
                                 (mixed ? T(.25 * double(dry[i + 1]) + .75 * double(T(value)))
                                        : T(value)),
@@ -533,15 +535,14 @@ template <class T> void tileStages(const VectorOps& ops) {
             }
             // Exact in-place application, as used by the dynamics processors.
             auto inPlace = input;
-            kernels.applyGains(inPlace.data() + 1, gains.data() + 1, inPlace.data() + 1, count,
-                               1.4, .5, inPlace.data() + 1, .25, .75, mixed);
+            kernels.applyGains(inPlace.data() + 1, gains.data() + 1, inPlace.data() + 1, count, 1.4,
+                               .5, inPlace.data() + 1, .25, .75, mixed);
             for (std::size_t i = 0; i < count; ++i) {
-                const double value =
-                    std::clamp(double(input[i + 1]) * gains[i + 1] * 1.4, -.5, .5);
-                require(inPlace[i + 1] ==
-                            (mixed ? T(.25 * double(input[i + 1]) + .75 * double(T(value)))
-                                   : T(value)),
-                        "in-place vector gain application");
+                const double value = std::clamp(double(input[i + 1]) * gains[i + 1] * 1.4, -.5, .5);
+                require(
+                    inPlace[i + 1] ==
+                        (mixed ? T(.25 * double(input[i + 1]) + .75 * double(T(value))) : T(value)),
+                    "in-place vector gain application");
             }
         }
         wide.fill(12345);
@@ -557,7 +558,7 @@ template <class T> void tileStages(const VectorOps& ops) {
 void curveKernels() {
     double worst = 0;
     unsigned tested = 0;
-    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512}) {
+    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512, CpuBackend::neon, CpuBackend::sve}) {
         VectorOps ops;
         if (VectorOps::create(backend, ops) != Status::ok)
             continue;
@@ -565,8 +566,7 @@ void curveKernels() {
         tileStages<float>(ops);
         tileStages<double>(ops);
         const auto& table = detail::VectorAccess::table(ops);
-        require(table.expanderGain && table.dynamicEqGain && table.transientGain &&
-                    table.minimum,
+        require(table.expanderGain && table.dynamicEqGain && table.transientGain && table.minimum,
                 "x64 gain-curve kernels selected");
         std::array<double, 68> envelope{}, slow{}, output{};
         for (std::size_t i = 0; i < 67; ++i) {
@@ -615,9 +615,8 @@ void curveKernels() {
                     table.transientGain(envelope.data(), slow.data(), output.data(), count,
                                         parameters.data());
                     for (std::size_t i = 0; i < count; ++i) {
-                        const double attack =
-                            std::clamp((envelope[i] - slow[i]) / std::max(1e-12, envelope[i]),
-                                       0., 1.);
+                        const double attack = std::clamp(
+                            (envelope[i] - slow[i]) / std::max(1e-12, envelope[i]), 0., 1.);
                         const double hold =
                             std::clamp(slow[i] / std::max(1e-12, envelope[i]), 0., 1.) *
                             (1 - attack);
@@ -636,8 +635,8 @@ void curveKernels() {
         }
     }
     if (tested)
-        std::cout << "QUALITY gain-curve SIMD maxRelativeError=" << worst
-                  << " backends=" << tested << '\n';
+        std::cout << "QUALITY gain-curve SIMD maxRelativeError=" << worst << " backends=" << tested
+                  << '\n';
 }
 // A constant channel takes a shortcut inside the tiled saturator. It must equal
 // the general tile path, which blocks shorter than eight frames always use.
@@ -646,8 +645,8 @@ template <class T> void constantChannelSaturation() {
     ok(in.resize(2, 71));
     ok(whole.resize(2, 71));
     ok(pieces.resize(2, 71));
-    for (auto shape :
-         {AdaaShape::tanh, AdaaShape::atan, AdaaShape::hardClip, AdaaShape::wavefolder})
+    for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::hardClip, AdaaShape::wavefolder,
+                       AdaaShape::cubic, AdaaShape::hysteresis})
         for (bool antialias : {false, true})
             for (double level : {0., -0., .37, -2.5}) {
                 AdaaSaturator<T> a, b;
@@ -669,11 +668,10 @@ template <class T> void constantChannelSaturation() {
                                            : T(ch ? -level : level);
                     ok(a.processMixed(in.block(), whole.block(), {1.5, .05, 1}, .25, .75));
                     for (std::size_t offset = 0; offset < 71; offset += 7)
-                        ok(b.processMixed(in.block().subBlock(offset, std::min<std::size_t>(
-                                                                          7, 71 - offset)),
-                                          pieces.block().subBlock(
-                                              offset, std::min<std::size_t>(7, 71 - offset)),
-                                          {1.5, .05, 1}, .25, .75));
+                        ok(b.processMixed(
+                            in.block().subBlock(offset, std::min<std::size_t>(7, 71 - offset)),
+                            pieces.block().subBlock(offset, std::min<std::size_t>(7, 71 - offset)),
+                            {1.5, .05, 1}, .25, .75));
                     for (std::size_t ch = 0; ch < 2; ++ch)
                         for (std::size_t i = 0; i < 71; ++i)
                             require(whole.block().channel(ch)[i] == pieces.block().channel(ch)[i],

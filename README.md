@@ -10,7 +10,7 @@
     <td width="400" align="center" valign="middle"><strong>CyDSP</strong><br><sub>C++20 DSP · x64 / ARM64</sub></td>
     <td width="300" align="right" valign="top">
       <p><sub>Library license</sub><br><a href="LICENSE"><strong>MIT</strong></a></p>
-      <p><sub>Version</sub><br><a href="VERSION.md"><strong>0.3.0</strong></a><br><strong>IN DEVELOPMENT</strong></p>
+      <p><sub>Version</sub><br><a href="VERSION.md"><strong>0.3.1</strong></a><br><strong>IN DEVELOPMENT</strong></p>
     </td>
   </tr>
 </table>
@@ -19,7 +19,7 @@
 
 A C++20 audio DSP library for DAWs, effects, synthesizers and game audio. Build processing chains, render many sound sources and work with spatial audio through a common float/double API, prepared storage and SIMD backends for x64 and ARM64.
 
-> **IN DEVELOPMENT · 0.3.0**
+> **IN DEVELOPMENT · 0.3.1**
 >
 > Available as source; no binary release is published. Read the [version notes and platform limitations](VERSION.md).
 
@@ -66,7 +66,7 @@ Use CMake 3.24+ and a C++20 compiler to build static libraries for the target AB
 After installing the CMake package, link it from your application:
 
 ```cmake
-find_package(CyDSP 0.3 CONFIG REQUIRED)
+find_package(CyDSP 0.3.1 CONFIG REQUIRED)
 
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # Optional time/pitch processing:
@@ -109,5 +109,5 @@ CyDSP uses the [MIT license](LICENSE), copyright © 2026 MrMybal CyberAlien. Com
 
 - [Module index and API contracts](docs/Modules.md) · [Architecture](docs/Architecture.md).
 - [Granulation and analysis](docs/GranulationAndAnalysis.md) · [DSP/spatial integration](docs/ExpansionGuide.fr.md) · [Advanced APIs](docs/AdvancedExpansionGuide.fr.md).
-- [Migration to CyDSP 0.2.0](docs/Migration.fr.md) · [Version notes](VERSION.md).
+- [Migration guide](docs/Migration.fr.md) · [Version notes](VERSION.md).
 - [Source repository](https://github.com/MrMybal/CyDSP) · [Issue tracker](https://github.com/MrMybal/CyDSP/issues).

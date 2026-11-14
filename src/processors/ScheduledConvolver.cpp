@@ -122,12 +122,8 @@ struct ScheduledConvolver<T>::State {
         switch (phase) {
         case Phase::pack: {
             const auto end = std::min(p, cursor + quantum);
-            for (auto i = cursor; i < end; ++i) {
-                const auto real = 2 * i < p ? workInput[channel * p + 2 * i] : T{};
-                const auto imag = 2 * i + 1 < p ? workInput[channel * p + 2 * i + 1] : T{};
-                work[reverse[i]] = {real, imag};
-                sum[i] = {};
-            }
+            detail::packRealChunk(workInput.data() + channel * p, work, reverse, p, cursor, end);
+            std::fill(sum.begin() + cursor, sum.begin() + end, std::complex<T>{});
             if (cursor == 0)
                 sum[p] = {};
             cursor = end;
@@ -203,19 +199,8 @@ struct ScheduledConvolver<T>::State {
             break;
         case Phase::emit: {
             const auto end = std::min(p, cursor + quantum);
-            const auto scale = T{1} / static_cast<T>(p);
-            if (p == 1) {
-                nextReady[channel] = work[0].real() + overlap[channel];
-                overlap[channel] = work[0].imag();
-            } else
-                for (auto i = cursor; i < end; i += 2) {
-                    const auto first = work[i / 2] * scale, second = work[(i + p) / 2] * scale;
-                    const auto offset = channel * p + i;
-                    nextReady[offset] = first.real() + overlap[offset];
-                    nextReady[offset + 1] = first.imag() + overlap[offset + 1];
-                    overlap[offset] = second.real();
-                    overlap[offset + 1] = second.imag();
-                }
+            detail::emitRealChunk(*kernels, work, overlap.data() + channel * p,
+                                  nextReady.data() + channel * p, p, cursor, end);
             cursor = end;
             if (cursor == p) {
                 cursor = 0;

@@ -482,105 +482,74 @@ void fftStageF64(double* data, const double* weights, std::size_t count, std::si
         butterflyF64(data + 2 * base, data + 2 * (base + half), weights, half, inverse);
 }
 using SaturationVector = Double8;
-void adaaTanhSimd(const double* x, double* y, std::size_t n, double previous, bool active,
-                  double dc, double gain) noexcept {
-    simdAdaaTanh<SaturationVector>(x, y, n, previous, active, dc, gain);
-}
-void adaaAtanSimd(const double* x, double* y, std::size_t n, double previous, bool active,
-                  double dc, double gain) noexcept {
-    simdAdaaAtan<SaturationVector>(x, y, n, previous, active, dc, gain);
-}
-void shapeTanhSimd(const double* x, double* y, std::size_t n, double dc, double gain) noexcept {
-    simdShapeTanh<SaturationVector>(x, y, n, dc, gain);
-}
-void shapeAtanSimd(const double* x, double* y, std::size_t n, double dc, double gain) noexcept {
-    simdShapeAtan<SaturationVector>(x, y, n, dc, gain);
-}
-void saturationDriveF32(const float* in, double* out, std::size_t n, const double* stage,
-                        bool staged) noexcept {
-    simdSaturationDrive<SaturationVector>(in, out, n, stage, staged);
-}
-void saturationDriveF64(const double* in, double* out, std::size_t n, const double* stage,
-                        bool staged) noexcept {
-    simdSaturationDrive<SaturationVector>(in, out, n, stage, staged);
-}
-void saturationPublishF32(const float* dry, const double* wet, float* out, std::size_t n,
-                          double dryGain, double wetGain, bool mixed) noexcept {
-    simdSaturationPublish<SaturationVector>(dry, wet, out, n, dryGain, wetGain, mixed);
-}
-void saturationPublishF64(const double* dry, const double* wet, double* out, std::size_t n,
-                          double dryGain, double wetGain, bool mixed) noexcept {
-    simdSaturationPublish<SaturationVector>(dry, wet, out, n, dryGain, wetGain, mixed);
-}
-void expanderGainSimd(const double* envelope, double* gains, std::size_t n, double thresholdDb,
-                      double ratio) noexcept {
-    simdExpanderGain<SaturationVector>(envelope, gains, n, thresholdDb, ratio);
-}
-void dynamicEqGainSimd(const double* envelope, double* gains, std::size_t n, double thresholdDb,
-                       double staticGainDb, double rangeDb) noexcept {
-    simdDynamicEqGain<SaturationVector>(envelope, gains, n, thresholdDb, staticGainDb, rangeDb);
-}
-void transientGainSimd(const double* fast, const double* slow, double* gains, std::size_t n,
-                       const double* parameters) noexcept {
-    simdTransientGain<SaturationVector>(fast, slow, gains, n, parameters);
-}
-double minimumSimd(const double* x, std::size_t n) noexcept {
-    return simdMinimum<SaturationVector>(x, n);
-}
-void magnitudeF32(const float* in, double* out, std::size_t n, bool accumulate) noexcept {
-    simdMagnitude<SaturationVector>(in, out, n, accumulate);
-}
-void magnitudeF64(const double* in, double* out, std::size_t n, bool accumulate) noexcept {
-    simdMagnitude<SaturationVector>(in, out, n, accumulate);
-}
-void applyGainsF32(const float* in, const double* gains, float* out, std::size_t n, double scale,
-                   double ceiling, const float* dry, double dryGain, double wetGain,
-                   bool mixed) noexcept {
-    simdApplyGains<SaturationVector>(in, gains, out, n, scale, ceiling, dry, dryGain, wetGain,
-                                     mixed);
-}
-void applyGainsF64(const double* in, const double* gains, double* out, std::size_t n,
-                   double scale, double ceiling, const double* dry, double dryGain,
-                   double wetGain, bool mixed) noexcept {
-    simdApplyGains<SaturationVector>(in, gains, out, n, scale, ceiling, dry, dryGain, wetGain,
-                                     mixed);
-}
-void compressorGainSimd(const double* envelope, double* gains, std::size_t n,
-                        double thresholdDb, double ratio, double kneeDb, bool limiter) noexcept {
-    simdCompressorGain<SaturationVector>(envelope, gains, n,
-                                         makeCompressorCurve(thresholdDb, ratio, kneeDb, limiter));
-}
-void compressorGainPreparedSimd(const double* envelope, double* gains, std::size_t n,
-                                const CompressorCurve& curve) noexcept {
-    simdCompressorGain<SaturationVector>(envelope, gains, n, curve);
-}
+#include "detail/ConvolutionSimd.h"
+#include "detail/TileKernelBindings.h"
 } // namespace
 const VectorTable& avx512Table() noexcept {
-    static constexpr VectorTable table{
-        CpuBackend::avx512,
-        {multiplyF32, complexMacF32, butterflyF32, copyF32, scaleF32, addScaledF32, fillF32, dotF32,
-         biquadBankF32, gainChainF32, fftStageF32, firHeadF32, fftPairF32, realSplitF32,
-         clipDirectF32, saturationDriveF32, saturationPublishF32,
-         magnitudeF32, applyGainsF32, fftHeadF32,
-         realSplitRangeF32, realMergeRangeF32},
-        {multiplyF64, complexMacF64, butterflyF64, copyF64, scaleF64, addScaledF64, fillF64, dotF64,
-         biquadBankF64, gainChainF64, fftStageF64, firHeadF64, fftPairF64, realSplitF64,
-         clipDirectF64, saturationDriveF64, saturationPublishF64,
-         magnitudeF64, applyGainsF64, fftHeadF64,
-         realSplitRangeF64, realMergeRangeF64},
-        dotMixed,
-        adaaFoldAvx2,
-        adaaClipAvx2,
-        adaaTanhSimd,
-        compressorGainSimd,
-        compressorGainPreparedSimd,
-        adaaAtanSimd,
-        shapeTanhSimd,
-        shapeAtanSimd,
-        expanderGainSimd,
-        dynamicEqGainSimd,
-        transientGainSimd,
-        minimumSimd};
+    static constexpr VectorTable table{CpuBackend::avx512,
+                                       {multiplyF32,
+                                        complexMacF32,
+                                        butterflyF32,
+                                        copyF32,
+                                        scaleF32,
+                                        addScaledF32,
+                                        fillF32,
+                                        dotF32,
+                                        biquadBankF32,
+                                        gainChainF32,
+                                        fftStageF32,
+                                        firHeadF32,
+                                        fftPairF32,
+                                        realSplitF32,
+                                        clipDirectF32,
+                                        saturationDriveF32,
+                                        saturationPublishF32,
+                                        magnitudeF32,
+                                        applyGainsF32,
+                                        fftHeadF32,
+                                        realSplitRangeF32,
+                                        realMergeRangeF32,
+                                        convolutionEmit<float>,
+                                        cubicDirectF32},
+                                       {multiplyF64,
+                                        complexMacF64,
+                                        butterflyF64,
+                                        copyF64,
+                                        scaleF64,
+                                        addScaledF64,
+                                        fillF64,
+                                        dotF64,
+                                        biquadBankF64,
+                                        gainChainF64,
+                                        fftStageF64,
+                                        firHeadF64,
+                                        fftPairF64,
+                                        realSplitF64,
+                                        clipDirectF64,
+                                        saturationDriveF64,
+                                        saturationPublishF64,
+                                        magnitudeF64,
+                                        applyGainsF64,
+                                        fftHeadF64,
+                                        realSplitRangeF64,
+                                        realMergeRangeF64,
+                                        convolutionEmit<double>,
+                                        cubicDirectF64},
+                                       dotMixed,
+                                       adaaFoldAvx2,
+                                       adaaClipAvx2,
+                                       adaaTanhSimd,
+                                       compressorGainSimd,
+                                       compressorGainPreparedSimd,
+                                       adaaAtanSimd,
+                                       shapeTanhSimd,
+                                       shapeAtanSimd,
+                                       expanderGainSimd,
+                                       dynamicEqGainSimd,
+                                       transientGainSimd,
+                                       minimumSimd,
+                                       adaaCubicSimd,
+                                       shapeCubicSimd};
     return table;
 }
 } // namespace cydsp::detail

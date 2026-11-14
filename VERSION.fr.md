@@ -1,10 +1,13 @@
-# CyDSP 0.3.0
+# CyDSP 0.3.1
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
 
-- Version 0.3.0. Le numéro de paquet était resté à 0.2.0 malgré plusieurs ajouts d’API ; il couvre désormais tout ce qui est listé ci-dessous. `find_package` n’accepte qu’une même version mineure : les consommateurs demandent `CyDSP 0.3` et recompilent leurs archives avec ces en-têtes. `cydsp/core/Version.h` donne la version à la compilation.
+- 0.3.1 : partage des courbes de saturation et de dynamique entre AVX2, AVX-512, NEON ARM64 et SVE à longueur vectorielle variable. Ajout du cubic SIMD (direct et ADAA) et de l’évaluation vectorielle de tanh pour l’hystérésis, en conservant sa mémoire séquentielle. API publiques et politiques de qualité par défaut inchangées. NEON conserve la primitive scalaire mise en cache pour le cubic ADAA, plus rapide sur Quest ; son chemin direct utilise une passe SIMD fusionnée.
+- 0.3.1 : fusion des travaux FFT progressifs avec une borne de 64 papillons, simplification du remplissage des partitions réelles partielles et publication vectorielle du recouvrement. Latence et budgets de travail conservés.
+
+- Version 0.3.1. Le numéro de paquet était resté à 0.2.0 malgré plusieurs ajouts d’API ; il couvre désormais tout ce qui est listé ci-dessous. `find_package` n’accepte qu’une même version mineure : les consommateurs demandent `CyDSP 0.3.1` et recompilent leurs archives avec ces en-têtes. `cydsp/core/Version.h` donne la version à la compilation.
 - Ajout de formes par bloc qui renvoient les mêmes échantillons que leurs appels unitaires : `Adsr::process` et `SampleData::render` (un seul choix de niveau mip par bloc, bouclage et fondu de boucle compris). `SpscQueue` avance ses index sans division entière.
 
 - Saturation et dynamique évaluées par tuiles de 64 frames avec des noyaux x64 génériques en largeur (quatre doubles en AVX2, huit en AVX-512). Les ADAA tanh et atan renvoient la moyenne exacte entre échantillons consécutifs (erreur absolue proche de 1e-15, sans repli scalaire) ; les dynamiques non liées, avec sidechain, lookahead, expandeur et gate, l’égaliseur dynamique et le gain transitoire `fast` utilisent des courbes de transfert vectorielles ; la validation des entrées est sans branche. Résultats : [rapport des noyaux par tuiles](docs/TileKernelOptimization.fr.md).

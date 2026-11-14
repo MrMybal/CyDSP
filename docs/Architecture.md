@@ -55,6 +55,14 @@ Detection follows the [Intel ISA reference](https://www.intel.com/content/dam/de
 The connected Ryzen executes AVX-512; the Quest executes NEON and reports no SVE.
 SVE runtime and its different vector lengths still need compatible hardware.
 
+Saturation and dynamics tile laws share the same double-precision formulas on
+AVX2, AVX-512, ARM64 NEON and SVE. SVE obtains its lane count per call; fixed
+stack scratch covers every architectural vector length (128–2048 bits), including
+lengths that do not divide the 64-frame tile. Stateful envelope and hysteresis
+recurrences retain their sample order. ARM32 keeps the portable double fallback.
+Progressive convolution may fuse two FFT stages only when their combined job
+stays within 64 butterflies; advertised work-unit counts remain conservative.
+
 ## Lifecycle and memory
 
 Preparation validates first and commits the new configuration only on success;

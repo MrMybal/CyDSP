@@ -1,3 +1,4 @@
+#include "detail/CurveSimd.h"
 #include "detail/Scalar.h"
 #include "detail/VectorTable.h"
 #include <arm_sve.h>
@@ -327,15 +328,75 @@ void fftStageF64(double* data, const double* weights, std::size_t count, std::si
     for (std::size_t base = 0; base < count; base += 2 * half)
         butterflyF64(data + 2 * base, data + 2 * (base + half), weights, half, inverse);
 }
+using SaturationVector = DoubleSve;
+#include "detail/ConvolutionSimd.h"
+#include "detail/TileKernelBindings.h"
 } // namespace
 const VectorTable& sveTable() noexcept {
-    static constexpr VectorTable table{
-        CpuBackend::sve,
-        {multiplyF32, complexMacF32, butterflyF32, copyF32, scaleF32, addScaledF32, fillF32, dotF32,
-         biquadBankF32, gainChainF32, fftStageF32},
-        {multiplyF64, complexMacF64, butterflyF64, copyF64, scaleF64, addScaledF64, fillF64, dotF64,
-         biquadBankF64, gainChainF64, fftStageF64},
-        dotMixed};
+    static constexpr VectorTable table{CpuBackend::sve,
+                                       {multiplyF32,
+                                        complexMacF32,
+                                        butterflyF32,
+                                        copyF32,
+                                        scaleF32,
+                                        addScaledF32,
+                                        fillF32,
+                                        dotF32,
+                                        biquadBankF32,
+                                        gainChainF32,
+                                        fftStageF32,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        saturationDriveF32,
+                                        saturationPublishF32,
+                                        magnitudeF32,
+                                        applyGainsF32,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        convolutionEmit<float>,
+                                        cubicDirectF32},
+                                       {multiplyF64,
+                                        complexMacF64,
+                                        butterflyF64,
+                                        copyF64,
+                                        scaleF64,
+                                        addScaledF64,
+                                        fillF64,
+                                        dotF64,
+                                        biquadBankF64,
+                                        gainChainF64,
+                                        fftStageF64,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        saturationDriveF64,
+                                        saturationPublishF64,
+                                        magnitudeF64,
+                                        applyGainsF64,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        convolutionEmit<double>,
+                                        cubicDirectF64},
+                                       dotMixed,
+                                       adaaFoldSimd,
+                                       adaaClipSimd,
+                                       adaaTanhSimd,
+                                       compressorGainSimd,
+                                       compressorGainPreparedSimd,
+                                       adaaAtanSimd,
+                                       shapeTanhSimd,
+                                       shapeAtanSimd,
+                                       expanderGainSimd,
+                                       dynamicEqGainSimd,
+                                       transientGainSimd,
+                                       minimumSimd,
+                                       adaaCubicSimd,
+                                       shapeCubicSimd};
     return table;
 }
 } // namespace cydsp::detail

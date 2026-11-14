@@ -13,6 +13,22 @@ template <class T>
 bool advanceFftChunk(const Kernels<T>& kernels, std::span<std::complex<T>> work,
                      const std::complex<T>* weights, std::size_t& half, std::size_t& cursor,
                      bool inverse) noexcept {
+    // Two adjacent stages may share loads/stores. A job still performs at most
+    // 64 butterflies in total, even when the packed transform is very small.
+    // The scheduler's original stage count stays a conservative upper bound.
+    if (kernels.fftPair && half >= 4 && half <= fftWorkQuantum / 4 && half <= work.size() / 4) {
+        const auto elements = std::min(fftWorkQuantum, work.size() - 2 * cursor);
+        kernels.fftPair(reinterpret_cast<T*>(work.data() + 2 * cursor),
+                        reinterpret_cast<const T*>(weights + half - 1),
+                        reinterpret_cast<const T*>(weights + 2 * half - 1), elements, half,
+                        inverse);
+        cursor += elements / 2;
+        if (cursor == work.size() / 2) {
+            cursor = 0;
+            half *= 4;
+        }
+        return half == work.size();
+    }
     const auto count = std::min(fftWorkQuantum, work.size() / 2 - cursor);
     if (half <= fftWorkQuantum) {
         kernels.fftStage(reinterpret_cast<T*>(work.data() + 2 * cursor),
@@ -29,6 +45,40 @@ bool advanceFftChunk(const Kernels<T>& kernels, std::span<std::complex<T>> work,
         half *= 2;
     }
     return half == work.size();
+}
+// Pack a bounded part of a zero-padded real partition. Split at the input
+// boundary once, avoiding two per-bin bounds checks inside the scatter loop.
+template <class T>
+void packRealChunk(const T* input, std::complex<T>* work, const std::size_t* reverse, std::size_t p,
+                   std::size_t first, std::size_t end) noexcept {
+    const auto middle = std::min(end, p / 2);
+    for (auto i = first; i < middle; ++i)
+        work[reverse[i]] = {input[2 * i], input[2 * i + 1]};
+    if (p == 1 && first == 0) {
+        work[0] = {input[0], T{}};
+        return;
+    }
+    for (auto i = std::max(first, middle); i < end; ++i)
+        work[reverse[i]] = {};
+}
+template <class T>
+void emitRealChunk(const Kernels<T>& kernels, const std::complex<T>* work, T* overlap, T* ready,
+                   std::size_t p, std::size_t first, std::size_t end) noexcept {
+    const auto scale = T{1} / static_cast<T>(p);
+    if (p == 1) {
+        ready[0] = work[0].real() + overlap[0];
+        overlap[0] = work[0].imag();
+        return;
+    }
+    const auto* values = reinterpret_cast<const T*>(work);
+    if (kernels.convolutionEmit)
+        kernels.convolutionEmit(values + first, values + p + first, overlap + first, ready + first,
+                                end - first, scale);
+    else
+        for (auto i = first; i < end; ++i) {
+            ready[i] = values[i] * scale + overlap[i];
+            overlap[i] = values[p + i] * scale;
+        }
 }
 // Bins [first,end), 1 <= first, of the real-spectrum split of a packed transform.
 template <class T>
