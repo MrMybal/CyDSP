@@ -8,10 +8,23 @@ struct FftPlanAccess {
     // specific pack/permutation avoids another full buffer traversal in STFT.
     template <Sample T>
     static void transformPermutedUnscaled(const ComplexFft<T>& plan,
-                                          std::span<std::complex<T>> data, bool inverse) noexcept {
+                                          std::span<std::complex<T>> data, bool inverse,
+                                          std::size_t firstHalf = 1) noexcept {
         const auto weights = std::span<const std::complex<T>>(plan.twiddles_);
         const auto& table = kernels(plan);
-        fftRuntimeStages<T>(data, weights, table, inverse);
+        fftRuntimeStages<T>(data, weights, table, inverse, firstHalf);
+    }
+    // Permutation and the first two stages in one pass when the backend has the
+    // fused kernel; returns the first stage still to run (4, or 1 if not taken).
+    template <Sample T>
+    static std::size_t permuteHead(const ComplexFft<T>& plan, const T* natural, T* permuted,
+                                   std::size_t count, bool inverse) noexcept {
+        const auto head = kernels(plan).fftHead;
+        if (!head || count < 16)
+            return 1;
+        head(natural, permuted, plan.reverse_.data(),
+             reinterpret_cast<const T*>(plan.twiddles_.data()), count, inverse);
+        return 4;
     }
     template <Sample T>
     static std::span<const std::size_t> reverse(const ComplexFft<T>& plan) noexcept {

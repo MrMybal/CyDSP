@@ -414,16 +414,12 @@ log evaluation avoids cancellation. No global fast-math, reciprocal approximatio
 FMA contraction or FP-state mutation is enabled. EQ designs share their denominator
 reciprocal and use the bounded gain conversion; stability checks remain mandatory.
 
-Hard clipping and tanh ADAA have time-parallel x64 kernels alongside wavefolding.
-The tanh integral retains standard libm secants for endpoints within 1% of the
-sample scale, and the original midpoint threshold (1e-5) is unchanged. This bounds
-amplification of primitive rounding when endpoints almost coincide. Scalar tails,
+Hard clipping has a time-parallel x64 kernel alongside wavefolding; both keep the
+cached-primitive law with the original midpoint threshold (1e-5). Scalar tails,
 shape/drive/bias automation, in-place processing and the first active sample follow
 the same contracts. Regressions include output gains up to 16 and clamp extremes.
-
-Constant tanh input channels evaluate their first ADAA transition using retained
-history, then fill the remaining midpoint output. No silence detector threshold or
-state reset is introduced; the shortcut requires exact equality of input samples.
+The tanh and atan x64 kernels are described under "Tile kernels" below: they no
+longer use libm secants, a proximity threshold or a constant-channel shortcut.
 
 Measured results and precision limits of this pass: [detailed hotspot report](DetailedHotspotOptimization.fr.md).
 
@@ -448,7 +444,11 @@ plan while preparation remains externally serialized.
 linear gain directly, including on a zero detector input. Its `MathAccuracy::precise`
 default retains the original decimal-power formula. `MathAccuracy::fast` explicitly
 selects the bounded double-precision exponential kernel for the final gain; the
-envelopes and transfer law remain unchanged. Prepare one detector
+envelopes and transfer law remain unchanged. On x64 SIMD backends the fast gain law
+of a 64-frame tile is one vector pass (relative error below 1e-13 against the
+decimal power, measured near 2e-14), so `fast` is the recommended real-time setting;
+`precise` stays bit-identical to the reference power and skips the library call
+only when the decibel gain is exactly zero. Prepare one detector
 channel for a linked stereo application, then apply that gain to both program
 channels. This avoids recovering gain by dividing a processed detector by its input.
 
@@ -463,10 +463,9 @@ arguments and block layout before changing processing state, support correspondi
 in-place buffers, and use prepared storage without allocations or locks.
 
 Saturation retains **ADAA enabled** and `MathAccuracy::precise` by default.
-`MathAccuracy::fast` explicitly permits the original vector approximation of the
-atan ADAA primitive when available. Near-equal endpoints retain the precise limit;
-slow inputs and unsupported backends can use the precise path. It does not turn off
-ADAA. `antialias=false` independently selects the direct memoryless transfer function,
+`MathAccuracy::fast` permits a bounded atan ADAA approximation. The x64 atan kernel
+is accurate to rounding, so both policies currently share it there; other backends
+use the precise scalar path. The policy does not turn off ADAA. `antialias=false` independently selects the direct memoryless transfer function,
 which may produce more aliasing. Hysteresis remains the documented stateful model.
 No mode enables compiler fast-math, FMA contraction or global floating-point changes.
 
@@ -492,3 +491,98 @@ fuse packing or recombination with the prepared permutation, and inverse scaling
 with restitution. Available SIMD backends may pair adjacent radix-2 stages and
 vectorize real-spectrum conversion. The existing convolution configurations and
 reported latency are preserved; these changes do not select a cheaper quality mode.
+
+## Tile kernels
+
+Nonlinear and dynamics processors split a block into tiles of at most 64 frames.
+Recurrences (envelopes, detector filters, lookahead queues, gate state) remain
+scalar, ordered and unchanged. The memoryless work of a tile (input stage, transfer
+law, gain application, dry/wet mix, rounding to the sample type) runs as whole-tile
+passes in the private x64 translation units. `SaturationSimd.h` and `CurveSimd.h`
+are written once against a small register-traits type and instantiated with four
+doubles in the AVX2 unit and eight in the AVX-512 unit, so the AVX-512 table no
+longer forwards these kernels to 256-bit code. Backends without the kernels use the
+same laws in scalar code. No FMA, vector libm, approximate reciprocal or
+floating-point state change is involved.
+
+A fused expression per vector group is a dependency chain of more than a hundred
+operations: it fills the floating-point scheduler and consecutive groups cannot
+overlap. The kernels therefore evaluate each tile as several short passes over
+small stack arrays (for example exponential, series, quotient, combination) and
+their polynomials as balanced Estrin trees. The arithmetic is unchanged; the cost
+does not depend on the signal, and there is no silence, stationarity or proximity
+branch into scalar code.
+
+The tanh and atan ADAA kernels return the exact mean of the shape between two
+consecutive driven samples instead of dividing a difference of primitives by the
+step. For tanh, `log cosh a - log cosh b` is `(|a|-|b|) + log((1+p)/(1+q))` with
+`p = exp(-2|a|)`, `q = exp(-2|b|)`; when the endpoints are close `p-q` is formed as
+`q*expm1(-2d)`, and close endpoints on one side of zero need no division by the
+step. For atan the primitive difference is regrouped around the midpoint `m` and
+half step `h` as `h(atan a + atan b) + m(atan a - atan b) - log((1+a*a)/(1+b*b))/2`,
+with the two differences taken from `atan(2h/(1+ab))` and the exact `a*a-b*b`.
+Neither form subtracts nearly equal values before a division, so the absolute
+error stays near 1e-15 for all finite endpoints, including equal ones. The scalar
+law (cached primitive difference, midpoint below a 1e-5 relative step) remains on
+other backends; the two agree within about 5e-11 times the output gain, the scalar
+law being the less exact one. The memoryless tanh/atan shapes (`antialias=false`)
+use the same exponential and five-interval arctangent reduction.
+
+`validateAnalysis` tests samples with integer arithmetic on their IEEE bit patterns:
+no branch or floating-point comparison per sample, the same accepted and rejected
+values, and a form any baseline compiler can vectorize.
+
+`Dynamics` uses tiles on every path. Unlinked channels, sidechains with unequal
+envelopes, lookahead, the expander and the gate previously evaluated `log10` and
+`pow` per sample; they now share the vector transfer curve, a vector linked
+detector magnitude, a vector minimum for `minimumAppliedGain` and a vector gain
+application with the optional mix and limiter ceiling. The decibel meter is
+evaluated once per block from the last envelope, with the original formula. Gate
+decisions compare the envelope with linear thresholds; within a relative 1e-9 of a
+threshold the original decibel comparison decides, so every decision is unchanged.
+Lookahead queue indices wrap by comparison instead of a division.
+
+`DynamicEqualizer` runs each band's detector filter and envelope over a tile (the
+detector only reads the sidechain), converts the envelope tile to band weights in
+one vector pass and then applies the cascaded audio corrections in the original
+order. Measured results: [tile kernel report](TileKernelOptimization.fr.md).
+
+## Spectral convolution head
+
+`ConvolutionConfig::spectralHead` is an opt-in for MatrixConvolver in every mode.
+The early tier then also stores, per route, the spectrum of the first
+earlyPartition taps, and defers the inverse transforms of a completed partition
+until the first frames of the next one arrive. If the process call still holds a
+whole early partition at that point, the partition's forward transform (the one
+the boundary needs anyway) is taken immediately, multiplied by the head spectra
+and added to the pending spectra; one inverse transform per output then delivers
+the head and the older partitions together, and its second half carries the head's
+tail into the overlap. The number of transforms is unchanged and the direct FIR
+does not run for those frames. Latency stays zero and no impulse is shortened.
+
+Process steps end at early partition boundaries so that every new partition can be
+taken whole. A partition the call cannot complete uses the direct FIR as before;
+its inverse transforms simply run when its first frames arrive. After spectral
+partitions the direct history holds zeros, because their head tail lives in the
+tier overlap. On a direct-to-spectral transition the FIR runs once more over the
+old history alone. The input snapshot and tier scratch grow from 64 frames to one
+early partition. The spectral output differs from the direct sum by FFT rounding,
+so it depends on the host block pattern; without the option the previous path,
+its arithmetic and its results are unchanged.
+
+## Fused FFT passes
+
+The transform is still the reference radix-2 algorithm; every value sees the same
+butterflies, twiddles and operation order, so results are bit-identical to the
+stage-at-a-time reference on every backend (an exact-equality regression covers
+real and complex transforms from 2 to 8192 points). On x64 three reorganizations
+remove buffer passes. The bit-reversal permutation is fused with stages half=1
+and half=2: permuted block `reverse[j]` depends only on `x[j]`, `x[j+n/4]`,
+`x[j+n/2]` and `x[j+3n/4]`, so the four quarter streams are read contiguously,
+both stages run in registers and each block is stored at its permuted position.
+For the forward real transform the real input already is the packed even+i*odd
+sequence, which removes the packing copy. The inverse real transform merges the
+real-spectrum bins with a vector kernel into a natural-order buffer and scales the
+result in one vector pass. The progressive convolution tiers use ranged versions
+of the split/merge kernels inside their existing bounded jobs; job counts and the
+per-frame work budget are unchanged.

@@ -1,3 +1,5 @@
+#include "detail/FftAlgorithm.h"
+#include "detail/RealFftAlgorithm.h"
 #include "detail/VectorTable.h"
 #include <algorithm>
 #include <array>
@@ -21,6 +23,79 @@ void ok(Status s) {
 }
 bool same(const BiquadCoefficients& a, const BiquadCoefficients& b) {
     return a.b0 == b.b0 && a.b1 == b.b1 && a.b2 == b.b2 && a.a1 == b.a1 && a.a2 == b.a2;
+}
+// Every backend and size must reproduce, bit for bit, the reference transform:
+// bit reversal, one scalar radix-2 butterfly stage at a time, scalar real-spectrum
+// split/merge and scaling. Fused permutation/stage kernels, vector recombination
+// and vector scaling only reorganize those same operations.
+template <class T> void fftReferenceIdentity() {
+    for (auto backend : {CpuBackend::scalar, CpuBackend::sse2, CpuBackend::avx2, CpuBackend::avx512,
+                         CpuBackend::neon, CpuBackend::sve}) {
+        VectorOps probe;
+        if (VectorOps::create(backend, probe) != Status::ok)
+            continue;
+        for (std::size_t n = 2; n <= 8192; n *= 2) {
+            const auto half = n / 2;
+            std::vector<std::size_t> reverse(half);
+            detail::fillBitReverse(reverse);
+            std::vector<std::complex<T>> twiddles(half - 1 + (half == 1)), real(half - 1);
+            for (std::size_t width = 1; width < half; width *= 2)
+                for (std::size_t j = 0; j < width; ++j) {
+                    const auto angle = -std::numbers::pi * double(j) / double(width);
+                    twiddles[width - 1 + j] = {T(std::cos(angle)), T(std::sin(angle))};
+                }
+            for (std::size_t k = 1; k < half; ++k) {
+                const auto angle = -std::numbers::pi * double(k) / double(half);
+                real[k - 1] = {T(std::cos(angle)), T(std::sin(angle))};
+            }
+            const auto reference = [&](std::span<const std::complex<T>> input,
+                                       std::span<std::complex<T>> output, bool inverse) {
+                detail::fftTransform<T>(
+                    input, output, reverse, std::span<const std::complex<T>>(twiddles), inverse,
+                    [](std::span<std::complex<T>> even, std::span<std::complex<T>> odd,
+                       std::span<const std::complex<T>> w, bool conjugate) {
+                        detail::scalarComplexButterfly<T>(even, odd, w, conjugate);
+                    });
+            };
+            RealFft<T> fft;
+            ComplexFft<T> complexFft;
+            ok(fft.prepare(n, backend));
+            ok(complexFft.prepare(half, backend));
+            std::vector<T> in(n), restored(n), expectedReal(n);
+            std::vector<std::complex<T>> spectrum(half + 1), expected(half + 1), packed(half),
+                transformed(half), direct(half);
+            for (int pattern = 0; pattern < 3; ++pattern) {
+                for (std::size_t i = 0; i < n; ++i)
+                    in[i] = pattern == 0   ? T(.3 * std::sin(.173 * double(i)) +
+                                               .2 * std::cos(2.9 * double(i)))
+                            : pattern == 1 ? T(i == 3 % n ? 1 : 0)
+                                           : T(double((i * 2654435761u) % 2001) / 1000 - 1);
+                ok(fft.forward(in, spectrum));
+                detail::packReal<T>(in, packed);
+                reference(packed, transformed, false);
+                detail::splitRealSpectrum<T>(transformed, real, expected);
+                for (std::size_t k = 0; k <= half; ++k)
+                    require(spectrum[k].real() == expected[k].real() &&
+                                spectrum[k].imag() == expected[k].imag(),
+                            "real forward FFT is bit-identical to the reference transform");
+                ok(complexFft.process(packed, direct, FftDirection::forward));
+                for (std::size_t k = 0; k < half; ++k)
+                    require(direct[k] == transformed[k],
+                            "complex forward FFT is bit-identical to the reference transform");
+                ok(fft.inverse(spectrum, restored));
+                detail::mergeRealSpectrum<T>(spectrum, real, packed);
+                reference(packed, transformed, true);
+                detail::scatterReal<T>(transformed, expectedReal);
+                for (std::size_t i = 0; i < n; ++i)
+                    require(restored[i] == expectedReal[i],
+                            "real inverse FFT is bit-identical to the reference transform");
+                ok(complexFft.process(packed, direct, FftDirection::inverse));
+                for (std::size_t k = 0; k < half; ++k)
+                    require(direct[k] == transformed[k],
+                            "complex inverse FFT is bit-identical to the reference transform");
+            }
+        }
+    }
 }
 template <class T> void fftQuality() {
     for (auto backend : {CpuBackend::scalar, CpuBackend::sse2, CpuBackend::avx2, CpuBackend::avx512,
@@ -455,6 +530,8 @@ void preparedOptimizationRegression() {
     directClipKernels<double>();
     fftQuality<float>();
     fftQuality<double>();
+    fftReferenceIdentity<float>();
+    fftReferenceIdentity<double>();
     preparedControls();
     transientGain<float>();
     transientGain<double>();

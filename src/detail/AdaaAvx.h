@@ -1,5 +1,4 @@
 #pragma once
-#include "CurveAvx.h"
 #include <algorithm>
 #include <cmath>
 #include <immintrin.h>
@@ -110,104 +109,6 @@ inline void adaaClipAvx2(const double* x, double* y, std::size_t n, double previ
     }
     if (n && !active)
         y[0] = (std::clamp(x[0], -1., 1.) - dc) * gain;
-}
-inline void adaaTanhAvx2(const double* x, double* y, std::size_t n, double previous, bool active,
-                         double dc, double gain) noexcept {
-    const auto exactPrimitive = [](double v) {
-        const auto a = std::abs(v);
-        return a + std::log1p(std::exp(-2 * a)) - std::numbers::ln2;
-    };
-    double previousPrimitive = exactPrimitive(previous);
-    bool previousValid = true, previousExact = true;
-    std::size_t i = 0;
-    for (; n - i >= 4; i += 4) {
-        const auto current = _mm256_loadu_pd(x + i), magnitude = foldAbs(current);
-        const auto before =
-            i ? _mm256_loadu_pd(x + i - 1) : _mm256_setr_pd(previous, x[0], x[1], x[2]);
-        const auto delta = _mm256_sub_pd(current, before);
-        const auto scale =
-            _mm256_max_pd(_mm256_set1_pd(1), _mm256_max_pd(magnitude, foldAbs(before)));
-        const auto close =
-            _mm256_cmp_pd(foldAbs(delta), _mm256_mul_pd(_mm256_set1_pd(.01), scale), _CMP_LT_OQ);
-        if (_mm256_movemask_pd(close) == 15) {
-            // Silence and slowly moving inputs retain the cached scalar integral,
-            // avoiding vector transcendental work that would immediately be discarded.
-            for (std::size_t j = 0; j < 4; ++j) {
-                const auto index = i + j;
-                const double beforeSample = index ? x[index - 1] : previous;
-                const double d = x[index] - beforeSample;
-                const double localScale =
-                    std::max({1., std::abs(x[index]), std::abs(beforeSample)});
-                double value;
-                if (!index && !active) {
-                    value = std::tanh(x[index]);
-                    previousValid = previousExact = false;
-                } else if (std::abs(d) > 1e-5 * localScale) {
-                    if (!previousExact)
-                        previousPrimitive = exactPrimitive(beforeSample);
-                    const auto currentPrimitive = exactPrimitive(x[index]);
-                    value = (currentPrimitive - previousPrimitive) / d;
-                    previousPrimitive = currentPrimitive;
-                    previousValid = previousExact = true;
-                } else {
-                    value = std::tanh(.5 * (x[index] + beforeSample));
-                    previousValid = previousExact = false;
-                }
-                y[index] = (value - dc) * gain;
-            }
-            continue;
-        }
-        if (!previousValid)
-            previousPrimitive = exactPrimitive(i ? x[i - 1] : previous);
-        const auto argument =
-            _mm256_max_pd(_mm256_set1_pd(-64), _mm256_mul_pd(magnitude, _mm256_set1_pd(-2)));
-        const auto primitives = _mm256_sub_pd(
-            _mm256_add_pd(magnitude,
-                          curveLog(_mm256_add_pd(_mm256_set1_pd(1), curveExp(argument)))),
-            _mm256_set1_pd(std::numbers::ln2));
-        double values[4];
-        _mm256_storeu_pd(values, primitives);
-
-        const auto beforePrimitive =
-            _mm256_setr_pd(previousPrimitive, values[0], values[1], values[2]);
-
-        const auto distinct = _mm256_cmp_pd(foldAbs(delta), _mm256_set1_pd(0), _CMP_GT_OQ);
-        const auto safe = _mm256_blendv_pd(_mm256_set1_pd(1), delta, distinct);
-        _mm256_storeu_pd(
-            y + i,
-            _mm256_mul_pd(
-                _mm256_sub_pd(_mm256_div_pd(_mm256_sub_pd(primitives, beforePrimitive), safe),
-                              _mm256_set1_pd(dc)),
-                _mm256_set1_pd(gain)));
-        // Close endpoints retain the exact libm secant/midpoint, bounding the
-        // amplification of the vector primitive's rounding error.
-        for (std::size_t j = 0; j < 4; ++j) {
-            const auto index = i + j;
-            const double beforeSample = index ? x[index - 1] : previous;
-            const double d = x[index] - beforeSample;
-            const double scale = std::max({1., std::abs(x[index]), std::abs(beforeSample)});
-            if (!index && !active)
-                y[index] = (std::tanh(x[index]) - dc) * gain;
-            else if (std::abs(d) < .01 * scale) {
-                const double v = std::abs(d) > 1e-5 * scale
-                                     ? (exactPrimitive(x[index]) - exactPrimitive(beforeSample)) / d
-                                     : std::tanh(.5 * (x[index] + beforeSample));
-                y[index] = (v - dc) * gain;
-            }
-        }
-        previousPrimitive = values[3];
-        previousValid = true;
-        previousExact = false;
-    }
-    for (; i < n; ++i) {
-        const auto before = i ? x[i - 1] : previous, d = x[i] - before;
-        const auto scale = std::max({1., std::abs(x[i]), std::abs(before)});
-        const auto v = !i && !active ? std::tanh(x[i])
-                       : std::abs(d) > 1e-5 * scale
-                           ? (exactPrimitive(x[i]) - exactPrimitive(before)) / d
-                           : std::tanh(.5 * (x[i] + before));
-        y[i] = (v - dc) * gain;
-    }
 }
 inline void clipDirectF32(const float* x, float* y, std::size_t n, double drive, double bias,
                           double dc, double gain) noexcept {

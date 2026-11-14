@@ -91,6 +91,29 @@ void wavefolderKernels() {
         }
     }
 }
+// Independent libm oracles for the exact mean of the shape between two driven
+// samples. They use well-conditioned identities, not the kernels' polynomials.
+double exactTanhMean(double a, double b) {
+    if (a == b)
+        return std::tanh(a);
+    const double m = .5 * (a + b), h = .5 * (a - b);
+    if (std::abs(h) <= 1)
+        return std::atanh(std::tanh(m) * std::tanh(h)) / h;
+    return ((std::abs(a) - std::abs(b)) + (std::log1p(std::exp(-2 * std::abs(a))) -
+                                           std::log1p(std::exp(-2 * std::abs(b))))) /
+           (a - b);
+}
+double exactAtanMean(double a, double b) {
+    if (a == b)
+        return 2 / std::numbers::pi * std::atan(a);
+    const double m = .5 * (a + b), step = a - b;
+    const double turn = std::atan2(step, 1 + a * b);
+    const double logarithm = std::abs(a) >= std::abs(b)
+                                 ? std::log1p((a - b) * (a + b) / (1 + b * b))
+                                 : -std::log1p((b - a) * (b + a) / (1 + a * a));
+    return 2 / std::numbers::pi *
+           (.5 * (std::atan(a) + std::atan(b)) + (m * turn - .5 * logarithm) / step);
+}
 template <class T> void saturation() {
     AudioBuffer<T> in, out;
     ok(in.resize(2, 257));
@@ -99,6 +122,12 @@ template <class T> void saturation() {
     ok(p.prepare({48000, 257, 2}));
     double previous[2]{}, memory[2]{};
     bool active[2]{};
+    // x64 kernels evaluate the exact mean; other backends keep the cached
+    // primitive difference with the midpoint limit below a 1e-5 relative step.
+    VectorOps selected;
+    ok(VectorOps::create(CpuBackend::automatic, selected));
+    const bool exactTanh = detail::VectorAccess::table(selected).adaaTanh != nullptr,
+               exactAtan = detail::VectorAccess::table(selected).adaaAtan != nullptr;
     for (int block = 0; block < 120; ++block) {
         SaturationParameters s;
         s.shape = AdaaShape((block / 3) % 6);
@@ -134,13 +163,19 @@ template <class T> void saturation() {
                     y = std::tanh(x + s.hysteresisAmount * memory[c]) - std::tanh(s.bias);
                 } else {
                     const double delta = x - previous[c];
-                    y = s.antialias && active[c]
-                            ? (std::abs(delta) >
-                                       1e-5 * std::max({1., std::abs(x), std::abs(previous[c])})
-                                   ? (primitive(s.shape, x) - primitive(s.shape, previous[c])) /
-                                         delta
-                                   : shape(s.shape, .5 * (x + previous[c])))
-                            : shape(s.shape, x);
+                    if (s.antialias && active[c] && s.shape == AdaaShape::tanh && exactTanh)
+                        y = exactTanhMean(x, previous[c]);
+                    else if (s.antialias && active[c] && s.shape == AdaaShape::atan && exactAtan)
+                        y = exactAtanMean(x, previous[c]);
+                    else
+                        y = s.antialias && active[c]
+                                ? (std::abs(delta) > 1e-5 * std::max({1., std::abs(x),
+                                                                      std::abs(previous[c])})
+                                       ? (primitive(s.shape, x) -
+                                          primitive(s.shape, previous[c])) /
+                                             delta
+                                       : shape(s.shape, .5 * (x + previous[c])))
+                                : shape(s.shape, x);
                     y -= shape(s.shape, s.bias);
                 }
                 const T expected = T(y * s.outputGain);
@@ -290,44 +325,96 @@ void transferKernels() {
                     }
     }
 }
-void tanhEndpointAccuracy() {
-    double maximum = 0;
+void transcendentalEndpointAccuracy() {
+    double maximum[2]{};
     unsigned tested = 0;
     for (auto backend : {CpuBackend::avx2, CpuBackend::avx512}) {
         VectorOps ops;
         if (VectorOps::create(backend, ops) != Status::ok)
             continue;
         ++tested;
-        const auto kernel = detail::VectorAccess::table(ops).adaaTanh;
-        for (double initial : {-1e6, -32., -8., -1., -.1, 0., .1, 1., 8., 32., 1e6})
-            for (double delta : {0., 9.999e-6, 1.0001e-5, .009999, .010001, .05, 1.}) {
-                std::array<double, 67> input{}, output{};
-                double previous = initial;
-                for (std::size_t i = 0; i < input.size(); ++i) {
-                    input[i] = std::clamp(previous + (i % 3 ? 1 : -1) * delta *
-                                                         std::max(1., std::abs(previous)),
-                                          -1e6, 1e6);
-                    previous = input[i];
+        const auto& table = detail::VectorAccess::table(ops);
+        for (int shape = 0; shape < 2; ++shape) {
+            const auto kernel = shape ? table.adaaAtan : table.adaaTanh;
+            const auto exact = shape ? exactAtanMean : exactTanhMean;
+            require(kernel != nullptr, "x64 transcendental ADAA kernel selected");
+            for (double initial : {-1e6, -32., -8., -2.4, -1., -.41, -.1, -1e-9, 0., 1e-300, .1,
+                                   .2, .67, 1., 1.5, 5.03, 8., 32., 1e6})
+                for (double delta : {0., 1e-300, 1e-15, 1e-9, 9.999e-6, 1.0001e-5, .009999,
+                                     .010001, .05, .1249, .1251, .26, 1., 3., 70.}) {
+                    std::array<double, 67> input{}, output{};
+                    double previous = initial;
+                    for (std::size_t i = 0; i < input.size(); ++i) {
+                        input[i] = std::clamp(previous + (i % 3 ? 1 : -1) * delta *
+                                                             std::max(1., std::abs(previous)),
+                                              -1e6, 1e6);
+                        previous = input[i];
+                    }
+                    kernel(input.data(), output.data(), input.size(), initial, true, -.3, 16);
+                    previous = initial;
+                    for (std::size_t i = 0; i < input.size(); ++i) {
+                        const auto error =
+                            std::abs(output[i] - (exact(input[i], previous) + .3) * 16);
+                        maximum[shape] = std::max(maximum[shape], error);
+                        require(error < 1e-13, "exact ADAA mean for close/far endpoints, gain 16");
+                        previous = input[i];
+                    }
                 }
-                kernel(input.data(), output.data(), input.size(), initial, true, -.3, 16);
-                previous = initial;
-                for (std::size_t i = 0; i < input.size(); ++i) {
-                    const auto d = input[i] - previous;
-                    const auto value =
-                        std::abs(d) > 1e-5 * std::max({1., std::abs(input[i]), std::abs(previous)})
-                            ? (primitive(AdaaShape::tanh, input[i]) -
-                               primitive(AdaaShape::tanh, previous)) /
-                                  d
-                            : std::tanh(.5 * (input[i] + previous));
-                    const auto error = std::abs(output[i] - (value + .3) * 16);
-                    maximum = std::max(maximum, error);
-                    require(error < 2e-12, "tanh close endpoints/high gain independent integral");
-                    previous = input[i];
+            // Sign changes, signed zeros, tails, inactive history and output bounds.
+            for (std::size_t count = 0; count <= 67; ++count)
+                for (bool active : {false, true}) {
+                    std::array<double, 70> x{}, output{};
+                    output.fill(12345);
+                    for (std::size_t i = 0; i < count; ++i)
+                        x[i + 1] = i % 11 == 0   ? -0.
+                                   : i % 7 == 0  ? 1e6
+                                   : i % 5 == 0  ? -1e6
+                                   : i % 13 == 0 ? x[i]
+                                                 : 3 * std::sin(double(i) * .7 + double(count));
+                    kernel(x.data() + 1, output.data() + 1, count, -.7, active, .25, .8);
+                    double previous = active ? -.7 : x[1];
+                    for (std::size_t i = 0; i < count; ++i) {
+                        const auto error =
+                            std::abs(output[i + 1] - (exact(x[i + 1], previous) - .25) * .8);
+                        maximum[shape] = std::max(maximum[shape], error);
+                        require(error < 1e-14, "exact ADAA mean tails/sign changes/first sample");
+                        previous = x[i + 1];
+                    }
+                    require(output.front() == 12345 && output[count + 1] == 12345,
+                            "transcendental ADAA respects output bounds");
                 }
+            const auto direct = shape ? table.shapeAtan : table.shapeTanh;
+            require(direct != nullptr, "x64 memoryless shape kernel selected");
+            for (std::size_t count = 0; count <= 67; ++count) {
+                std::array<double, 70> x{}, output{};
+                output.fill(12345);
+                for (std::size_t i = 0; i < count; ++i)
+                    x[i + 1] = i % 11 == 0   ? -0.
+                               : i % 7 == 0  ? 1e6
+                               : i % 5 == 0  ? -1e-9
+                               : i % 3 == 0  ? .1 * std::sin(double(i))
+                                             : 9 * std::sin(double(i) * .7 + double(count));
+                direct(x.data() + 1, output.data() + 1, count, .25, .8);
+                for (std::size_t i = 0; i < count; ++i) {
+                    const double v = x[i + 1];
+                    const double expected = shape ? 2 / std::numbers::pi * std::atan(v)
+                                                  : std::tanh(v);
+                    require(std::abs(output[i + 1] - (expected - .25) * .8) < 1e-15,
+                            "memoryless SIMD shape matches libm");
+                }
+                require(output.front() == 12345 && output[count + 1] == 12345,
+                        "memoryless SIMD shape respects output bounds");
+                // In-place evaluation is part of the kernel contract.
+                auto inPlace = x;
+                direct(inPlace.data() + 1, inPlace.data() + 1, count, .25, .8);
+                for (std::size_t i = 0; i < count; ++i)
+                    require(inPlace[i + 1] == output[i + 1], "memoryless SIMD shape in place");
             }
+        }
     }
     if (tested)
-        std::cout << "QUALITY tanh SIMD maxAbsError=" << maximum << " backends=" << tested << '\n';
+        std::cout << "QUALITY ADAA SIMD exact-mean maxAbsError tanh=" << maximum[0]
+                  << " atan=" << maximum[1] << " backends=" << tested << '\n';
 }
 void coefficientAndMaterialAccuracy() {
     for (double frequency : {10., 500., 2800., 16000., 23900.})
@@ -389,15 +476,223 @@ void audioMathAccuracy() {
                     std::log(std::numeric_limits<double>::denorm_min()),
             "numerical kernel exceptional-value fallbacks");
 }
+// Typed tile stages share the scalar operation order, so they are compared
+// for exact equality with the processors' scalar expressions.
+template <class T> void tileStages(const VectorOps& ops) {
+    const auto& kernels = detail::VectorAccess::kernels<T>(ops);
+    require(kernels.saturationDrive && kernels.saturationPublish && kernels.magnitude &&
+                kernels.applyGains,
+            "x64 typed tile stages selected");
+    const std::array<double, 5> stage{4, .2, 2.5, 1.3, -.4};
+    for (std::size_t count = 0; count <= 67; ++count) {
+        std::array<T, 70> input{}, dry{}, output{};
+        std::array<double, 70> wide{}, gains{};
+        for (std::size_t i = 0; i < count; ++i) {
+            input[i + 1] = T(i % 9 == 0 ? -0. : i % 7 == 0 ? 1e7 : 3 * std::sin(.9 * double(i)));
+            dry[i + 1] = T(.7 * std::cos(.4 * double(i)));
+            gains[i + 1] = i % 5 == 0 ? 1 : .05 + .3 * double(i % 6);
+        }
+        for (bool staged : {false, true}) {
+            wide.fill(12345);
+            kernels.saturationDrive(input.data() + 1, wide.data() + 1, count, stage.data(),
+                                    staged);
+            for (std::size_t i = 0; i < count; ++i) {
+                double sample = double(input[i + 1]);
+                if (staged)
+                    sample = (sample * stage[0] + stage[1]) * stage[2];
+                require(wide[i + 1] == std::clamp(sample * stage[3] + stage[4], -1e6, 1e6),
+                        "vector drive stage equals the scalar stage");
+            }
+            require(wide.front() == 12345 && wide[count + 1] == 12345, "drive stage bounds");
+        }
+        for (bool mixed : {false, true}) {
+            output.fill(T(12345));
+            kernels.saturationPublish(dry.data() + 1, gains.data() + 1, output.data() + 1, count,
+                                      .25, .75, mixed);
+            for (std::size_t i = 0; i < count; ++i)
+                require(output[i + 1] ==
+                            (mixed ? T(.25 * double(dry[i + 1]) + .75 * double(T(gains[i + 1])))
+                                   : T(gains[i + 1])),
+                        "vector publication equals the scalar mix");
+            require(output.front() == T(12345) && output[count + 1] == T(12345),
+                    "publication bounds");
+            for (double ceiling : {.5, std::numeric_limits<double>::infinity()}) {
+                output.fill(T(12345));
+                kernels.applyGains(input.data() + 1, gains.data() + 1, output.data() + 1, count,
+                                   1.4, ceiling, dry.data() + 1, .25, .75, mixed);
+                for (std::size_t i = 0; i < count; ++i) {
+                    const double value = std::clamp(
+                        double(input[i + 1]) * gains[i + 1] * 1.4, -ceiling, ceiling);
+                    require(output[i + 1] ==
+                                (mixed ? T(.25 * double(dry[i + 1]) + .75 * double(T(value)))
+                                       : T(value)),
+                            "vector gain application equals the scalar law");
+                }
+                require(output.front() == T(12345) && output[count + 1] == T(12345),
+                        "gain application bounds");
+            }
+            // Exact in-place application, as used by the dynamics processors.
+            auto inPlace = input;
+            kernels.applyGains(inPlace.data() + 1, gains.data() + 1, inPlace.data() + 1, count,
+                               1.4, .5, inPlace.data() + 1, .25, .75, mixed);
+            for (std::size_t i = 0; i < count; ++i) {
+                const double value =
+                    std::clamp(double(input[i + 1]) * gains[i + 1] * 1.4, -.5, .5);
+                require(inPlace[i + 1] ==
+                            (mixed ? T(.25 * double(input[i + 1]) + .75 * double(T(value)))
+                                   : T(value)),
+                        "in-place vector gain application");
+            }
+        }
+        wide.fill(12345);
+        kernels.magnitude(input.data() + 1, wide.data() + 1, count, false);
+        kernels.magnitude(dry.data() + 1, wide.data() + 1, count, true);
+        for (std::size_t i = 0; i < count; ++i)
+            require(wide[i + 1] ==
+                        std::max(std::abs(double(input[i + 1])), std::abs(double(dry[i + 1]))),
+                    "linked detector magnitude");
+        require(wide.front() == 12345 && wide[count + 1] == 12345, "magnitude bounds");
+    }
+}
+void curveKernels() {
+    double worst = 0;
+    unsigned tested = 0;
+    for (auto backend : {CpuBackend::avx2, CpuBackend::avx512}) {
+        VectorOps ops;
+        if (VectorOps::create(backend, ops) != Status::ok)
+            continue;
+        ++tested;
+        tileStages<float>(ops);
+        tileStages<double>(ops);
+        const auto& table = detail::VectorAccess::table(ops);
+        require(table.expanderGain && table.dynamicEqGain && table.transientGain &&
+                    table.minimum,
+                "x64 gain-curve kernels selected");
+        std::array<double, 68> envelope{}, slow{}, output{};
+        for (std::size_t i = 0; i < 67; ++i) {
+            envelope[i] = i % 13 == 0 ? 0 : std::pow(10., (-250 + 4.1 * double(i)) / 20);
+            slow[i] = envelope[i] * (.2 + .03 * double(i));
+        }
+        const auto close = [&](double actual, double expected, const char* message) {
+            const double error = std::abs(actual - expected) / (1 + std::abs(expected));
+            worst = std::max(worst, std::abs(actual / expected - 1));
+            require(error < 2e-13 && std::abs(actual / expected - 1) < 2e-13, message);
+        };
+        for (std::size_t count = 0; count <= 67; ++count) {
+            for (double threshold : {-60., -24., 0.})
+                for (double ratio : {1., 2., 8.}) {
+                    output.fill(12345);
+                    table.expanderGain(envelope.data(), output.data(), count, threshold, ratio);
+                    for (std::size_t i = 0; i < count; ++i) {
+                        const double over =
+                            20 * std::log10(std::max(1e-12, envelope[i])) - threshold;
+                        close(output[i],
+                              std::pow(10.,
+                                       (over < 0 ? std::max(-160., (ratio - 1) * over) : 0.) / 20),
+                              "SIMD expander independent transfer oracle");
+                    }
+                    require(output[count] == 12345, "expander tail bounds");
+                }
+            for (double threshold : {-90., -35., -6.})
+                for (double range : {-18., 0., 12.}) {
+                    output.fill(12345);
+                    table.dynamicEqGain(envelope.data(), output.data(), count, threshold, 1.5,
+                                        range);
+                    for (std::size_t i = 0; i < count; ++i) {
+                        const double over =
+                            20 * std::log10(std::max(1e-12, envelope[i])) - threshold;
+                        const double expected =
+                            std::pow(10., (1.5 + range * std::clamp(over / 24., 0., 1.)) / 20);
+                        // The kernel returns the weight minus one.
+                        close(output[i] + 1, expected, "SIMD dynamic EQ weight oracle");
+                    }
+                    require(output[count] == 12345, "dynamic EQ tail bounds");
+                }
+            for (double amount : {-1., .7})
+                for (double sustain : {-.3, 1.}) {
+                    const std::array<double, 3> parameters{amount, sustain, 24};
+                    output.fill(12345);
+                    table.transientGain(envelope.data(), slow.data(), output.data(), count,
+                                        parameters.data());
+                    for (std::size_t i = 0; i < count; ++i) {
+                        const double attack =
+                            std::clamp((envelope[i] - slow[i]) / std::max(1e-12, envelope[i]),
+                                       0., 1.);
+                        const double hold =
+                            std::clamp(slow[i] / std::max(1e-12, envelope[i]), 0., 1.) *
+                            (1 - attack);
+                        close(output[i],
+                              std::pow(10.,
+                                       24 * std::clamp(amount * attack + sustain * hold, -1., 1.) /
+                                           20),
+                              "SIMD transient gain oracle");
+                    }
+                    require(output[count] == 12345, "transient tail bounds");
+                }
+            double expected = std::numeric_limits<double>::infinity();
+            for (std::size_t i = 0; i < count; ++i)
+                expected = std::min(expected, slow[i]);
+            require(table.minimum(slow.data(), count) == expected, "SIMD minimum");
+        }
+    }
+    if (tested)
+        std::cout << "QUALITY gain-curve SIMD maxRelativeError=" << worst
+                  << " backends=" << tested << '\n';
+}
+// A constant channel takes a shortcut inside the tiled saturator. It must equal
+// the general tile path, which blocks shorter than eight frames always use.
+template <class T> void constantChannelSaturation() {
+    AudioBuffer<T> in, whole, pieces;
+    ok(in.resize(2, 71));
+    ok(whole.resize(2, 71));
+    ok(pieces.resize(2, 71));
+    for (auto shape :
+         {AdaaShape::tanh, AdaaShape::atan, AdaaShape::hardClip, AdaaShape::wavefolder})
+        for (bool antialias : {false, true})
+            for (double level : {0., -0., .37, -2.5}) {
+                AdaaSaturator<T> a, b;
+                ok(a.prepare({48000, 71, 2}));
+                ok(b.prepare({48000, 71, 2}));
+                SaturationParameters p;
+                p.shape = shape;
+                p.antialias = antialias;
+                p.drive = 2.5;
+                p.bias = .1;
+                p.outputGain = .9;
+                ok(a.setParameters(p));
+                ok(b.setParameters(p));
+                for (int block = 0; block < 3; ++block) {
+                    for (std::size_t ch = 0; ch < 2; ++ch)
+                        for (std::size_t i = 0; i < 71; ++i)
+                            in.block().channel(ch)[i] =
+                                block == 1 ? T(.8 * std::sin(.3 * double(i) + double(ch)))
+                                           : T(ch ? -level : level);
+                    ok(a.processMixed(in.block(), whole.block(), {1.5, .05, 1}, .25, .75));
+                    for (std::size_t offset = 0; offset < 71; offset += 7)
+                        ok(b.processMixed(in.block().subBlock(offset, std::min<std::size_t>(
+                                                                          7, 71 - offset)),
+                                          pieces.block().subBlock(
+                                              offset, std::min<std::size_t>(7, 71 - offset)),
+                                          {1.5, .05, 1}, .25, .75));
+                    for (std::size_t ch = 0; ch < 2; ++ch)
+                        for (std::size_t i = 0; i < 71; ++i)
+                            require(whole.block().channel(ch)[i] == pieces.block().channel(ch)[i],
+                                    "constant-channel saturation equals the general tile path");
+                }
+            }
+}
 } // namespace
 void hotspotRegression() {
     audioMathAccuracy();
     transferKernels();
-    tanhEndpointAccuracy();
+    curveKernels();
+    transcendentalEndpointAccuracy();
     coefficientAndMaterialAccuracy();
     wavefolderKernels();
     saturation<float>();
     saturation<double>();
+    constantChannelSaturation<float>();
+    constantChannelSaturation<double>();
     dynamics<float>();
     dynamics<double>();
 }

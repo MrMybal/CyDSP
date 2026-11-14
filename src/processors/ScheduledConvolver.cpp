@@ -152,8 +152,8 @@ struct ScheduledConvolver<T>::State {
                 spectrum[0] = detail::splitRealBin<T>({work, p}, {realWeights, p - 1}, 0);
                 spectrum[p] = detail::splitRealBin<T>({work, p}, {realWeights, p - 1}, p);
             }
-            for (auto i = std::max(cursor, std::size_t{1}); i < end; ++i)
-                spectrum[i] = detail::splitRealBin<T>({work, p}, {realWeights, p - 1}, i);
+            detail::splitRealRange<T>(*kernels, work, realWeights, spectrum, p,
+                                      std::max(cursor, std::size_t{1}), end);
             cursor = end;
             if (cursor == p) {
                 phase = Phase::mac;
@@ -184,9 +184,8 @@ struct ScheduledConvolver<T>::State {
             if (cursor == 0)
                 work[reverse[0]] =
                     detail::mergeRealBin<T>({sum.data(), p + 1}, {realWeights, p - 1}, 0);
-            for (auto i = std::max(cursor, std::size_t{1}); i < end; ++i)
-                work[reverse[i]] =
-                    detail::mergeRealBin<T>({sum.data(), p + 1}, {realWeights, p - 1}, i);
+            detail::mergeRealRange<T>(*kernels, sum.data(), realWeights, work, reverse, p,
+                                      std::max(cursor, std::size_t{1}), end);
             cursor = end;
             if (cursor == p) {
                 cursor = 0;

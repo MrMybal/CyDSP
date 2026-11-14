@@ -20,6 +20,7 @@ Status RealFft<T>::prepare(std::size_t count, CpuBackend backend) noexcept {
         return status;
     try {
         next.scratch_.resize(half);
+        next.natural_.resize(half);
         next.twiddles_.resize(half - 1);
         for (std::size_t k = 1; k < half; ++k) {
             const auto angle =
@@ -49,10 +50,15 @@ Status RealFft<T>::forward(std::span<const T> input, std::span<std::complex<T>> 
         output[0] = {input[0], T{0}};
         return Status::ok;
     }
-    const auto reverse = detail::FftPlanAccess::reverse(fft_);
-    for (std::size_t i = 0; i < scratch_.size(); ++i)
-        scratch_[reverse[i]] = {input[2 * i], input[2 * i + 1]};
-    detail::FftPlanAccess::transformPermutedUnscaled<T>(fft_, scratch_, false);
+    // The real input already is the packed even+i*odd sequence in natural order.
+    const auto first = detail::FftPlanAccess::permuteHead<T>(
+        fft_, input.data(), reinterpret_cast<T*>(scratch_.data()), scratch_.size(), false);
+    if (first == 1) {
+        const auto reverse = detail::FftPlanAccess::reverse(fft_);
+        for (std::size_t i = 0; i < scratch_.size(); ++i)
+            scratch_[reverse[i]] = {input[2 * i], input[2 * i + 1]};
+    }
+    detail::FftPlanAccess::transformPermutedUnscaled<T>(fft_, scratch_, false, first);
     const auto split = detail::FftPlanAccess::kernels(fft_).realSplit;
     if (split && scratch_.size() >= 4)
         split(reinterpret_cast<const T*>(scratch_.data()),
@@ -77,15 +83,31 @@ Status RealFft<T>::inverse(std::span<const std::complex<T>> input, std::span<T> 
         output[0] = input[0].real();
         return Status::ok;
     }
-    const auto reverse = detail::FftPlanAccess::reverse(fft_);
-    for (std::size_t k = 0; k < scratch_.size(); ++k)
-        scratch_[reverse[k]] = detail::mergeRealBin<T>(input, twiddles_, k);
-    detail::FftPlanAccess::transformPermutedUnscaled<T>(fft_, scratch_, true);
-    const auto scale = T{1} / static_cast<T>(scratch_.size());
-    for (std::size_t i = 0; i < scratch_.size(); ++i) {
-        output[2 * i] = scratch_[i].real() * scale;
-        output[2 * i + 1] = scratch_[i].imag() * scale;
+    const auto& kernels = detail::FftPlanAccess::kernels(fft_);
+    std::size_t first = 1;
+    if (kernels.realMergeRange && scratch_.size() >= 16) {
+        natural_[0] = detail::mergeRealBin<T>(input, twiddles_, 0);
+        kernels.realMergeRange(reinterpret_cast<const T*>(input.data()),
+                               reinterpret_cast<const T*>(twiddles_.data()),
+                               reinterpret_cast<T*>(natural_.data() + 1), scratch_.size(), 1,
+                               scratch_.size());
+        first = detail::FftPlanAccess::permuteHead<T>(
+            fft_, reinterpret_cast<const T*>(natural_.data()),
+            reinterpret_cast<T*>(scratch_.data()), scratch_.size(), true);
+        if (first == 1) {
+            const auto reverse = detail::FftPlanAccess::reverse(fft_);
+            for (std::size_t k = 0; k < scratch_.size(); ++k)
+                scratch_[reverse[k]] = natural_[k];
+        }
+    } else {
+        const auto reverse = detail::FftPlanAccess::reverse(fft_);
+        for (std::size_t k = 0; k < scratch_.size(); ++k)
+            scratch_[reverse[k]] = detail::mergeRealBin<T>(input, twiddles_, k);
     }
+    detail::FftPlanAccess::transformPermutedUnscaled<T>(fft_, scratch_, true, first);
+    // The packed result is the interleaved real output: one scaling pass.
+    kernels.scale(reinterpret_cast<const T*>(scratch_.data()), output.data(), output.size(),
+                  T{1} / static_cast<T>(scratch_.size()));
     return Status::ok;
 }
 template class RealFft<float>;

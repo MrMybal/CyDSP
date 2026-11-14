@@ -4,6 +4,10 @@
 
 ## Changements
 
+- Saturation et dynamique évaluées par tuiles de 64 frames avec des noyaux x64 génériques en largeur (quatre doubles en AVX2, huit en AVX-512). Les ADAA tanh et atan renvoient la moyenne exacte entre échantillons consécutifs (erreur absolue proche de 1e-15, sans repli scalaire) ; les dynamiques non liées, avec sidechain, lookahead, expandeur et gate, l’égaliseur dynamique et le gain transitoire `fast` utilisent des courbes de transfert vectorielles ; la validation des entrées est sans branche. Résultats : [rapport des noyaux par tuiles](docs/TileKernelOptimization.fr.md).
+- Ajout de l’option `ConvolutionConfig::spectralHead` pour MatrixConvolver : les partitions précoces entières convoluent leurs premiers taps avec les transformées du niveau précoce au lieu de la FIR directe, sans latence.
+- Permutation de la FFT fusionnée avec ses deux premiers étages, fusion et mise à l’échelle vectorielles de l’inverse réelle, noyaux par plage dans les niveaux de convolution progressifs. Résultats identiques bit à bit à la transformée de référence.
+
 - Ajout des sources groupées SIMD et banques partagées, préparation HRTF (onsets, alignement, conversion et interpolation), Ambisonics ordre 7 et rendu binaural HOA, diffraction, analyse détaillée d’IR, séparation harmonique/percussive, pitch spectral/formants, contacts physiques, annulation d’écho avec double parole et profils de qualité avec transitions préparées. Voir le [guide des API avancées](docs/AdvancedExpansionGuide.fr.md).
 
 - Extension des dix lots DSP/3D : fondations, graphes multibus/PDC, propagation, pièces/réverbérations, binaural/VBAP/HOA, dynamique avancée, effets/synthèse, analyse musicale/physique et restauration/diagnostic. API originales MIT ; voir les [contrats et limites](docs/ExpansionGuide.fr.md).

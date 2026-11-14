@@ -1,0 +1,6006 @@
+{
+  "status": "passed",
+  "sourceSha256": "afd35c7e00626a3710ad7c0dd26fed8d30659bc542fb2e9fdf368a0db76cbbff",
+  "baselineProductionCommit": "b973c1bc0aaf7a7db26a150af7cd6a2ad4e42ee5",
+  "method": "Alternating independent process pairs; median of process medians of nine 128-call batch means, 256-frame blocks at 48 kHz. No global CPU/FP state changes.",
+  "logicalCpu": 4,
+  "processPairs": 5,
+  "executablesSha256": {
+    "before": "5cccf827857249b682f43d882a2cc74f9086d867d900dfe6a0e000016913f013",
+    "after": "915fd2b6f56a6f3c4221c5e18653effec14d9d8fad5d4bb492967109e33774a6"
+  },
+  "cases": [
+    {
+      "case": "compressor.1.independent.peak.f32",
+      "beforeUs": 8.49296875,
+      "afterUs": 0.940625,
+      "speedupBeforeOverAfter": 9.02906976744186,
+      "costChangePercent": -88.92466194462331,
+      "processMeansUs": {
+        "before": [
+          8.4796875,
+          8.7171875,
+          8.515625,
+          8.49296875,
+          8.4921875
+        ],
+        "after": [
+          0.9375,
+          0.9390625,
+          0.9421875,
+          0.94375,
+          0.940625
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.independent.rms.f32",
+      "beforeUs": 9.5734375,
+      "afterUs": 1.38515625,
+      "speedupBeforeOverAfter": 6.911449520586577,
+      "costChangePercent": -85.53125510037539,
+      "processMeansUs": {
+        "before": [
+          9.528125,
+          9.72578125,
+          9.60234375,
+          9.53515625,
+          9.5734375
+        ],
+        "after": [
+          1.38515625,
+          1.3796875,
+          1.390625,
+          1.3796875,
+          1.3859375
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.peak.f32",
+      "beforeUs": 1.6375,
+      "afterUs": 0.84375,
+      "speedupBeforeOverAfter": 1.9407407407407407,
+      "costChangePercent": -48.473282442748086,
+      "processMeansUs": {
+        "before": [
+          1.6375,
+          1.68359375,
+          1.63359375,
+          1.6390625,
+          1.63203125
+        ],
+        "after": [
+          0.84453125,
+          0.84375,
+          0.846875,
+          0.83671875,
+          0.84375
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.rms.f32",
+      "beforeUs": 2.021875,
+      "afterUs": 1.40625,
+      "speedupBeforeOverAfter": 1.4377777777777778,
+      "costChangePercent": -30.44822256568779,
+      "processMeansUs": {
+        "before": [
+          2.0203125,
+          2.05703125,
+          2.02421875,
+          2.021875,
+          2.01484375
+        ],
+        "after": [
+          1.41328125,
+          1.403125,
+          1.4046875,
+          1.40625,
+          1.4125
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.peak.f32",
+      "beforeUs": 16.925,
+      "afterUs": 1.8765625,
+      "speedupBeforeOverAfter": 9.019150707743547,
+      "costChangePercent": -88.91248153618906,
+      "processMeansUs": {
+        "before": [
+          17.2265625,
+          17.22265625,
+          16.925,
+          16.88828125,
+          16.853125
+        ],
+        "after": [
+          1.85078125,
+          1.8765625,
+          1.86015625,
+          1.8796875,
+          1.87734375
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.rms.f32",
+      "beforeUs": 19.0203125,
+      "afterUs": 2.7390625,
+      "speedupBeforeOverAfter": 6.94409583571021,
+      "costChangePercent": -85.59927708863879,
+      "processMeansUs": {
+        "before": [
+          19.26484375,
+          19.18359375,
+          18.91796875,
+          19.0203125,
+          18.946875
+        ],
+        "after": [
+          2.72578125,
+          2.74296875,
+          2.7296875,
+          2.7390625,
+          2.753125
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.peak.f32",
+      "beforeUs": 2.31875,
+      "afterUs": 0.94375,
+      "speedupBeforeOverAfter": 2.4569536423841063,
+      "costChangePercent": -59.299191374663074,
+      "processMeansUs": {
+        "before": [
+          2.31875,
+          2.35625,
+          2.32890625,
+          2.309375,
+          2.31796875
+        ],
+        "after": [
+          1.08359375,
+          0.9671875,
+          0.9359375,
+          0.940625,
+          0.94375
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.rms.f32",
+      "beforeUs": 2.63671875,
+      "afterUs": 1.515625,
+      "speedupBeforeOverAfter": 1.7396907216494846,
+      "costChangePercent": -42.51851851851852,
+      "processMeansUs": {
+        "before": [
+          2.634375,
+          2.63671875,
+          2.64609375,
+          2.63984375,
+          2.62734375
+        ],
+        "after": [
+          1.553125,
+          1.51640625,
+          1.515625,
+          1.5140625,
+          1.515625
+        ]
+      }
+    },
+    {
+      "case": "compressor.r2.level-40.f32",
+      "beforeUs": 2.20859375,
+      "afterUs": 0.7875,
+      "speedupBeforeOverAfter": 2.804563492063492,
+      "costChangePercent": -64.34382737884683,
+      "processMeansUs": {
+        "before": [
+          2.20859375,
+          2.19375,
+          2.2203125,
+          2.2375,
+          2.16640625
+        ],
+        "after": [
+          0.78125,
+          0.78671875,
+          0.8015625,
+          0.79765625,
+          0.7875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r2.level-24.f32",
+      "beforeUs": 3.8015625,
+      "afterUs": 1.26171875,
+      "speedupBeforeOverAfter": 3.0130030959752325,
+      "costChangePercent": -66.81052198931361,
+      "processMeansUs": {
+        "before": [
+          3.7765625,
+          3.8515625,
+          3.78359375,
+          3.84140625,
+          3.8015625
+        ],
+        "after": [
+          1.2515625,
+          1.25078125,
+          1.2640625,
+          1.26171875,
+          1.2671875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r2.level-8.f32",
+      "beforeUs": 2.190625,
+      "afterUs": 0.84765625,
+      "speedupBeforeOverAfter": 2.584331797235023,
+      "costChangePercent": -61.305278174037085,
+      "processMeansUs": {
+        "before": [
+          2.1796875,
+          2.2671875,
+          2.190625,
+          2.17421875,
+          2.23046875
+        ],
+        "after": [
+          0.84765625,
+          0.8515625,
+          0.84765625,
+          0.846875,
+          0.84921875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r4.level-40.f32",
+      "beforeUs": 2.140625,
+      "afterUs": 0.84296875,
+      "speedupBeforeOverAfter": 2.5393883225208524,
+      "costChangePercent": -60.62043795620438,
+      "processMeansUs": {
+        "before": [
+          2.1109375,
+          2.18984375,
+          2.140625,
+          2.1203125,
+          2.1546875
+        ],
+        "after": [
+          0.84140625,
+          0.8390625,
+          0.8578125,
+          0.84765625,
+          0.84296875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r4.level-24.f32",
+      "beforeUs": 3.76484375,
+      "afterUs": 1.26328125,
+      "speedupBeforeOverAfter": 2.9802102659245517,
+      "costChangePercent": -66.44532060593484,
+      "processMeansUs": {
+        "before": [
+          3.76484375,
+          3.8296875,
+          3.7953125,
+          3.76328125,
+          3.759375
+        ],
+        "after": [
+          1.26328125,
+          1.25078125,
+          1.26796875,
+          1.2734375,
+          1.25859375
+        ]
+      }
+    },
+    {
+      "case": "compressor.r4.level-8.f32",
+      "beforeUs": 2.259375,
+      "afterUs": 0.9359375,
+      "speedupBeforeOverAfter": 2.4140233722871454,
+      "costChangePercent": -58.575380359612716,
+      "processMeansUs": {
+        "before": [
+          2.2578125,
+          2.28203125,
+          2.26171875,
+          2.25078125,
+          2.259375
+        ],
+        "after": [
+          0.946875,
+          0.93359375,
+          0.946875,
+          0.9359375,
+          0.93359375
+        ]
+      }
+    },
+    {
+      "case": "compressor.r6.level-40.f32",
+      "beforeUs": 2.1265625,
+      "afterUs": 0.8046875,
+      "speedupBeforeOverAfter": 2.6427184466019416,
+      "costChangePercent": -62.16017634092579,
+      "processMeansUs": {
+        "before": [
+          2.1265625,
+          2.1484375,
+          2.1296875,
+          2.12109375,
+          2.11640625
+        ],
+        "after": [
+          0.8046875,
+          0.79609375,
+          0.80625,
+          0.8125,
+          0.790625
+        ]
+      }
+    },
+    {
+      "case": "compressor.r6.level-24.f32",
+      "beforeUs": 3.74375,
+      "afterUs": 1.265625,
+      "speedupBeforeOverAfter": 2.9580246913580246,
+      "costChangePercent": -66.19365609348915,
+      "processMeansUs": {
+        "before": [
+          3.7390625,
+          3.79609375,
+          3.74375,
+          3.7453125,
+          3.73515625
+        ],
+        "after": [
+          1.25703125,
+          1.265625,
+          1.26484375,
+          1.26796875,
+          1.26640625
+        ]
+      }
+    },
+    {
+      "case": "compressor.r6.level-8.f32",
+      "beforeUs": 3.73515625,
+      "afterUs": 1.265625,
+      "speedupBeforeOverAfter": 2.951234567901235,
+      "costChangePercent": -66.11587533988705,
+      "processMeansUs": {
+        "before": [
+          3.73515625,
+          3.7984375,
+          3.73203125,
+          3.7359375,
+          3.7328125
+        ],
+        "after": [
+          1.265625,
+          1.26953125,
+          1.2578125,
+          1.2796875,
+          1.2578125
+        ]
+      }
+    },
+    {
+      "case": "compressor.r12.level-40.f32",
+      "beforeUs": 2.1140625,
+      "afterUs": 0.7921875,
+      "speedupBeforeOverAfter": 2.668639053254438,
+      "costChangePercent": -62.52771618625277,
+      "processMeansUs": {
+        "before": [
+          2.109375,
+          2.153125,
+          2.10546875,
+          2.1140625,
+          2.11484375
+        ],
+        "after": [
+          0.79140625,
+          0.79140625,
+          0.8,
+          0.8,
+          0.7921875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r12.level-24.f32",
+      "beforeUs": 3.74375,
+      "afterUs": 1.26171875,
+      "speedupBeforeOverAfter": 2.9671826625386997,
+      "costChangePercent": -66.29799666110183,
+      "processMeansUs": {
+        "before": [
+          3.7359375,
+          3.80390625,
+          3.74375,
+          3.74609375,
+          3.73828125
+        ],
+        "after": [
+          1.24140625,
+          1.26171875,
+          1.2578125,
+          1.2796875,
+          1.26484375
+        ]
+      }
+    },
+    {
+      "case": "compressor.r12.level-8.f32",
+      "beforeUs": 3.7328125,
+      "afterUs": 1.25078125,
+      "speedupBeforeOverAfter": 2.984384759525297,
+      "costChangePercent": -66.49225617413144,
+      "processMeansUs": {
+        "before": [
+          3.7390625,
+          3.75703125,
+          3.72890625,
+          3.7328125,
+          3.73125
+        ],
+        "after": [
+          1.2640625,
+          1.25,
+          1.2375,
+          1.25078125,
+          1.26484375
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.direct.f32",
+      "beforeUs": 4.23046875,
+      "afterUs": 0.97265625,
+      "speedupBeforeOverAfter": 4.349397590361446,
+      "costChangePercent": -77.00831024930747,
+      "processMeansUs": {
+        "before": [
+          4.23046875,
+          4.2640625,
+          4.2359375,
+          4.21328125,
+          4.20859375
+        ],
+        "after": [
+          0.97265625,
+          0.97265625,
+          0.9734375,
+          0.97109375,
+          1.01171875
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.adaa.f32",
+      "beforeUs": 7.4453125,
+      "afterUs": 1.63828125,
+      "speedupBeforeOverAfter": 4.544587505960897,
+      "costChangePercent": -77.99580272822666,
+      "processMeansUs": {
+        "before": [
+          7.521875,
+          7.4375,
+          7.4453125,
+          7.44765625,
+          7.3921875
+        ],
+        "after": [
+          1.6453125,
+          1.6328125,
+          1.63828125,
+          1.634375,
+          1.7078125
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.direct.f32",
+      "beforeUs": 3.43515625,
+      "afterUs": 0.72734375,
+      "speedupBeforeOverAfter": 4.722878625134264,
+      "costChangePercent": -78.8264725949511,
+      "processMeansUs": {
+        "before": [
+          3.44765625,
+          3.46171875,
+          3.43515625,
+          3.428125,
+          3.4234375
+        ],
+        "after": [
+          0.725,
+          0.72734375,
+          0.72734375,
+          0.721875,
+          0.75625
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.adaa.f32",
+      "beforeUs": 7.70546875,
+      "afterUs": 2.0390625,
+      "speedupBeforeOverAfter": 3.778927203065134,
+      "costChangePercent": -73.53746324647673,
+      "processMeansUs": {
+        "before": [
+          7.70546875,
+          7.7265625,
+          7.7359375,
+          7.7,
+          7.6984375
+        ],
+        "after": [
+          2.0765625,
+          2.0390625,
+          2.028125,
+          2.04609375,
+          2.0390625
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.direct.f32",
+      "beforeUs": 2.6453125,
+      "afterUs": 1.99140625,
+      "speedupBeforeOverAfter": 1.3283640643389565,
+      "costChangePercent": -24.719432959243946,
+      "processMeansUs": {
+        "before": [
+          2.6453125,
+          2.65,
+          2.65,
+          2.63203125,
+          2.6375
+        ],
+        "after": [
+          1.99375,
+          1.99140625,
+          1.98046875,
+          2.0046875,
+          1.99140625
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.adaa.f32",
+      "beforeUs": 3.3,
+      "afterUs": 2.6515625,
+      "speedupBeforeOverAfter": 1.2445492044784914,
+      "costChangePercent": -19.649621212121215,
+      "processMeansUs": {
+        "before": [
+          3.2984375,
+          3.30625,
+          3.3015625,
+          3.28125,
+          3.3
+        ],
+        "after": [
+          2.6515625,
+          2.6734375,
+          2.65,
+          2.66953125,
+          2.62890625
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.direct.f32",
+      "beforeUs": 0.778125,
+      "afterUs": 0.14375,
+      "speedupBeforeOverAfter": 5.41304347826087,
+      "costChangePercent": -81.52610441767068,
+      "processMeansUs": {
+        "before": [
+          0.778125,
+          0.77890625,
+          0.7765625,
+          0.77734375,
+          0.78046875
+        ],
+        "after": [
+          0.14375,
+          0.14375,
+          0.14375,
+          0.1609375,
+          0.14375
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.adaa.f32",
+      "beforeUs": 1.81171875,
+      "afterUs": 0.44921875,
+      "speedupBeforeOverAfter": 4.033043478260869,
+      "costChangePercent": -75.20482966796033,
+      "processMeansUs": {
+        "before": [
+          1.9984375,
+          1.80703125,
+          1.90625,
+          1.81171875,
+          1.79765625
+        ],
+        "after": [
+          0.45546875,
+          0.45,
+          0.44921875,
+          0.44921875,
+          0.44921875
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.direct.f32",
+      "beforeUs": 3.01875,
+      "afterUs": 2.38515625,
+      "speedupBeforeOverAfter": 1.2656403537504093,
+      "costChangePercent": -20.988612836438914,
+      "processMeansUs": {
+        "before": [
+          3.01328125,
+          3.0390625,
+          3.0109375,
+          3.03828125,
+          3.01875
+        ],
+        "after": [
+          2.40390625,
+          2.38359375,
+          2.39296875,
+          2.37109375,
+          2.38515625
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.adaa.f32",
+      "beforeUs": 2.12265625,
+      "afterUs": 0.71484375,
+      "speedupBeforeOverAfter": 2.969398907103825,
+      "costChangePercent": -66.32315053367685,
+      "processMeansUs": {
+        "before": [
+          2.26796875,
+          2.12265625,
+          2.1234375,
+          2.10234375,
+          2.0890625
+        ],
+        "after": [
+          0.71640625,
+          0.71484375,
+          0.71484375,
+          0.7140625,
+          0.72109375
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.slow.f32",
+      "beforeUs": 8.68359375,
+      "afterUs": 1.66640625,
+      "speedupBeforeOverAfter": 5.210970464135021,
+      "costChangePercent": -80.80971659919028,
+      "processMeansUs": {
+        "before": [
+          8.68359375,
+          8.6859375,
+          8.671875,
+          8.66484375,
+          8.709375
+        ],
+        "after": [
+          1.66640625,
+          1.65703125,
+          1.66640625,
+          1.659375,
+          1.66875
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.silence.f32",
+      "beforeUs": 0.8578125,
+      "afterUs": 0.4265625,
+      "speedupBeforeOverAfter": 2.010989010989011,
+      "costChangePercent": -50.273224043715835,
+      "processMeansUs": {
+        "before": [
+          0.85703125,
+          0.8609375,
+          0.85859375,
+          0.8578125,
+          0.85625
+        ],
+        "after": [
+          0.4234375,
+          0.4265625,
+          0.42890625,
+          0.42578125,
+          0.43125
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.slow.f32",
+      "beforeUs": 7.62109375,
+      "afterUs": 2.0625,
+      "speedupBeforeOverAfter": 3.695075757575758,
+      "costChangePercent": -72.93695540748334,
+      "processMeansUs": {
+        "before": [
+          7.6453125,
+          7.62109375,
+          7.703125,
+          7.58515625,
+          7.58671875
+        ],
+        "after": [
+          2.0640625,
+          2.06015625,
+          2.06171875,
+          2.0625,
+          2.07734375
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.silence.f32",
+      "beforeUs": 4.25859375,
+      "afterUs": 0.45625,
+      "speedupBeforeOverAfter": 9.333904109589042,
+      "costChangePercent": -89.2863694734911,
+      "processMeansUs": {
+        "before": [
+          4.25390625,
+          4.25078125,
+          4.25859375,
+          4.2640625,
+          4.25859375
+        ],
+        "after": [
+          0.45,
+          0.453125,
+          0.46328125,
+          0.45625,
+          0.4640625
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.slow.f32",
+      "beforeUs": 3.3109375,
+      "afterUs": 2.68125,
+      "speedupBeforeOverAfter": 1.2348484848484849,
+      "costChangePercent": -19.018404907975462,
+      "processMeansUs": {
+        "before": [
+          3.35703125,
+          3.3109375,
+          3.434375,
+          3.30625,
+          3.28984375
+        ],
+        "after": [
+          2.68828125,
+          2.68125,
+          2.6484375,
+          2.68671875,
+          2.66953125
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.silence.f32",
+      "beforeUs": 3.296875,
+      "afterUs": 2.65859375,
+      "speedupBeforeOverAfter": 1.2400822803408758,
+      "costChangePercent": -19.360189573459717,
+      "processMeansUs": {
+        "before": [
+          3.296875,
+          3.21953125,
+          3.3125,
+          3.29921875,
+          3.2140625
+        ],
+        "after": [
+          2.6578125,
+          2.6703125,
+          2.65859375,
+          2.58046875,
+          2.6625
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.slow.f32",
+      "beforeUs": 1.8140625,
+      "afterUs": 0.4390625,
+      "speedupBeforeOverAfter": 4.131672597864768,
+      "costChangePercent": -75.79672695951766,
+      "processMeansUs": {
+        "before": [
+          1.80703125,
+          1.85703125,
+          1.8140625,
+          1.80234375,
+          1.81640625
+        ],
+        "after": [
+          0.4375,
+          0.44375,
+          0.43828125,
+          0.43984375,
+          0.4390625
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.silence.f32",
+      "beforeUs": 1.81640625,
+      "afterUs": 0.24609375,
+      "speedupBeforeOverAfter": 7.380952380952381,
+      "costChangePercent": -86.45161290322581,
+      "processMeansUs": {
+        "before": [
+          1.81640625,
+          1.8171875,
+          1.809375,
+          1.7984375,
+          1.8296875
+        ],
+        "after": [
+          0.2453125,
+          0.24609375,
+          0.24921875,
+          0.2421875,
+          0.253125
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.slow.f32",
+      "beforeUs": 2.10859375,
+      "afterUs": 0.7359375,
+      "speedupBeforeOverAfter": 2.8651804670912946,
+      "costChangePercent": -65.09818451278251,
+      "processMeansUs": {
+        "before": [
+          2.10390625,
+          2.11015625,
+          2.09765625,
+          2.14375,
+          2.10859375
+        ],
+        "after": [
+          0.73203125,
+          0.7203125,
+          0.7359375,
+          0.76953125,
+          0.7515625
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.silence.f32",
+      "beforeUs": 2.12265625,
+      "afterUs": 0.253125,
+      "speedupBeforeOverAfter": 8.385802469135802,
+      "costChangePercent": -88.07508281192491,
+      "processMeansUs": {
+        "before": [
+          2.1265625,
+          2.10234375,
+          2.29453125,
+          2.0890625,
+          2.12265625
+        ],
+        "after": [
+          0.25390625,
+          0.2484375,
+          0.25546875,
+          0.253125,
+          0.25234375
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.4.f32",
+      "beforeUs": 4.50703125,
+      "afterUs": 4.52578125,
+      "speedupBeforeOverAfter": 0.9958570688762299,
+      "costChangePercent": 0.4160166406656174,
+      "processMeansUs": {
+        "before": [
+          4.50703125,
+          4.53359375,
+          4.4921875,
+          4.48828125,
+          4.5359375
+        ],
+        "after": [
+          4.50390625,
+          4.5078125,
+          4.5265625,
+          4.53203125,
+          4.52578125
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.4.f32",
+      "beforeUs": 4.47265625,
+      "afterUs": 4.471875,
+      "speedupBeforeOverAfter": 1.0001747030048918,
+      "costChangePercent": -0.017467248908298316,
+      "processMeansUs": {
+        "before": [
+          4.4703125,
+          4.47265625,
+          4.4734375,
+          4.47265625,
+          4.4765625
+        ],
+        "after": [
+          4.4734375,
+          4.47109375,
+          4.4734375,
+          4.471875,
+          4.46875
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.8.f32",
+      "beforeUs": 8.946875,
+      "afterUs": 8.94140625,
+      "speedupBeforeOverAfter": 1.000611620795107,
+      "costChangePercent": -0.06112469437653534,
+      "processMeansUs": {
+        "before": [
+          8.946875,
+          8.9390625,
+          8.9484375,
+          8.946875,
+          8.94453125
+        ],
+        "after": [
+          8.93359375,
+          8.940625,
+          8.94296875,
+          8.9453125,
+          8.94140625
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.8.f32",
+      "beforeUs": 8.925,
+      "afterUs": 8.93203125,
+      "speedupBeforeOverAfter": 0.9992128050380479,
+      "costChangePercent": 0.07878151260503063,
+      "processMeansUs": {
+        "before": [
+          8.92421875,
+          8.925,
+          8.9296875,
+          8.9234375,
+          8.93125
+        ],
+        "after": [
+          8.93203125,
+          8.9328125,
+          8.93125,
+          8.93125,
+          8.934375
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.scalar.f32",
+      "beforeUs": 1.1203125,
+      "afterUs": 1.11953125,
+      "speedupBeforeOverAfter": 1.0006978367062107,
+      "costChangePercent": -0.06973500697349255,
+      "processMeansUs": {
+        "before": [
+          1.1203125,
+          1.12109375,
+          1.1203125,
+          1.121875,
+          1.11875
+        ],
+        "after": [
+          1.11953125,
+          1.12109375,
+          1.11953125,
+          1.11875,
+          1.1203125
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.avx512.f32",
+      "beforeUs": 1.121875,
+      "afterUs": 1.11953125,
+      "speedupBeforeOverAfter": 1.0020935101186321,
+      "costChangePercent": -0.20891364902505538,
+      "processMeansUs": {
+        "before": [
+          1.121875,
+          1.121875,
+          1.11796875,
+          1.12265625,
+          1.1203125
+        ],
+        "after": [
+          1.11953125,
+          1.12265625,
+          1.11875,
+          1.11875,
+          1.1265625
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p32.nonuniform.f32",
+      "beforeUs": 6.621875,
+      "afterUs": 6.99296875,
+      "speedupBeforeOverAfter": 0.9469333035415037,
+      "costChangePercent": 5.604058518168942,
+      "processMeansUs": {
+        "before": [
+          6.921875,
+          6.63984375,
+          6.621875,
+          6.5921875,
+          6.6140625
+        ],
+        "after": [
+          6.9640625,
+          6.99296875,
+          7.03046875,
+          6.9984375,
+          6.959375
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p32.scheduled.f32",
+      "beforeUs": 6.8125,
+      "afterUs": 7.415625,
+      "speedupBeforeOverAfter": 0.9186683522966709,
+      "costChangePercent": 8.853211009174311,
+      "processMeansUs": {
+        "before": [
+          6.92578125,
+          6.8125,
+          6.8859375,
+          6.6671875,
+          6.65546875
+        ],
+        "after": [
+          7.32890625,
+          7.4421875,
+          7.27578125,
+          7.415625,
+          7.4953125
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p64.nonuniform.f32",
+      "beforeUs": 4.934375,
+      "afterUs": 4.8921875,
+      "speedupBeforeOverAfter": 1.0086234429894603,
+      "costChangePercent": -0.8549715009499637,
+      "processMeansUs": {
+        "before": [
+          4.9234375,
+          5.30078125,
+          4.86640625,
+          5.225,
+          4.934375
+        ],
+        "after": [
+          4.8921875,
+          5.465625,
+          4.80625,
+          4.83203125,
+          4.90234375
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p64.scheduled.f32",
+      "beforeUs": 4.8609375,
+      "afterUs": 4.8640625,
+      "speedupBeforeOverAfter": 0.9993575329264376,
+      "costChangePercent": 0.06428801028608433,
+      "processMeansUs": {
+        "before": [
+          4.9046875,
+          4.85390625,
+          4.8421875,
+          4.8609375,
+          4.91875
+        ],
+        "after": [
+          4.821875,
+          4.90625,
+          4.82578125,
+          4.978125,
+          4.8640625
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p128.nonuniform.f32",
+      "beforeUs": 5.0703125,
+      "afterUs": 5.1234375,
+      "speedupBeforeOverAfter": 0.9896309850564197,
+      "costChangePercent": 1.047765793528499,
+      "processMeansUs": {
+        "before": [
+          5.0703125,
+          5.07734375,
+          5.10390625,
+          5.0265625,
+          5.0359375
+        ],
+        "after": [
+          5.1265625,
+          5.10703125,
+          5.12578125,
+          5.0890625,
+          5.1234375
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p128.scheduled.f32",
+      "beforeUs": 5.10625,
+      "afterUs": 5.09453125,
+      "speedupBeforeOverAfter": 1.0023002606962121,
+      "costChangePercent": -0.22949816401468537,
+      "processMeansUs": {
+        "before": [
+          5.1375,
+          5.10625,
+          5.1296875,
+          5.08046875,
+          5.10234375
+        ],
+        "after": [
+          5.0921875,
+          5.11015625,
+          5.09453125,
+          5.09140625,
+          5.20390625
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p256.nonuniform.f32",
+      "beforeUs": 6.6625,
+      "afterUs": 6.65625,
+      "speedupBeforeOverAfter": 1.0009389671361502,
+      "costChangePercent": -0.09380863039398779,
+      "processMeansUs": {
+        "before": [
+          6.71171875,
+          6.71953125,
+          6.6625,
+          6.65625,
+          6.6609375
+        ],
+        "after": [
+          6.70234375,
+          6.65625,
+          6.675,
+          6.63046875,
+          6.64921875
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p256.scheduled.f32",
+      "beforeUs": 6.74375,
+      "afterUs": 6.7625,
+      "speedupBeforeOverAfter": 0.9972273567467653,
+      "costChangePercent": 0.2780352177942591,
+      "processMeansUs": {
+        "before": [
+          6.790625,
+          6.79453125,
+          6.7359375,
+          6.73984375,
+          6.74375
+        ],
+        "after": [
+          6.74765625,
+          6.7625,
+          6.784375,
+          6.75859375,
+          6.771875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p32.nonuniform.f32",
+      "beforeUs": 12.92890625,
+      "afterUs": 14.0109375,
+      "speedupBeforeOverAfter": 0.922772387643582,
+      "costChangePercent": 8.36908574536226,
+      "processMeansUs": {
+        "before": [
+          13.19765625,
+          13.08203125,
+          12.92890625,
+          12.85546875,
+          12.896875
+        ],
+        "after": [
+          14.265625,
+          13.8140625,
+          14.0109375,
+          14.146875,
+          13.24609375
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p32.scheduled.f32",
+      "beforeUs": 19.73203125,
+      "afterUs": 19.8921875,
+      "speedupBeforeOverAfter": 0.9919487864268322,
+      "costChangePercent": 0.8116561745258766,
+      "processMeansUs": {
+        "before": [
+          19.82421875,
+          20.290625,
+          19.46484375,
+          19.73203125,
+          19.49609375
+        ],
+        "after": [
+          20.271875,
+          19.8921875,
+          19.84765625,
+          19.8546875,
+          20.0796875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p64.nonuniform.f32",
+      "beforeUs": 9.759375,
+      "afterUs": 9.8015625,
+      "speedupBeforeOverAfter": 0.9956958393113344,
+      "costChangePercent": 0.4322766570605152,
+      "processMeansUs": {
+        "before": [
+          9.78515625,
+          9.6328125,
+          9.67109375,
+          9.78203125,
+          9.759375
+        ],
+        "after": [
+          10.57890625,
+          9.8015625,
+          9.6921875,
+          9.84375,
+          9.715625
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p64.scheduled.f32",
+      "beforeUs": 12.603125,
+      "afterUs": 12.8734375,
+      "speedupBeforeOverAfter": 0.9790023061051099,
+      "costChangePercent": 2.1448053558145164,
+      "processMeansUs": {
+        "before": [
+          12.66796875,
+          12.603125,
+          12.51015625,
+          12.44140625,
+          13.06953125
+        ],
+        "after": [
+          13.61796875,
+          13.14453125,
+          12.746875,
+          12.8734375,
+          12.70078125
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.nonuniform.f32",
+      "beforeUs": 9.01171875,
+      "afterUs": 9.234375,
+      "speedupBeforeOverAfter": 0.9758883248730964,
+      "costChangePercent": 2.4707412223667014,
+      "processMeansUs": {
+        "before": [
+          9.05,
+          8.9171875,
+          9.01171875,
+          9.12109375,
+          8.96328125
+        ],
+        "after": [
+          9.234375,
+          9.29921875,
+          9.0734375,
+          9.14453125,
+          9.2765625
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.f32",
+      "beforeUs": 11.22890625,
+      "afterUs": 11.17109375,
+      "speedupBeforeOverAfter": 1.0051751870760193,
+      "costChangePercent": -0.5148542405899903,
+      "processMeansUs": {
+        "before": [
+          11.22890625,
+          11.26796875,
+          11.36328125,
+          11.0140625,
+          10.95859375
+        ],
+        "after": [
+          11.17109375,
+          11.28046875,
+          11.11328125,
+          11.19765625,
+          11.12109375
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p256.nonuniform.f32",
+      "beforeUs": 10.38203125,
+      "afterUs": 10.3953125,
+      "speedupBeforeOverAfter": 0.9987223808808058,
+      "costChangePercent": 0.12792535179471098,
+      "processMeansUs": {
+        "before": [
+          10.49375,
+          10.396875,
+          10.35703125,
+          10.36484375,
+          10.38203125
+        ],
+        "after": [
+          10.496875,
+          10.53984375,
+          10.3953125,
+          10.35234375,
+          10.371875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p256.scheduled.f32",
+      "beforeUs": 11.9203125,
+      "afterUs": 11.93671875,
+      "speedupBeforeOverAfter": 0.9986255645002944,
+      "costChangePercent": 0.1376327172630809,
+      "processMeansUs": {
+        "before": [
+          11.96171875,
+          11.9203125,
+          12.015625,
+          11.87421875,
+          11.90625
+        ],
+        "after": [
+          11.875,
+          12.08125,
+          11.93671875,
+          11.86484375,
+          11.95625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p32.nonuniform.f32",
+      "beforeUs": 21.1171875,
+      "afterUs": 21.0203125,
+      "speedupBeforeOverAfter": 1.0046086374786294,
+      "costChangePercent": -0.4587495375508732,
+      "processMeansUs": {
+        "before": [
+          21.18046875,
+          21.1171875,
+          20.940625,
+          21.0296875,
+          21.5953125
+        ],
+        "after": [
+          21.04453125,
+          20.9953125,
+          21.3296875,
+          21.0203125,
+          20.99765625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p32.scheduled.f32",
+      "beforeUs": 34.3765625,
+      "afterUs": 34.0578125,
+      "speedupBeforeOverAfter": 1.009359086112768,
+      "costChangePercent": -0.9272305804281622,
+      "processMeansUs": {
+        "before": [
+          34.9421875,
+          33.68359375,
+          38.1578125,
+          34.3765625,
+          33.5046875
+        ],
+        "after": [
+          34.0578125,
+          33.7265625,
+          36.00078125,
+          33.33046875,
+          34.34296875
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p64.nonuniform.f32",
+      "beforeUs": 14.6203125,
+      "afterUs": 14.63046875,
+      "speedupBeforeOverAfter": 0.9993058151332301,
+      "costChangePercent": 0.06946670941541111,
+      "processMeansUs": {
+        "before": [
+          15.146875,
+          14.6203125,
+          14.56640625,
+          14.3140625,
+          14.62578125
+        ],
+        "after": [
+          14.48671875,
+          14.71796875,
+          14.63046875,
+          15.0734375,
+          14.50625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p64.scheduled.f32",
+      "beforeUs": 20.55859375,
+      "afterUs": 20.86328125,
+      "speedupBeforeOverAfter": 0.9853959932596892,
+      "costChangePercent": 1.4820444613338424,
+      "processMeansUs": {
+        "before": [
+          20.62734375,
+          20.828125,
+          20.55859375,
+          20.5296875,
+          20.4875
+        ],
+        "after": [
+          20.93046875,
+          20.7890625,
+          20.50546875,
+          20.9703125,
+          20.86328125
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p128.nonuniform.f32",
+      "beforeUs": 13.76953125,
+      "afterUs": 14.0078125,
+      "speedupBeforeOverAfter": 0.982989403234802,
+      "costChangePercent": 1.7304964539007095,
+      "processMeansUs": {
+        "before": [
+          13.70703125,
+          13.76953125,
+          13.85703125,
+          13.61640625,
+          13.7921875
+        ],
+        "after": [
+          13.6171875,
+          13.57421875,
+          14.3078125,
+          14.0078125,
+          14.1640625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p128.scheduled.f32",
+      "beforeUs": 17.41484375,
+      "afterUs": 17.45625,
+      "speedupBeforeOverAfter": 0.9976279985678481,
+      "costChangePercent": 0.23776412004845593,
+      "processMeansUs": {
+        "before": [
+          17.53984375,
+          17.34765625,
+          17.41484375,
+          17.3671875,
+          17.47734375
+        ],
+        "after": [
+          17.39765625,
+          17.48203125,
+          17.45625,
+          17.43125,
+          17.84765625
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p256.nonuniform.f32",
+      "beforeUs": 16.2015625,
+      "afterUs": 16.22890625,
+      "speedupBeforeOverAfter": 0.9983151205892264,
+      "costChangePercent": 0.1687723020542098,
+      "processMeansUs": {
+        "before": [
+          16.28828125,
+          16.0234375,
+          16.2015625,
+          16.2984375,
+          16.1328125
+        ],
+        "after": [
+          16.3015625,
+          16.43359375,
+          16.22890625,
+          16.1859375,
+          16.18828125
+        ]
+      }
+    },
+    {
+      "case": "matrix.16384.p256.scheduled.f32",
+      "beforeUs": 18.80546875,
+      "afterUs": 18.71875,
+      "speedupBeforeOverAfter": 1.0046327212020032,
+      "costChangePercent": -0.46113580657222153,
+      "processMeansUs": {
+        "before": [
+          18.80546875,
+          19.0953125,
+          18.6109375,
+          18.846875,
+          18.61796875
+        ],
+        "after": [
+          18.69375,
+          18.74375,
+          18.80625,
+          18.71875,
+          18.7015625
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p32.nonuniform.f32",
+      "beforeUs": 19.32578125,
+      "afterUs": 19.2109375,
+      "speedupBeforeOverAfter": 1.005978039853599,
+      "costChangePercent": -0.5942515260540793,
+      "processMeansUs": {
+        "before": [
+          19.32578125,
+          20.60859375,
+          19.38828125,
+          18.7046875,
+          18.915625
+        ],
+        "after": [
+          19.31015625,
+          19.3015625,
+          19.1296875,
+          19.2109375,
+          18.996875
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p32.scheduled.f32",
+      "beforeUs": 29.690625,
+      "afterUs": 27.54296875,
+      "speedupBeforeOverAfter": 1.0779747553538506,
+      "costChangePercent": -7.233449110619938,
+      "processMeansUs": {
+        "before": [
+          39.059375,
+          31.84765625,
+          29.321875,
+          29.0234375,
+          29.690625
+        ],
+        "after": [
+          27.49609375,
+          27.54296875,
+          27.76796875,
+          27.54609375,
+          27.2359375
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p64.nonuniform.f32",
+      "beforeUs": 15.53828125,
+      "afterUs": 15.3171875,
+      "speedupBeforeOverAfter": 1.014434356829542,
+      "costChangePercent": -1.4228970787872774,
+      "processMeansUs": {
+        "before": [
+          15.58359375,
+          15.5265625,
+          15.928125,
+          15.16796875,
+          15.53828125
+        ],
+        "after": [
+          15.321875,
+          15.3171875,
+          15.5453125,
+          15.2203125,
+          15.23671875
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p64.scheduled.f32",
+      "beforeUs": 20.70390625,
+      "afterUs": 20.77890625,
+      "speedupBeforeOverAfter": 0.9963905703650788,
+      "costChangePercent": 0.36225048111391267,
+      "processMeansUs": {
+        "before": [
+          20.70390625,
+          21.0375,
+          20.62109375,
+          20.55,
+          20.76875
+        ],
+        "after": [
+          20.84453125,
+          20.73515625,
+          20.765625,
+          20.77890625,
+          20.8234375
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p128.nonuniform.f32",
+      "beforeUs": 15.25625,
+      "afterUs": 14.71171875,
+      "speedupBeforeOverAfter": 1.0370134352928682,
+      "costChangePercent": -3.569233920524373,
+      "processMeansUs": {
+        "before": [
+          15.49296875,
+          15.12265625,
+          15.215625,
+          15.33125,
+          15.25625
+        ],
+        "after": [
+          14.684375,
+          14.71171875,
+          14.68515625,
+          14.7265625,
+          14.96484375
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p128.scheduled.f32",
+      "beforeUs": 18.92890625,
+      "afterUs": 19.04609375,
+      "speedupBeforeOverAfter": 0.993847163542393,
+      "costChangePercent": 0.6190928226505354,
+      "processMeansUs": {
+        "before": [
+          18.93359375,
+          18.84765625,
+          18.92890625,
+          18.9640625,
+          18.72734375
+        ],
+        "after": [
+          19.15625,
+          19.04609375,
+          18.9765625,
+          18.95078125,
+          19.290625
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p256.nonuniform.f32",
+      "beforeUs": 16.20546875,
+      "afterUs": 16.21328125,
+      "speedupBeforeOverAfter": 0.9995181419553799,
+      "costChangePercent": 0.04820903437303681,
+      "processMeansUs": {
+        "before": [
+          16.6484375,
+          16.20546875,
+          16.4453125,
+          16.134375,
+          16.19609375
+        ],
+        "after": [
+          16.14375,
+          16.00703125,
+          16.49453125,
+          16.21328125,
+          16.37890625
+        ]
+      }
+    },
+    {
+      "case": "matrix.65536.p256.scheduled.f32",
+      "beforeUs": 20.1265625,
+      "afterUs": 19.621875,
+      "speedupBeforeOverAfter": 1.0257206561554388,
+      "costChangePercent": -2.5075692880987432,
+      "processMeansUs": {
+        "before": [
+          20.16171875,
+          20.1265625,
+          20.8625,
+          20.00078125,
+          19.646875
+        ],
+        "after": [
+          19.56484375,
+          19.68203125,
+          19.55546875,
+          19.625,
+          19.621875
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.peak.f32",
+      "beforeUs": 66.56015625,
+      "afterUs": 7.5109375,
+      "speedupBeforeOverAfter": 8.86176409402954,
+      "costChangePercent": -88.71556510205758,
+      "processMeansUs": {
+        "before": [
+          66.3171875,
+          66.56015625,
+          66.50234375,
+          68.46875,
+          66.66484375
+        ],
+        "after": [
+          7.4953125,
+          7.5546875,
+          7.5109375,
+          7.48671875,
+          7.6078125
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.rms.f32",
+      "beforeUs": 74.91953125,
+      "afterUs": 11.0375,
+      "speedupBeforeOverAfter": 6.787726500566252,
+      "costChangePercent": -85.2675266170996,
+      "processMeansUs": {
+        "before": [
+          75.09453125,
+          74.73125,
+          74.346875,
+          74.91953125,
+          74.95703125
+        ],
+        "after": [
+          11.0296875,
+          11.10546875,
+          11.0375,
+          11.00546875,
+          11.0703125
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.peak.f32",
+      "beforeUs": 6.8375,
+      "afterUs": 1.4671875,
+      "speedupBeforeOverAfter": 4.660276890308839,
+      "costChangePercent": -78.5420475319927,
+      "processMeansUs": {
+        "before": [
+          6.86640625,
+          6.82421875,
+          6.82109375,
+          6.85546875,
+          6.8375
+        ],
+        "after": [
+          1.46171875,
+          1.45703125,
+          1.478125,
+          1.4796875,
+          1.4671875
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.rms.f32",
+      "beforeUs": 7.70078125,
+      "afterUs": 2.046875,
+      "speedupBeforeOverAfter": 3.7622137404580154,
+      "costChangePercent": -73.41990463629908,
+      "processMeansUs": {
+        "before": [
+          7.70078125,
+          7.7328125,
+          7.7046875,
+          7.6734375,
+          7.67578125
+        ],
+        "after": [
+          2.01953125,
+          2.084375,
+          2.046875,
+          2.05625,
+          2.02421875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.0.adaa.tone110.f32",
+      "beforeUs": 7.65703125,
+      "afterUs": 1.66171875,
+      "speedupBeforeOverAfter": 4.607898448519041,
+      "costChangePercent": -78.29813284358738,
+      "processMeansUs": {
+        "before": [
+          7.65703125,
+          7.6109375,
+          7.6828125,
+          7.67890625,
+          7.61953125
+        ],
+        "after": [
+          1.65234375,
+          1.696875,
+          1.66171875,
+          1.66171875,
+          1.64765625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.adaa.tone110.f32",
+      "beforeUs": 7.66640625,
+      "afterUs": 2.053125,
+      "speedupBeforeOverAfter": 3.7340182648401825,
+      "costChangePercent": -73.2191990217059,
+      "processMeansUs": {
+        "before": [
+          7.74921875,
+          7.6640625,
+          7.71015625,
+          7.65078125,
+          7.66640625
+        ],
+        "after": [
+          2.034375,
+          2.053125,
+          2.04296875,
+          2.05390625,
+          2.0859375
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.fast.tone110.f32",
+      "beforeUs": 6.859375,
+      "afterUs": 2.08359375,
+      "speedupBeforeOverAfter": 3.292088488938883,
+      "costChangePercent": -69.62414578587699,
+      "processMeansUs": {
+        "before": [
+          6.859375,
+          6.94296875,
+          6.84609375,
+          6.86953125,
+          6.83515625
+        ],
+        "after": [
+          2.1015625,
+          2.096875,
+          2.08359375,
+          2.04375,
+          2.0390625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.2.adaa.tone110.f32",
+      "beforeUs": 3.25,
+      "afterUs": 2.61875,
+      "speedupBeforeOverAfter": 1.2410501193317423,
+      "costChangePercent": -19.42307692307692,
+      "processMeansUs": {
+        "before": [
+          3.28828125,
+          3.2484375,
+          3.29453125,
+          3.24609375,
+          3.25
+        ],
+        "after": [
+          2.61171875,
+          2.61875,
+          2.62421875,
+          2.6140625,
+          2.621875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.3.adaa.tone110.f32",
+      "beforeUs": 1.81484375,
+      "afterUs": 0.421875,
+      "speedupBeforeOverAfter": 4.301851851851852,
+      "costChangePercent": -76.75419715884632,
+      "processMeansUs": {
+        "before": [
+          1.81171875,
+          1.81640625,
+          1.8078125,
+          1.840625,
+          1.81484375
+        ],
+        "after": [
+          0.415625,
+          0.4265625,
+          0.43125,
+          0.4203125,
+          0.421875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.4.adaa.tone110.f32",
+      "beforeUs": 2.109375,
+      "afterUs": 0.740625,
+      "speedupBeforeOverAfter": 2.848101265822785,
+      "costChangePercent": -64.88888888888889,
+      "processMeansUs": {
+        "before": [
+          2.09375,
+          2.109375,
+          2.11640625,
+          2.12578125,
+          2.10546875
+        ],
+        "after": [
+          0.71796875,
+          0.74453125,
+          0.74765625,
+          0.72109375,
+          0.740625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.0.adaa.tone997.f32",
+      "beforeUs": 7.6390625,
+      "afterUs": 1.6703125,
+      "speedupBeforeOverAfter": 4.573433115060804,
+      "costChangePercent": -78.13458785027613,
+      "processMeansUs": {
+        "before": [
+          7.6390625,
+          7.64140625,
+          7.6484375,
+          7.6171875,
+          7.62578125
+        ],
+        "after": [
+          1.65234375,
+          1.671875,
+          1.6703125,
+          1.68359375,
+          1.66328125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.adaa.tone997.f32",
+      "beforeUs": 7.7375,
+      "afterUs": 2.07265625,
+      "speedupBeforeOverAfter": 3.733132303053147,
+      "costChangePercent": -73.21284329563812,
+      "processMeansUs": {
+        "before": [
+          7.7375,
+          7.78515625,
+          7.753125,
+          7.72890625,
+          7.70390625
+        ],
+        "after": [
+          2.0703125,
+          2.07265625,
+          2.07421875,
+          2.08046875,
+          2.071875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.fast.tone997.f32",
+      "beforeUs": 6.5515625,
+      "afterUs": 2.0734375,
+      "speedupBeforeOverAfter": 3.1597588545591564,
+      "costChangePercent": -68.35201526353447,
+      "processMeansUs": {
+        "before": [
+          6.60390625,
+          6.54140625,
+          6.5515625,
+          6.56328125,
+          6.51484375
+        ],
+        "after": [
+          2.0765625,
+          2.07734375,
+          2.059375,
+          2.06328125,
+          2.0734375
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.2.adaa.tone997.f32",
+      "beforeUs": 3.275,
+      "afterUs": 2.66328125,
+      "speedupBeforeOverAfter": 1.2296861249633324,
+      "costChangePercent": -18.67843511450382,
+      "processMeansUs": {
+        "before": [
+          3.28125,
+          3.2640625,
+          3.275,
+          3.28828125,
+          3.271875
+        ],
+        "after": [
+          2.64375,
+          2.66328125,
+          2.64296875,
+          2.69921875,
+          2.66953125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.3.adaa.tone997.f32",
+      "beforeUs": 1.81484375,
+      "afterUs": 0.425,
+      "speedupBeforeOverAfter": 4.270220588235294,
+      "costChangePercent": -76.58200602668963,
+      "processMeansUs": {
+        "before": [
+          1.84140625,
+          1.809375,
+          1.81484375,
+          1.81640625,
+          1.80234375
+        ],
+        "after": [
+          0.4171875,
+          0.425,
+          0.46015625,
+          0.41953125,
+          0.4359375
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.4.adaa.tone997.f32",
+      "beforeUs": 2.10859375,
+      "afterUs": 0.73203125,
+      "speedupBeforeOverAfter": 2.8804695837780145,
+      "costChangePercent": -65.28343831048535,
+      "processMeansUs": {
+        "before": [
+          2.1796875,
+          2.1,
+          2.10859375,
+          2.10859375,
+          2.09140625
+        ],
+        "after": [
+          0.73359375,
+          0.73203125,
+          0.71953125,
+          0.7421875,
+          0.73046875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.0.adaa.multitone.f32",
+      "beforeUs": 9.10390625,
+      "afterUs": 1.66953125,
+      "speedupBeforeOverAfter": 5.452971455311184,
+      "costChangePercent": -81.66137475328242,
+      "processMeansUs": {
+        "before": [
+          9.09140625,
+          9.12890625,
+          9.10390625,
+          9.13828125,
+          9.10234375
+        ],
+        "after": [
+          1.67578125,
+          1.66953125,
+          1.66875,
+          1.6875,
+          1.66796875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.adaa.multitone.f32",
+      "beforeUs": 7.55390625,
+      "afterUs": 2.07734375,
+      "speedupBeforeOverAfter": 3.6363294471605867,
+      "costChangePercent": -72.49974144172097,
+      "processMeansUs": {
+        "before": [
+          7.58984375,
+          7.553125,
+          7.5921875,
+          7.55390625,
+          7.55
+        ],
+        "after": [
+          2.065625,
+          2.07734375,
+          2.109375,
+          2.084375,
+          2.06171875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.fast.multitone.f32",
+      "beforeUs": 7.75078125,
+      "afterUs": 2.065625,
+      "speedupBeforeOverAfter": 3.7522692889561275,
+      "costChangePercent": -73.34946073984477,
+      "processMeansUs": {
+        "before": [
+          7.7625,
+          7.7921875,
+          7.73828125,
+          7.73828125,
+          7.75078125
+        ],
+        "after": [
+          2.0578125,
+          2.0703125,
+          2.05859375,
+          2.065625,
+          2.06875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.2.adaa.multitone.f32",
+      "beforeUs": 3.31953125,
+      "afterUs": 2.70703125,
+      "speedupBeforeOverAfter": 1.2262626262626262,
+      "costChangePercent": -18.45140032948929,
+      "processMeansUs": {
+        "before": [
+          3.3625,
+          3.31953125,
+          3.33359375,
+          3.3078125,
+          3.31171875
+        ],
+        "after": [
+          2.71875,
+          2.70546875,
+          2.6984375,
+          2.80703125,
+          2.70703125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.3.adaa.multitone.f32",
+      "beforeUs": 1.815625,
+      "afterUs": 0.4234375,
+      "speedupBeforeOverAfter": 4.287822878228782,
+      "costChangePercent": -76.67814113597247,
+      "processMeansUs": {
+        "before": [
+          1.796875,
+          1.8734375,
+          1.85859375,
+          1.81171875,
+          1.815625
+        ],
+        "after": [
+          0.4234375,
+          0.4234375,
+          0.425,
+          0.44609375,
+          0.41640625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.4.adaa.multitone.f32",
+      "beforeUs": 2.1046875,
+      "afterUs": 0.7234375,
+      "speedupBeforeOverAfter": 2.9092872570194386,
+      "costChangePercent": -65.62731997030437,
+      "processMeansUs": {
+        "before": [
+          2.1046875,
+          2.10390625,
+          2.178125,
+          2.14921875,
+          2.1015625
+        ],
+        "after": [
+          0.72265625,
+          0.7265625,
+          0.73203125,
+          0.7234375,
+          0.71953125
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.0.direct.f32",
+      "beforeUs": 5,
+      "afterUs": 1.08359375,
+      "speedupBeforeOverAfter": 4.614275414563807,
+      "costChangePercent": -78.328125,
+      "processMeansUs": {
+        "before": [
+          4.9734375,
+          5,
+          5.046875,
+          4.96953125,
+          5.0265625
+        ],
+        "after": [
+          1.08125,
+          1.08359375,
+          1.1015625,
+          1.075,
+          1.09921875
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.0.adaa.f32",
+      "beforeUs": 9.1515625,
+      "afterUs": 1.75546875,
+      "speedupBeforeOverAfter": 5.213173119715177,
+      "costChangePercent": -80.81782482499574,
+      "processMeansUs": {
+        "before": [
+          9.1515625,
+          9.16015625,
+          9.10390625,
+          9.0578125,
+          9.1671875
+        ],
+        "after": [
+          1.75546875,
+          1.7578125,
+          1.7515625,
+          1.76640625,
+          1.75
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.1.direct.f32",
+      "beforeUs": 4.28359375,
+      "afterUs": 0.82265625,
+      "speedupBeforeOverAfter": 5.2070275403608735,
+      "costChangePercent": -80.79518511763632,
+      "processMeansUs": {
+        "before": [
+          4.30859375,
+          4.29609375,
+          4.28359375,
+          4.28359375,
+          4.28359375
+        ],
+        "after": [
+          0.8171875,
+          0.82265625,
+          0.82578125,
+          0.82421875,
+          0.81640625
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.1.adaa.f32",
+      "beforeUs": 8.40390625,
+      "afterUs": 2.15625,
+      "speedupBeforeOverAfter": 3.897463768115942,
+      "costChangePercent": -74.34228874221438,
+      "processMeansUs": {
+        "before": [
+          8.40390625,
+          8.44609375,
+          8.46015625,
+          8.38203125,
+          8.38203125
+        ],
+        "after": [
+          2.15703125,
+          2.17109375,
+          2.153125,
+          2.15625,
+          2.14765625
+        ]
+      }
+    },
+    {
+      "case": "program.transient.precise.audio.f32",
+      "beforeUs": 9.8921875,
+      "afterUs": 9.49453125,
+      "speedupBeforeOverAfter": 1.0418826627170248,
+      "costChangePercent": -4.01990206918339,
+      "processMeansUs": {
+        "before": [
+          9.8921875,
+          9.89609375,
+          9.8921875,
+          9.85078125,
+          9.84140625
+        ],
+        "after": [
+          9.46875,
+          9.52265625,
+          9.47109375,
+          9.53828125,
+          9.49453125
+        ]
+      }
+    },
+    {
+      "case": "program.transient.precise.gain.f32",
+      "beforeUs": 9.73515625,
+      "afterUs": 9.20859375,
+      "speedupBeforeOverAfter": 1.0571816407907015,
+      "costChangePercent": -5.408875692159532,
+      "processMeansUs": {
+        "before": [
+          9.73515625,
+          9.77890625,
+          9.7484375,
+          9.72265625,
+          9.72109375
+        ],
+        "after": [
+          9.16953125,
+          9.22578125,
+          9.20859375,
+          9.23125,
+          9.1890625
+        ]
+      }
+    },
+    {
+      "case": "program.transient.fast.audio.f32",
+      "beforeUs": 6.60703125,
+      "afterUs": 1.696875,
+      "speedupBeforeOverAfter": 3.8936464088397793,
+      "costChangePercent": -74.31713373536715,
+      "processMeansUs": {
+        "before": [
+          6.60703125,
+          6.60625,
+          6.609375,
+          6.6015625,
+          6.615625
+        ],
+        "after": [
+          1.690625,
+          2.040625,
+          1.6953125,
+          1.696875,
+          1.69765625
+        ]
+      }
+    },
+    {
+      "case": "program.transient.fast.gain.f32",
+      "beforeUs": 6.42421875,
+      "afterUs": 1.64921875,
+      "speedupBeforeOverAfter": 3.895310279488394,
+      "costChangePercent": -74.32810409826097,
+      "processMeansUs": {
+        "before": [
+          6.42578125,
+          6.44609375,
+          6.42109375,
+          6.4234375,
+          6.42421875
+        ],
+        "after": [
+          1.6484375,
+          1.65,
+          1.64609375,
+          1.64921875,
+          1.65078125
+        ]
+      }
+    },
+    {
+      "case": "program.dynamicEq.1.f32",
+      "beforeUs": 16.60703125,
+      "afterUs": 3.453125,
+      "speedupBeforeOverAfter": 4.809276018099547,
+      "costChangePercent": -79.20684950839723,
+      "processMeansUs": {
+        "before": [
+          16.503125,
+          16.60703125,
+          17.084375,
+          16.56796875,
+          16.82578125
+        ],
+        "after": [
+          3.4484375,
+          3.4546875,
+          3.47890625,
+          3.4359375,
+          3.453125
+        ]
+      }
+    },
+    {
+      "case": "program.dynamicEq.3.f32",
+      "beforeUs": 43.53359375,
+      "afterUs": 9.7,
+      "speedupBeforeOverAfter": 4.487999355670103,
+      "costChangePercent": -77.71835687238664,
+      "processMeansUs": {
+        "before": [
+          43.56640625,
+          43.53359375,
+          43.46171875,
+          43.58125,
+          43.52734375
+        ],
+        "after": [
+          9.671875,
+          9.7140625,
+          9.69765625,
+          10.06953125,
+          9.7
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r4.linked.f32",
+      "beforeUs": 2.3109375,
+      "afterUs": 0.934375,
+      "speedupBeforeOverAfter": 2.4732441471571907,
+      "costChangePercent": -59.56727518593645,
+      "processMeansUs": {
+        "before": [
+          2.3109375,
+          2.31796875,
+          2.30078125,
+          2.30078125,
+          2.3703125
+        ],
+        "after": [
+          0.934375,
+          0.93515625,
+          0.93203125,
+          0.93203125,
+          0.94140625
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r4.independent.f32",
+      "beforeUs": 16.8953125,
+      "afterUs": 1.85390625,
+      "speedupBeforeOverAfter": 9.113358617783396,
+      "costChangePercent": -89.0270970128549,
+      "processMeansUs": {
+        "before": [
+          16.8953125,
+          16.98515625,
+          16.996875,
+          16.85234375,
+          16.875
+        ],
+        "after": [
+          1.96328125,
+          1.85390625,
+          1.8515625,
+          1.8453125,
+          1.85859375
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r4.lookahead.f32",
+      "beforeUs": 18.3859375,
+      "afterUs": 3.03828125,
+      "speedupBeforeOverAfter": 6.0514271020827985,
+      "costChangePercent": -83.47497238038582,
+      "processMeansUs": {
+        "before": [
+          18.0625,
+          18.39453125,
+          19.1046875,
+          18.3046875,
+          18.3859375
+        ],
+        "after": [
+          3.03828125,
+          2.98671875,
+          3.06484375,
+          3.08203125,
+          3.02578125
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r6.linked.f32",
+      "beforeUs": 3.83359375,
+      "afterUs": 1.2875,
+      "speedupBeforeOverAfter": 2.9775485436893203,
+      "costChangePercent": -66.41532504585285,
+      "processMeansUs": {
+        "before": [
+          3.8375,
+          3.8328125,
+          3.8328125,
+          3.8375,
+          3.83359375
+        ],
+        "after": [
+          1.28046875,
+          1.28515625,
+          1.2875,
+          1.2890625,
+          1.290625
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r6.independent.f32",
+      "beforeUs": 16.9125,
+      "afterUs": 2.42265625,
+      "speedupBeforeOverAfter": 6.980973879393744,
+      "costChangePercent": -85.67535107169253,
+      "processMeansUs": {
+        "before": [
+          16.8734375,
+          16.9125,
+          16.96171875,
+          17.0671875,
+          16.8953125
+        ],
+        "after": [
+          2.42265625,
+          2.45703125,
+          2.41953125,
+          2.41875,
+          2.43046875
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r6.lookahead.f32",
+      "beforeUs": 19.05390625,
+      "afterUs": 3.53671875,
+      "speedupBeforeOverAfter": 5.387453059421251,
+      "costChangePercent": -81.43835335602117,
+      "processMeansUs": {
+        "before": [
+          18.2203125,
+          19.07578125,
+          19.05390625,
+          18.14296875,
+          19.75234375
+        ],
+        "after": [
+          3.57109375,
+          3.53125,
+          3.5296875,
+          3.5703125,
+          3.53671875
+        ]
+      }
+    },
+    {
+      "case": "program.dynamics.limiter.f32",
+      "beforeUs": 4.0390625,
+      "afterUs": 1.296875,
+      "speedupBeforeOverAfter": 3.1144578313253013,
+      "costChangePercent": -67.8916827852998,
+      "processMeansUs": {
+        "before": [
+          4.009375,
+          4.0625,
+          4.0453125,
+          4.009375,
+          4.0390625
+        ],
+        "after": [
+          1.30390625,
+          1.30546875,
+          1.296875,
+          1.28125,
+          1.2890625
+        ]
+      }
+    },
+    {
+      "case": "program.dynamics.expander.f32",
+      "beforeUs": 6.4671875,
+      "afterUs": 2.17421875,
+      "speedupBeforeOverAfter": 2.974487962630255,
+      "costChangePercent": -66.38076830152211,
+      "processMeansUs": {
+        "before": [
+          6.4328125,
+          6.4671875,
+          6.484375,
+          6.46328125,
+          6.49296875
+        ],
+        "after": [
+          2.18046875,
+          2.17421875,
+          2.20390625,
+          2.17421875,
+          2.171875
+        ]
+      }
+    },
+    {
+      "case": "program.dynamics.gate.f32",
+      "beforeUs": 6.3109375,
+      "afterUs": 2.965625,
+      "speedupBeforeOverAfter": 2.1280295047418334,
+      "costChangePercent": -53.00817033919286,
+      "processMeansUs": {
+        "before": [
+          6.3015625,
+          6.30234375,
+          6.31875,
+          6.325,
+          6.3109375
+        ],
+        "after": [
+          2.9609375,
+          3.01328125,
+          2.96640625,
+          2.96328125,
+          2.965625
+        ]
+      }
+    },
+    {
+      "case": "matrix.512.p128.scheduled.block480.f32",
+      "beforeUs": 9.75390625,
+      "afterUs": 9.64921875,
+      "speedupBeforeOverAfter": 1.0108493239413814,
+      "costChangePercent": -1.0732879455346511,
+      "processMeansUs": {
+        "before": [
+          9.91171875,
+          9.6796875,
+          9.75390625,
+          9.57578125,
+          9.8953125
+        ],
+        "after": [
+          9.6390625,
+          9.6578125,
+          9.62109375,
+          9.99921875,
+          9.64921875
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.block480.f32",
+      "beforeUs": 20.90234375,
+      "afterUs": 20.89296875,
+      "speedupBeforeOverAfter": 1.0004487155517332,
+      "costChangePercent": -0.04485142963931432,
+      "processMeansUs": {
+        "before": [
+          20.8828125,
+          21.071875,
+          20.90234375,
+          20.815625,
+          20.98671875
+        ],
+        "after": [
+          21.04375,
+          20.8109375,
+          20.78046875,
+          21.26484375,
+          20.89296875
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.independent.peak.f64",
+      "beforeUs": 8.65546875,
+      "afterUs": 0.9765625,
+      "speedupBeforeOverAfter": 8.8632,
+      "costChangePercent": -88.7173932665403,
+      "processMeansUs": {
+        "before": [
+          8.634375,
+          8.65546875,
+          8.65078125,
+          8.6828125,
+          8.69140625
+        ],
+        "after": [
+          0.98671875,
+          0.9765625,
+          0.98125,
+          0.9703125,
+          0.97578125
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.independent.rms.f64",
+      "beforeUs": 9.59296875,
+      "afterUs": 1.4109375,
+      "speedupBeforeOverAfter": 6.799003322259137,
+      "costChangePercent": -85.29196188614708,
+      "processMeansUs": {
+        "before": [
+          9.59296875,
+          9.6078125,
+          9.5671875,
+          9.6,
+          9.571875
+        ],
+        "after": [
+          1.4109375,
+          1.41640625,
+          1.4078125,
+          1.41328125,
+          1.4109375
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.peak.f64",
+      "beforeUs": 1.63828125,
+      "afterUs": 0.8734375,
+      "speedupBeforeOverAfter": 1.8756708407871199,
+      "costChangePercent": -46.68574153552694,
+      "processMeansUs": {
+        "before": [
+          1.64453125,
+          1.63671875,
+          1.64140625,
+          1.63828125,
+          1.6359375
+        ],
+        "after": [
+          0.8734375,
+          0.87421875,
+          0.8734375,
+          0.87265625,
+          0.87265625
+        ]
+      }
+    },
+    {
+      "case": "compressor.1.linked.rms.f64",
+      "beforeUs": 1.8734375,
+      "afterUs": 1.45390625,
+      "speedupBeforeOverAfter": 1.2885545405695864,
+      "costChangePercent": -22.393661384487075,
+      "processMeansUs": {
+        "before": [
+          1.8734375,
+          1.87421875,
+          1.871875,
+          1.87265625,
+          1.8765625
+        ],
+        "after": [
+          1.44765625,
+          1.45625,
+          1.45390625,
+          1.446875,
+          1.4546875
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.peak.f64",
+      "beforeUs": 17.1015625,
+      "afterUs": 1.93046875,
+      "speedupBeforeOverAfter": 8.858761634965601,
+      "costChangePercent": -88.71174052078574,
+      "processMeansUs": {
+        "before": [
+          17.23046875,
+          17.27734375,
+          16.9953125,
+          17.1015625,
+          17.08671875
+        ],
+        "after": [
+          1.921875,
+          1.94140625,
+          1.93046875,
+          1.95625,
+          1.92421875
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.independent.rms.f64",
+      "beforeUs": 19.0140625,
+      "afterUs": 2.7671875,
+      "speedupBeforeOverAfter": 6.871259175607002,
+      "costChangePercent": -85.44662667433643,
+      "processMeansUs": {
+        "before": [
+          19.17734375,
+          19.2578125,
+          18.84765625,
+          18.9375,
+          19.0140625
+        ],
+        "after": [
+          2.809375,
+          2.778125,
+          2.76640625,
+          2.7640625,
+          2.7671875
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.peak.f64",
+      "beforeUs": 2.3046875,
+      "afterUs": 0.9828125,
+      "speedupBeforeOverAfter": 2.3449920508744038,
+      "costChangePercent": -57.355932203389834,
+      "processMeansUs": {
+        "before": [
+          2.3046875,
+          2.3015625,
+          2.3078125,
+          2.3140625,
+          2.303125
+        ],
+        "after": [
+          0.9796875,
+          0.984375,
+          0.98046875,
+          0.9828125,
+          0.98359375
+        ]
+      }
+    },
+    {
+      "case": "compressor.2.linked.rms.f64",
+      "beforeUs": 2.6296875,
+      "afterUs": 1.54921875,
+      "speedupBeforeOverAfter": 1.697428139183056,
+      "costChangePercent": -41.0873440285205,
+      "processMeansUs": {
+        "before": [
+          2.6296875,
+          2.63359375,
+          2.63203125,
+          2.6203125,
+          2.5765625
+        ],
+        "after": [
+          1.54921875,
+          1.5609375,
+          1.546875,
+          1.5484375,
+          1.55
+        ]
+      }
+    },
+    {
+      "case": "compressor.r2.level-40.f64",
+      "beforeUs": 2.16171875,
+      "afterUs": 0.82734375,
+      "speedupBeforeOverAfter": 2.6128423040604343,
+      "costChangePercent": -61.7275027105168,
+      "processMeansUs": {
+        "before": [
+          2.11328125,
+          2.20859375,
+          2.2140625,
+          2.16171875,
+          2.15703125
+        ],
+        "after": [
+          0.83359375,
+          0.82421875,
+          0.82578125,
+          0.846875,
+          0.82734375
+        ]
+      }
+    },
+    {
+      "case": "compressor.r2.level-24.f64",
+      "beforeUs": 3.78515625,
+      "afterUs": 1.38515625,
+      "speedupBeforeOverAfter": 2.7326565143824024,
+      "costChangePercent": -63.405572755417964,
+      "processMeansUs": {
+        "before": [
+          3.73359375,
+          3.7640625,
+          3.846875,
+          3.78515625,
+          3.7875
+        ],
+        "after": [
+          1.31953125,
+          1.359375,
+          1.38515625,
+          1.46171875,
+          1.38828125
+        ]
+      }
+    },
+    {
+      "case": "compressor.r2.level-8.f64",
+      "beforeUs": 2.17578125,
+      "afterUs": 0.87890625,
+      "speedupBeforeOverAfter": 2.4755555555555557,
+      "costChangePercent": -59.60502692998204,
+      "processMeansUs": {
+        "before": [
+          2.18203125,
+          2.17578125,
+          2.17265625,
+          2.225,
+          2.175
+        ],
+        "after": [
+          0.87890625,
+          0.884375,
+          0.871875,
+          0.87890625,
+          0.87421875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r4.level-40.f64",
+      "beforeUs": 2.1109375,
+      "afterUs": 0.83671875,
+      "speedupBeforeOverAfter": 2.522875816993464,
+      "costChangePercent": -60.36269430051813,
+      "processMeansUs": {
+        "before": [
+          2.11640625,
+          2.10625,
+          2.10390625,
+          2.14921875,
+          2.1109375
+        ],
+        "after": [
+          0.8328125,
+          0.8359375,
+          0.83671875,
+          0.83984375,
+          0.84453125
+        ]
+      }
+    },
+    {
+      "case": "compressor.r4.level-24.f64",
+      "beforeUs": 3.7671875,
+      "afterUs": 1.30546875,
+      "speedupBeforeOverAfter": 2.8856971873129864,
+      "costChangePercent": -65.34632932393198,
+      "processMeansUs": {
+        "before": [
+          3.784375,
+          3.76171875,
+          3.7484375,
+          3.7671875,
+          3.7671875
+        ],
+        "after": [
+          1.3046875,
+          1.3171875,
+          1.30625,
+          1.30234375,
+          1.30546875
+        ]
+      }
+    },
+    {
+      "case": "compressor.r4.level-8.f64",
+      "beforeUs": 2.24921875,
+      "afterUs": 0.9734375,
+      "speedupBeforeOverAfter": 2.310593900481541,
+      "costChangePercent": -56.72108370962139,
+      "processMeansUs": {
+        "before": [
+          2.26171875,
+          2.25625,
+          2.24921875,
+          2.24921875,
+          2.2484375
+        ],
+        "after": [
+          0.9875,
+          0.97421875,
+          0.96875,
+          0.96953125,
+          0.9734375
+        ]
+      }
+    },
+    {
+      "case": "compressor.r6.level-40.f64",
+      "beforeUs": 2.10625,
+      "afterUs": 0.8265625,
+      "speedupBeforeOverAfter": 2.5482041587901705,
+      "costChangePercent": -60.7566765578635,
+      "processMeansUs": {
+        "before": [
+          2.10546875,
+          2.1078125,
+          2.10625,
+          2.103125,
+          2.1515625
+        ],
+        "after": [
+          0.81328125,
+          0.8265625,
+          0.8203125,
+          0.82734375,
+          0.8265625
+        ]
+      }
+    },
+    {
+      "case": "compressor.r6.level-24.f64",
+      "beforeUs": 3.7390625,
+      "afterUs": 1.28828125,
+      "speedupBeforeOverAfter": 2.902365069739236,
+      "costChangePercent": -65.545340576682,
+      "processMeansUs": {
+        "before": [
+          3.7328125,
+          3.7390625,
+          3.73203125,
+          3.746875,
+          3.7703125
+        ],
+        "after": [
+          1.28828125,
+          1.29921875,
+          1.34765625,
+          1.2796875,
+          1.275
+        ]
+      }
+    },
+    {
+      "case": "compressor.r6.level-8.f64",
+      "beforeUs": 3.73046875,
+      "afterUs": 1.28515625,
+      "speedupBeforeOverAfter": 2.9027355623100304,
+      "costChangePercent": -65.54973821989529,
+      "processMeansUs": {
+        "before": [
+          3.753125,
+          3.73046875,
+          3.7203125,
+          3.7296875,
+          3.734375
+        ],
+        "after": [
+          1.2875,
+          1.2921875,
+          1.28515625,
+          1.2765625,
+          1.28359375
+        ]
+      }
+    },
+    {
+      "case": "compressor.r12.level-40.f64",
+      "beforeUs": 2.0984375,
+      "afterUs": 0.81640625,
+      "speedupBeforeOverAfter": 2.5703349282296655,
+      "costChangePercent": -61.094564408041705,
+      "processMeansUs": {
+        "before": [
+          2.1125,
+          2.096875,
+          2.0984375,
+          2.0953125,
+          2.0984375
+        ],
+        "after": [
+          0.81640625,
+          0.8171875,
+          0.81640625,
+          0.82578125,
+          0.81328125
+        ]
+      }
+    },
+    {
+      "case": "compressor.r12.level-24.f64",
+      "beforeUs": 3.73125,
+      "afterUs": 1.290625,
+      "speedupBeforeOverAfter": 2.8910411622276033,
+      "costChangePercent": -65.4103852596315,
+      "processMeansUs": {
+        "before": [
+          3.73046875,
+          3.7640625,
+          3.72734375,
+          3.73125,
+          3.74921875
+        ],
+        "after": [
+          1.28515625,
+          1.3078125,
+          1.28515625,
+          1.2953125,
+          1.290625
+        ]
+      }
+    },
+    {
+      "case": "compressor.r12.level-8.f64",
+      "beforeUs": 3.73515625,
+      "afterUs": 1.29140625,
+      "speedupBeforeOverAfter": 2.8923169993950393,
+      "costChangePercent": -65.42564317088475,
+      "processMeansUs": {
+        "before": [
+          3.7390625,
+          3.73203125,
+          3.72734375,
+          3.73515625,
+          3.7390625
+        ],
+        "after": [
+          1.290625,
+          1.3078125,
+          1.29140625,
+          1.28828125,
+          1.38046875
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.direct.f64",
+      "beforeUs": 4.16484375,
+      "afterUs": 1,
+      "speedupBeforeOverAfter": 4.16484375,
+      "costChangePercent": -75.98949540423936,
+      "processMeansUs": {
+        "before": [
+          4.165625,
+          4.171875,
+          4.1640625,
+          4.15234375,
+          4.16484375
+        ],
+        "after": [
+          1.025,
+          1,
+          0.9890625,
+          0.99921875,
+          1.03203125
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.adaa.f64",
+      "beforeUs": 7.43046875,
+      "afterUs": 1.6703125,
+      "speedupBeforeOverAfter": 4.448550046772684,
+      "costChangePercent": -77.52076542950267,
+      "processMeansUs": {
+        "before": [
+          7.43046875,
+          7.49609375,
+          7.334375,
+          7.35703125,
+          7.45546875
+        ],
+        "after": [
+          1.6671875,
+          1.67734375,
+          1.6578125,
+          1.6734375,
+          1.6703125
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.direct.f64",
+      "beforeUs": 3.2890625,
+      "afterUs": 0.753125,
+      "speedupBeforeOverAfter": 4.367219917012448,
+      "costChangePercent": -77.1021377672209,
+      "processMeansUs": {
+        "before": [
+          3.28515625,
+          3.28984375,
+          3.2890625,
+          3.284375,
+          3.29296875
+        ],
+        "after": [
+          0.7453125,
+          0.75546875,
+          0.78203125,
+          0.75,
+          0.753125
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.adaa.f64",
+      "beforeUs": 7.6359375,
+      "afterUs": 2.075,
+      "speedupBeforeOverAfter": 3.679969879518072,
+      "costChangePercent": -72.82586453857172,
+      "processMeansUs": {
+        "before": [
+          7.62578125,
+          7.6359375,
+          7.66875,
+          7.6375,
+          7.625
+        ],
+        "after": [
+          2.075,
+          2.08203125,
+          2.0703125,
+          2.06484375,
+          2.09453125
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.direct.f64",
+      "beforeUs": 2.521875,
+      "afterUs": 1.88671875,
+      "speedupBeforeOverAfter": 1.3366459627329192,
+      "costChangePercent": -25.18587360594796,
+      "processMeansUs": {
+        "before": [
+          2.525,
+          2.51875,
+          2.521875,
+          2.52265625,
+          2.521875
+        ],
+        "after": [
+          1.88828125,
+          1.90234375,
+          1.88359375,
+          1.87421875,
+          1.88671875
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.adaa.f64",
+      "beforeUs": 3.46953125,
+      "afterUs": 2.959375,
+      "speedupBeforeOverAfter": 1.1723864836325237,
+      "costChangePercent": -14.703895519027244,
+      "processMeansUs": {
+        "before": [
+          3.46953125,
+          3.4671875,
+          3.46875,
+          3.46953125,
+          3.47265625
+        ],
+        "after": [
+          2.95625,
+          2.96875,
+          2.959375,
+          2.959375,
+          2.95546875
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.direct.f64",
+      "beforeUs": 0.73984375,
+      "afterUs": 0.13203125,
+      "speedupBeforeOverAfter": 5.603550295857989,
+      "costChangePercent": -82.15417106652588,
+      "processMeansUs": {
+        "before": [
+          0.740625,
+          0.73984375,
+          0.73984375,
+          0.73984375,
+          0.74375
+        ],
+        "after": [
+          0.13203125,
+          0.13203125,
+          0.1328125,
+          0.13359375,
+          0.13203125
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.adaa.f64",
+      "beforeUs": 1.790625,
+      "afterUs": 0.43671875,
+      "speedupBeforeOverAfter": 4.100178890876565,
+      "costChangePercent": -75.6108202443281,
+      "processMeansUs": {
+        "before": [
+          1.884375,
+          1.896875,
+          1.784375,
+          1.78828125,
+          1.790625
+        ],
+        "after": [
+          0.4328125,
+          0.43671875,
+          0.43671875,
+          0.4390625,
+          0.44140625
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.direct.f64",
+      "beforeUs": 2.89375,
+      "afterUs": 2.2890625,
+      "speedupBeforeOverAfter": 1.2641638225255971,
+      "costChangePercent": -20.8963282937365,
+      "processMeansUs": {
+        "before": [
+          2.89765625,
+          2.878125,
+          2.87734375,
+          2.896875,
+          2.89375
+        ],
+        "after": [
+          2.30078125,
+          2.29609375,
+          2.26953125,
+          2.2890625,
+          2.278125
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.adaa.f64",
+      "beforeUs": 2.08671875,
+      "afterUs": 0.7421875,
+      "speedupBeforeOverAfter": 2.8115789473684214,
+      "costChangePercent": -64.4327967053538,
+      "processMeansUs": {
+        "before": [
+          2.17890625,
+          2.16875,
+          2.07734375,
+          2.08671875,
+          2.07890625
+        ],
+        "after": [
+          0.753125,
+          0.73359375,
+          0.7421875,
+          0.740625,
+          0.7421875
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.slow.f64",
+      "beforeUs": 8.7421875,
+      "afterUs": 1.6890625,
+      "speedupBeforeOverAfter": 5.1757631822386685,
+      "costChangePercent": -80.67917783735479,
+      "processMeansUs": {
+        "before": [
+          8.7421875,
+          8.64453125,
+          8.69375,
+          8.77109375,
+          8.8171875
+        ],
+        "after": [
+          1.6890625,
+          1.6953125,
+          1.67890625,
+          1.6890625,
+          1.68671875
+        ]
+      }
+    },
+    {
+      "case": "saturator.0.silence.f64",
+      "beforeUs": 0.91015625,
+      "afterUs": 0.46875,
+      "speedupBeforeOverAfter": 1.9416666666666667,
+      "costChangePercent": -48.49785407725322,
+      "processMeansUs": {
+        "before": [
+          0.91015625,
+          0.909375,
+          0.91015625,
+          0.91015625,
+          0.9140625
+        ],
+        "after": [
+          0.48984375,
+          0.46875,
+          0.4671875,
+          0.47578125,
+          0.46484375
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.slow.f64",
+      "beforeUs": 7.54296875,
+      "afterUs": 2.0890625,
+      "speedupBeforeOverAfter": 3.610695587135378,
+      "costChangePercent": -72.3045054375971,
+      "processMeansUs": {
+        "before": [
+          7.54296875,
+          7.53046875,
+          7.5421875,
+          7.5703125,
+          7.553125
+        ],
+        "after": [
+          2.1078125,
+          2.14921875,
+          2.07265625,
+          2.0890625,
+          2.084375
+        ]
+      }
+    },
+    {
+      "case": "saturator.1.silence.f64",
+      "beforeUs": 4.2,
+      "afterUs": 0.496875,
+      "speedupBeforeOverAfter": 8.452830188679245,
+      "costChangePercent": -88.16964285714286,
+      "processMeansUs": {
+        "before": [
+          4.1765625,
+          4.2,
+          4.1828125,
+          4.209375,
+          4.20625
+        ],
+        "after": [
+          0.4953125,
+          0.49765625,
+          0.496875,
+          0.50078125,
+          0.49296875
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.slow.f64",
+      "beforeUs": 3.49921875,
+      "afterUs": 2.9546875,
+      "speedupBeforeOverAfter": 1.1842940243257536,
+      "costChangePercent": -15.561509265461037,
+      "processMeansUs": {
+        "before": [
+          3.48828125,
+          3.4921875,
+          3.50390625,
+          3.50546875,
+          3.49921875
+        ],
+        "after": [
+          2.95234375,
+          2.971875,
+          2.9546875,
+          2.95859375,
+          2.95234375
+        ]
+      }
+    },
+    {
+      "case": "saturator.2.silence.f64",
+      "beforeUs": 3.3953125,
+      "afterUs": 2.8734375,
+      "speedupBeforeOverAfter": 1.1816204458945079,
+      "costChangePercent": -15.370455591348364,
+      "processMeansUs": {
+        "before": [
+          3.39453125,
+          3.384375,
+          3.40390625,
+          3.3953125,
+          3.40234375
+        ],
+        "after": [
+          2.8734375,
+          2.7953125,
+          2.8765625,
+          2.8828125,
+          2.871875
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.slow.f64",
+      "beforeUs": 1.7984375,
+      "afterUs": 0.43828125,
+      "speedupBeforeOverAfter": 4.103386809269162,
+      "costChangePercent": -75.62988705473501,
+      "processMeansUs": {
+        "before": [
+          1.7984375,
+          1.78203125,
+          1.83125,
+          1.7984375,
+          1.7921875
+        ],
+        "after": [
+          0.46796875,
+          0.4359375,
+          0.43828125,
+          0.4359375,
+          0.47109375
+        ]
+      }
+    },
+    {
+      "case": "saturator.3.silence.f64",
+      "beforeUs": 1.78828125,
+      "afterUs": 0.2828125,
+      "speedupBeforeOverAfter": 6.323204419889502,
+      "costChangePercent": -84.18523372651812,
+      "processMeansUs": {
+        "before": [
+          1.78203125,
+          1.77890625,
+          1.7984375,
+          1.78828125,
+          1.79609375
+        ],
+        "after": [
+          0.2859375,
+          0.28046875,
+          0.28359375,
+          0.2828125,
+          0.27734375
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.slow.f64",
+      "beforeUs": 2.090625,
+      "afterUs": 0.73828125,
+      "speedupBeforeOverAfter": 2.831746031746032,
+      "costChangePercent": -64.68609865470853,
+      "processMeansUs": {
+        "before": [
+          2.1015625,
+          2.12578125,
+          2.090625,
+          2.08984375,
+          2.08984375
+        ],
+        "after": [
+          0.73359375,
+          0.75234375,
+          0.73828125,
+          0.7453125,
+          0.7328125
+        ]
+      }
+    },
+    {
+      "case": "saturator.4.silence.f64",
+      "beforeUs": 2.08984375,
+      "afterUs": 0.28203125,
+      "speedupBeforeOverAfter": 7.409972299168975,
+      "costChangePercent": -86.50467289719626,
+      "processMeansUs": {
+        "before": [
+          2.08984375,
+          2.07265625,
+          2.18203125,
+          2.0828125,
+          2.10234375
+        ],
+        "after": [
+          0.28125,
+          0.28125,
+          0.28203125,
+          0.2828125,
+          0.284375
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.4.f64",
+      "beforeUs": 4.48828125,
+      "afterUs": 4.52578125,
+      "speedupBeforeOverAfter": 0.99171413775246,
+      "costChangePercent": 0.8355091383811963,
+      "processMeansUs": {
+        "before": [
+          4.5046875,
+          4.48671875,
+          4.4859375,
+          4.48828125,
+          4.52109375
+        ],
+        "after": [
+          4.52578125,
+          4.54453125,
+          4.50703125,
+          4.5265625,
+          4.48671875
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.4.f64",
+      "beforeUs": 4.47265625,
+      "afterUs": 4.471875,
+      "speedupBeforeOverAfter": 1.0001747030048918,
+      "costChangePercent": -0.017467248908298316,
+      "processMeansUs": {
+        "before": [
+          4.471875,
+          4.47421875,
+          4.4703125,
+          4.47265625,
+          4.478125
+        ],
+        "after": [
+          4.471875,
+          4.475,
+          4.47109375,
+          4.47109375,
+          4.471875
+        ]
+      }
+    },
+    {
+      "case": "eq.smoothed.8.f64",
+      "beforeUs": 8.94609375,
+      "afterUs": 8.93984375,
+      "speedupBeforeOverAfter": 1.0006991173643276,
+      "costChangePercent": -0.06986289407038271,
+      "processMeansUs": {
+        "before": [
+          8.940625,
+          8.9484375,
+          8.940625,
+          8.94609375,
+          8.94609375
+        ],
+        "after": [
+          8.9484375,
+          8.94140625,
+          8.93515625,
+          8.9375,
+          8.93984375
+        ]
+      }
+    },
+    {
+      "case": "eq.plain.8.f64",
+      "beforeUs": 8.93203125,
+      "afterUs": 8.92421875,
+      "speedupBeforeOverAfter": 1.0008754267705506,
+      "costChangePercent": -0.08746610688358247,
+      "processMeansUs": {
+        "before": [
+          8.91796875,
+          8.9296875,
+          8.93359375,
+          8.93203125,
+          8.9328125
+        ],
+        "after": [
+          8.921875,
+          8.92421875,
+          8.91953125,
+          8.92578125,
+          8.93125
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.scalar.f64",
+      "beforeUs": 1.121875,
+      "afterUs": 1.1234375,
+      "speedupBeforeOverAfter": 0.9986091794158553,
+      "costChangePercent": 0.1392757660167332,
+      "processMeansUs": {
+        "before": [
+          1.1234375,
+          1.121875,
+          1.1234375,
+          1.11953125,
+          1.12109375
+        ],
+        "after": [
+          1.1234375,
+          1.12265625,
+          1.12109375,
+          1.1234375,
+          1.1234375
+        ]
+      }
+    },
+    {
+      "case": "biquad.stereo.avx512.f64",
+      "beforeUs": 1.12265625,
+      "afterUs": 1.12265625,
+      "speedupBeforeOverAfter": 1.0,
+      "costChangePercent": 0.0,
+      "processMeansUs": {
+        "before": [
+          1.121875,
+          1.1234375,
+          1.1234375,
+          1.12265625,
+          1.12109375
+        ],
+        "after": [
+          1.12265625,
+          1.1234375,
+          1.121875,
+          1.12265625,
+          1.12265625
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.nonuniform.f64",
+      "beforeUs": 13.59765625,
+      "afterUs": 13.54375,
+      "speedupBeforeOverAfter": 1.0039801568989386,
+      "costChangePercent": -0.396437805228389,
+      "processMeansUs": {
+        "before": [
+          13.3859375,
+          13.59765625,
+          13.66015625,
+          13.409375,
+          13.77109375
+        ],
+        "after": [
+          13.41484375,
+          13.68671875,
+          13.63984375,
+          13.4828125,
+          13.54375
+        ]
+      }
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.f64",
+      "beforeUs": 17.3984375,
+      "afterUs": 17.11953125,
+      "speedupBeforeOverAfter": 1.016291698991466,
+      "costChangePercent": -1.6030534351144987,
+      "processMeansUs": {
+        "before": [
+          17.35390625,
+          17.41484375,
+          17.23671875,
+          17.3984375,
+          17.42421875
+        ],
+        "after": [
+          17.0859375,
+          17.28359375,
+          17.11953125,
+          17.26875,
+          16.93203125
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.peak.f64",
+      "beforeUs": 68.165625,
+      "afterUs": 7.5640625,
+      "speedupBeforeOverAfter": 9.011774426771328,
+      "costChangePercent": -88.90340622564526,
+      "processMeansUs": {
+        "before": [
+          70.3875,
+          67.6765625,
+          67.496875,
+          68.165625,
+          69.36171875
+        ],
+        "after": [
+          7.6015625,
+          7.84375,
+          7.54296875,
+          7.53125,
+          7.5640625
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.independent.rms.f64",
+      "beforeUs": 75.00703125,
+      "afterUs": 10.959375,
+      "speedupBeforeOverAfter": 6.84409751924722,
+      "costChangePercent": -85.38886979345686,
+      "processMeansUs": {
+        "before": [
+          75.00703125,
+          74.9546875,
+          74.89609375,
+          75.0515625,
+          75.096875
+        ],
+        "after": [
+          10.959375,
+          11.34453125,
+          10.9421875,
+          10.90625,
+          10.9625
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.peak.f64",
+      "beforeUs": 6.87265625,
+      "afterUs": 1.63671875,
+      "speedupBeforeOverAfter": 4.199045346062053,
+      "costChangePercent": -76.18506308968966,
+      "processMeansUs": {
+        "before": [
+          6.87265625,
+          6.81328125,
+          6.83671875,
+          6.93515625,
+          6.88046875
+        ],
+        "after": [
+          1.71640625,
+          1.80390625,
+          1.63671875,
+          1.60859375,
+          1.609375
+        ]
+      }
+    },
+    {
+      "case": "compressor.8.linked.rms.f64",
+      "beforeUs": 7.66015625,
+      "afterUs": 2.1859375,
+      "speedupBeforeOverAfter": 3.504288777698356,
+      "costChangePercent": -71.46353901070881,
+      "processMeansUs": {
+        "before": [
+          7.66015625,
+          7.61328125,
+          7.6109375,
+          7.8015625,
+          7.67734375
+        ],
+        "after": [
+          2.17421875,
+          2.37890625,
+          2.20546875,
+          2.1859375,
+          2.16171875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.0.adaa.tone110.f64",
+      "beforeUs": 7.6015625,
+      "afterUs": 1.68828125,
+      "speedupBeforeOverAfter": 4.502545118000926,
+      "costChangePercent": -77.79033915724564,
+      "processMeansUs": {
+        "before": [
+          7.58125,
+          7.5625,
+          7.60859375,
+          7.6015625,
+          7.6671875
+        ],
+        "after": [
+          1.68828125,
+          1.690625,
+          1.74609375,
+          1.67734375,
+          1.6703125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.adaa.tone110.f64",
+      "beforeUs": 7.6234375,
+      "afterUs": 2.07109375,
+      "speedupBeforeOverAfter": 3.680875141456054,
+      "costChangePercent": -72.83254765320761,
+      "processMeansUs": {
+        "before": [
+          7.59609375,
+          7.62265625,
+          7.62421875,
+          7.6234375,
+          7.6734375
+        ],
+        "after": [
+          2.06328125,
+          2.1,
+          2.07109375,
+          2.06484375,
+          2.09140625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.fast.tone110.f64",
+      "beforeUs": 6.81171875,
+      "afterUs": 2.06796875,
+      "speedupBeforeOverAfter": 3.2939176426142804,
+      "costChangePercent": -69.64101387773826,
+      "processMeansUs": {
+        "before": [
+          6.81171875,
+          6.80703125,
+          6.79609375,
+          6.81953125,
+          6.85703125
+        ],
+        "after": [
+          2.07109375,
+          2.103125,
+          2.059375,
+          2.06796875,
+          2.05234375
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.2.adaa.tone110.f64",
+      "beforeUs": 3.44453125,
+      "afterUs": 2.93515625,
+      "speedupBeforeOverAfter": 1.173542720255523,
+      "costChangePercent": -14.787933771830343,
+      "processMeansUs": {
+        "before": [
+          3.434375,
+          3.44375,
+          3.44453125,
+          3.4453125,
+          3.45078125
+        ],
+        "after": [
+          2.93515625,
+          3.6765625,
+          2.921875,
+          2.9390625,
+          2.92734375
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.3.adaa.tone110.f64",
+      "beforeUs": 1.7984375,
+      "afterUs": 0.4359375,
+      "speedupBeforeOverAfter": 4.125448028673835,
+      "costChangePercent": -75.76020851433536,
+      "processMeansUs": {
+        "before": [
+          1.79375,
+          1.796875,
+          1.7984375,
+          1.809375,
+          1.81640625
+        ],
+        "after": [
+          0.4359375,
+          0.4359375,
+          0.43828125,
+          0.43359375,
+          0.43828125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.4.adaa.tone110.f64",
+      "beforeUs": 2.09609375,
+      "afterUs": 0.73671875,
+      "speedupBeforeOverAfter": 2.8451749734888656,
+      "costChangePercent": -64.85277674245249,
+      "processMeansUs": {
+        "before": [
+          2.0875,
+          2.09609375,
+          2.0859375,
+          3.4453125,
+          2.11171875
+        ],
+        "after": [
+          0.75390625,
+          0.7484375,
+          0.73671875,
+          0.73046875,
+          0.73359375
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.0.adaa.tone997.f64",
+      "beforeUs": 7.653125,
+      "afterUs": 1.68828125,
+      "speedupBeforeOverAfter": 4.533086534012032,
+      "costChangePercent": -77.93997550020417,
+      "processMeansUs": {
+        "before": [
+          7.6765625,
+          7.653125,
+          7.59453125,
+          7.6421875,
+          7.68046875
+        ],
+        "after": [
+          1.69140625,
+          1.76171875,
+          1.68359375,
+          1.68828125,
+          1.68515625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.adaa.tone997.f64",
+      "beforeUs": 7.68359375,
+      "afterUs": 2.09453125,
+      "speedupBeforeOverAfter": 3.6684073107049606,
+      "costChangePercent": -72.74021352313167,
+      "processMeansUs": {
+        "before": [
+          7.69296875,
+          7.66484375,
+          7.68359375,
+          7.67109375,
+          7.7609375
+        ],
+        "after": [
+          2.0859375,
+          2.1,
+          2.09453125,
+          2.09375,
+          2.1390625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.fast.tone997.f64",
+      "beforeUs": 6.54765625,
+      "afterUs": 2.084375,
+      "speedupBeforeOverAfter": 3.141304347826087,
+      "costChangePercent": -68.16608996539793,
+      "processMeansUs": {
+        "before": [
+          6.49140625,
+          6.5234375,
+          6.54765625,
+          6.5671875,
+          6.6
+        ],
+        "after": [
+          2.0765625,
+          2.121875,
+          2.084375,
+          2.13515625,
+          2.0828125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.2.adaa.tone997.f64",
+      "beforeUs": 3.45390625,
+      "afterUs": 2.93984375,
+      "speedupBeforeOverAfter": 1.174860483656657,
+      "costChangePercent": -14.883510517982357,
+      "processMeansUs": {
+        "before": [
+          3.44765625,
+          3.4640625,
+          3.4484375,
+          3.45390625,
+          3.46640625
+        ],
+        "after": [
+          2.93984375,
+          2.9640625,
+          2.93359375,
+          2.9390625,
+          2.9515625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.3.adaa.tone997.f64",
+      "beforeUs": 1.81796875,
+      "afterUs": 0.4421875,
+      "speedupBeforeOverAfter": 4.1113074204946995,
+      "costChangePercent": -75.6768371293511,
+      "processMeansUs": {
+        "before": [
+          1.81796875,
+          1.83359375,
+          1.7890625,
+          1.87578125,
+          1.8
+        ],
+        "after": [
+          0.43359375,
+          0.4421875,
+          0.4890625,
+          0.4671875,
+          0.43515625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.4.adaa.tone997.f64",
+      "beforeUs": 2.11796875,
+      "afterUs": 0.734375,
+      "speedupBeforeOverAfter": 2.8840425531914895,
+      "costChangePercent": -65.32644780523793,
+      "processMeansUs": {
+        "before": [
+          2.0890625,
+          2.1203125,
+          2.08359375,
+          2.18671875,
+          2.11796875
+        ],
+        "after": [
+          0.7328125,
+          0.73828125,
+          0.73359375,
+          0.734375,
+          0.74453125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.0.adaa.multitone.f64",
+      "beforeUs": 9.03359375,
+      "afterUs": 1.7125,
+      "speedupBeforeOverAfter": 5.275091240875913,
+      "costChangePercent": -81.04298192510593,
+      "processMeansUs": {
+        "before": [
+          9.03359375,
+          9.01875,
+          9.05390625,
+          9.03046875,
+          9.25390625
+        ],
+        "after": [
+          1.74453125,
+          1.73671875,
+          1.68125,
+          1.70390625,
+          1.7125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.adaa.multitone.f64",
+      "beforeUs": 7.5203125,
+      "afterUs": 2.0890625,
+      "speedupBeforeOverAfter": 3.5998504113687364,
+      "costChangePercent": -72.22106794099315,
+      "processMeansUs": {
+        "before": [
+          7.51875,
+          7.5203125,
+          7.51796875,
+          7.534375,
+          7.559375
+        ],
+        "after": [
+          2.09453125,
+          2.09609375,
+          2.08515625,
+          2.0890625,
+          2.0765625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.1.fast.multitone.f64",
+      "beforeUs": 7.734375,
+      "afterUs": 2.08203125,
+      "speedupBeforeOverAfter": 3.7148217636022514,
+      "costChangePercent": -73.08080808080808,
+      "processMeansUs": {
+        "before": [
+          7.7125,
+          7.70546875,
+          7.734375,
+          7.734375,
+          7.96171875
+        ],
+        "after": [
+          2.12578125,
+          2.184375,
+          2.08203125,
+          2.08203125,
+          2.08046875
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.2.adaa.multitone.f64",
+      "beforeUs": 3.47890625,
+      "afterUs": 2.97734375,
+      "speedupBeforeOverAfter": 1.1684597218577801,
+      "costChangePercent": -14.417246799910167,
+      "processMeansUs": {
+        "before": [
+          3.49921875,
+          3.47890625,
+          3.47890625,
+          3.4734375,
+          3.49375
+        ],
+        "after": [
+          2.9828125,
+          3.0171875,
+          2.965625,
+          2.97734375,
+          2.97265625
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.3.adaa.multitone.f64",
+      "beforeUs": 1.7984375,
+      "afterUs": 0.4375,
+      "speedupBeforeOverAfter": 4.110714285714286,
+      "costChangePercent": -75.67332754126846,
+      "processMeansUs": {
+        "before": [
+          1.79296875,
+          1.79296875,
+          1.7984375,
+          1.82890625,
+          1.903125
+        ],
+        "after": [
+          0.43359375,
+          0.4359375,
+          0.4375,
+          0.45546875,
+          0.4578125
+        ]
+      }
+    },
+    {
+      "case": "program.saturator.4.adaa.multitone.f64",
+      "beforeUs": 2.10078125,
+      "afterUs": 0.740625,
+      "speedupBeforeOverAfter": 2.8364978902953584,
+      "costChangePercent": -64.7452584603942,
+      "processMeansUs": {
+        "before": [
+          2.084375,
+          2.10078125,
+          2.09921875,
+          2.11484375,
+          2.2046875
+        ],
+        "after": [
+          0.74921875,
+          0.740625,
+          0.7421875,
+          0.7359375,
+          0.7328125
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.0.direct.f64",
+      "beforeUs": 4.7515625,
+      "afterUs": 1.0375,
+      "speedupBeforeOverAfter": 4.579819277108434,
+      "costChangePercent": -78.16507727721145,
+      "processMeansUs": {
+        "before": [
+          4.73671875,
+          4.725,
+          4.7578125,
+          4.7625,
+          4.7515625
+        ],
+        "after": [
+          1.22265625,
+          1.13125,
+          1.0375,
+          1.03359375,
+          1.03359375
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.0.adaa.f64",
+      "beforeUs": 9.12578125,
+      "afterUs": 1.715625,
+      "speedupBeforeOverAfter": 5.319216757741348,
+      "costChangePercent": -81.20023970550466,
+      "processMeansUs": {
+        "before": [
+          9.12578125,
+          9.09609375,
+          9.1484375,
+          9.1,
+          9.2734375
+        ],
+        "after": [
+          1.715625,
+          1.72421875,
+          1.72109375,
+          1.715625,
+          1.70234375
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.1.direct.f64",
+      "beforeUs": 3.78984375,
+      "afterUs": 0.7859375,
+      "speedupBeforeOverAfter": 4.8220675944334,
+      "costChangePercent": -79.26200783343641,
+      "processMeansUs": {
+        "before": [
+          3.7859375,
+          3.8,
+          3.78984375,
+          3.77109375,
+          3.825
+        ],
+        "after": [
+          0.784375,
+          0.7921875,
+          0.784375,
+          0.7859375,
+          0.8109375
+        ]
+      }
+    },
+    {
+      "case": "program.saturatorMixed.1.adaa.f64",
+      "beforeUs": 8.19453125,
+      "afterUs": 2.14453125,
+      "speedupBeforeOverAfter": 3.8211293260473593,
+      "costChangePercent": -73.82972638001716,
+      "processMeansUs": {
+        "before": [
+          8.16640625,
+          8.1875,
+          8.19453125,
+          8.19453125,
+          8.246875
+        ],
+        "after": [
+          2.14453125,
+          2.159375,
+          2.11171875,
+          2.159375,
+          2.1125
+        ]
+      }
+    },
+    {
+      "case": "program.transient.precise.audio.f64",
+      "beforeUs": 9.678125,
+      "afterUs": 9.28203125,
+      "speedupBeforeOverAfter": 1.0426731756586147,
+      "costChangePercent": -4.092670326122061,
+      "processMeansUs": {
+        "before": [
+          9.678125,
+          9.66484375,
+          9.6921875,
+          9.671875,
+          9.796875
+        ],
+        "after": [
+          9.196875,
+          9.46015625,
+          9.21484375,
+          9.32109375,
+          9.28203125
+        ]
+      }
+    },
+    {
+      "case": "program.transient.precise.gain.f64",
+      "beforeUs": 9.49921875,
+      "afterUs": 9.00546875,
+      "speedupBeforeOverAfter": 1.0548277956103063,
+      "costChangePercent": -5.197795871371003,
+      "processMeansUs": {
+        "before": [
+          9.49921875,
+          9.4765625,
+          9.57578125,
+          9.4734375,
+          9.6078125
+        ],
+        "after": [
+          8.984375,
+          9.18125,
+          8.9828125,
+          9.0546875,
+          9.00546875
+        ]
+      }
+    },
+    {
+      "case": "program.transient.fast.audio.f64",
+      "beforeUs": 6.3390625,
+      "afterUs": 1.7,
+      "speedupBeforeOverAfter": 3.728860294117647,
+      "costChangePercent": -73.18215430120779,
+      "processMeansUs": {
+        "before": [
+          6.3359375,
+          6.3390625,
+          6.37265625,
+          6.33359375,
+          6.40390625
+        ],
+        "after": [
+          1.7,
+          1.7359375,
+          1.70859375,
+          1.6921875,
+          1.6953125
+        ]
+      }
+    },
+    {
+      "case": "program.transient.fast.gain.f64",
+      "beforeUs": 6.21171875,
+      "afterUs": 1.66015625,
+      "speedupBeforeOverAfter": 3.7416470588235295,
+      "costChangePercent": -73.27380203747957,
+      "processMeansUs": {
+        "before": [
+          6.1953125,
+          6.21171875,
+          6.22578125,
+          6.19765625,
+          6.2203125
+        ],
+        "after": [
+          1.6578125,
+          1.7015625,
+          1.665625,
+          1.65546875,
+          1.66015625
+        ]
+      }
+    },
+    {
+      "case": "program.dynamicEq.1.f64",
+      "beforeUs": 16.778125,
+      "afterUs": 3.52109375,
+      "speedupBeforeOverAfter": 4.765032172176614,
+      "costChangePercent": -79.01378282734215,
+      "processMeansUs": {
+        "before": [
+          16.778125,
+          16.77578125,
+          17.3296875,
+          16.7109375,
+          17.08828125
+        ],
+        "after": [
+          3.50703125,
+          3.59609375,
+          3.52109375,
+          3.4984375,
+          3.5234375
+        ]
+      }
+    },
+    {
+      "case": "program.dynamicEq.3.f64",
+      "beforeUs": 43.58125,
+      "afterUs": 9.73984375,
+      "speedupBeforeOverAfter": 4.474532766503569,
+      "costChangePercent": -77.65129786318657,
+      "processMeansUs": {
+        "before": [
+          43.4953125,
+          43.58125,
+          45.9515625,
+          43.521875,
+          43.8734375
+        ],
+        "after": [
+          9.73984375,
+          10.18984375,
+          9.7640625,
+          9.7375,
+          9.7390625
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r4.linked.f64",
+      "beforeUs": 2.29921875,
+      "afterUs": 0.9640625,
+      "speedupBeforeOverAfter": 2.384927066450567,
+      "costChangePercent": -58.0699966021067,
+      "processMeansUs": {
+        "before": [
+          2.30234375,
+          2.31328125,
+          2.29765625,
+          2.29921875,
+          2.29921875
+        ],
+        "after": [
+          0.959375,
+          0.9765625,
+          0.9625,
+          0.9640625,
+          0.9671875
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r4.independent.f64",
+      "beforeUs": 17.15703125,
+      "afterUs": 1.8703125,
+      "speedupBeforeOverAfter": 9.173350041771094,
+      "costChangePercent": -89.09885706479669,
+      "processMeansUs": {
+        "before": [
+          17.0328125,
+          17.0953125,
+          17.15703125,
+          17.16484375,
+          17.3125
+        ],
+        "after": [
+          1.8828125,
+          1.9078125,
+          1.8703125,
+          1.85625,
+          1.8671875
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r4.lookahead.f64",
+      "beforeUs": 18.5203125,
+      "afterUs": 3.06953125,
+      "speedupBeforeOverAfter": 6.033596334945279,
+      "costChangePercent": -83.42613684299334,
+      "processMeansUs": {
+        "before": [
+          18.5046875,
+          18.71953125,
+          18.5203125,
+          18.509375,
+          18.61015625
+        ],
+        "after": [
+          3.06953125,
+          3.07421875,
+          3.01171875,
+          3.0515625,
+          3.62578125
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r6.linked.f64",
+      "beforeUs": 3.796875,
+      "afterUs": 1.3140625,
+      "speedupBeforeOverAfter": 2.8894173602853748,
+      "costChangePercent": -65.39094650205762,
+      "processMeansUs": {
+        "before": [
+          3.77578125,
+          3.81640625,
+          3.796875,
+          3.78125,
+          3.81875
+        ],
+        "after": [
+          1.31484375,
+          1.3140625,
+          1.31953125,
+          1.3140625,
+          1.3140625
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r6.independent.f64",
+      "beforeUs": 17.09140625,
+      "afterUs": 2.44140625,
+      "speedupBeforeOverAfter": 7.00064,
+      "costChangePercent": -85.71559171732869,
+      "processMeansUs": {
+        "before": [
+          17.00234375,
+          17.1765625,
+          17.09140625,
+          17.03125,
+          17.29765625
+        ],
+        "after": [
+          2.43125,
+          2.4921875,
+          2.46640625,
+          2.4375,
+          2.44140625
+        ]
+      }
+    },
+    {
+      "case": "program.compressor.r6.lookahead.f64",
+      "beforeUs": 18.3671875,
+      "afterUs": 3.60625,
+      "speedupBeforeOverAfter": 5.09315424610052,
+      "costChangePercent": -80.36580178647384,
+      "processMeansUs": {
+        "before": [
+          18.3359375,
+          18.45703125,
+          18.3359375,
+          18.3671875,
+          18.6109375
+        ],
+        "after": [
+          3.56953125,
+          3.71171875,
+          3.59609375,
+          4.996875,
+          3.60625
+        ]
+      }
+    },
+    {
+      "case": "program.dynamics.limiter.f64",
+      "beforeUs": 3.965625,
+      "afterUs": 1.334375,
+      "speedupBeforeOverAfter": 2.971896955503513,
+      "costChangePercent": -66.35145784081955,
+      "processMeansUs": {
+        "before": [
+          3.9578125,
+          3.965625,
+          3.96484375,
+          3.9703125,
+          4.025
+        ],
+        "after": [
+          1.32421875,
+          1.3546875,
+          1.334375,
+          1.325,
+          1.42265625
+        ]
+      }
+    },
+    {
+      "case": "program.dynamics.expander.f64",
+      "beforeUs": 6.44375,
+      "afterUs": 2.22734375,
+      "speedupBeforeOverAfter": 2.893019992984917,
+      "costChangePercent": -65.4340446168768,
+      "processMeansUs": {
+        "before": [
+          6.32578125,
+          6.3546875,
+          6.7328125,
+          6.44375,
+          6.459375
+        ],
+        "after": [
+          2.20390625,
+          2.27265625,
+          2.25703125,
+          2.22734375,
+          2.20703125
+        ]
+      }
+    },
+    {
+      "case": "program.dynamics.gate.f64",
+      "beforeUs": 6.14609375,
+      "afterUs": 2.99921875,
+      "speedupBeforeOverAfter": 2.0492315707215423,
+      "costChangePercent": -51.20122028727596,
+      "processMeansUs": {
+        "before": [
+          6.0328125,
+          6.1828125,
+          6.38046875,
+          6.01171875,
+          6.14609375
+        ],
+        "after": [
+          2.99765625,
+          3.053125,
+          2.99921875,
+          3.0078125,
+          2.99296875
+        ]
+      }
+    },
+    {
+      "case": "design.peaking.fixed34",
+      "beforeUs": 0.9609375,
+      "afterUs": 0.94765625,
+      "speedupBeforeOverAfter": 1.01401483924155,
+      "costChangePercent": -1.382113821138209,
+      "processMeansUs": {
+        "before": [
+          0.9609375,
+          0.96015625,
+          0.96171875,
+          0.9625,
+          0.9609375
+        ],
+        "after": [
+          0.94765625,
+          1.40625,
+          0.94765625,
+          0.94765625,
+          0.95234375
+        ]
+      }
+    },
+    {
+      "case": "design.peaking.changing34",
+      "beforeUs": 0.97578125,
+      "afterUs": 0.96015625,
+      "speedupBeforeOverAfter": 1.016273393002441,
+      "costChangePercent": -1.6012810248198561,
+      "processMeansUs": {
+        "before": [
+          0.9765625,
+          0.98125,
+          0.9734375,
+          0.96875,
+          0.97578125
+        ],
+        "after": [
+          0.95859375,
+          1.43671875,
+          0.96015625,
+          0.96328125,
+          0.96015625
+        ]
+      }
+    },
+    {
+      "case": "spatial.directivity.64calls",
+      "beforeUs": 2.325,
+      "afterUs": 2.3125,
+      "speedupBeforeOverAfter": 1.0054054054054056,
+      "costChangePercent": -0.5376344086021612,
+      "processMeansUs": {
+        "before": [
+          2.325,
+          2.33046875,
+          2.31484375,
+          2.325,
+          2.35078125
+        ],
+        "after": [
+          2.29453125,
+          2.33828125,
+          2.3125,
+          2.3140625,
+          2.3046875
+        ]
+      }
+    },
+    {
+      "case": "spatial.material.64calls",
+      "beforeUs": 3.04375,
+      "afterUs": 3.04453125,
+      "speedupBeforeOverAfter": 0.9997433923530922,
+      "costChangePercent": 0.025667351129343707,
+      "processMeansUs": {
+        "before": [
+          3.04375,
+          3.0453125,
+          3.03671875,
+          3.0359375,
+          3.06640625
+        ],
+        "after": [
+          3.0265625,
+          3.16953125,
+          3.04453125,
+          3.08828125,
+          3.0421875
+        ]
+      }
+    }
+  ],
+  "renderComparison": {
+    "samples": 2373120,
+    "maxAbsoluteError": 2.230721163343219e-11,
+    "sha256": [
+      "eab530cfc6eba33e1857aa99da98868e3f1718a1d6b208736b69ef26e6966c8e",
+      "c8a54c9ae8e127a240bbc36421450235d05a8aafbfc723da7bf5c8816674bb8d"
+    ],
+    "byType": {
+      "f32": {
+        "samples": 1359360,
+        "maxAbsoluteError": 0.0
+      },
+      "f64": {
+        "samples": 1013760,
+        "maxAbsoluteError": 2.230721163343219e-11
+      }
+    }
+  },
+  "renderCases": [
+    {
+      "case": "compressor.1.independent.peak.f32",
+      "samples": 5120,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.1.independent.rms.f32",
+      "samples": 5120,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.1.linked.peak.f32",
+      "samples": 5120,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.1.linked.rms.f32",
+      "samples": 5120,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.2.independent.peak.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.2.independent.rms.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.2.linked.peak.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.2.linked.rms.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r2.level-40.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r2.level-24.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r2.level-8.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r4.level-40.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r4.level-24.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r4.level-8.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r6.level-40.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r6.level-24.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r6.level-8.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r12.level-40.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r12.level-24.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r12.level-8.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.0.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.0.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.1.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.1.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.0.slow.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.0.silence.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.1.slow.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.1.silence.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.slow.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.silence.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.slow.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.silence.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.slow.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.silence.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.smoothed.4.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.plain.4.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.smoothed.8.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.plain.8.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "biquad.stereo.scalar.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "biquad.stereo.avx512.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p32.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p32.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p64.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p64.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p128.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p128.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p256.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p256.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p32.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p32.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p64.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p64.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p128.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p256.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p256.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p32.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p32.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p64.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p64.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p128.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p128.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p256.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.16384.p256.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p32.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p32.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p64.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p64.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p128.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p128.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p256.nonuniform.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.65536.p256.scheduled.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.8.independent.peak.f32",
+      "samples": 40960,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.8.independent.rms.f32",
+      "samples": 40960,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.8.linked.peak.f32",
+      "samples": 40960,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.8.linked.rms.f32",
+      "samples": 40960,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.0.adaa.tone110.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.1.adaa.tone110.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.1.fast.tone110.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.2.adaa.tone110.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.3.adaa.tone110.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.4.adaa.tone110.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.0.adaa.tone997.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.1.adaa.tone997.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.1.fast.tone997.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.2.adaa.tone997.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.3.adaa.tone997.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.4.adaa.tone997.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.0.adaa.multitone.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.1.adaa.multitone.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.1.fast.multitone.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.2.adaa.multitone.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.3.adaa.multitone.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.4.adaa.multitone.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturatorMixed.0.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturatorMixed.0.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturatorMixed.1.direct.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturatorMixed.1.adaa.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.transient.precise.audio.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.transient.precise.gain.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.transient.fast.audio.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.transient.fast.gain.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.dynamicEq.1.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.dynamicEq.3.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.compressor.r4.linked.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.compressor.r4.independent.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.compressor.r4.lookahead.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.compressor.r6.linked.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.compressor.r6.independent.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.compressor.r6.lookahead.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.dynamics.limiter.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.dynamics.expander.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.dynamics.gate.f32",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.512.p128.scheduled.block480.f32",
+      "samples": 19200,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.block480.f32",
+      "samples": 19200,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.1.independent.peak.f64",
+      "samples": 5120,
+      "maxAbsoluteError": 2.7755575615628914e-16
+    },
+    {
+      "case": "compressor.1.independent.rms.f64",
+      "samples": 5120,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "compressor.1.linked.peak.f64",
+      "samples": 5120,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "compressor.1.linked.rms.f64",
+      "samples": 5120,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "compressor.2.independent.peak.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.7755575615628914e-16
+    },
+    {
+      "case": "compressor.2.independent.rms.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "compressor.2.linked.peak.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "compressor.2.linked.rms.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "compressor.r2.level-40.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r2.level-24.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.3877787807814457e-17
+    },
+    {
+      "case": "compressor.r2.level-8.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "compressor.r4.level-40.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r4.level-24.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.0816681711721685e-17
+    },
+    {
+      "case": "compressor.r4.level-8.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.220446049250313e-16
+    },
+    {
+      "case": "compressor.r6.level-40.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r6.level-24.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.0816681711721685e-17
+    },
+    {
+      "case": "compressor.r6.level-8.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "compressor.r12.level-40.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.r12.level-24.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.0816681711721685e-17
+    },
+    {
+      "case": "compressor.r12.level-8.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "saturator.0.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.220446049250313e-16
+    },
+    {
+      "case": "saturator.0.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 5.487832410722149e-13
+    },
+    {
+      "case": "saturator.1.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "saturator.1.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 4.496403249731884e-14
+    },
+    {
+      "case": "saturator.2.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.0.slow.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 9.103828801926284e-14
+    },
+    {
+      "case": "saturator.0.silence.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.1.slow.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 5.362377208939506e-14
+    },
+    {
+      "case": "saturator.1.silence.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.slow.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.2.silence.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.slow.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.3.silence.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.slow.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "saturator.4.silence.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.smoothed.4.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.plain.4.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.smoothed.8.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "eq.plain.8.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "biquad.stereo.scalar.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "biquad.stereo.avx512.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p128.nonuniform.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "matrix.8192.p128.scheduled.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "compressor.8.independent.peak.f64",
+      "samples": 40960,
+      "maxAbsoluteError": 2.7755575615628914e-16
+    },
+    {
+      "case": "compressor.8.independent.rms.f64",
+      "samples": 40960,
+      "maxAbsoluteError": 2.220446049250313e-16
+    },
+    {
+      "case": "compressor.8.linked.peak.f64",
+      "samples": 40960,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "compressor.8.linked.rms.f64",
+      "samples": 40960,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "program.saturator.0.adaa.tone110.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 4.778399897986674e-13
+    },
+    {
+      "case": "program.saturator.1.adaa.tone110.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.0547118733938987e-12
+    },
+    {
+      "case": "program.saturator.1.fast.tone110.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.230721163343219e-11
+    },
+    {
+      "case": "program.saturator.2.adaa.tone110.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.3.adaa.tone110.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.4.adaa.tone110.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.0.adaa.tone997.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 4.21995771660022e-13
+    },
+    {
+      "case": "program.saturator.1.adaa.tone997.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.9964919434632975e-13
+    },
+    {
+      "case": "program.saturator.1.fast.tone997.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.099653784171096e-12
+    },
+    {
+      "case": "program.saturator.2.adaa.tone997.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.3.adaa.tone997.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.4.adaa.tone997.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.0.adaa.multitone.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 5.622169396701793e-13
+    },
+    {
+      "case": "program.saturator.1.adaa.multitone.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.6142642778049776e-12
+    },
+    {
+      "case": "program.saturator.1.fast.multitone.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.694250295614097e-11
+    },
+    {
+      "case": "program.saturator.2.adaa.multitone.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.3.adaa.multitone.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturator.4.adaa.multitone.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.saturatorMixed.0.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.220446049250313e-16
+    },
+    {
+      "case": "program.saturatorMixed.0.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 8.318346012003985e-14
+    },
+    {
+      "case": "program.saturatorMixed.1.direct.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "program.saturatorMixed.1.adaa.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 6.853406731011091e-13
+    },
+    {
+      "case": "program.transient.precise.audio.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.transient.precise.gain.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    },
+    {
+      "case": "program.transient.fast.audio.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 6.661338147750939e-16
+    },
+    {
+      "case": "program.transient.fast.gain.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.7763568394002505e-15
+    },
+    {
+      "case": "program.dynamicEq.1.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 5.551115123125783e-17
+    },
+    {
+      "case": "program.dynamicEq.3.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 4.440892098500626e-16
+    },
+    {
+      "case": "program.compressor.r4.linked.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 5.551115123125783e-17
+    },
+    {
+      "case": "program.compressor.r4.independent.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.6653345369377348e-16
+    },
+    {
+      "case": "program.compressor.r4.lookahead.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 8.326672684688674e-17
+    },
+    {
+      "case": "program.compressor.r6.linked.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 8.326672684688674e-17
+    },
+    {
+      "case": "program.compressor.r6.independent.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.7755575615628914e-16
+    },
+    {
+      "case": "program.compressor.r6.lookahead.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 8.326672684688674e-17
+    },
+    {
+      "case": "program.dynamics.limiter.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 1.1102230246251565e-16
+    },
+    {
+      "case": "program.dynamics.expander.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 2.220446049250313e-16
+    },
+    {
+      "case": "program.dynamics.gate.f64",
+      "samples": 10240,
+      "maxAbsoluteError": 0.0
+    }
+  ]
+}

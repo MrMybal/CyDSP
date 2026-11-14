@@ -27,15 +27,51 @@ struct Case {
 std::vector<Case> cases;
 template <class T> struct Data {
     AudioBuffer<T> in, out;
-    Data(std::size_t ch) {
-        ok(in.resize(ch, 256));
-        ok(out.resize(ch, 256));
+    Data(std::size_t ch, std::size_t frames = 256) {
+        ok(in.resize(ch, frames));
+        ok(out.resize(ch, frames));
         for (std::size_t c = 0; c < ch; ++c)
-            for (std::size_t i = 0; i < 256; ++i)
+            for (std::size_t i = 0; i < frames; ++i)
                 in.block().channel(c)[i] = T(.42 * std::sin(.17 * double(i) + .9 * double(c)) +
                                              .08 * std::cos(1.13 * double(i)));
     }
+    // Program-like material at 48 kHz: most energy is far below Nyquist, so
+    // adjacent samples are close. signal 0/1/2 = 110 Hz, 997 Hz, multitone.
+    void program(int signal, double level) {
+        constexpr double w = 2 * 3.14159265358979323846 / 48000;
+        for (std::size_t c = 0; c < in.block().channels(); ++c)
+            for (std::size_t i = 0; i < in.block().frames(); ++i) {
+                const double t = double(i), phase = .37 * double(c);
+                double v;
+                if (signal == 0)
+                    v = std::sin(w * 110 * t + phase);
+                else if (signal == 1)
+                    v = std::sin(w * 997 * t + phase);
+                else
+                    v = .5 * std::sin(w * 55 * t + phase) + .3 * std::sin(w * 220 * t) +
+                        .2 * std::sin(w * 997 * t + 2 * phase) + .08 * std::sin(w * 3100 * t) +
+                        .03 * std::sin(w * 7000 * t + phase);
+                in.block().channel(c)[i] = T(level * v);
+            }
+    }
 };
+template <class T, class F>
+void addCustom(std::string name, std::shared_ptr<Data<T>> d, F run, std::function<void()> reset) {
+    name += std::same_as<T, float> ? ".f32" : ".f64";
+    cases.push_back({name,
+                     [d, run] {
+                         run();
+                         sink = d->out.block().channel(0).back();
+                     },
+                     std::move(reset),
+                     [d](std::ofstream& f) {
+                         for (std::size_t c = 0; c < d->out.block().channels(); ++c)
+                             for (T x : d->out.block().channel(c)) {
+                                 double v = x;
+                                 f.write(reinterpret_cast<const char*>(&v), sizeof(v));
+                             }
+                     }});
+}
 template <class T, class P>
 void add(std::string name, std::shared_ptr<P> p, std::shared_ptr<Data<T>> d) {
     name += std::same_as<T, float> ? ".f32" : ".f64";
@@ -52,6 +88,133 @@ void add(std::string name, std::shared_ptr<P> p, std::shared_ptr<Data<T>> d) {
                                  f.write(reinterpret_cast<const char*>(&v), sizeof(v));
                              }
                      }});
+}
+template <class T> void programCases() {
+    const ProcessSpec spec{48000, 256, 2};
+    static constexpr const char* signals[]{"tone110", "tone997", "multitone"};
+    for (int signal = 0; signal < 3; ++signal) {
+        auto d = std::make_shared<Data<T>>(2);
+        d->program(signal, .5);
+        for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::hardClip,
+                           AdaaShape::wavefolder})
+            for (auto math : {MathAccuracy::precise, MathAccuracy::fast}) {
+                if (math == MathAccuracy::fast && shape != AdaaShape::atan)
+                    continue;
+                auto p = std::make_shared<AdaaSaturator<T>>();
+                ok(p->prepare(spec));
+                SaturationParameters settings;
+                settings.shape = shape;
+                settings.drive = 3;
+                settings.math = math;
+                ok(p->setParameters(settings));
+                add("program.saturator." + std::to_string(int(shape)) +
+                        (math == MathAccuracy::fast ? ".fast." : ".adaa.") + signals[signal],
+                    p, d);
+            }
+        if (signal != 2)
+            continue;
+        for (auto shape : {AdaaShape::tanh, AdaaShape::atan})
+            for (bool aa : {false, true}) {
+                auto p = std::make_shared<AdaaSaturator<T>>();
+                ok(p->prepare(spec));
+                SaturationParameters settings;
+                settings.shape = shape;
+                settings.drive = 3;
+                settings.antialias = aa;
+                ok(p->setParameters(settings));
+                addCustom(
+                    "program.saturatorMixed." + std::to_string(int(shape)) +
+                        (aa ? ".adaa" : ".direct"),
+                    d,
+                    [p, d] {
+                        ok(p->processMixed(d->in.block(), d->out.block(), {1.5, 0, 1}, .25, .75));
+                    },
+                    [p] { p->reset(); });
+            }
+        for (auto math : {MathAccuracy::precise, MathAccuracy::fast})
+            for (bool gain : {false, true}) {
+                auto p = std::make_shared<TransientShaper<T>>();
+                ok(p->prepare(spec));
+                TransientParameters settings;
+                settings.attack = .6;
+                settings.sustain = -.3;
+                settings.math = math;
+                ok(p->setParameters(settings));
+                addCustom(
+                    std::string("program.transient.") +
+                        (math == MathAccuracy::fast ? "fast" : "precise") +
+                        (gain ? ".gain" : ".audio"),
+                    d,
+                    [p, d, gain] {
+                        ok(gain ? p->processGain(d->in.block(), d->out.block())
+                                : p->process(d->in.block(), d->out.block()));
+                    },
+                    [p] { p->reset(); });
+            }
+        for (std::size_t bands : {1u, 3u}) {
+            auto p = std::make_shared<DynamicEqualizer<T>>();
+            ok(p->prepare(spec, 4));
+            std::array<DynamicEqBand, 3> settings{{{200, 1, -30, -9, 10, 100, 0},
+                                                   {1200, 2, -35, -12, 5, 80, 1},
+                                                   {6000, .7, -40, 6, 2, 60, 0}}};
+            ok(p->setBands(std::span(settings).first(bands)));
+            add("program.dynamicEq." + std::to_string(bands), p, d);
+        }
+        for (double ratio : {4., 6.})
+            for (int variant = 0; variant < 3; ++variant) {
+                auto p = std::make_shared<Dynamics<T>>();
+                ok(p->prepare(spec, DynamicsMode::compressor, 5));
+                DynamicsParameters settings;
+                settings.thresholdDb = -24;
+                settings.ratio = ratio;
+                settings.kneeDb = 6;
+                settings.attackMs = 5;
+                settings.releaseMs = 100;
+                settings.linkedChannels = variant != 1;
+                settings.lookAheadMs = variant == 2 ? 3 : 0;
+                ok(p->setParameters(settings));
+                add("program.compressor.r" + std::to_string(int(ratio)) +
+                        (variant == 0 ? ".linked" : variant == 1 ? ".independent" : ".lookahead"),
+                    p, d);
+            }
+        for (auto mode : {DynamicsMode::limiter, DynamicsMode::expander, DynamicsMode::noiseGate}) {
+            auto p = std::make_shared<Dynamics<T>>();
+            ok(p->prepare(spec, mode, 0));
+            DynamicsParameters settings;
+            settings.thresholdDb = mode == DynamicsMode::limiter ? -9 : -30;
+            settings.ratio = 3;
+            settings.attackMs = 1;
+            settings.releaseMs = 80;
+            ok(p->setParameters(settings));
+            add(std::string("program.dynamics.") +
+                    (mode == DynamicsMode::limiter    ? "limiter"
+                     : mode == DynamicsMode::expander ? "expander"
+                                                      : "gate"),
+                p, d);
+        }
+    }
+    // Host blocks that are not a multiple of the partition (MetaSound-like 480).
+    if constexpr (std::same_as<T, float>) {
+        const ProcessSpec wide{48000, 480, 2};
+        auto d = std::make_shared<Data<T>>(2, 480);
+        d->program(2, .5);
+        for (std::size_t length : {512u, 8192u}) {
+            auto p = std::make_shared<MatrixConvolver<T>>();
+            std::vector<T> ir(length), ir2(length);
+            for (std::size_t i = 0; i < length; ++i) {
+                ir[i] = T(std::exp(-6. * double(i) / double(length)) * .01 *
+                          std::cos(.3 * double(i)));
+                ir2[i] = T(.8 * double(ir[i]));
+            }
+            ir[0] += T(1);
+            std::array<ConvolutionRoute<T>, 2> r{{{0, 0, ir}, {1, 1, ir2}}};
+            ok(p->prepare(wide, 2, r, {ConvolutionMode::scheduled, 128, 1024}));
+            add("matrix." + std::to_string(length) + ".p128.scheduled.block480", p, d);
+            auto q = std::make_shared<MatrixConvolver<T>>();
+            ok(q->prepare(wide, 2, r, {ConvolutionMode::scheduled, 128, 1024, true}));
+            add("matrix." + std::to_string(length) + ".p128.scheduled.block480.spectral", q, d);
+        }
+    }
 }
 template <class T> void make() {
     for (std::size_t channels : {1u, 2u, 8u}) {
@@ -166,8 +329,18 @@ template <class T> void make() {
                     add("matrix." + std::to_string(length) + ".p" + std::to_string(early) +
                             (mode == ConvolutionMode::scheduled ? ".scheduled" : ".nonuniform"),
                         p, d);
+                    if (early >= 64) {
+                        auto q = std::make_shared<MatrixConvolver<T>>();
+                        ok(q->prepare(spec, 2, std::span(r).first(mimo ? 4 : 2),
+                                      {mode, early, 1024, true}));
+                        add("matrix." + std::to_string(length) + ".p" + std::to_string(early) +
+                                (mode == ConvolutionMode::scheduled ? ".scheduled.spectral"
+                                                                    : ".nonuniform.spectral"),
+                            q, d);
+                    }
                 }
     }
+    programCases<T>();
 }
 void controlCases() {
     for (bool moving : {false, true}) {

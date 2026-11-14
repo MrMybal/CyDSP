@@ -11,6 +11,81 @@ void require(bool ok, const char* message) {
         throw std::runtime_error(message);
 }
 template <class T> constexpr double tolerance = std::same_as<T, float> ? 3e-4 : 2e-11;
+// The spectral head must reproduce the direct convolution for every block
+// pattern: whole partitions (spectral), partial ones (direct FIR) and every
+// transition between the two, including in-place calls and reset.
+template <class T> void spectralHeadCase(CpuBackend backend, ConvolutionMode mode) {
+    constexpr std::size_t early = 32, late = 128, frames = 1500, ins = 2, outs = 2, active = 900;
+    const ConvolutionConfig config{mode, early, late, true};
+    const std::array<std::size_t, 4> lengths{20, 33, 100, 700};
+    std::array<std::vector<T>, 4> impulses;
+    std::array<ConvolutionRoute<T>, 4> routes;
+    for (std::size_t r = 0; r < routes.size(); ++r) {
+        impulses[r].resize(lengths[r]);
+        for (std::size_t k = 0; k < lengths[r]; ++k)
+            impulses[r][k] = static_cast<T>(static_cast<int>((k * 7 + 3 * r) % 13) - 6) *
+                             T{0.0078125};
+        routes[r] = {r % 2, r / 2, impulses[r]};
+    }
+    AudioBuffer<T> input, output, first;
+    require(input.resize(ins, frames) == Status::ok && output.resize(outs, frames) == Status::ok &&
+                first.resize(outs, frames) == Status::ok,
+            "spectral head buffers");
+    for (std::size_t ch = 0; ch < ins; ++ch)
+        for (std::size_t f = 0; f < frames; ++f)
+            input.block().channel(ch)[f] =
+                f < active ? static_cast<T>(static_cast<int>((f * 7 + ch * 3) % 19) - 9) * T{0.0625}
+                           : T{};
+    std::vector<long double> expected(outs * frames);
+    for (const auto& route : routes)
+        for (std::size_t f = 0; f < frames; ++f) {
+            long double sum = 0;
+            for (std::size_t k = 0; k < route.impulse.size() && k <= f; ++k)
+                sum += static_cast<long double>(route.impulse[k]) *
+                       input.block().channel(route.inputChannel)[f - k];
+            expected[route.outputChannel * frames + f] += sum;
+        }
+    const std::array<std::vector<std::size_t>, 7> patterns{
+        {{32}, {64}, {1}, {31}, {480}, {7, 32, 100, 5, 64, 33, 256}, {512, 3}}};
+    for (const auto& pattern : patterns)
+        for (bool inPlace : {false, true}) {
+            MatrixConvolver<T> convolver;
+            require(convolver.prepare({48000, 512, ins}, outs, routes, config, backend) ==
+                            Status::ok &&
+                        convolver.configuration() == config && convolver.latencyFrames() == 0,
+                    "spectral head prepare");
+            for (int pass = 0; pass < 2; ++pass) {
+                for (std::size_t ch = 0; ch < outs; ++ch)
+                    std::copy_n(input.block().channel(ch).data(), frames,
+                                output.block().channel(ch).data());
+                std::size_t step = 0;
+                for (std::size_t offset = 0; offset < frames; ++step) {
+                    const auto count =
+                        std::min(pattern[step % pattern.size()], frames - offset);
+                    const auto source = inPlace ? AudioBlock<const T>{output.block()}.subBlock(
+                                                      offset, count)
+                                                : input.block().subBlock(offset, count);
+                    require(convolver.process(source, output.block().subBlock(offset, count)) ==
+                                Status::ok,
+                            "spectral head process");
+                    offset += count;
+                }
+                for (std::size_t ch = 0; ch < outs; ++ch)
+                    for (std::size_t f = 0; f < frames; ++f) {
+                        const auto value = output.block().channel(ch)[f];
+                        require(std::abs(static_cast<long double>(value) -
+                                         expected[ch * frames + f]) < tolerance<T>,
+                                "spectral head equals the direct convolution");
+                        if (pass)
+                            require(value == first.block().channel(ch)[f],
+                                    "spectral head reset restores the initial state");
+                        else
+                            first.block().channel(ch)[f] = value;
+                    }
+                convolver.reset();
+            }
+        }
+}
 template <class T>
 void matrixCase(CpuBackend backend, std::size_t p, std::size_t ins, std::size_t outs,
                 bool sparse = false) {
@@ -171,5 +246,10 @@ void matrixSchedulingRegression() {
         }
         matrixCase<float>(backend, 1024, 4, 3, true);
         matrixCase<double>(backend, 1024, 4, 3, true);
+        for (auto mode :
+             {ConvolutionMode::hybrid, ConvolutionMode::nonuniform, ConvolutionMode::scheduled}) {
+            spectralHeadCase<float>(backend, mode);
+            spectralHeadCase<double>(backend, mode);
+        }
     }
 }

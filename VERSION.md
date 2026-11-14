@@ -4,6 +4,10 @@
 
 ## Changes
 
+- Evaluate saturation and dynamics as 64-frame tiles with width-generic x64 kernels (four doubles in AVX2, eight in AVX-512). Tanh and atan ADAA return the exact mean between consecutive samples (absolute error near 1e-15, no scalar fallback); unlinked, sidechained, lookahead, expander and gate dynamics, the dynamic equalizer and the `fast` transient gain use vector transfer curves; input validation is branch-free. Results: [tile kernel report](docs/TileKernelOptimization.fr.md).
+- Add the opt-in `ConvolutionConfig::spectralHead` for MatrixConvolver: whole early partitions convolve their first taps with the early tier's own transforms instead of the direct FIR, at zero latency.
+- Fuse the FFT bit-reversal with its first two stages, vectorize the inverse real-spectrum merge and scaling, and use ranged split/merge kernels in the progressive convolution tiers. Results stay bit-identical to the reference transform.
+
 - Add SIMD source batches and shared banks, HRTF preparation (onsets, alignment, conversion and interpolation), order-7 Ambisonics and binaural HOA, diffraction, detailed IR analysis, harmonic/percussive separation, spectral pitch/formants, physical contacts, echo cancellation with double-talk gating and quality profiles with prepared transitions. See the [advanced API guide](docs/AdvancedExpansionGuide.fr.md).
 
 - Ten-lot DSP/3D expansion: shared foundations, multibus/PDC graphs, propagation, acoustic rooms/reverbs, binaural/VBAP/HOA, advanced dynamics, effects/synthesis, musical/physical processing and restoration/diagnostics. Original MIT APIs; see [contracts and limits (French)](docs/ExpansionGuide.fr.md).

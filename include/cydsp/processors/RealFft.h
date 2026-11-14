@@ -41,11 +41,12 @@ class RealFft {
     void swap(RealFft& other) noexcept {
         std::swap(fft_, other.fft_);
         scratch_.swap(other.scratch_);
+        natural_.swap(other.natural_);
         twiddles_.swap(other.twiddles_);
         std::swap(size_, other.size_);
     }
     ComplexFft<T> fft_;
-    std::vector<std::complex<T>> scratch_, twiddles_;
+    std::vector<std::complex<T>> scratch_, natural_, twiddles_;
     std::size_t size_ = 0;
 };
 extern template class RealFft<float>;

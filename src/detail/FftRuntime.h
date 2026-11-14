@@ -5,8 +5,9 @@
 namespace cydsp::detail {
 template <class T>
 void fftRuntimeStages(std::span<std::complex<T>> data, std::span<const std::complex<T>> weights,
-                      const Kernels<T>& table, bool inverse) noexcept {
-    for (std::size_t half = 1; half < data.size();) {
+                      const Kernels<T>& table, bool inverse,
+                      std::size_t firstHalf = 1) noexcept {
+    for (std::size_t half = firstHalf; half < data.size();) {
         if (table.fftPair && half >= 4 && half <= data.size() / 4) {
             table.fftPair(reinterpret_cast<T*>(data.data()),
                           reinterpret_cast<const T*>(weights.data() + half - 1),

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <numbers>
 #include <vector>
 namespace cydsp {
@@ -183,72 +184,86 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
             return Status::ok;
         }
     }
-    auto fold = p.shape == AdaaShape::wavefolder                             ? table.adaaFold
-                : p.shape == AdaaShape::hardClip                             ? table.adaaClip
-                : p.shape == AdaaShape::tanh                                 ? table.adaaTanh
-                : p.shape == AdaaShape::atan && p.math == MathAccuracy::fast ? table.adaaAtanFast
-                                                                             : nullptr;
-    // A cheap policy choice may retain the precise scalar path on nearly
-    // stationary inputs. A false positive affects speed only, never quality.
-    if (p.antialias && p.shape == AdaaShape::atan && p.math == MathAccuracy::fast && fold &&
-        in.frames() >= 8) {
-        bool stationary = true;
-        for (std::size_t ch = 0; ch < in.channels() && stationary; ++ch) {
-            const auto source = in.channel(ch);
-            const auto reference = driven(source.front());
-            for (std::size_t j = 1; j <= 4; ++j) {
-                const auto value = driven(source[(source.size() - 1) * j / 4]);
-                if (std::abs(value - reference) >
-                    .01 * std::max({1., std::abs(value), std::abs(reference)})) {
-                    stationary = false;
-                    break;
-                }
-            }
-        }
-        if (stationary)
-            fold = nullptr;
+    using Secant = void (*)(const double*, double*, std::size_t, double, bool, double,
+                            double) noexcept;
+    using Memoryless = void (*)(const double*, double*, std::size_t, double, double) noexcept;
+    Secant secant = nullptr;
+    Memoryless memoryless = nullptr;
+    switch (p.shape) {
+    case AdaaShape::tanh:
+        secant = table.adaaTanh;
+        memoryless = table.shapeTanh;
+        break;
+    case AdaaShape::atan:
+        // The vector kernel is exact to rounding, so both math policies share it.
+        secant = table.adaaAtan;
+        memoryless = table.shapeAtan;
+        break;
+    case AdaaShape::hardClip:
+        secant = table.adaaClip;
+        break;
+    case AdaaShape::wavefolder:
+        secant = table.adaaFold;
+        break;
+    default:
+        break;
     }
-    if (p.antialias && fold && in.frames() >= 4) {
-        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
-            const auto source = in.channel(ch);
-            if (p.shape == AdaaShape::tanh &&
-                std::all_of(source.begin() + 1, source.end(),
-                            [first = source.front()](T value) { return value == first; })) {
-                // A constant channel still has one possible transition from the
-                // retained driven input; every later sample uses the midpoint law.
-                const T dry = source.front();
+    if (p.antialias ? secant != nullptr : memoryless != nullptr) {
+        // Tiles of driven doubles: input stage, shaping and publication are each
+        // one vector pass. Cost does not depend on the signal: there is no
+        // silence, stationarity or proximity branch into scalar code.
+        const auto& kernels = detail::VectorAccess::kernels<T>(s.ops);
+        const std::array<double, 5> stage{inputStage.gain, inputStage.bias, inputStage.scale,
+                                          p.drive, p.bias};
+        for (std::size_t ch = 0; ch < in.channels() && in.frames(); ++ch) {
+            const auto* source = in.channel(ch).data();
+            auto* destination = out.channel(ch).data();
+            auto previous = s.previous[ch];
+            bool active = s.active[ch] != 0;
+            // A constant channel (digital silence, DC) has one transition from the
+            // retained history and then a steady value. Both come from the same
+            // kernel as the general path, so the output is identical; a varying
+            // signal leaves this test at its first differing sample.
+            if (in.frames() >= 8 &&
+                std::all_of(source + 1, source + in.frames(),
+                            [first = source[0]](T value) { return value == first; })) {
+                const T dry = source[0];
                 const double x = driven(dry);
-                const double previous = s.previous[ch], delta = x - previous;
-                double first = std::tanh(x);
-                if (s.active[ch]) {
-                    if (std::abs(delta) > 1e-5 * std::max({1., std::abs(x), std::abs(previous)})) {
-                        const auto before = s.primitiveValid[ch]
-                                                ? s.previousPrimitive[ch]
-                                                : primitive(AdaaShape::tanh, previous);
-                        first = (primitive(AdaaShape::tanh, x) - before) / delta;
-                    } else
-                        first = std::tanh(.5 * (x + previous));
+                double first = 0, steady = 0;
+                if (p.antialias) {
+                    secant(&x, &first, 1, previous, active, dc, p.outputGain);
+                    secant(&x, &steady, 1, x, true, dc, p.outputGain);
+                } else {
+                    memoryless(&x, &first, 1, dc, p.outputGain);
+                    steady = first;
                 }
-                auto destination = out.channel(ch);
-                destination.front() = publish(dry, (first - dc) * p.outputGain);
-                std::fill(destination.begin() + 1, destination.end(),
-                          publish(dry, (std::tanh(x) - dc) * p.outputGain));
+                destination[0] = publish(dry, first);
+                std::fill(destination + 1, destination + in.frames(), publish(dry, steady));
                 s.previous[ch] = x;
                 s.active[ch] = 1;
                 s.primitiveValid[ch] = 0;
                 continue;
             }
-            auto previous = s.previous[ch];
-            bool active = s.active[ch] != 0;
             for (std::size_t offset = 0; offset < in.frames();) {
                 const auto count = std::min(s.foldInput.size(), in.frames() - offset);
-                for (std::size_t i = 0; i < count; ++i)
-                    s.foldInput[i] = driven(in.channel(ch)[offset + i]);
-                fold(s.foldInput.data(), s.foldOutput.data(), count, previous, active, dc,
-                     p.outputGain);
-                for (std::size_t i = 0; i < count; ++i)
-                    out.channel(ch)[offset + i] =
-                        publish(in.channel(ch)[offset + i], s.foldOutput[i]);
+                if (kernels.saturationDrive)
+                    kernels.saturationDrive(source + offset, s.foldInput.data(), count,
+                                            stage.data(), Mixed);
+                else
+                    for (std::size_t i = 0; i < count; ++i)
+                        s.foldInput[i] = driven(source[offset + i]);
+                if (p.antialias)
+                    secant(s.foldInput.data(), s.foldOutput.data(), count, previous, active, dc,
+                           p.outputGain);
+                else
+                    memoryless(s.foldInput.data(), s.foldOutput.data(), count, dc, p.outputGain);
+                if (kernels.saturationPublish)
+                    kernels.saturationPublish(source + offset, s.foldOutput.data(),
+                                              destination + offset, count, dryGain, wetGain,
+                                              Mixed);
+                else
+                    for (std::size_t i = 0; i < count; ++i)
+                        destination[offset + i] = publish(source[offset + i], s.foldOutput[i]);
                 previous = s.foldInput[count - 1];
                 active = true;
                 offset += count;
@@ -393,6 +408,8 @@ template <Sample T> struct DynamicEqualizer<T>::State {
         std::vector<double> envelope;
     };
     ProcessSpec spec;
+    VectorOps ops;
+    std::array<double, 64> signal{}, envelope{}, weight{};
     std::vector<Band> bands;
     std::size_t active = 0;
 };
@@ -408,6 +425,9 @@ Status DynamicEqualizer<T>::prepare(const ProcessSpec& spec, std::size_t maximum
     try {
         auto s = std::make_unique<State>();
         s->spec = spec;
+        const auto status = VectorOps::create(CpuBackend::automatic, s->ops);
+        if (status != Status::ok)
+            return status;
         s->bands.resize(maximum);
         for (auto& b : s->bands) {
             b.audio.resize(spec.channels);
@@ -482,6 +502,46 @@ Status DynamicEqualizer<T>::process(AudioBlock<const T> in, AudioBlock<const T> 
         if (status != Status::ok)
             return status;
     }
+    if (const auto weights = detail::VectorAccess::table(s.ops).dynamicEqGain) {
+        // Each band's detector reads only the sidechain, so its filter and
+        // envelope recurrences can run over a whole tile before the cascaded
+        // audio corrections. The decibel weight of the tile is one vector pass;
+        // every recurrence keeps its original sample order and arithmetic.
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            const auto* source = in.channel(ch).data();
+            const auto* detector = side.channel(side.channels() == 1 ? 0 : ch).data();
+            auto* destination = out.channel(ch).data();
+            for (std::size_t offset = 0; offset < in.frames();) {
+                const auto count = std::min(s.signal.size(), in.frames() - offset);
+                for (std::size_t i = 0; i < count; ++i)
+                    s.signal[i] = source[offset + i];
+                for (std::size_t b = 0; b < s.active; ++b) {
+                    auto& band = s.bands[b];
+                    auto filter = band.detector[ch];
+                    double envelope = band.envelope[ch];
+                    for (std::size_t i = 0; i < count; ++i) {
+                        const double level =
+                            std::abs(filter.run(double(detector[offset + i]), band.coefficients));
+                        envelope = level + (level > envelope ? band.attack : band.release) *
+                                               (envelope - level);
+                        s.envelope[i] = envelope;
+                    }
+                    band.detector[ch] = filter;
+                    band.envelope[ch] = envelope;
+                    weights(s.envelope.data(), s.weight.data(), count, band.p.thresholdDb,
+                            band.p.staticGainDb, band.p.rangeDb);
+                    auto audio = band.audio[ch];
+                    for (std::size_t i = 0; i < count; ++i)
+                        s.signal[i] += s.weight[i] * audio.run(s.signal[i], band.coefficients);
+                    band.audio[ch] = audio;
+                }
+                for (std::size_t i = 0; i < count; ++i)
+                    destination[offset + i] = T(s.signal[i]);
+                offset += count;
+            }
+        }
+        return Status::ok;
+    }
     for (std::size_t ch = 0; ch < in.channels(); ++ch)
         for (std::size_t i = 0; i < in.frames(); ++i) {
             double x = in.channel(ch)[i];
@@ -512,6 +572,8 @@ template <Sample T> void DynamicEqualizer<T>::reset() noexcept {
 template <Sample T> struct TransientShaper<T>::State {
     ProcessSpec spec;
     TransientParameters p;
+    VectorOps ops;
+    std::array<double, 64> fastTile{}, slowTile{}, gainTile{};
     double fast = 0, slow = 0, release = 0;
     std::vector<double> f, s;
 };
@@ -526,6 +588,9 @@ template <Sample T> Status TransientShaper<T>::prepare(const ProcessSpec& spec) 
     try {
         auto s = std::make_unique<State>();
         s->spec = spec;
+        const auto status = VectorOps::create(CpuBackend::automatic, s->ops);
+        if (status != Status::ok)
+            return status;
         s->f.resize(spec.channels);
         s->s.resize(spec.channels);
         s->fast = pole(1, spec.sampleRate);
@@ -581,6 +646,52 @@ Status TransientShaper<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out
     const auto p = s.p;
     const auto fast = s.fast, slowCoefficient = s.slow, release = s.release;
     const auto frames = in.frames();
+    if (const auto curve = detail::VectorAccess::table(s.ops).transientGain;
+        curve && p.math == MathAccuracy::fast) {
+        // The two envelope recurrences stay scalar and ordered. The gain law of a
+        // tile (two quotients, the decibel mix and its exponential) is one
+        // double-precision vector pass followed by a vector gain application.
+        // Precise keeps the reference decimal power below, bit for bit.
+        const auto& kernels = detail::VectorAccess::kernels<T>(s.ops);
+        const std::array<double, 3> parameters{p.attack, p.sustain, p.maximumGainDb};
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            auto fastEnvelope = s.f[ch], slowEnvelope = s.s[ch];
+            const auto* source = in.channel(ch).data();
+            auto* destination = out.channel(ch).data();
+            for (std::size_t offset = 0; offset < frames;) {
+                const auto count = std::min(s.fastTile.size(), frames - offset);
+                for (std::size_t i = 0; i < count; ++i) {
+                    const double level = std::abs(double(source[offset + i]));
+                    fastEnvelope =
+                        level + (level > fastEnvelope ? fast : release) * (fastEnvelope - level);
+                    slowEnvelope = level + (level > slowEnvelope ? slowCoefficient : release) *
+                                               (slowEnvelope - level);
+                    s.fastTile[i] = fastEnvelope;
+                    s.slowTile[i] = slowEnvelope;
+                }
+                curve(s.fastTile.data(), s.slowTile.data(), s.gainTile.data(), count,
+                      parameters.data());
+                if (gainOnly) {
+                    if (kernels.saturationPublish)
+                        kernels.saturationPublish(source + offset, s.gainTile.data(),
+                                                  destination + offset, count, 0, 1, false);
+                    else
+                        for (std::size_t i = 0; i < count; ++i)
+                            destination[offset + i] = T(s.gainTile[i]);
+                } else if (kernels.applyGains)
+                    kernels.applyGains(source + offset, s.gainTile.data(), destination + offset,
+                                       count, 1, std::numeric_limits<double>::infinity(),
+                                       source + offset, 0, 1, false);
+                else
+                    for (std::size_t i = 0; i < count; ++i)
+                        destination[offset + i] = T(double(source[offset + i]) * s.gainTile[i]);
+                offset += count;
+            }
+            s.f[ch] = fastEnvelope;
+            s.s[ch] = slowEnvelope;
+        }
+        return Status::ok;
+    }
     const auto run = [&]<bool Fast, bool GainOnly>() noexcept {
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
             auto fastEnvelope = s.f[ch], slowEnvelope = s.s[ch];
@@ -604,7 +715,9 @@ Status TransientShaper<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out
                 if constexpr (Fast)
                     gain = detail::audioExp(db * (std::numbers::ln10 / 20));
                 else
-                    gain = std::pow(10., db / 20);
+                    // pow(10, +/-0) is exactly one: neutral settings and silence
+                    // skip the library call without changing any result.
+                    gain = db == 0 ? 1. : std::pow(10., db / 20);
                 if constexpr (GainOnly)
                     destination[i] = T(gain);
                 else

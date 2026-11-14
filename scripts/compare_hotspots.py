@@ -71,7 +71,7 @@ if a.before_render:
         if not name.endswith(('.f32', '.f64')):
             continue
         channels = int(name.split('.')[1]) if name.startswith('compressor.') and not name.startswith('compressor.r') else 2
-        count = 20 * 256 * channels
+        count = 20 * (480 if '.block480.' in name else 256) * channels
         before = arrays[0][offset:offset+count]
         after = arrays[1][offset:offset+count]
         assert len(before) == count and len(after) == count

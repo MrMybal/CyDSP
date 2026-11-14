@@ -53,16 +53,21 @@ Status ComplexFft<T>::process(std::span<const std::complex<T>> input,
     if (input.data() != output.data() &&
         detail::overlaps(input.data(), input.size_bytes(), output.data(), output.size_bytes()))
         return Status::partial_overlap;
+    const bool inverse = direction == FftDirection::inverse;
+    std::size_t first = 1;
     if (input.data() == output.data()) {
         for (std::size_t i = 0; i < input.size(); ++i)
             if (reverse_[i] > i)
                 std::swap(output[i], output[reverse_[i]]);
     } else {
-        for (std::size_t i = 0; i < input.size(); ++i)
-            output[reverse_[i]] = input[i];
+        first = detail::FftPlanAccess::permuteHead<T>(
+            *this, reinterpret_cast<const T*>(input.data()), reinterpret_cast<T*>(output.data()),
+            count, inverse);
+        if (first == 1)
+            for (std::size_t i = 0; i < input.size(); ++i)
+                output[reverse_[i]] = input[i];
     }
-    detail::FftPlanAccess::transformPermutedUnscaled(*this, output,
-                                                     direction == FftDirection::inverse);
+    detail::FftPlanAccess::transformPermutedUnscaled(*this, output, inverse, first);
     if (direction == FftDirection::inverse) {
         const auto scale = T{1} / static_cast<T>(input.size());
         for (auto& value : output)

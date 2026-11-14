@@ -9,6 +9,12 @@ struct ConvolutionConfig {
     std::size_t earlyPartition = 128;
     // Used by nonuniform and scheduled modes; ignored by hybrid.
     std::size_t latePartition = 1024;
+    // MatrixConvolver only. When a process call still holds a whole early
+    // partition at a partition boundary, the first earlyPartition taps are
+    // convolved in the frequency domain with the early tier's own transforms
+    // instead of the direct FIR. Latency stays zero. That output differs from
+    // the direct sum by FFT rounding, so it depends on the host block pattern.
+    bool spectralHead = false;
     bool operator==(const ConvolutionConfig&) const = default;
 };
 // Common zero-added-block-latency interface. Engine selection happens during prepare.

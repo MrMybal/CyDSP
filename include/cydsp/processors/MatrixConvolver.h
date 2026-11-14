@@ -58,21 +58,31 @@ class MatrixConvolver {
         struct Job {
             std::size_t filter = 0, part = 0;
         };
+        // Spectrum of the first partition of one route's impulse (offset 0).
+        struct Head {
+            std::size_t input = 0, output = 0, offset = 0;
+        };
         RealFft<T> fft;
         VectorOps ops;
         std::vector<std::size_t> inputs, outputs;
         std::vector<Filter> routes;
         std::vector<Job> jobs;
         std::vector<T> input, ready, overlap, time;
-        std::vector<std::complex<T>> filters, history, sum;
+        std::vector<std::complex<T>> filters, history, sum, headFilters;
+        std::vector<Head> heads;
+        // With heads, the inverse transform of a completed partition waits for
+        // the next partition so a whole-partition call can add its head first.
+        bool pending = false;
         std::size_t partition = 0, parts = 0, position = 0, head = 0, done = 0, baseJobs = 0,
                     extraJobs = 0, debt = 0;
         Status prepare(std::span<const ConvolutionRoute<T>>, std::size_t, std::size_t, std::size_t,
-                       CpuBackend, bool progressive = false) noexcept;
+                       CpuBackend, bool progressive = false, bool spectralHead = false) noexcept;
         void reset() noexcept;
-        void process(AudioBlock<const T>, AudioBlock<T>) noexcept;
+        void process(AudioBlock<const T>, AudioBlock<T>, bool aligned = false) noexcept;
         void accumulate(const Filter&, std::size_t) noexcept;
         void boundary() noexcept;
+        void emit() noexcept;
+        void alignedPartition(AudioBlock<const T>, AudioBlock<T>, std::size_t) noexcept;
     };
     struct ProgressiveTier;
     void swap(MatrixConvolver&) noexcept;
@@ -84,7 +94,10 @@ class MatrixConvolver {
     Tier early_, late_;
     AudioBuffer<T> input_, scratch_;
     VectorOps ops_;
-    std::size_t outputs_ = 0, tile_ = 0, tail_ = 0, headSize_ = 0, write_ = 0;
+    std::size_t outputs_ = 0, tile_ = 0, tail_ = 0, headSize_ = 0, write_ = 0, capacity_ = 0;
+    // True while the direct head history holds only zeros (reset, or the last
+    // partition was convolved spectrally and its tail lives in the tier overlap).
+    bool headZero_ = true;
 };
 extern template class MatrixConvolver<float>;
 extern template class MatrixConvolver<double>;

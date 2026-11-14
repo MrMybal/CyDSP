@@ -540,6 +540,11 @@ fixed-rate mode retains exact rational integer state.
 
 ## Common convolution engine selection
 
+`ConvolutionConfig::spectralHead` (default false, MatrixConvolver only) convolves the
+first earlyPartition taps in the frequency domain whenever a process call holds a
+whole early partition at a partition boundary; latency stays zero and the result
+then differs from the direct FIR by FFT rounding. See Architecture.md.
+
 `ConvolutionConfig{mode, earlyPartition, latePartition}` selects `hybrid`,
 `nonuniform` or `scheduled`. `Convolver<T>::prepare(spec, impulse, config, backend)`
 is a common interface over the existing engines; default configuration is hybrid
