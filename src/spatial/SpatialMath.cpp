@@ -1,5 +1,6 @@
 #include "cydsp/spatial/SpatialMath.h"
 #include "cydsp/core/Memory.h"
+#include "detail/AudioMath.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -231,13 +232,17 @@ Status directivityGains(double cosine, const Directivity& p,
     const double a = p.pattern == DirectivityPattern::custom ? p.customOmniWeight
                                                              : weights[std::size_t(p.pattern)];
     double value = a + (1 - a) * cosine;
-    value = std::copysign(std::max(std::abs(value), std::pow(10., p.minimumGainDb / 20)), value);
+    value = std::copysign(
+        std::max(std::abs(value), detail::audioExp(p.minimumGainDb * (std::numbers::ln10 / 20))),
+        value);
     if (!p.preservePolarity)
         value = std::abs(value);
     std::array<double, 3> result{};
     for (std::size_t b = 0; b < 3; ++b)
-        result[b] = 1 - p.amount +
-                    p.amount * value * std::pow(10., -p.rearLossDb[b] * (1 - cosine) * .5 / 20);
+        result[b] =
+            1 - p.amount +
+            p.amount * value *
+                detail::audioExp(-p.rearLossDb[b] * (1 - cosine) * (std::numbers::ln10 / 40));
     output = result;
     return Status::ok;
 }
@@ -254,8 +259,15 @@ Status materialResponse(const AcousticMaterial& material, double thickness,
         if (!isFinite(a) || a < 0 || a > 1 || !isFinite(loss) || loss < 0 || loss > 300)
             return Status::invalid_argument;
         const double scale = thickness / material.referenceThicknessMetres;
-        const double absorption = 1 - std::pow(1 - a, scale);
-        const double transmission = std::min(1 - absorption, std::pow(10., -loss * scale / 10));
+        const double base = 1 - a;
+        const double remaining = scale == 0    ? 1
+                                 : scale == 1  ? base
+                                 : scale == 2  ? base * base
+                                 : scale == .5 ? std::sqrt(base)
+                                               : std::pow(base, scale);
+        const double absorption = 1 - remaining;
+        const double transmission =
+            std::min(1 - absorption, detail::audioExp(-loss * scale * (std::numbers::ln10 / 10)));
         result.transmission[b] = std::sqrt(transmission);
         result.reflection[b] =
             std::sqrt(std::max(0., 1 - absorption - transmission) * (1 - material.scattering));

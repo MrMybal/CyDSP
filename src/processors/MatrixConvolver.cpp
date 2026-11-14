@@ -203,17 +203,25 @@ struct MatrixConvolver<T>::ProgressiveTier {
         const auto p = data.partition;
         for (std::size_t ch = 0; ch < output.channels(); ++ch)
             kernels->fill(output.channel(ch).data(), output.frames(), T{});
-        for (std::size_t f = 0; f < source.frames(); ++f) {
+        for (std::size_t offset = 0; offset < source.frames();) {
+            const auto count = std::min(p - data.position, source.frames() - offset);
             for (std::size_t ch = 0; ch < data.inputs.size(); ++ch)
-                data.input[ch * p + data.position] = source.channel(data.inputs[ch])[f];
+                kernels->copy(source.channel(data.inputs[ch]).data() + offset,
+                              data.input.data() + ch * p + data.position, count);
             for (std::size_t ch = 0; ch < data.outputs.size(); ++ch)
-                output.channel(data.outputs[ch])[f] = data.ready[ch * p + data.position];
+                kernels->copy(data.ready.data() + ch * p + data.position,
+                              output.channel(data.outputs[ch]).data() + offset, count);
             if (pipeline) {
-                const auto due = detail::advancePartitionJobs(baseJobs, extraJobs, p, debt);
+                // Pending jobs read workInput and write nextReady, not these buffers.
+                const auto credit = std::uint64_t(debt) + std::uint64_t(extraJobs) * count;
+                const auto due = baseJobs * count + std::size_t(credit / p);
+                debt = std::size_t(credit % p);
                 for (std::size_t job = 0; job < due; ++job)
                     runOne();
             }
-            if (++data.position == p) {
+            data.position += count;
+            offset += count;
+            if (data.position == p) {
                 if (pipeline) {
                     data.ready.swap(nextReady);
                     if (++data.head == data.parts)
@@ -389,13 +397,18 @@ void MatrixConvolver<T>::Tier::process(AudioBlock<const T> source, AudioBlock<T>
         ops.fill(output.channel(ch), T{});
     if (!partition)
         return;
-    for (std::size_t f = 0; f < source.frames(); ++f) {
+    const auto& kernels = detail::VectorAccess::kernels<T>(ops);
+    for (std::size_t offset = 0; offset < source.frames();) {
+        const auto count = std::min(partition - position, source.frames() - offset);
         for (std::size_t ch = 0; ch < inputs.size(); ++ch)
-            input[ch * partition + position] = source.channel(inputs[ch])[f];
+            kernels.copy(source.channel(inputs[ch]).data() + offset,
+                         input.data() + ch * partition + position, count);
         for (std::size_t ch = 0; ch < outputs.size(); ++ch)
-            output.channel(outputs[ch])[f] = ready[ch * partition + position];
-        ++position;
-        const auto due = done + detail::advancePartitionJobs(baseJobs, extraJobs, partition, debt);
+            kernels.copy(ready.data() + ch * partition + position,
+                         output.channel(outputs[ch]).data() + offset, count);
+        position += count;
+        offset += count;
+        const auto due = detail::duePartitionJobs(jobs.size(), position, partition);
         while (done < due) {
             const auto job = jobs[done++];
             accumulate(routes[job.filter], job.part);
@@ -574,14 +587,18 @@ Status MatrixConvolver<T>::process(AudioBlock<const T> input, AudioBlock<T> outp
             auto* history = headHistory_.data() + ch * stride;
             std::copy_n(saved.channel(ch).data(), count, history + headSize_);
         }
-        const auto dot = detail::VectorAccess::kernels<T>(ops_).dot;
+        const auto& kernels = detail::VectorAccess::kernels<T>(ops_);
         for (const auto& route : routes_) {
             const auto* data = headHistory_.data() + route.input * stride + headSize_ + 1 -
                                route.coefficients.size();
             auto destination = out.channel(route.output);
-            for (std::size_t f = 0; f < count; ++f)
-                destination[f] +=
-                    dot(data + f, route.coefficients.data(), route.coefficients.size());
+            if (kernels.firHead && count >= 16)
+                kernels.firHead(data, route.coefficients.data(), destination.data(), count,
+                                route.coefficients.size());
+            else
+                for (std::size_t f = 0; f < count; ++f)
+                    destination[f] +=
+                        kernels.dot(data + f, route.coefficients.data(), route.coefficients.size());
         }
         for (std::size_t ch = 0; ch < spec_.channels; ++ch) {
             auto* history = headHistory_.data() + ch * stride;

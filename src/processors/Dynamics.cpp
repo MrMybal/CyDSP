@@ -1,7 +1,11 @@
 #include "cydsp/processors/Dynamics.h"
 #include "detail/Analysis.h"
+#include "detail/AudioMath.h"
+#include "detail/VectorTable.h"
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <numbers>
 #include <stdexcept>
 #include <vector>
 namespace cydsp {
@@ -82,6 +86,8 @@ template <Sample T> struct Dynamics<T>::State {
     ProcessSpec spec;
     DynamicsMode mode;
     DynamicsParameters p;
+    VectorOps ops;
+    std::array<double, 64> curveInput{}, curveOutput{};
     std::vector<double> values, gateGain;
     std::vector<std::uint64_t> hold;
     std::vector<std::uint8_t> gateOpen;
@@ -110,6 +116,9 @@ Status Dynamics<T>::prepare(const ProcessSpec& spec, DynamicsMode mode,
         auto next = std::make_unique<State>();
         next->spec = spec;
         next->mode = mode;
+        const auto vectorStatus = VectorOps::create(CpuBackend::automatic, next->ops);
+        if (vectorStatus != Status::ok)
+            return vectorStatus;
         next->values.resize(spec.channels);
         next->gateGain.resize(spec.channels);
         next->gateOpen.resize(spec.channels);
@@ -205,14 +214,14 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
         return Status::channel_mismatch;
     auto detectorSpec = s.spec;
     detectorSpec.channels = side.channels();
-    status = detail::validateAnalysis(detectorSpec, side);
-    if (status != Status::ok)
-        return status;
     if (side.frames() != in.frames())
         return Status::invalid_argument;
     const bool same = side.channelData() == in.channelData() &&
                       side.frameOffset() == in.frameOffset() && side.channels() == in.channels();
     if (!same) {
+        status = detail::validateAnalysis(detectorSpec, side);
+        if (status != Status::ok)
+            return status;
         status = validateDisjointBlocks(side, out);
         if (status != Status::ok)
             return status;
@@ -241,55 +250,90 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
         const double lowerKnee = std::pow(10.0, (s.p.thresholdDb - halfKnee) / 20);
         const double upperKnee = std::pow(10.0, (s.p.thresholdDb + halfKnee) / 20);
         const double threshold = std::pow(10.0, s.p.thresholdDb / 20);
-        for (std::size_t i = 0; i < in.frames(); ++i) {
-            double magnitude = 0;
-            for (std::size_t ch = 0; ch < side.channels(); ++ch)
-                magnitude = std::max(magnitude, std::abs(double(side.channel(ch)[i])));
-            const double detector =
-                s.p.detector == DetectorMode::rms ? magnitude * magnitude : magnitude;
-            envelopeState = advance(detector, envelopeState, s.attack, s.release);
-            const double envelope = s.p.detector == DetectorMode::rms
-                                        ? std::sqrt(std::max(0.0, envelopeState))
-                                        : envelopeState;
-            lastEnvelope = envelope;
-            db = 0;
-            double gain = 1;
-            // Above the soft knee the curve is a power of the linear ratio.
-            // Common ratios use square roots; the final dB meter is evaluated
-            // once below. This is the same curve, with ordinary FP rounding.
-            if (envelope > upperKnee * (1 + 1e-12)) {
-                const double t = threshold / envelope;
-                if (s.mode == DynamicsMode::limiter)
-                    gain = t;
-                else if (s.p.ratio == 2)
-                    gain = std::sqrt(t);
-                else if (s.p.ratio == 4) {
-                    const double root = std::sqrt(t);
-                    gain = root * std::sqrt(root);
-                } else
-                    gain = std::pow(t, 1 - 1 / s.p.ratio);
-            } else
-                // This conservative guard skips only levels strictly below the knee;
-                // the original log curve still decides all boundary cases.
-                if (std::max(1e-12, envelope) >= lowerKnee * (1 - 1e-12)) {
-                    const double over =
-                        20 * std::log10(std::max(1e-12, envelope)) - s.p.thresholdDb;
-                    if (s.p.kneeDb > 0 && std::abs(over) < halfKnee) {
-                        const double t = over + halfKnee;
-                        db = slope * t * t / (2 * s.p.kneeDb);
-                    } else if (over >= halfKnee)
-                        db = slope * over;
+        const auto curve = detail::VectorAccess::table(s.ops).compressorGain;
+        if (curve && in.frames() >= 4) {
+            for (std::size_t offset = 0; offset < in.frames();) {
+                const auto count = std::min(s.curveInput.size(), in.frames() - offset);
+                for (std::size_t i = 0; i < count; ++i) {
+                    double magnitude = 0;
+                    for (std::size_t ch = 0; ch < side.channels(); ++ch)
+                        magnitude =
+                            std::max(magnitude, std::abs(double(side.channel(ch)[offset + i])));
+                    const double detector =
+                        s.p.detector == DetectorMode::rms ? magnitude * magnitude : magnitude;
+                    envelopeState = advance(detector, envelopeState, s.attack, s.release);
+                    s.curveInput[i] = s.p.detector == DetectorMode::rms
+                                          ? std::sqrt(std::max(0., envelopeState))
+                                          : envelopeState;
                 }
-            if (db != 0)
-                gain = std::pow(10.0, db / 20);
-            minimumGain = std::min(minimumGain, gain * s.makeup);
-            for (std::size_t ch = 0; ch < in.channels(); ++ch) {
-                double value = double(in.channel(ch)[i]) * gain * s.makeup;
-                if (s.mode == DynamicsMode::limiter)
-                    value = std::clamp(value, -ceiling, ceiling);
-                out.channel(ch)[i] = static_cast<T>(value);
+                lastEnvelope = s.curveInput[count - 1];
+                curve(s.curveInput.data(), s.curveOutput.data(), count, s.p.thresholdDb, s.p.ratio,
+                      s.p.kneeDb, s.mode == DynamicsMode::limiter);
+                for (std::size_t i = 0; i < count; ++i)
+                    minimumGain = std::min(minimumGain, s.curveOutput[i] * s.makeup);
+                for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+                    const auto* source = in.channel(ch).data() + offset;
+                    auto* destination = out.channel(ch).data() + offset;
+                    for (std::size_t i = 0; i < count; ++i) {
+                        double value = double(source[i]) * s.curveOutput[i] * s.makeup;
+                        if (s.mode == DynamicsMode::limiter)
+                            value = std::clamp(value, -ceiling, ceiling);
+                        destination[i] = T(value);
+                    }
+                }
+                offset += count;
             }
-        }
+        } else
+            for (std::size_t i = 0; i < in.frames(); ++i) {
+                double magnitude = 0;
+                for (std::size_t ch = 0; ch < side.channels(); ++ch)
+                    magnitude = std::max(magnitude, std::abs(double(side.channel(ch)[i])));
+                const double detector =
+                    s.p.detector == DetectorMode::rms ? magnitude * magnitude : magnitude;
+                envelopeState = advance(detector, envelopeState, s.attack, s.release);
+                const double envelope = s.p.detector == DetectorMode::rms
+                                            ? std::sqrt(std::max(0.0, envelopeState))
+                                            : envelopeState;
+                lastEnvelope = envelope;
+                db = 0;
+                double gain = 1;
+                // Above the soft knee the curve is a power of the linear ratio.
+                // Common ratios use square roots; the final dB meter is evaluated
+                // once below. This is the same curve, with ordinary FP rounding.
+                if (envelope > upperKnee * (1 + 1e-12)) {
+                    const double t = threshold / envelope;
+                    if (s.mode == DynamicsMode::limiter)
+                        gain = t;
+                    else if (s.p.ratio == 2)
+                        gain = std::sqrt(t);
+                    else if (s.p.ratio == 4) {
+                        const double root = std::sqrt(t);
+                        gain = root * std::sqrt(root);
+                    } else
+                        gain = detail::audioExp(detail::audioLog(t) * (1 - 1 / s.p.ratio));
+                } else
+                    // This conservative guard skips only levels strictly below the knee;
+                    // the original log curve still decides all boundary cases.
+                    if (std::max(1e-12, envelope) >= lowerKnee * (1 - 1e-12)) {
+                        const double over = (20 / std::numbers::ln10) *
+                                                detail::audioLog(std::max(1e-12, envelope)) -
+                                            s.p.thresholdDb;
+                        if (s.p.kneeDb > 0 && std::abs(over) < halfKnee) {
+                            const double t = over + halfKnee;
+                            db = slope * t * t / (2 * s.p.kneeDb);
+                        } else if (over >= halfKnee)
+                            db = slope * over;
+                    }
+                if (db != 0)
+                    gain = detail::audioExp(db * (std::numbers::ln10 / 20));
+                minimumGain = std::min(minimumGain, gain * s.makeup);
+                for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+                    double value = double(in.channel(ch)[i]) * gain * s.makeup;
+                    if (s.mode == DynamicsMode::limiter)
+                        value = std::clamp(value, -ceiling, ceiling);
+                    out.channel(ch)[i] = static_cast<T>(value);
+                }
+            }
         std::fill(s.values.begin(), s.values.end(), envelopeState);
         const double over = 20 * std::log10(std::max(1e-12, lastEnvelope)) - s.p.thresholdDb;
         db = 0;

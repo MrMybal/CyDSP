@@ -75,8 +75,27 @@ template <class T> void make() {
             }
         if (channels != 2)
             continue;
-        for (auto shape :
-             {AdaaShape::tanh, AdaaShape::atan, AdaaShape::hardClip, AdaaShape::wavefolder})
+        for (double ratio : {2., 4., 6., 12.})
+            for (int level : {-40, -24, -8}) {
+                auto d = std::make_shared<Data<T>>(2);
+                const auto amplitude = std::pow(10., level / 20.);
+                for (std::size_t c = 0; c < 2; ++c)
+                    std::fill(d->in.block().channel(c).begin(), d->in.block().channel(c).end(),
+                              T(amplitude * (c ? .7 : 1.)));
+                auto p = std::make_shared<Dynamics<T>>();
+                ok(p->prepare(spec, DynamicsMode::compressor, 0));
+                DynamicsParameters settings;
+                settings.thresholdDb = -24;
+                settings.ratio = ratio;
+                settings.kneeDb = 6;
+                settings.attackMs = 5;
+                settings.releaseMs = 100;
+                ok(p->setParameters(settings));
+                add("compressor.r" + std::to_string(int(ratio)) + ".level" + std::to_string(level),
+                    p, d);
+            }
+        for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::hardClip,
+                           AdaaShape::wavefolder})
             for (bool aa : {false, true}) {
                 auto p = std::make_shared<AdaaSaturator<T>>();
                 ok(p->prepare(spec));
@@ -86,6 +105,23 @@ template <class T> void make() {
                 settings.drive = 3;
                 ok(p->setParameters(settings));
                 add("saturator." + std::to_string(int(shape)) + (aa ? ".adaa" : ".direct"), p, d);
+            }
+        for (auto shape : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::hardClip,
+                           AdaaShape::wavefolder})
+            for (bool silence : {false, true}) {
+                auto d = std::make_shared<Data<T>>(2);
+                for (std::size_t c = 0; c < 2; ++c)
+                    for (std::size_t i = 0; i < 256; ++i)
+                        d->in.block().channel(c)[i] =
+                            silence ? T{} : T(.42 * std::sin(.0033 * double(i) + .2 * double(c)));
+                auto p = std::make_shared<AdaaSaturator<T>>();
+                ok(p->prepare(spec));
+                SaturationParameters settings;
+                settings.shape = shape;
+                settings.drive = 3;
+                ok(p->setParameters(settings));
+                add("saturator." + std::to_string(int(shape)) + (silence ? ".silence" : ".slow"), p,
+                    d);
             }
         for (std::size_t bands : {4u, 8u}) {
             std::vector<BiquadCoefficients> coefficients(bands);
@@ -108,7 +144,7 @@ template <class T> void make() {
             ok(p->setAllCoefficients(c));
             add(std::string("biquad.stereo.") + backendName(p->backend()), p, d);
         }
-        for (std::size_t length : {8192u, 16384u, 65536u})
+        for (std::size_t length : {512u, 8192u, 16384u, 65536u})
             for (std::size_t early : {32u, 64u, 128u, 256u})
                 for (auto mode : {ConvolutionMode::nonuniform, ConvolutionMode::scheduled}) {
                     if constexpr (std::same_as<T, double>) {
@@ -133,11 +169,51 @@ template <class T> void make() {
                 }
     }
 }
+void controlCases() {
+    for (bool moving : {false, true}) {
+        auto coefficients = std::make_shared<BiquadCoefficients>();
+        auto cursor = std::make_shared<unsigned>(0);
+        cases.push_back({moving ? "design.peaking.changing34" : "design.peaking.fixed34",
+                         [coefficients, cursor, moving] {
+                             for (int i = 0; i < 34; ++i) {
+                                 const auto n = (*cursor)++ % 257;
+                                 ok(designPeakingBiquad(48000, moving ? 500 + n * 20 : 2800, .8,
+                                                        moving ? -9. * n / 256 : -3,
+                                                        *coefficients));
+                                 sink = coefficients->b0;
+                             }
+                         },
+                         [cursor] { *cursor = 0; }, [](std::ofstream&) {}});
+    }
+    auto gains = std::make_shared<std::array<double, 3>>();
+    Directivity directivity;
+    AcousticMaterial material;
+    material.absorption = {.2, .4, .7};
+    material.transmissionLossDb = {6, 12, 24};
+    auto response = std::make_shared<MaterialResponse>();
+    cases.push_back({"spatial.directivity.64calls",
+                     [gains, directivity] {
+                         for (int i = 0; i < 64; ++i) {
+                             ok(directivityGains(.25, directivity, *gains));
+                             sink = (*gains)[0];
+                         }
+                     },
+                     [] {}, [](std::ofstream&) {}});
+    cases.push_back({"spatial.material.64calls",
+                     [response, material] {
+                         for (int i = 0; i < 64; ++i) {
+                             ok(materialResponse(material, .2, *response));
+                             sink = response->transmission[0];
+                         }
+                     },
+                     [] {}, [](std::ofstream&) {}});
+}
 } // namespace
 int main(int argc, char** argv) {
     try {
         make<float>();
         make<double>();
+        controlCases();
         // Capture only reset deterministic output, independent of timing/warmup history.
         if (argc > 1) {
             std::ofstream f(argv[1], std::ios::binary);

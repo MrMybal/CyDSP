@@ -64,10 +64,10 @@ for folder in ('include', 'src', 'tests', 'examples'):
         for target in re.findall(r'^#include ["<](cydsp/[^">]+|detail/[^">]+)[">]', content, re.M):
             require(any((base / target).is_file() for base in (ROOT / 'include', ROOT / 'src', path.parent)),
                     'Missing include ' + target + ' in ' + str(path))
-        if path.name not in ('Avx2.cpp', 'Avx512.cpp', 'Sve.cpp', 'Sse2.cpp', 'Neon.cpp') and path != ROOT / 'src/detail/AdaaAvx.h':
+        if path.name not in ('Avx2.cpp', 'Avx512.cpp', 'Sve.cpp', 'Sse2.cpp', 'Neon.cpp') and path not in (ROOT / 'src/detail/AdaaAvx.h', ROOT / 'src/detail/FirAvx.h', ROOT / 'src/detail/DynamicsAvx.h', ROOT / 'src/detail/CurveAvx.h'):
             require(not any(header in content for header in ('immintrin.h', 'arm_neon.h', 'arm64_neon.h', 'arm_sve.h')),
                     'ISA intrinsics outside private kernels: ' + str(path))
-        if '#include "detail/AdaaAvx.h"' in content:
+        if any(h in content for h in ('#include "detail/AdaaAvx.h"', '#include "detail/FirAvx.h"', '#include "detail/DynamicsAvx.h"')):
             require(path in (ROOT / 'src/math/Avx2.cpp', ROOT / 'src/math/Avx512.cpp'),
                     'Private ADAA intrinsics included outside ISA translation units: ' + str(path))
         if folder == 'include':

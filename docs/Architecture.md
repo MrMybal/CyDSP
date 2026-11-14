@@ -391,5 +391,38 @@ scalar cached path. No ISPC runtime/compiler dependency is required by productio
 SmoothedBiquadCascade prepares scratch up to the caller's maximum block size and
 splits at transition boundaries; BiquadBank still limits larger SIMD packs to 64
 frames. MatrixConvolver snapshots a contiguous direct-head history per tile;
-ordered dot accumulation, scheduled tail work, routing and zero latency remain
-unchanged. The zero-capacity DryWetMixer delay copies planar dry samples directly.
+four independent FIR tap chains can be accumulated across time in private x64
+SIMD kernels. This changes floating-point summation order within a route; route
+addition order, scheduled work budgets, routing and zero latency are retained. The zero-capacity DryWetMixer delay copies planar dry samples directly.
+
+
+The second hotspot pass batches tier input/output copies up to a partition boundary.
+The number and order of completed jobs match the sample scheduler at the end of
+any call, including single-frame calls. Pending jobs read previous input storage
+and write next-ready storage; they never consume the current partial input block.
+
+Linked equal-envelope dynamics can collect 64 detector values and evaluate their
+curve through private AVX2/AVX-512 double arithmetic. Detector recurrence, sidechain
+validation, lookahead behavior and final dB metering retain their existing order.
+Scalar/other backends retain scalar processing. The input is not rescanned when
+it is also the identical detector block; distinct sidechains remain validated.
+
+Private audio log/exp helpers use bounded double range reduction and small
+polynomials. Normal operating ranges are covered by independent numerical sweeps;
+subnormal/domain and exp underflow/overflow boundaries use standard libm. Near-one
+log evaluation avoids cancellation. No global fast-math, reciprocal approximation,
+FMA contraction or FP-state mutation is enabled. EQ designs share their denominator
+reciprocal and use the bounded gain conversion; stability checks remain mandatory.
+
+Hard clipping and tanh ADAA have time-parallel x64 kernels alongside wavefolding.
+The tanh integral retains standard libm secants for endpoints within 1% of the
+sample scale, and the original midpoint threshold (1e-5) is unchanged. This bounds
+amplification of primitive rounding when endpoints almost coincide. Scalar tails,
+shape/drive/bias automation, in-place processing and the first active sample follow
+the same contracts. Regressions include output gains up to 16 and clamp extremes.
+
+Constant tanh input channels evaluate their first ADAA transition using retained
+history, then fill the remaining midpoint output. No silence detector threshold or
+state reset is introduced; the shortcut requires exact equality of input samples.
+
+Measured results and precision limits of this pass: [detailed hotspot report](DetailedHotspotOptimization.fr.md).

@@ -129,9 +129,40 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
         return status;
     const auto& p = s.p;
     const double dc = shape(p.shape, p.bias);
-    const auto fold = detail::VectorAccess::table(s.ops).adaaFold;
-    if (p.shape == AdaaShape::wavefolder && p.antialias && fold && in.frames() >= 4) {
+    const auto& table = detail::VectorAccess::table(s.ops);
+    const auto fold = p.shape == AdaaShape::wavefolder ? table.adaaFold
+                      : p.shape == AdaaShape::hardClip ? table.adaaClip
+                      : p.shape == AdaaShape::tanh     ? table.adaaTanh
+                                                       : nullptr;
+    if (p.antialias && fold && in.frames() >= 4) {
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            const auto source = in.channel(ch);
+            if (p.shape == AdaaShape::tanh &&
+                std::all_of(source.begin() + 1, source.end(),
+                            [first = source.front()](T value) { return value == first; })) {
+                // A constant channel still has one possible transition from the
+                // retained driven input; every later sample uses the midpoint law.
+                const double x = std::clamp(double(source.front()) * p.drive + p.bias, -1e6, 1e6);
+                const double previous = s.previous[ch], delta = x - previous;
+                double first = std::tanh(x);
+                if (s.active[ch]) {
+                    if (std::abs(delta) > 1e-5 * std::max({1., std::abs(x), std::abs(previous)})) {
+                        const auto before = s.primitiveValid[ch]
+                                                ? s.previousPrimitive[ch]
+                                                : primitive(AdaaShape::tanh, previous);
+                        first = (primitive(AdaaShape::tanh, x) - before) / delta;
+                    } else
+                        first = std::tanh(.5 * (x + previous));
+                }
+                auto destination = out.channel(ch);
+                destination.front() = T((first - dc) * p.outputGain);
+                std::fill(destination.begin() + 1, destination.end(),
+                          T((std::tanh(x) - dc) * p.outputGain));
+                s.previous[ch] = x;
+                s.active[ch] = 1;
+                s.primitiveValid[ch] = 0;
+                continue;
+            }
             auto previous = s.previous[ch];
             bool active = s.active[ch] != 0;
             for (std::size_t offset = 0; offset < in.frames();) {
@@ -153,47 +184,70 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
         }
         return Status::ok;
     }
-    for (std::size_t ch = 0; ch < in.channels(); ++ch) {
-        auto previous = s.previous[ch], previousPrimitive = s.previousPrimitive[ch];
-        bool active = s.active[ch] != 0, primitiveValid = s.primitiveValid[ch] != 0;
-        auto memory = s.memory[ch];
-        const auto input = in.channel(ch);
-        auto output = out.channel(ch);
-        for (std::size_t i = 0; i < in.frames(); ++i) {
-            const double x = std::clamp(double(input[i]) * p.drive + p.bias, -1e6, 1e6);
-            double y;
-            if (p.shape == AdaaShape::hysteresis) {
-                memory = std::clamp(memory, x - p.hysteresisWidth, x + p.hysteresisWidth);
-                y = std::tanh(x + p.hysteresisAmount * memory) - dc;
-                primitiveValid = false;
-            } else if (p.antialias && active) {
-                const double delta = x - previous;
-                if (std::abs(delta) > 1e-5 * std::max({1., std::abs(x), std::abs(previous)})) {
-                    const auto currentPrimitive = primitive(p.shape, x);
-                    if (!primitiveValid)
-                        previousPrimitive = primitive(p.shape, previous);
-                    y = (currentPrimitive - previousPrimitive) / delta;
-                    previousPrimitive = currentPrimitive;
-                    primitiveValid = true;
+    // Select the curve once, allowing each inner loop to inline its primitive.
+    const auto run = [&]<AdaaShape type>() noexcept {
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            auto previous = s.previous[ch], previousPrimitive = s.previousPrimitive[ch];
+            bool active = s.active[ch] != 0, primitiveValid = s.primitiveValid[ch] != 0;
+            auto memory = s.memory[ch];
+            const auto input = in.channel(ch);
+            auto output = out.channel(ch);
+            for (std::size_t i = 0; i < in.frames(); ++i) {
+                const double x = std::clamp(double(input[i]) * p.drive + p.bias, -1e6, 1e6);
+                double y;
+                if (type == AdaaShape::hysteresis) {
+                    memory = std::clamp(memory, x - p.hysteresisWidth, x + p.hysteresisWidth);
+                    y = std::tanh(x + p.hysteresisAmount * memory) - dc;
+                    primitiveValid = false;
+                } else if (p.antialias && active) {
+                    const double delta = x - previous;
+                    if (std::abs(delta) > 1e-5 * std::max({1., std::abs(x), std::abs(previous)})) {
+                        const auto currentPrimitive = primitive(type, x);
+                        if (!primitiveValid)
+                            previousPrimitive = primitive(type, previous);
+                        y = (currentPrimitive - previousPrimitive) / delta;
+                        previousPrimitive = currentPrimitive;
+                        primitiveValid = true;
+                    } else {
+                        y = shape(type, .5 * (x + previous));
+                        // Avoid evaluating an expensive primitive for a constant segment.
+                        primitiveValid = false;
+                    }
+                    y -= dc;
                 } else {
-                    y = shape(p.shape, .5 * (x + previous));
-                    // Avoid evaluating an expensive primitive for a constant segment.
+                    y = shape(type, x) - dc;
                     primitiveValid = false;
                 }
-                y -= dc;
-            } else {
-                y = shape(p.shape, x) - dc;
-                primitiveValid = false;
+                previous = x;
+                active = true;
+                output[i] = T(y * p.outputGain);
             }
-            previous = x;
-            active = true;
-            output[i] = T(y * p.outputGain);
+            s.previous[ch] = previous;
+            s.previousPrimitive[ch] = previousPrimitive;
+            s.primitiveValid[ch] = primitiveValid;
+            s.active[ch] = active;
+            s.memory[ch] = memory;
         }
-        s.previous[ch] = previous;
-        s.previousPrimitive[ch] = previousPrimitive;
-        s.primitiveValid[ch] = primitiveValid;
-        s.active[ch] = active;
-        s.memory[ch] = memory;
+    };
+    switch (p.shape) {
+    case AdaaShape::atan:
+        run.template operator()<AdaaShape::atan>();
+        break;
+    case AdaaShape::cubic:
+        run.template operator()<AdaaShape::cubic>();
+        break;
+    case AdaaShape::hardClip:
+        run.template operator()<AdaaShape::hardClip>();
+        break;
+    case AdaaShape::wavefolder:
+        run.template operator()<AdaaShape::wavefolder>();
+        break;
+    case AdaaShape::hysteresis:
+        run.template operator()<AdaaShape::hysteresis>();
+        break;
+    default:
+        run.template operator()<AdaaShape::tanh>();
+        break;
     }
     return Status::ok;
 }

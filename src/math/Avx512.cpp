@@ -1,4 +1,6 @@
 #include "detail/AdaaAvx.h"
+#include "detail/DynamicsAvx.h"
+#include "detail/FirAvx.h"
 #include "detail/Scalar.h"
 #include "detail/VectorTable.h"
 #include <array>
@@ -482,10 +484,14 @@ const VectorTable& avx512Table() noexcept {
     static constexpr VectorTable table{
         CpuBackend::avx512,
         {multiplyF32, complexMacF32, butterflyF32, copyF32, scaleF32, addScaledF32, fillF32, dotF32,
-         biquadBankF32, gainChainF32, fftStageF32},
+         biquadBankF32, gainChainF32, fftStageF32, firHeadF32},
         {multiplyF64, complexMacF64, butterflyF64, copyF64, scaleF64, addScaledF64, fillF64, dotF64,
-         biquadBankF64, gainChainF64, fftStageF64},
-        dotMixed, adaaFoldAvx2};
+         biquadBankF64, gainChainF64, fftStageF64, firHeadF64},
+        dotMixed,
+        adaaFoldAvx2,
+        adaaClipAvx2,
+        adaaTanhAvx2,
+        compressorGainAvx2};
     return table;
 }
 } // namespace cydsp::detail

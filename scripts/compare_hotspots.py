@@ -15,6 +15,7 @@ p.add_argument('--before', type=Path, required=True)
 p.add_argument('--after', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--trials', type=int, default=3)
+p.add_argument('--baseline-commit', default='fda6bd30c5b622795cc08e8bd2750188a6c5a0c0')
 p.add_argument('--logical-cpu', type=int)
 p.add_argument('--before-render', type=Path)
 p.add_argument('--after-render', type=Path)
@@ -49,7 +50,7 @@ for name in runs['before'][0]:
                  'speedupBeforeOverAfter': before / after,
                  'costChangePercent': (after / before - 1) * 100, 'processMeansUs': values})
 report = {'status': 'passed', 'sourceSha256': source_digest(),
-          'baselineProductionCommit': 'fda6bd30c5b622795cc08e8bd2750188a6c5a0c0',
+          'baselineProductionCommit': a.baseline_commit,
           'method': 'Alternating independent process pairs; median of process medians of nine 128-call batch means, 256-frame blocks at 48 kHz. No global CPU/FP state changes.',
           'logicalCpu': a.logical_cpu, 'processPairs': a.trials,
           'executablesSha256': {label: hashlib.sha256(getattr(a, label).read_bytes()).hexdigest() for label in runs}, 'cases': rows}
@@ -63,6 +64,27 @@ if a.before_render:
     report['renderComparison'] = {'samples': len(arrays[0]),
         'maxAbsoluteError': max(abs(x-y) for x, y in zip(*arrays)),
         'sha256': [hashlib.sha256(path.read_bytes()).hexdigest() for path in (a.before_render, a.after_render)]}
+    offset = 0
+    render_cases = []
+    for row in rows:
+        name = row['case']
+        if not name.endswith(('.f32', '.f64')):
+            continue
+        channels = int(name.split('.')[1]) if name.startswith('compressor.') and not name.startswith('compressor.r') else 2
+        count = 20 * 256 * channels
+        before = arrays[0][offset:offset+count]
+        after = arrays[1][offset:offset+count]
+        assert len(before) == count and len(after) == count
+        render_cases.append({'case': name, 'samples': count,
+                             'maxAbsoluteError': max(abs(x-y) for x,y in zip(before,after))})
+        offset += count
+    assert offset == len(arrays[0])
+    report['renderCases'] = render_cases
+    report['renderComparison']['byType'] = {
+        suffix: {'samples': sum(x['samples'] for x in render_cases if x['case'].endswith(suffix)),
+                 'maxAbsoluteError': max(x['maxAbsoluteError'] for x in render_cases if x['case'].endswith(suffix))}
+        for suffix in ('f32','f64')}
+
 a.output.parent.mkdir(parents=True, exist_ok=True)
 a.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 print('PASS: ' + str(len(rows)) + ' component cases, ' + str(a.trials) + ' alternating process pairs')

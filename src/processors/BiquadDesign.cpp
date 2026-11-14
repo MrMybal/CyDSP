@@ -2,6 +2,7 @@
 // MIT license: third_party/licenses/DSPFilters.txt; pinned source: third_party/manifest.json.
 // CyDSP adds normalized types, argument checks and transactional coefficient publication.
 #include "cydsp/processors/Biquad.h"
+#include "detail/AudioMath.h"
 #include <cmath>
 #include <numbers>
 namespace cydsp {
@@ -64,11 +65,12 @@ bool validEq(double sampleRate, double frequency, double shape, double gain) noe
 Status publishEq(double a0, BiquadCoefficients next, BiquadCoefficients& result) noexcept {
     if (!isFinite(a0) || a0 <= 0)
         return Status::invalid_argument;
-    next.b0 /= a0;
-    next.b1 /= a0;
-    next.b2 /= a0;
-    next.a1 /= a0;
-    next.a2 /= a0;
+    const double inverse = 1 / a0;
+    next.b0 *= inverse;
+    next.b1 *= inverse;
+    next.b2 *= inverse;
+    next.a1 *= inverse;
+    next.a2 *= inverse;
     if (!next.isStable())
         return Status::invalid_argument;
     result = next;
@@ -80,7 +82,8 @@ Status designPeakingBiquad(double sampleRate, double frequency, double q, double
     if (!validEq(sampleRate, frequency, q, gain))
         return Status::invalid_argument;
     const auto angle = 2 * std::numbers::pi * (frequency / sampleRate), cs = std::cos(angle),
-               alpha = std::sin(angle) / (2 * q), a = std::pow(10.0, gain / 40);
+               alpha = std::sin(angle) / (2 * q),
+               a = detail::audioExp(gain * (std::numbers::ln10 / 40));
     return publishEq(1 + alpha / a, {1 + alpha * a, -2 * cs, 1 - alpha * a, -2 * cs, 1 - alpha / a},
                      result);
 }
@@ -88,7 +91,7 @@ Status designShelfBiquad(bool high, double sampleRate, double frequency, double 
                          BiquadCoefficients& result) noexcept {
     if (!validEq(sampleRate, frequency, slope, gain) || slope > 1)
         return Status::invalid_argument;
-    const auto a = std::pow(10.0, gain / 40),
+    const auto a = detail::audioExp(gain * (std::numbers::ln10 / 40)),
                angle = 2 * std::numbers::pi * (frequency / sampleRate), cs = std::cos(angle);
     const auto alpha = std::sin(angle) * 0.5 * std::sqrt((a + 1 / a) * (1 / slope - 1) + 2),
                sq = 2 * std::sqrt(a) * alpha;
