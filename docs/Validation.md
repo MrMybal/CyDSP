@@ -1,3 +1,32 @@
+# CyDSP 0.3.2 optimization validation — 2026-11-14
+
+Compiler-input SHA-256: `114977a9b190a6dd11a017bddf6c144cbc5d69230976cb0ef419782ec3a73bd7`.
+
+MSVC x64 Release, clang-cl x64 Release, x64 AddressSanitizer and Quest 3
+Android ARM64/NEON completed the regression suite. Windows ARM64 compiled its
+static library, individual public headers and regression objects. Android ARM64
+compiled/linked NEON and SVE; actual SVE execution/vector lengths remain unverified.
+
+New independent checks cover direct SIMD wavefolder tails, exact same-channel
+aliases and typed intermediate mix rounding; the precise transient's unchanged
+scalar power argument; dynamic-EQ filter/envelope oracles with 1/2/3/7 channels,
+mono/full sidechains, in-place processing, split blocks, resets and automation;
+and saturation DC-cache transitions including signed zero. Existing convolution,
+allocation/free, alias, latency and scheduled-budget regressions still pass.
+
+Object inspection covered 84 x64, 84 Android ARM64 and 83 Windows ARM64 production
+objects, with no fused FP instructions or wide-ISA leakage. The installed exact
+0.3.2 package compiled, linked and ran a consumer with the updated private
+MatrixConvolver layout. Rebuild headers, archive and consumers together.
+
+Detailed timing repetitions, discarded experiments, raw audio comparisons and
+integration-oriented notes remain local under the Git-ignored build directory.
+These checks do not imply a listening test or a new CyMetaSound integration run.
+macOS/Linux desktop execution remains deferred; Windows ARM64 and SVE runtime,
+and x86/ARM32 reruns, are still outstanding for this snapshot.
+
+---
+
 # Ten-lot DSP / spatial expansion — 2026-11-13
 
 The latest extension results, exact source digest, CPU costs and numerical errors

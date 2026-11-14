@@ -555,6 +555,62 @@ template <class T> void tileStages(const VectorOps& ops) {
         require(wide.front() == 12345 && wide[count + 1] == 12345, "magnitude bounds");
     }
 }
+template <class T> void directFoldStages(const VectorOps& ops) {
+    const auto run = detail::VectorAccess::kernels<T>(ops).foldDirect;
+    require(run != nullptr, "direct wavefolder SIMD selected");
+    const std::array<double, 5> stage{1.5, -.25, 1.2, 3.1, .37};
+    const auto dc = shape(AdaaShape::wavefolder, stage[4]);
+    std::array<T, 68> input{}, output{};
+    for (std::size_t i = 0; i < 68; ++i)
+        input[i] = T(i % 7 == 0 ? 1e8 : 17.3 * std::sin(double(i) * .3));
+    for (bool mixed : {false, true})
+        for (bool alias : {false, true})
+            for (std::size_t count = 0; count <= 67; ++count) {
+                output.fill(T(12345));
+                if (alias)
+                    std::copy_n(input.begin(), count, output.begin());
+                run(alias ? output.data() : input.data(), output.data(), count, stage.data(), dc,
+                    .7, .25, .75, mixed);
+                for (std::size_t i = 0; i < count; ++i) {
+                    double x = input[i];
+                    if (mixed)
+                        x = (x * stage[0] + stage[1]) * stage[2];
+                    x = std::clamp(x * stage[3] + stage[4], -1e6, 1e6);
+                    const auto wet = T((shape(AdaaShape::wavefolder, x) - dc) * .7);
+                    const auto expected =
+                        mixed ? T(.25 * double(input[i]) + .75 * double(wet)) : wet;
+                    require(output[i] == expected,
+                            "fused wavefolder rounding, mixing and alias oracle");
+                }
+                require(output[count] == T(12345), "direct wavefolder tail bounds");
+            }
+}
+template <class T> void signedZeroDcCache() {
+    AdaaSaturator<T> p;
+    ok(p.prepare({48000, 2, 1}));
+    T input[]{T(0), T(-0.)}, output[2]{};
+    const T* source[]{input};
+    T* destination[]{output};
+    for (auto type : {AdaaShape::tanh, AdaaShape::atan, AdaaShape::cubic, AdaaShape::wavefolder})
+        for (double bias : {0., -0., 0., .3, -0.}) {
+            SaturationParameters settings;
+            settings.antialias = false;
+            settings.shape = type;
+            settings.bias = bias;
+            ok(p.setParameters(settings));
+            ok(p.process({source, 1, 2}, {destination, 1, 2}));
+            for (std::size_t i = 0; i < 2; ++i) {
+                const auto expected = T(shape(type, double(input[i]) + bias) - shape(type, bias));
+                require(std::abs(double(output[i]) - double(expected)) < 1e-14,
+                        "cached DC numerical oracle");
+                // A nonzero bias may leave the existing SIMD/libm roundoff
+                // residual. Zero bias isolates the actual signed-zero contract.
+                if (bias == 0 && expected == T(0))
+                    require(output[i] == T(0) && std::signbit(output[i]) == std::signbit(expected),
+                            "DC cache preserves signed zero");
+            }
+        }
+}
 void curveKernels() {
     double worst = 0;
     unsigned tested = 0;
@@ -565,6 +621,8 @@ void curveKernels() {
         ++tested;
         tileStages<float>(ops);
         tileStages<double>(ops);
+        directFoldStages<float>(ops);
+        directFoldStages<double>(ops);
         const auto& table = detail::VectorAccess::table(ops);
         require(table.expanderGain && table.dynamicEqGain && table.transientGain && table.minimum,
                 "x64 gain-curve kernels selected");
@@ -627,6 +685,24 @@ void curveKernels() {
                               "SIMD transient gain oracle");
                     }
                     require(output[count] == 12345, "transient tail bounds");
+                    require(table.transientExponent != nullptr,
+                            "precise transient SIMD stage available");
+                    output.fill(12345);
+                    table.transientExponent(envelope.data(), slow.data(), output.data(), count,
+                                            parameters.data());
+                    for (std::size_t i = 0; i < count; ++i) {
+                        const auto attack = std::clamp(
+                            (envelope[i] - slow[i]) / std::max(1e-12, envelope[i]), 0., 1.);
+                        const auto sustain =
+                            std::clamp(slow[i] / std::max(1e-12, envelope[i]), 0., 1.) *
+                            (1 - attack);
+                        const auto expected =
+                            24 * std::clamp(amount * attack + sustain * parameters[1], -1., 1.) /
+                            20;
+                        require(output[i] == expected,
+                                "precise transient scalar pow argument unchanged");
+                    }
+                    require(output[count] == 12345, "precise transient tail bounds");
                 }
             double expected = std::numeric_limits<double>::infinity();
             for (std::size_t i = 0; i < count; ++i)
@@ -637,6 +713,106 @@ void curveKernels() {
     if (tested)
         std::cout << "QUALITY gain-curve SIMD maxRelativeError=" << worst << " backends=" << tested
                   << '\n';
+}
+// Independent scalar filters and decimal powers verify paired SIMD lanes,
+// odd channel counts, mono/stereo sidechains, automation and in-place tiling.
+template <class T> void pairedDynamicEq() {
+    struct Filter {
+        double z1 = 0, z2 = 0;
+        double run(double x, const BiquadCoefficients& c) {
+            const auto y = c.b0 * x + z1;
+            z1 = c.b1 * x - c.a1 * y + z2;
+            z2 = c.b2 * x - c.a2 * y;
+            return y;
+        }
+    };
+    for (std::size_t channels : {1u, 2u, 3u, 7u}) {
+        AudioBuffer<T> input, side, output, alias;
+        ok(input.resize(channels, 131));
+        ok(side.resize(channels, 131));
+        ok(output.resize(channels, 131));
+        ok(alias.resize(channels, 131));
+        DynamicEqualizer<T> whole, cut;
+        ok(whole.prepare({48000, 131, channels}, 3));
+        ok(cut.prepare({48000, 131, channels}, 3));
+        std::vector<Filter> audio(3 * channels), detector(3 * channels);
+        std::vector<double> envelope(3 * channels);
+        for (unsigned block = 0; block < 18; ++block) {
+            std::array<DynamicEqBand, 3> bands{{{200, 1, -30, -9, 10, 100, 0},
+                                                {1200, 2, -35, -12, 5, 80, 1},
+                                                {6000, .7, -40, 6, 2, 60, 0}}};
+            if (block % 3 == 1)
+                bands[1].staticGainDb = 3;
+            if (block % 3 == 2) {
+                bands[1].frequencyHz = 2300;
+                bands[1].attackMs = 0;
+            }
+            const auto active = block % 4;
+            ok(whole.setBands(std::span(bands).first(active)));
+            ok(cut.setBands(std::span(bands).first(active)));
+            if (block % 7 == 0) {
+                whole.reset();
+                cut.reset();
+                std::fill(audio.begin(), audio.end(), Filter{});
+                std::fill(detector.begin(), detector.end(), Filter{});
+                std::fill(envelope.begin(), envelope.end(), 0.);
+            }
+            for (std::size_t ch = 0; ch < channels; ++ch)
+                for (std::size_t i = 0; i < 131; ++i) {
+                    input.block().channel(ch)[i] =
+                        T(.7 * std::sin(.11 * double(block * 131 + i) + double(ch)));
+                    side.block().channel(ch)[i] =
+                        T(.4 * std::cos(.23 * double(block * 131 + i) - double(ch)));
+                    alias.block().channel(ch)[i] = input.block().channel(ch)[i];
+                }
+            const auto mode = block % 3;
+            const T* mono[]{side.block().channel(0).data()};
+            const AudioBlock<const T> external =
+                mode == 1 ? AudioBlock<const T>{mono, 1, 131} : side.block();
+            const AudioBlock<const T> detectorBlock = mode == 0 ? input.block() : external;
+            ok(whole.process(input.block(), detectorBlock, output.block()));
+            for (std::size_t offset = 0; offset < 131; offset += 17) {
+                const auto count = std::min<std::size_t>(17, 131 - offset);
+                auto inPlace = alias.block().subBlock(offset, count);
+                const AudioBlock<const T> sideBlock =
+                    mode == 0 ? AudioBlock<const T>{inPlace} : external.subBlock(offset, count);
+                ok(cut.process(inPlace, sideBlock, inPlace));
+            }
+            std::array<BiquadCoefficients, 3> coefficients;
+            for (std::size_t b = 0; b < active; ++b)
+                ok(designBiquad(BiquadType::bandPass, 48000, bands[b].frequencyHz, bands[b].q,
+                                coefficients[b]));
+            for (std::size_t ch = 0; ch < channels; ++ch)
+                for (std::size_t i = 0; i < 131; ++i) {
+                    double x = input.block().channel(ch)[i];
+                    const double sideValue = detectorBlock.channel(mode == 1 ? 0 : ch)[i];
+                    for (std::size_t b = 0; b < active; ++b) {
+                        const auto id = b * channels + ch;
+                        const auto& band = bands[b];
+                        const auto level = std::abs(detector[id].run(sideValue, coefficients[b]));
+                        const auto attack =
+                            band.attackMs == 0 ? 0 : std::exp(-1000 / (band.attackMs * 48000));
+                        const auto release = std::exp(-1000 / (band.releaseMs * 48000));
+                        auto& env = envelope[id];
+                        env = level + (level > env ? attack : release) * (env - level);
+                        const auto over = 20 * std::log10(std::max(1e-12, env)) - band.thresholdDb;
+                        const auto db =
+                            band.staticGainDb + band.rangeDb * std::clamp(over / 24., 0., 1.);
+                        x += (std::pow(10., db / 20) - 1) * audio[id].run(x, coefficients[b]);
+                    }
+                    const auto actual = output.block().channel(ch)[i];
+                    require(std::abs(double(actual) - double(T(x))) <
+                                (std::same_as<T, float> ? 3e-6 : 3e-12),
+                            "paired dynamic EQ independent filter/envelope oracle");
+                    require(actual == alias.block().channel(ch)[i],
+                            "paired EQ in-place and block cuts");
+                }
+            auto invalid = bands;
+            invalid.back().frequencyHz = std::numeric_limits<double>::quiet_NaN();
+            require(whole.setBands(invalid) == Status::invalid_argument,
+                    "cached EQ validates all bands");
+        }
+    }
 }
 // A constant channel takes a shortcut inside the tiled saturator. It must equal
 // the general tile path, which blocks shorter than eight frames always use.
@@ -684,6 +860,10 @@ void hotspotRegression() {
     audioMathAccuracy();
     transferKernels();
     curveKernels();
+    signedZeroDcCache<float>();
+    signedZeroDcCache<double>();
+    pairedDynamicEq<float>();
+    pairedDynamicEq<double>();
     transcendentalEndpointAccuracy();
     coefficientAndMaterialAccuracy();
     wavefolderKernels();

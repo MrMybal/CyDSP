@@ -511,7 +511,9 @@ const VectorTable& avx2Table() noexcept {
                                         realSplitRangeF32,
                                         realMergeRangeF32,
                                         convolutionEmit<float>,
-                                        cubicDirectF32},
+                                        cubicDirectF32,
+                                        dynamicEqDetectPair,
+                                        foldDirectF32},
                                        {multiplyF64,
                                         complexMacF64,
                                         butterflyF64,
@@ -535,7 +537,9 @@ const VectorTable& avx2Table() noexcept {
                                         realSplitRangeF64,
                                         realMergeRangeF64,
                                         convolutionEmit<double>,
-                                        cubicDirectF64},
+                                        cubicDirectF64,
+                                        dynamicEqDetectPair,
+                                        foldDirectF64},
                                        dotMixed,
                                        adaaFoldAvx2,
                                        adaaClipAvx2,
@@ -550,7 +554,9 @@ const VectorTable& avx2Table() noexcept {
                                        transientGainSimd,
                                        minimumSimd,
                                        adaaCubicSimd,
-                                       shapeCubicSimd};
+                                       shapeCubicSimd,
+                                       dynamicEqApplyPair,
+                                       transientExponentSimd};
     return table;
 }
 } // namespace cydsp::detail

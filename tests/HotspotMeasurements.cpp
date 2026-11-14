@@ -202,7 +202,7 @@ template <class T> void programCases() {
         const ProcessSpec wide{48000, 480, 2};
         auto d = std::make_shared<Data<T>>(2, 480);
         d->program(2, .5);
-        for (std::size_t length : {512u, 8192u}) {
+        for (std::size_t length : {512u, 8192u, 65536u}) {
             auto p = std::make_shared<MatrixConvolver<T>>();
             std::vector<T> ir(length), ir2(length);
             for (std::size_t i = 0; i < length; ++i) {
@@ -217,6 +217,13 @@ template <class T> void programCases() {
             auto q = std::make_shared<MatrixConvolver<T>>();
             ok(q->prepare(wide, 2, r, {ConvolutionMode::scheduled, 128, 1024, true}));
             add("matrix." + std::to_string(length) + ".p128.scheduled.block480.spectral", q, d);
+            for (bool spectral : {false, true}) {
+                auto n = std::make_shared<MatrixConvolver<T>>();
+                ok(n->prepare(wide, 2, r, {ConvolutionMode::nonuniform, 128, 1024, spectral}));
+                add("matrix." + std::to_string(length) + ".p128.nonuniform.block480" +
+                        (spectral ? ".spectral" : ""),
+                    n, d);
+            }
         }
     }
 }
@@ -391,8 +398,15 @@ int main(int argc, char** argv) {
         make<float>();
         make<double>();
         controlCases();
+        if (argc > 2) {
+            const std::string filter = argv[2];
+            std::erase_if(cases,
+                          [&](const Case& c) { return c.name.find(filter) == std::string::npos; });
+            if (cases.empty())
+                throw std::runtime_error("empty measurement filter");
+        }
         // Capture only reset deterministic output, independent of timing/warmup history.
-        if (argc > 1) {
+        if (argc > 1 && std::string(argv[1]) != "-") {
             std::ofstream f(argv[1], std::ios::binary);
             for (auto& c : cases) {
                 c.reset();
@@ -410,15 +424,23 @@ int main(int argc, char** argv) {
             c.reset();
             for (int i = 0; i < 256; ++i)
                 c.run();
+            const auto calibrationStart = std::chrono::steady_clock::now();
+            for (int i = 0; i < 128; ++i)
+                c.run();
+            const auto calibrationUs = std::chrono::duration<double, std::micro>(
+                                           std::chrono::steady_clock::now() - calibrationStart)
+                                           .count();
+            const int iterations =
+                std::clamp(int(128000 / std::max(1., calibrationUs)), 128, 65536);
             std::array<double, 9> trials;
             for (auto& t : trials) {
                 const auto start = std::chrono::steady_clock::now();
-                for (int i = 0; i < 128; ++i)
+                for (int i = 0; i < iterations; ++i)
                     c.run();
                 t = std::chrono::duration<double, std::micro>(std::chrono::steady_clock::now() -
                                                               start)
                         .count() /
-                    128;
+                    iterations;
             }
             std::sort(trials.begin(), trials.end());
             if (!std::isfinite(sink))
@@ -427,6 +449,7 @@ int main(int argc, char** argv) {
                 std::cout << ",\n";
             first = false;
             std::cout << "{\"case\":\"" << c.name << "\",\"frames\":" << c.frames
+                      << ",\"iterationsPerTrial\":" << iterations
                       << ",\"medianBatchMeanUs\":" << trials[4]
                       << ",\"worstBatchMeanUs\":" << trials[8] << "}";
         }

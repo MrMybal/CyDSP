@@ -472,7 +472,9 @@ const VectorTable& neonTable() noexcept {
                                         nullptr,
                                         nullptr,
                                         convolutionEmit<float>,
-                                        cubicDirectF32
+                                        cubicDirectF32,
+                                        dynamicEqDetectPair,
+                                        foldDirectF32
 #endif
                                        },
                                        {multiplyF64,
@@ -500,7 +502,9 @@ const VectorTable& neonTable() noexcept {
                                         nullptr,
                                         nullptr,
                                         convolutionEmit<double>,
-                                        cubicDirectF64
+                                        cubicDirectF64,
+                                        dynamicEqDetectPair,
+                                        foldDirectF64
 #endif
                                        },
                                        dotMixed
@@ -519,7 +523,9 @@ const VectorTable& neonTable() noexcept {
                                        transientGainSimd,
                                        minimumSimd,
                                        adaaCubicSimd,
-                                       shapeCubicSimd
+                                       shapeCubicSimd,
+                                       dynamicEqApplyPair,
+                                       transientExponentSimd
 #endif
     };
     return table;

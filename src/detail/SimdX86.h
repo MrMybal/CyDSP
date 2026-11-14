@@ -2,6 +2,46 @@
 #include <immintrin.h>
 namespace cydsp::detail {
 namespace {
+// Two independent recursive voices, never two consecutive time samples.
+struct DoublePair {
+    using Reg = __m128d;
+    static CYDSP_SIMD_INLINE Reg pair(double a, double b) noexcept {
+        return _mm_set_pd(b, a);
+    }
+    static CYDSP_SIMD_INLINE double first(Reg x) noexcept {
+        return _mm_cvtsd_f64(x);
+    }
+    static CYDSP_SIMD_INLINE double second(Reg x) noexcept {
+        return _mm_cvtsd_f64(_mm_unpackhi_pd(x, x));
+    }
+    static CYDSP_SIMD_INLINE Reg load(const double* p) noexcept {
+        return _mm_loadu_pd(p);
+    }
+    static CYDSP_SIMD_INLINE void store(double* p, Reg x) noexcept {
+        _mm_storeu_pd(p, x);
+    }
+    static CYDSP_SIMD_INLINE Reg set(double x) noexcept {
+        return _mm_set1_pd(x);
+    }
+    static CYDSP_SIMD_INLINE Reg add(Reg a, Reg b) noexcept {
+        return _mm_add_pd(a, b);
+    }
+    static CYDSP_SIMD_INLINE Reg sub(Reg a, Reg b) noexcept {
+        return _mm_sub_pd(a, b);
+    }
+    static CYDSP_SIMD_INLINE Reg mul(Reg a, Reg b) noexcept {
+        return _mm_mul_pd(a, b);
+    }
+    static CYDSP_SIMD_INLINE Reg abs(Reg x) noexcept {
+        return _mm_andnot_pd(_mm_set1_pd(-0.), x);
+    }
+    static CYDSP_SIMD_INLINE Reg gt(Reg a, Reg b) noexcept {
+        return _mm_cmpgt_pd(a, b);
+    }
+    static CYDSP_SIMD_INLINE Reg select(Reg m, Reg a, Reg b) noexcept {
+        return _mm_or_pd(_mm_and_pd(m, a), _mm_andnot_pd(m, b));
+    }
+};
 struct Double4 {
     using Reg = __m256d;
     using Mask = __m256d;

@@ -299,6 +299,10 @@ Status MatrixConvolver<T>::Tier::prepare(std::span<const ConvolutionRoute<T>> de
                                  headFilters.size()});
                 headFilters.resize(size);
             }
+        const auto maximumOutput = *std::max_element(outputs.begin(), outputs.end());
+        coveredOutputs.resize(maximumOutput + 1);
+        for (const auto ch : outputs)
+            coveredOutputs[ch] = 1;
         std::size_t samples{}, hist{}, sums{};
         if (!detail::checkedMultiply(inputs.size(), p, samples) ||
             !detail::checkedMultiply(inputs.size(), parts, hist) ||
@@ -396,10 +400,14 @@ void MatrixConvolver<T>::Tier::emit() noexcept {
         spectrum.front().imag(T{});
         spectrum.back().imag(T{});
         (void)fft.inverse(spectrum, time);
-        for (std::size_t i = 0; i < partition; ++i) {
-            ready[ch * partition + i] = time[i] + overlap[ch * partition + i];
-            overlap[ch * partition + i] = time[partition + i];
-        }
+        if (const auto emit = detail::VectorAccess::kernels<T>(ops).convolutionEmit)
+            emit(time.data(), time.data() + partition, overlap.data() + ch * partition,
+                 ready.data() + ch * partition, partition, T{1});
+        else
+            for (std::size_t i = 0; i < partition; ++i) {
+                ready[ch * partition + i] = time[i] + overlap[ch * partition + i];
+                overlap[ch * partition + i] = time[partition + i];
+            }
     }
     std::fill(sum.begin(), sum.end(), std::complex<T>{});
     pending = false;
@@ -432,10 +440,14 @@ void MatrixConvolver<T>::Tier::alignedPartition(AudioBlock<const T> source, Audi
         spectrum.back().imag(T{});
         (void)fft.inverse(spectrum, time);
         auto* destination = output.channel(outputs[ch]).data() + offset;
-        for (std::size_t i = 0; i < partition; ++i) {
-            destination[i] = time[i] + overlap[ch * partition + i];
-            overlap[ch * partition + i] = time[partition + i];
-        }
+        if (kernels.convolutionEmit)
+            kernels.convolutionEmit(time.data(), time.data() + partition,
+                                    overlap.data() + ch * partition, destination, partition, T{1});
+        else
+            for (std::size_t i = 0; i < partition; ++i) {
+                destination[i] = time[i] + overlap[ch * partition + i];
+                overlap[ch * partition + i] = time[partition + i];
+            }
     }
     std::fill(sum.begin(), sum.end(), std::complex<T>{});
     // The same products the sample scheduler and the boundary would complete.
@@ -452,11 +464,14 @@ template <Sample T>
     requires(!std::is_const_v<T>)
 void MatrixConvolver<T>::Tier::process(AudioBlock<const T> source, AudioBlock<T> output,
                                        bool aligned) noexcept {
+    const auto& kernels = detail::VectorAccess::kernels<T>(ops);
+    // Mapped outputs are completely overwritten below, including partial calls.
+    // Only unmapped channels need a clear, prepared once as a bounded lookup.
     for (std::size_t ch = 0; ch < output.channels(); ++ch)
-        ops.fill(output.channel(ch), T{});
+        if (ch >= coveredOutputs.size() || !coveredOutputs[ch])
+            kernels.fill(output.channel(ch).data(), output.frames(), T{});
     if (!partition)
         return;
-    const auto& kernels = detail::VectorAccess::kernels<T>(ops);
     for (std::size_t offset = 0; offset < source.frames();) {
         if (!position && !heads.empty()) {
             if (aligned && source.frames() - offset >= partition) {
@@ -639,19 +654,24 @@ Status MatrixConvolver<T>::process(AudioBlock<const T> input, AudioBlock<T> outp
             ops_.fill(output.channel(ch), T{});
         return Status::ok;
     }
+    const bool disjoint = validateDisjointBlocks(input, output) == Status::ok;
     const bool spectral = !early_.heads.empty();
     for (std::size_t offset = 0; offset < input.frames();) {
         // With a spectral head, steps end at early partition boundaries so each
         // new partition can be taken whole when the call still holds all of it.
-        const bool aligned =
-            spectral && !early_.position && input.frames() - offset >= headSize_;
+        const bool aligned = spectral && !early_.position && input.frames() - offset >= headSize_;
         auto count = aligned ? headSize_ : std::min(tile_, input.frames() - offset);
         if (spectral && !aligned)
             count = std::min(count, headSize_ - early_.position);
-        auto saved = input_.block(count);
+        AudioBlock<const T> saved = input.subBlock(offset, count);
         auto out = output.subBlock(offset, count);
-        for (std::size_t ch = 0; ch < spec_.channels; ++ch)
-            (void)ops_.copy(input.channel(ch).subspan(offset, count), saved.channel(ch));
+        if (!disjoint) {
+            auto snapshot = input_.block(count);
+            const auto copy = detail::VectorAccess::kernels<T>(ops_).copy;
+            for (std::size_t ch = 0; ch < spec_.channels; ++ch)
+                copy(saved.channel(ch).data(), snapshot.channel(ch).data(), count);
+            saved = snapshot;
+        }
         early_.process(saved, out, aligned);
         if (progressive_ || late_.partition) {
             auto scratch = scratch_.block(count);
@@ -659,8 +679,9 @@ Status MatrixConvolver<T>::process(AudioBlock<const T> input, AudioBlock<T> outp
                 progressive_->process(saved, scratch);
             else
                 late_.process(saved, scratch);
+            const auto add = detail::VectorAccess::kernels<T>(ops_).addScaled;
             for (std::size_t ch = 0; ch < outputs_; ++ch)
-                (void)ops_.addScaled(scratch.channel(ch), out.channel(ch), T{1});
+                add(scratch.channel(ch).data(), out.channel(ch).data(), count, T{1});
         }
         // One contiguous history window per tile. Each dot reads the same ordered
         // samples as the mirrored ring, without per-frame modulo/route bookkeeping.

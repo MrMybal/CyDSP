@@ -10,7 +10,7 @@
     <td width="400" align="center" valign="middle"><strong>CyDSP</strong><br><sub>C++20 DSP · x64 / ARM64</sub></td>
     <td width="300" align="right" valign="top">
       <p><sub>Licence de la bibliothèque</sub><br><a href="LICENSE"><strong>MIT</strong></a></p>
-      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.3.1</strong></a><br><strong>EN DÉVELOPPEMENT</strong></p>
+      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.3.2</strong></a><br><strong>EN DÉVELOPPEMENT</strong></p>
     </td>
   </tr>
 </table>
@@ -19,7 +19,7 @@
 
 Bibliothèque C++20 de calcul DSP audio pour les DAW, effets, synthétiseurs et jeux vidéo. Construire des chaînes de traitement, rendre de nombreuses sources et travailler le son spatial avec une API float/double commune, un stockage préparé et des implémentations SIMD pour x64 et ARM64.
 
-> **EN DÉVELOPPEMENT · 0.3.1**
+> **EN DÉVELOPPEMENT · 0.3.2**
 >
 > Disponible sous forme de sources ; aucune release binaire publiée. Consulter les [notes de version et limites des plateformes](VERSION.fr.md).
 
@@ -66,7 +66,7 @@ Utiliser CMake 3.24+ et un compilateur C++20 pour produire les bibliothèques st
 Après installation du package CMake, le lier à l’application :
 
 ```cmake
-find_package(CyDSP 0.3.1 CONFIG REQUIRED)
+find_package(CyDSP 0.3.2 CONFIG REQUIRED)
 
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # Traitement durée/hauteur optionnel :

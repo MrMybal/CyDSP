@@ -8,7 +8,9 @@
 #include "detail/VectorTable.h"
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <numbers>
 #include <vector>
@@ -77,10 +79,18 @@ struct SectionState {
 template <Sample T> struct AdaaSaturator<T>::State {
     ProcessSpec spec;
     SaturationParameters p;
+#if !defined(__aarch64__) && !defined(_M_ARM64)
+    // x64 benefits from keeping control-only math beside its parameters.
+    double dc = 0;
+#endif
     VectorOps ops;
     std::array<double, 64> foldInput{}, foldOutput{};
     std::vector<double> previous, memory, previousPrimitive;
     std::vector<unsigned char> active, primitiveValid;
+#if defined(__aarch64__) || defined(_M_ARM64)
+    // ARM64 retains the established recursive-state offsets (Quest measurements).
+    double dc = 0;
+#endif
 };
 template <Sample T> AdaaSaturator<T>::AdaaSaturator() = default;
 template <Sample T> AdaaSaturator<T>::~AdaaSaturator() = default;
@@ -117,6 +127,9 @@ template <Sample T> Status AdaaSaturator<T>::setParameters(const SaturationParam
     if (state_->p.shape != p.shape)
         std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(),
                   static_cast<unsigned char>(0));
+    if (state_->p.shape != p.shape ||
+        std::bit_cast<std::uint64_t>(state_->p.bias) != std::bit_cast<std::uint64_t>(p.bias))
+        state_->dc = shape(p.shape, p.bias);
     state_->p = p;
     return Status::ok;
 }
@@ -165,17 +178,20 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
         else
             return T(value);
     };
-    const double dc = shape(p.shape, p.bias);
     const auto& table = detail::VectorAccess::table(s.ops);
-    const auto cubicDirect = detail::VectorAccess::kernels<T>(s.ops).cubicDirect;
-    if (!p.antialias && p.shape == AdaaShape::cubic && cubicDirect) {
+    const double dc = s.dc;
+    const auto& typed = detail::VectorAccess::kernels<T>(s.ops);
+    const auto direct = p.shape == AdaaShape::cubic        ? typed.cubicDirect
+                        : p.shape == AdaaShape::wavefolder ? typed.foldDirect
+                                                           : nullptr;
+    if (!p.antialias && direct) {
         const std::array<double, 5> stage{inputStage.gain, inputStage.bias, inputStage.scale,
                                           p.drive, p.bias};
         for (std::size_t ch = 0; ch < in.channels() && in.frames(); ++ch) {
             const auto source = in.channel(ch);
             const auto last = driven(source.back());
-            cubicDirect(source.data(), out.channel(ch).data(), in.frames(), stage.data(), dc,
-                        p.outputGain, dryGain, wetGain, Mixed);
+            direct(source.data(), out.channel(ch).data(), in.frames(), stage.data(), dc,
+                   p.outputGain, dryGain, wetGain, Mixed);
             s.previous[ch] = last;
             s.active[ch] = 1;
             s.primitiveValid[ch] = 0;
@@ -479,13 +495,14 @@ template <Sample T> struct DynamicEqualizer<T>::State {
     struct Band {
         DynamicEqBand p;
         BiquadCoefficients coefficients;
+        std::array<double, 5> packed{};
         double attack = 0, release = 0;
         std::vector<SectionState> audio, detector;
         std::vector<double> envelope;
     };
     ProcessSpec spec;
     VectorOps ops;
-    std::array<double, 64> signal{}, envelope{}, weight{};
+    std::array<double, 64> signal{}, envelope{}, weight{}, signalR{}, envelopeR{}, weightR{};
     std::vector<Band> bands;
     std::size_t active = 0;
 };
@@ -531,17 +548,25 @@ Status DynamicEqualizer<T>::setBands(std::span<const DynamicEqBand> bands) noexc
             std::abs(p.staticGainDb) > 36 || !isFinite(p.attackMs) || p.attackMs < 0 ||
             p.attackMs > 10000 || !isFinite(p.releaseMs) || p.releaseMs < 0 || p.releaseMs > 10000)
             return Status::invalid_argument;
-        auto status = designBiquad(BiquadType::bandPass, s.spec.sampleRate, p.frequencyHz, p.q,
-                                   coefficients[i]);
-        if (status != Status::ok)
-            return status;
+        if (i < s.active && p.frequencyHz == s.bands[i].p.frequencyHz && p.q == s.bands[i].p.q)
+            coefficients[i] = s.bands[i].coefficients;
+        else {
+            const auto status = designBiquad(BiquadType::bandPass, s.spec.sampleRate, p.frequencyHz,
+                                             p.q, coefficients[i]);
+            if (status != Status::ok)
+                return status;
+        }
     }
     for (std::size_t i = 0; i < bands.size(); ++i) {
         auto& b = s.bands[i];
+        if (i >= s.active || b.p.attackMs != bands[i].attackMs)
+            b.attack = pole(bands[i].attackMs, s.spec.sampleRate);
+        if (i >= s.active || b.p.releaseMs != bands[i].releaseMs)
+            b.release = pole(bands[i].releaseMs, s.spec.sampleRate);
         b.p = bands[i];
         b.coefficients = coefficients[i];
-        b.attack = pole(b.p.attackMs, s.spec.sampleRate);
-        b.release = pole(b.p.releaseMs, s.spec.sampleRate);
+        const auto& c = b.coefficients;
+        b.packed = {c.b0, c.b1, c.b2, c.a1, c.a2};
     }
     s.active = bands.size();
     return Status::ok;
@@ -583,7 +608,52 @@ Status DynamicEqualizer<T>::process(AudioBlock<const T> in, AudioBlock<const T> 
         // envelope recurrences can run over a whole tile before the cascaded
         // audio corrections. The decibel weight of the tile is one vector pass;
         // every recurrence keeps its original sample order and arithmetic.
-        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+        const auto& table = detail::VectorAccess::table(s.ops);
+        const auto pairDetect = detail::VectorAccess::kernels<T>(s.ops).eqDetectPair;
+        std::size_t firstSingle = 0;
+        if (pairDetect && table.eqApplyPair) {
+            for (; firstSingle + 1 < in.channels(); firstSingle += 2) {
+                const auto ch = firstSingle;
+                const auto* detectorL = side.channel(side.channels() == 1 ? 0 : ch).data();
+                const auto* detectorR = side.channel(side.channels() == 1 ? 0 : ch + 1).data();
+                for (std::size_t offset = 0; offset < in.frames();) {
+                    const auto count = std::min(s.signal.size(), in.frames() - offset);
+                    for (std::size_t i = 0; i < count; ++i) {
+                        s.signal[i] = in.channel(ch)[offset + i];
+                        s.signalR[i] = in.channel(ch + 1)[offset + i];
+                    }
+                    for (std::size_t b = 0; b < s.active; ++b) {
+                        auto& band = s.bands[b];
+                        double detectorState[]{band.detector[ch].z1, band.detector[ch + 1].z1,
+                                               band.detector[ch].z2, band.detector[ch + 1].z2,
+                                               band.envelope[ch],    band.envelope[ch + 1]};
+                        pairDetect(detectorL + offset, detectorR + offset, s.envelope.data(),
+                                   s.envelopeR.data(), count, band.packed.data(), detectorState,
+                                   band.attack, band.release);
+                        band.detector[ch] = {detectorState[0], detectorState[2]};
+                        band.detector[ch + 1] = {detectorState[1], detectorState[3]};
+                        band.envelope[ch] = detectorState[4];
+                        band.envelope[ch + 1] = detectorState[5];
+                        weights(s.envelope.data(), s.weight.data(), count, band.p.thresholdDb,
+                                band.p.staticGainDb, band.p.rangeDb);
+                        weights(s.envelopeR.data(), s.weightR.data(), count, band.p.thresholdDb,
+                                band.p.staticGainDb, band.p.rangeDb);
+                        double audioState[]{band.audio[ch].z1, band.audio[ch + 1].z1,
+                                            band.audio[ch].z2, band.audio[ch + 1].z2};
+                        table.eqApplyPair(s.signal.data(), s.signalR.data(), s.weight.data(),
+                                          s.weightR.data(), count, band.packed.data(), audioState);
+                        band.audio[ch] = {audioState[0], audioState[2]};
+                        band.audio[ch + 1] = {audioState[1], audioState[3]};
+                    }
+                    for (std::size_t i = 0; i < count; ++i) {
+                        out.channel(ch)[offset + i] = T(s.signal[i]);
+                        out.channel(ch + 1)[offset + i] = T(s.signalR[i]);
+                    }
+                    offset += count;
+                }
+            }
+        }
+        for (std::size_t ch = firstSingle; ch < in.channels(); ++ch) {
             const auto* source = in.channel(ch).data();
             const auto* detector = side.channel(side.channels() == 1 ? 0 : ch).data();
             auto* destination = out.channel(ch).data();
@@ -722,6 +792,8 @@ Status TransientShaper<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out
     const auto p = s.p;
     const auto fast = s.fast, slowCoefficient = s.slow, release = s.release;
     const auto frames = in.frames();
+    // Keep Fast's original in-scope loop: outlining it through a captured
+    // generic lambda regressed NEON double on the measured Quest workload.
     if (const auto curve = detail::VectorAccess::table(s.ops).transientGain;
         curve && p.math == MathAccuracy::fast) {
         // The two envelope recurrences stay scalar and ordered. The gain law of a
@@ -768,6 +840,60 @@ Status TransientShaper<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out
         }
         return Status::ok;
     }
+    const auto& table = detail::VectorAccess::table(s.ops);
+    const auto runPreciseTiled = [&](auto curve) noexcept {
+        // The two envelope recurrences stay scalar and ordered. The gain law of a
+        // tile (two quotients, the decibel mix and its exponential) is one
+        // double-precision vector pass followed by a vector gain application.
+        // Precise vectorizes the quotients, but retains every reference decimal power.
+        const auto& kernels = detail::VectorAccess::kernels<T>(s.ops);
+        const std::array<double, 3> parameters{p.attack, p.sustain, p.maximumGainDb};
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            auto fastEnvelope = s.f[ch], slowEnvelope = s.s[ch];
+            const auto* source = in.channel(ch).data();
+            auto* destination = out.channel(ch).data();
+            for (std::size_t offset = 0; offset < frames;) {
+                const auto count = std::min(s.fastTile.size(), frames - offset);
+                for (std::size_t i = 0; i < count; ++i) {
+                    const double level = std::abs(double(source[offset + i]));
+                    fastEnvelope =
+                        level + (level > fastEnvelope ? fast : release) * (fastEnvelope - level);
+                    slowEnvelope = level + (level > slowEnvelope ? slowCoefficient : release) *
+                                               (slowEnvelope - level);
+                    s.fastTile[i] = fastEnvelope;
+                    s.slowTile[i] = slowEnvelope;
+                }
+                curve(s.fastTile.data(), s.slowTile.data(), s.gainTile.data(), count,
+                      parameters.data());
+                for (std::size_t i = 0; i < count; ++i)
+                    s.gainTile[i] = s.gainTile[i] == 0 ? 1. : std::pow(10., s.gainTile[i]);
+                if (gainOnly) {
+                    if (kernels.saturationPublish)
+                        kernels.saturationPublish(source + offset, s.gainTile.data(),
+                                                  destination + offset, count, 0, 1, false);
+                    else
+                        for (std::size_t i = 0; i < count; ++i)
+                            destination[offset + i] = T(s.gainTile[i]);
+                } else if (kernels.applyGains)
+                    kernels.applyGains(source + offset, s.gainTile.data(), destination + offset,
+                                       count, 1, std::numeric_limits<double>::infinity(),
+                                       source + offset, 0, 1, false);
+                else
+                    for (std::size_t i = 0; i < count; ++i)
+                        destination[offset + i] = T(double(source[offset + i]) * s.gainTile[i]);
+                offset += count;
+            }
+            s.f[ch] = fastEnvelope;
+            s.s[ch] = slowEnvelope;
+        }
+        return Status::ok;
+    };
+    // Two-lane NEON did not amortize the staged precise loop on Quest 3
+    // (double regressed); retain its original scalar recurrence and pow path.
+    // The SIMD exponent stays available for independent numerical verification.
+    if (p.math == MathAccuracy::precise && table.transientExponent &&
+        table.backend != CpuBackend::neon)
+        return runPreciseTiled(table.transientExponent);
     const auto run = [&]<bool Fast, bool GainOnly>() noexcept {
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
             auto fastEnvelope = s.f[ch], slowEnvelope = s.s[ch];

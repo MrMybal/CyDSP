@@ -46,6 +46,10 @@ template <class T> struct Kernels {
     void (*convolutionEmit)(const T*, const T*, T*, T*, std::size_t, T) noexcept = nullptr;
     void (*cubicDirect)(const T*, T*, std::size_t, const double*, double, double, double, double,
                         bool) noexcept = nullptr;
+    void (*eqDetectPair)(const T*, const T*, double*, double*, std::size_t, const double*, double*,
+                         double, double) noexcept = nullptr;
+    void (*foldDirect)(const T*, T*, std::size_t, const double*, double, double, double, double,
+                       bool) noexcept = nullptr;
 };
 struct CompressorCurve {
     double thresholdDb, ratio, kneeDb, lower, upper, threshold, slope;
@@ -87,6 +91,10 @@ struct VectorTable {
     void (*adaaCubic)(const double*, double*, std::size_t, double, bool, double,
                       double) noexcept = nullptr;
     void (*shapeCubic)(const double*, double*, std::size_t, double, double) noexcept = nullptr;
+    void (*eqApplyPair)(double*, double*, const double*, const double*, std::size_t, const double*,
+                        double*) noexcept = nullptr;
+    void (*transientExponent)(const double*, const double*, double*, std::size_t,
+                              const double*) noexcept = nullptr;
 };
 struct VectorAccess {
     template <class T> static const Kernels<T>& kernels(const VectorOps& ops) noexcept {

@@ -1,8 +1,13 @@
-# CyDSP 0.3.1
+# CyDSP 0.3.2
 
 **IN DEVELOPMENT.** Source distribution; no binary release is published.
 
 ## Changes
+
+- 0.3.2: fuse the direct wavefolder input/shape/mix in the x64 and ARM64 SIMD backends. Cache the saturation DC compensation when its shape/bias changes.
+- 0.3.2: vectorize the precise transient's rational/decibel stage while retaining each scalar `std::pow(10, exponent)` and its original exponent. Two-lane NEON retains the faster original scalar precise loop measured on Quest 3. Process independent dynamic-EQ channels in pairs, with unchanged ordered double filter/envelope recurrences; cache unchanged band coefficients and time constants.
+- 0.3.2: avoid convolution snapshots for disjoint input/output, duplicate clears of mapped outputs and repeated internal span validation; use the SIMD overlap emitter in regular partition tiers. Zero latency, routing, alias handling and scheduled work budgets are preserved.
+- Public processing signatures and quality defaults are unchanged. Rebuild the archive and its consumers together: the private layout of `MatrixConvolver` changed. A fused tanh experiment was rejected after it slowed both measured CPUs; its original tiled path is retained.
 
 - 0.3.1: share saturation and dynamics tile laws across AVX2, AVX-512, ARM64 NEON and vector-length-agnostic SVE. Add SIMD cubic (direct and ADAA), and vector tanh evaluation for the hysteresis model while retaining its sequential memory recurrence. Public APIs and default quality policies are unchanged. NEON retains the faster cached scalar primitive for cubic ADAA; its direct path is fused SIMD.
 - 0.3.1: bound fused progressive FFT jobs to 64 butterflies, simplify partial real-partition packing and vectorize overlap publication. Existing latency and work-budget contracts remain in force.

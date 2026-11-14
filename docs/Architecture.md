@@ -63,6 +63,20 @@ recurrences retain their sample order. ARM32 keeps the portable double fallback.
 Progressive convolution may fuse two FFT stages only when their combined job
 stays within 64 butterflies; advertised work-unit counts remain conservative.
 
+Direct wavefolding fuses typed drive, shaping and publication without changing
+intermediate sample rounding. Saturation caches its DC term by the exact shape
+and bias bits (including signed zero). Precise transient tiles vectorize only the
+quotients and decimal exponent; each nonzero exponent still uses scalar std::pow.
+Two-lane NEON retains the original scalar precise transient loop after it
+proved faster on Quest 3, while its private SIMD exponent remains oracle-tested.
+Dynamic EQ pairs independent channels in two double lanes (SSE2 within the x64
+ISA units, NEON within ARM64 units), retaining the exact time recurrence. Odd
+remaining channels use the original scalar recurrence. Coefficient cache updates
+commit only after every requested band validates.
+Matrix convolution snapshots inputs only for aliases. Prepared per-tier coverage
+clears only unmapped output channels; mapped channels are overwritten in full,
+including partial partitions. All public shape/alias checks precede output writes.
+
 ## Lifecycle and memory
 
 Preparation validates first and commits the new configuration only on success;

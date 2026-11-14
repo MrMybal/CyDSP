@@ -8,6 +8,15 @@ namespace cydsp::detail {
 namespace {
 struct Double2 {
     using Reg = float64x2_t;
+    static CYDSP_SIMD_INLINE Reg pair(double a, double b) noexcept {
+        return vsetq_lane_f64(b, vdupq_n_f64(a), 1);
+    }
+    static CYDSP_SIMD_INLINE double first(Reg x) noexcept {
+        return vgetq_lane_f64(x, 0);
+    }
+    static CYDSP_SIMD_INLINE double second(Reg x) noexcept {
+        return vgetq_lane_f64(x, 1);
+    }
     using Mask = uint64x2_t;
     static constexpr std::size_t maxWidth = 2;
     static constexpr std::size_t lanes() noexcept {

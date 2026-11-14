@@ -357,7 +357,9 @@ const VectorTable& sveTable() noexcept {
                                         nullptr,
                                         nullptr,
                                         convolutionEmit<float>,
-                                        cubicDirectF32},
+                                        cubicDirectF32,
+                                        dynamicEqDetectPair,
+                                        foldDirectF32},
                                        {multiplyF64,
                                         complexMacF64,
                                         butterflyF64,
@@ -381,7 +383,9 @@ const VectorTable& sveTable() noexcept {
                                         nullptr,
                                         nullptr,
                                         convolutionEmit<double>,
-                                        cubicDirectF64},
+                                        cubicDirectF64,
+                                        dynamicEqDetectPair,
+                                        foldDirectF64},
                                        dotMixed,
                                        adaaFoldSimd,
                                        adaaClipSimd,
@@ -396,7 +400,9 @@ const VectorTable& sveTable() noexcept {
                                        transientGainSimd,
                                        minimumSimd,
                                        adaaCubicSimd,
-                                       shapeCubicSimd};
+                                       shapeCubicSimd,
+                                       dynamicEqApplyPair,
+                                       transientExponentSimd};
     return table;
 }
 } // namespace cydsp::detail

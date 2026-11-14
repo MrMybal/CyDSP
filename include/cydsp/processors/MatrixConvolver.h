@@ -65,6 +65,7 @@ class MatrixConvolver {
         RealFft<T> fft;
         VectorOps ops;
         std::vector<std::size_t> inputs, outputs;
+        std::vector<unsigned char> coveredOutputs;
         std::vector<Filter> routes;
         std::vector<Job> jobs;
         std::vector<T> input, ready, overlap, time;

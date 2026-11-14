@@ -1,8 +1,13 @@
-# CyDSP 0.3.1
+# CyDSP 0.3.2
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
+
+- 0.3.2 : fusion SIMD du drive, du wavefolder direct et du mixage sur x64/ARM64. Compensation DC mise en cache lorsque la forme ou le biais change.
+- 0.3.2 : quotients et calcul en dB du transient précis vectorisés, en conservant chaque appel scalaire à `std::pow(10, exposant)` et son exposant d’origine. Le mode précis NEON à deux voies conserve la boucle scalaire d’origine, plus rapide sur le Quest 3. EQ dynamique par paires de canaux indépendants, avec les mêmes récurrences doubles et le cache des coefficients/constantes inchangés.
+- 0.3.2 : convolution sans copie d’entrée lorsque les buffers sont disjoints, sans double effacement des sorties réécrites et sans revalidation des vues internes déjà vérifiées. Publication SIMD des recouvrements des partitions ordinaires. Latence nulle, routage, alias et budgets de travail conservés.
+- Signatures de traitement et qualité par défaut inchangées. Recompiler ensemble l’archive et ses consommateurs : la disposition privée de `MatrixConvolver` change. La tentative de fusion supplémentaire de la tanh a été écartée après un ralentissement sur les deux CPU mesurés ; le chemin par tuiles est conservé.
 
 - 0.3.1 : partage des courbes de saturation et de dynamique entre AVX2, AVX-512, NEON ARM64 et SVE à longueur vectorielle variable. Ajout du cubic SIMD (direct et ADAA) et de l’évaluation vectorielle de tanh pour l’hystérésis, en conservant sa mémoire séquentielle. API publiques et politiques de qualité par défaut inchangées. NEON conserve la primitive scalaire mise en cache pour le cubic ADAA, plus rapide sur Quest ; son chemin direct utilise une passe SIMD fusionnée.
 - 0.3.1 : fusion des travaux FFT progressifs avec une borne de 64 papillons, simplification du remplissage des partitions réelles partielles et publication vectorielle du recouvrement. Latence et budgets de travail conservés.

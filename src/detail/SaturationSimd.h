@@ -15,6 +15,7 @@
 #endif
 #if defined(__aarch64__) || defined(_M_ARM64)
 #if defined(__ARM_FEATURE_SVE)
+#include "SimdNeon.h"
 #include "SimdSve.h"
 #else
 #include "SimdNeon.h"
@@ -486,11 +487,11 @@ CYDSP_SIMD_INLINE void simdShapeCubic(const double* x, double* y, std::size_t n,
         }
     }
 }
-// Fused typed cubic drive/shape/publication; avoids three short tile passes.
-template <class V, class T>
-CYDSP_SIMD_INLINE void simdCubicDirect(const T* in, T* out, std::size_t n, const double* stage,
-                                       double dc, double gain, double dryGain, double wetGain,
-                                       bool mixed) noexcept {
+// Fused typed piecewise drive/shape/publication; retains intermediate rounding.
+template <class V, int Kind, class T>
+CYDSP_SIMD_INLINE void simdPiecewiseDirect(const T* in, T* out, std::size_t n, const double* stage,
+                                           double dc, double gain, double dryGain, double wetGain,
+                                           bool mixed) noexcept {
     const auto w = V::lanes();
     std::size_t i = 0;
     for (; n - i >= w; i += w) {
@@ -500,7 +501,7 @@ CYDSP_SIMD_INLINE void simdCubicDirect(const T* in, T* out, std::size_t n, const
             x = V::mul(V::add(V::mul(x, V::set(stage[0])), V::set(stage[1])), V::set(stage[2]));
         x = V::min(V::max(V::add(V::mul(x, V::set(stage[3])), V::set(stage[4])), V::set(-1e6)),
                    V::set(1e6));
-        auto value = V::mul(V::sub(simdPiecewise<V, 0, false>(x), V::set(dc)), V::set(gain));
+        auto value = V::mul(V::sub(simdPiecewise<V, Kind, false>(x), V::set(dc)), V::set(gain));
         if (mixed)
             value = V::add(V::mul(V::set(dryGain), dry),
                            V::mul(V::set(wetGain), V::rounded(value, out)));
@@ -512,8 +513,14 @@ CYDSP_SIMD_INLINE void simdCubicDirect(const T* in, T* out, std::size_t n, const
         if (mixed)
             x = (x * stage[0] + stage[1]) * stage[2];
         x = std::clamp(x * stage[3] + stage[4], -1e6, 1e6);
-        const auto value =
-            T(((std::abs(x) <= 1 ? x - x * x * x / 3 : std::copysign(2. / 3, x)) - dc) * gain);
+        double shaped;
+        if constexpr (Kind == 0)
+            shaped = std::abs(x) <= 1 ? x - x * x * x / 3 : std::copysign(2. / 3, x);
+        else {
+            const auto r = x - 4 * std::floor(x * .25 + .5);
+            shaped = std::abs(r) <= 1 ? r : std::copysign(2 - std::abs(r), r);
+        }
+        const auto value = T((shaped - dc) * gain);
         out[i] = mixed ? T(dryGain * double(dry) + wetGain * double(value)) : value;
     }
 }

@@ -120,6 +120,26 @@ CYDSP_SIMD_INLINE void simdTransientGain(const double* fast, const double* slow,
             return simdExp<V>(V::mul(decibels, V::set(std::numbers::ln10 / 20)));
         });
 }
+// Precise path: vectorize only the rational/decibel stage. The caller still
+// evaluates std::pow(10, exponent) for every nonzero exponent, without replacing
+// it with the fast exponential or changing division/multiplication order.
+template <class V>
+CYDSP_SIMD_INLINE void simdTransientExponent(const double* fast, const double* slow,
+                                             double* exponents, std::size_t n,
+                                             const double* parameters) noexcept {
+    simdMap2<V>(
+        fast, slow, exponents, n, [parameters](typename V::Reg f, typename V::Reg s) noexcept {
+            const auto floor = V::max(V::set(1e-12), f);
+            const auto attack = simdClamp<V>(V::div(V::sub(f, s), floor), 0, 1);
+            const auto sustain =
+                V::mul(simdClamp<V>(V::div(s, floor), 0, 1), V::sub(V::set(1), attack));
+            const auto db = V::mul(V::set(parameters[2]),
+                                   simdClamp<V>(V::add(V::mul(V::set(parameters[0]), attack),
+                                                       V::mul(V::set(parameters[1]), sustain)),
+                                                -1, 1));
+            return V::div(db, V::set(20));
+        });
+}
 // Compressor/limiter transfer curve. Envelope is finite in [0,1e100], output is
 // disjoint; gain is always normal. Groups entirely below the knee are unity and
 // groups entirely above it use square roots for the common ratios; the others
