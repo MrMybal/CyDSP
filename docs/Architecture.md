@@ -426,3 +426,69 @@ history, then fill the remaining midpoint output. No silence detector threshold 
 state reset is introduced; the shortcut requires exact equality of input samples.
 
 Measured results and precision limits of this pass: [detailed hotspot report](DetailedHotspotOptimization.fr.md).
+
+
+## Prepared automation and nonlinear quality
+
+`PeakingBiquadDesigner` prepares the sample rate, frequency and Q once, then designs
+changing gain values without repeating the trigonometry. A design can be shared
+between channels with independent filter states. `designFor<float>` checks the
+stability of the rounded coefficients before publication. Invalid preparation or
+design leaves the previous plan or output intact.
+
+`PreparedAcousticMaterial` and `PreparedMaterialBand` validate static material
+properties once. The monoband API returns transmission and reflection together;
+the existing three-band API also avoids repeating identical bands. All variants
+retain the same thickness, scattering and energy model. `DopplerPlan` prepares
+sound speed, intensity and the semitone limit for repeated radial-velocity updates.
+These plans contain no mutable processing history: const evaluations can share a
+plan while preparation remains externally serialized.
+
+`TransientShaper::processGain` advances the same envelopes as `process` and returns
+linear gain directly, including on a zero detector input. Its `MathAccuracy::precise`
+default retains the original decimal-power formula. `MathAccuracy::fast` explicitly
+selects the bounded double-precision exponential kernel for the final gain; the
+envelopes and transfer law remain unchanged. Prepare one detector
+channel for a linked stereo application, then apply that gain to both program
+channels. This avoids recovering gain by dividing a processed detector by its input.
+
+`Dynamics::processMixed` combines wet processing with caller-supplied linear dry/wet
+gains. Dry follows the processor's lookahead delay and clears with it on reset or a
+lookahead change. Meters retain the wet dynamics gain, before mixing. The wet sample
+is rounded to the processor's sample type before the mix, matching a separate chain.
+`AdaaSaturator::processMixed` additionally accepts `SaturationInputStage`; its input
+transform runs in double before the processor's drive/bias and driven-input clamp.
+The input stage adds no separate DC compensation. Both mixed APIs preflight their
+arguments and block layout before changing processing state, support corresponding
+in-place buffers, and use prepared storage without allocations or locks.
+
+Saturation retains **ADAA enabled** and `MathAccuracy::precise` by default.
+`MathAccuracy::fast` explicitly permits the original vector approximation of the
+atan ADAA primitive when available. Near-equal endpoints retain the precise limit;
+slow inputs and unsupported backends can use the precise path. It does not turn off
+ADAA. `antialias=false` independently selects the direct memoryless transfer function,
+which may produce more aliasing. Hysteresis remains the documented stateful model.
+No mode enables compiler fast-math, FMA contraction or global floating-point changes.
+
+`qualitySettings` suggests `saturationAntialias=false` and `saturationMath=fast` for
+an explicitly selected economy profile; `transientMath` also becomes `fast`.
+Realtime-high and offline retain precise math and ADAA. These are host-applied settings, not an automatic global switch:
+
+```cpp
+cydsp::SaturationParameters settings;
+settings.antialias = policy.saturationAntialias;
+settings.math = policy.saturationMath;
+cydsp::TransientParameters transientSettings;
+transientSettings.math = policy.transientMath;
+```
+
+Check the returned statuses when preparing and applying parameters. Numerical and
+spectral/processing regressions remain opt-in; `cydsp_prepared_measurements` measures
+FFT and transient paths, and `--advanced` also compares prepared plans and mixed
+processing with separate chains. Preparation is outside the timed sections.
+
+The FFT plans keep forward/inverse scaling and alias contracts. Real transforms
+fuse packing or recombination with the prepared permutation, and inverse scaling
+with restitution. Available SIMD backends may pair adjacent radix-2 stages and
+vectorize real-spectrum conversion. The existing convolution configurations and
+reported latency are preserved; these changes do not select a cheaper quality mode.

@@ -9,6 +9,13 @@ struct SaturationParameters {
     AdaaShape shape = AdaaShape::tanh;
     double drive = 1, bias = 0, outputGain = 1, hysteresisWidth = .1, hysteresisAmount = .5;
     bool antialias = true;
+    // Fast permits a bounded atan ADAA approximation; antialias is independent.
+    MathAccuracy math = MathAccuracy::precise;
+};
+// Applied in double before the saturator's drive/bias: (input*gain+bias)*scale.
+// |gain|<=1e4, |bias|<=1e3, scale in [0,64]. No extra DC compensation is applied.
+struct SaturationInputStage {
+    double gain = 1, bias = 0, scale = 1;
 };
 // First-order ADAA for memoryless shapes, with the midpoint limit near equal
 // samples. Hysteresis uses a bounded play operator followed by tanh; it is a
@@ -22,9 +29,19 @@ template <Sample T> class AdaaSaturator {
     [[nodiscard]] Status prepare(const ProcessSpec&) noexcept;
     [[nodiscard]] Status setParameters(const SaturationParameters&) noexcept;
     [[nodiscard]] Status process(AudioBlock<const T>, AudioBlock<T>) noexcept;
+    // Input transform, shaping and linear mixing share the same prepared state.
+    // dryGain/wetGain must be finite with magnitude <=16; wet is rounded to T
+    // before mixing, as in a separate processor and mixer chain.
+    [[nodiscard]] Status processMixed(AudioBlock<const T>, AudioBlock<T>,
+                                      const SaturationInputStage&, double dryGain = 0,
+                                      double wetGain = 1) noexcept;
     void reset() noexcept;
 
   private:
+    template <bool Mixed>
+    [[nodiscard]] Status processImpl(AudioBlock<const T>, AudioBlock<T>,
+                                     const SaturationInputStage&, double dryGain,
+                                     double wetGain) noexcept;
     struct State;
     std::unique_ptr<State> state_;
 };
@@ -77,6 +94,8 @@ template <Sample T> class DeEsser {
 };
 struct TransientParameters {
     double attack = 0, sustain = 0, fastMs = 1, slowMs = 30, releaseMs = 150, maximumGainDb = 24;
+    // Fast uses a bounded exponential for gain; precise retains std::pow.
+    MathAccuracy math = MathAccuracy::precise;
 };
 template <Sample T> class TransientShaper {
   public:
@@ -87,9 +106,13 @@ template <Sample T> class TransientShaper {
     [[nodiscard]] Status prepare(const ProcessSpec&) noexcept;
     [[nodiscard]] Status setParameters(const TransientParameters&) noexcept;
     [[nodiscard]] Status process(AudioBlock<const T>, AudioBlock<T>) noexcept;
+    // The detector has the prepared channel count; output is linear gain, even
+    // when the detector is zero. It advances the same envelopes as process().
+    [[nodiscard]] Status processGain(AudioBlock<const T> detector, AudioBlock<T> gains) noexcept;
     void reset() noexcept;
 
   private:
+    [[nodiscard]] Status processImpl(AudioBlock<const T>, AudioBlock<T>, bool gainOnly) noexcept;
     struct State;
     std::unique_ptr<State> state_;
 };

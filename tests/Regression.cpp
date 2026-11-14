@@ -165,6 +165,7 @@ template <class T> void fft() {
 }
 } // namespace
 // This source is compiled as an OBJECT by --compile-checks; it is not linked/run.
+void preparedOptimizationRegression();
 void hotspotRegression();
 void advancedRegression();
 void filtersRegression();
@@ -193,13 +194,48 @@ void matrixSchedulingRegression();
 void expandedRegression();
 void stretchFftRegression();
 int main() {
- try {
-  hotspotRegression(); advancedExpansionContracts(); advancedExpansionRegression(); expansionContracts(); restorationDiagnosticsRegression(); musicalPhysicalRegression(); creativeRegression(); advancedDynamicsRegression(); spatialRenderingRegression(); acousticRegression(); spatialFoundationRegression(); multiBusGraphRegression(); advancedFoundationRegression(); foundationRegression(); granulationRegression(); audioAnalysisRegression(); performanceRegression(); dawExpansionRegression(); stretchFftRegression(); expandedRegression();
-  variableSincRealtimeRegression(); realtimeRegression(); schedulingRegression();
-  matrixSchedulingRegression(); optimizationRegression(); completionRegression();
-  routingRegression(); filtersRegression(); advancedRegression();
-  vectors<float>(); vectors<double>(); buffersAndGain(); filters(); fft<float>(); fft<double>();
-  std::cout << "PASS independent CyDSP DSP/SIMD/FFT/convolution/resampling/sampler/realtime\n";
-  return 0;
- } catch (const std::exception& e) { std::cerr << "FAIL: " << e.what() << '\n'; return 1; }
+    try {
+        preparedOptimizationRegression();
+        hotspotRegression();
+        advancedExpansionContracts();
+        advancedExpansionRegression();
+        expansionContracts();
+        restorationDiagnosticsRegression();
+        musicalPhysicalRegression();
+        creativeRegression();
+        advancedDynamicsRegression();
+        spatialRenderingRegression();
+        acousticRegression();
+        spatialFoundationRegression();
+        multiBusGraphRegression();
+        advancedFoundationRegression();
+        foundationRegression();
+        granulationRegression();
+        audioAnalysisRegression();
+        performanceRegression();
+        dawExpansionRegression();
+        stretchFftRegression();
+        expandedRegression();
+        variableSincRealtimeRegression();
+        realtimeRegression();
+        schedulingRegression();
+        matrixSchedulingRegression();
+        optimizationRegression();
+        completionRegression();
+        routingRegression();
+        filtersRegression();
+        advancedRegression();
+        vectors<float>();
+        vectors<double>();
+        buffersAndGain();
+        filters();
+        fft<float>();
+        fft<double>();
+        std::cout
+            << "PASS independent CyDSP DSP/SIMD/FFT/convolution/resampling/sampler/realtime\n";
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << "FAIL: " << e.what() << '\n';
+        return 1;
+    }
 }

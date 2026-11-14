@@ -1,6 +1,7 @@
 #include "cydsp/processors/ComplexFft.h"
 #include "detail/Alias.h"
 #include "detail/FftAlgorithm.h"
+#include "detail/FftPlanAccess.h"
 #include "detail/VectorTable.h"
 #include <cmath>
 #include <new>
@@ -52,13 +53,21 @@ Status ComplexFft<T>::process(std::span<const std::complex<T>> input,
     if (input.data() != output.data() &&
         detail::overlaps(input.data(), input.size_bytes(), output.data(), output.size_bytes()))
         return Status::partial_overlap;
-    detail::fftTransformStages<T>(
-        input, output, reverse_, twiddles_, direction == FftDirection::inverse,
-        [this](auto data, auto weights, std::size_t half, bool inverse) noexcept {
-            detail::VectorAccess::kernels<T>(ops_).fftStage(
-                reinterpret_cast<T*>(data.data()), reinterpret_cast<const T*>(weights.data()),
-                data.size(), half, inverse);
-        });
+    if (input.data() == output.data()) {
+        for (std::size_t i = 0; i < input.size(); ++i)
+            if (reverse_[i] > i)
+                std::swap(output[i], output[reverse_[i]]);
+    } else {
+        for (std::size_t i = 0; i < input.size(); ++i)
+            output[reverse_[i]] = input[i];
+    }
+    detail::FftPlanAccess::transformPermutedUnscaled(*this, output,
+                                                     direction == FftDirection::inverse);
+    if (direction == FftDirection::inverse) {
+        const auto scale = T{1} / static_cast<T>(input.size());
+        for (auto& value : output)
+            value *= scale;
+    }
     return Status::ok;
 }
 template class ComplexFft<float>;

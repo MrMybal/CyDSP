@@ -1,5 +1,6 @@
 #include "cydsp/processors/RealFft.h"
 #include "detail/Alias.h"
+#include "detail/FftPlanAccess.h"
 #include "detail/RealFftAlgorithm.h"
 #include <algorithm>
 #include <cmath>
@@ -48,9 +49,17 @@ Status RealFft<T>::forward(std::span<const T> input, std::span<std::complex<T>> 
         output[0] = {input[0], T{0}};
         return Status::ok;
     }
-    detail::packReal<T>(input, scratch_);
-    (void)fft_.process(scratch_, scratch_, FftDirection::forward);
-    detail::splitRealSpectrum<T>(scratch_, twiddles_, output);
+    const auto reverse = detail::FftPlanAccess::reverse(fft_);
+    for (std::size_t i = 0; i < scratch_.size(); ++i)
+        scratch_[reverse[i]] = {input[2 * i], input[2 * i + 1]};
+    detail::FftPlanAccess::transformPermutedUnscaled<T>(fft_, scratch_, false);
+    const auto split = detail::FftPlanAccess::kernels(fft_).realSplit;
+    if (split && scratch_.size() >= 4)
+        split(reinterpret_cast<const T*>(scratch_.data()),
+              reinterpret_cast<const T*>(twiddles_.data()), reinterpret_cast<T*>(output.data()),
+              scratch_.size());
+    else
+        detail::splitRealSpectrum<T>(scratch_, twiddles_, output);
     return Status::ok;
 }
 template <Sample T>
@@ -68,9 +77,15 @@ Status RealFft<T>::inverse(std::span<const std::complex<T>> input, std::span<T> 
         output[0] = input[0].real();
         return Status::ok;
     }
-    detail::mergeRealSpectrum<T>(input, twiddles_, scratch_);
-    (void)fft_.process(scratch_, scratch_, FftDirection::inverse);
-    detail::scatterReal<T>(scratch_, output);
+    const auto reverse = detail::FftPlanAccess::reverse(fft_);
+    for (std::size_t k = 0; k < scratch_.size(); ++k)
+        scratch_[reverse[k]] = detail::mergeRealBin<T>(input, twiddles_, k);
+    detail::FftPlanAccess::transformPermutedUnscaled<T>(fft_, scratch_, true);
+    const auto scale = T{1} / static_cast<T>(scratch_.size());
+    for (std::size_t i = 0; i < scratch_.size(); ++i) {
+        output[2 * i] = scratch_[i].real() * scale;
+        output[2 * i + 1] = scratch_[i].imag() * scale;
+    }
     return Status::ok;
 }
 template class RealFft<float>;

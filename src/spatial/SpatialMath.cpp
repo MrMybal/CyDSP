@@ -246,33 +246,153 @@ Status directivityGains(double cosine, const Directivity& p,
     output = result;
     return Status::ok;
 }
+namespace {
+bool validThickness(double thickness) noexcept {
+    return isFinite(thickness) && thickness >= 0 && thickness <= 1e6;
+}
+bool validMaterialBand(const AcousticMaterialBand& m) noexcept {
+    return isFinite(m.referenceThicknessMetres) && m.referenceThicknessMetres >= 1e-6 &&
+           m.referenceThicknessMetres <= 1e6 && isFinite(m.scattering) && m.scattering >= 0 &&
+           m.scattering <= 1 && isFinite(m.absorption) && m.absorption >= 0 && m.absorption <= 1 &&
+           isFinite(m.transmissionLossDb) && m.transmissionLossDb >= 0 &&
+           m.transmissionLossDb <= 300;
+}
+MaterialBandResponse evaluateMaterialBand(const AcousticMaterialBand& m,
+                                          double thickness) noexcept {
+    const double scale = thickness / m.referenceThicknessMetres, base = 1 - m.absorption;
+    const double remaining = scale == 0    ? 1
+                             : scale == 1  ? base
+                             : scale == 2  ? base * base
+                             : scale == .5 ? std::sqrt(base)
+                                           : std::pow(base, scale);
+    // Retain the cancellation/rounding policy of the existing energy model.
+    const double absorption = 1 - remaining;
+    const double transmission =
+        std::min(1 - absorption,
+                 detail::audioExp(-m.transmissionLossDb * scale * (std::numbers::ln10 / 10)));
+    return {std::sqrt(transmission),
+            std::sqrt(std::max(0., 1 - absorption - transmission) * (1 - m.scattering))};
+}
+AcousticMaterialBand materialBand(const AcousticMaterial& m, std::size_t b) noexcept {
+    return {m.absorption[b], m.transmissionLossDb[b], m.referenceThicknessMetres, m.scattering};
+}
+} // namespace
+Status materialBandResponse(const AcousticMaterialBand& m, double thickness,
+                            MaterialBandResponse& output) noexcept {
+    if (!validThickness(thickness) || !validMaterialBand(m))
+        return Status::invalid_argument;
+    output = evaluateMaterialBand(m, thickness);
+    return Status::ok;
+}
+Status PreparedMaterialBand::prepare(const AcousticMaterialBand& m) noexcept {
+    if (!validMaterialBand(m))
+        return Status::invalid_argument;
+    material_ = m;
+    prepared_ = true;
+    return Status::ok;
+}
+Status PreparedMaterialBand::response(double thickness,
+                                      MaterialBandResponse& output) const noexcept {
+    if (!prepared_)
+        return Status::not_prepared;
+    if (!validThickness(thickness))
+        return Status::invalid_argument;
+    output = evaluateMaterialBand(material_, thickness);
+    return Status::ok;
+}
+Status PreparedAcousticMaterial::prepare(const AcousticMaterial& m) noexcept {
+    for (std::size_t b = 0; b < 3; ++b)
+        if (!validMaterialBand(materialBand(m, b)))
+            return Status::invalid_argument;
+    material_ = m;
+    identicalBands_ = m.absorption[0] == m.absorption[1] && m.absorption[0] == m.absorption[2] &&
+                      m.transmissionLossDb[0] == m.transmissionLossDb[1] &&
+                      m.transmissionLossDb[0] == m.transmissionLossDb[2];
+    prepared_ = true;
+    return Status::ok;
+}
+Status PreparedAcousticMaterial::response(double thickness,
+                                          MaterialResponse& output) const noexcept {
+    if (!prepared_)
+        return Status::not_prepared;
+    if (!validThickness(thickness))
+        return Status::invalid_argument;
+    MaterialResponse next;
+    if (identicalBands_) {
+        const auto r = evaluateMaterialBand(materialBand(material_, 0), thickness);
+        next.transmission.fill(r.transmission);
+        next.reflection.fill(r.reflection);
+    } else {
+        for (std::size_t b = 0; b < 3; ++b) {
+            const auto r = evaluateMaterialBand(materialBand(material_, b), thickness);
+            next.transmission[b] = r.transmission;
+            next.reflection[b] = r.reflection;
+        }
+    }
+    output = next;
+    return Status::ok;
+}
 Status materialResponse(const AcousticMaterial& material, double thickness,
                         MaterialResponse& output) noexcept {
-    if (!isFinite(thickness) || thickness < 0 || thickness > 1e6 ||
-        !isFinite(material.referenceThicknessMetres) || material.referenceThicknessMetres < 1e-6 ||
-        material.referenceThicknessMetres > 1e6 || !isFinite(material.scattering) ||
-        material.scattering < 0 || material.scattering > 1)
+    if (!validThickness(thickness) || !isFinite(material.referenceThicknessMetres) ||
+        material.referenceThicknessMetres < 1e-6 || material.referenceThicknessMetres > 1e6 ||
+        !isFinite(material.scattering) || material.scattering < 0 || material.scattering > 1)
         return Status::invalid_argument;
-    MaterialResponse result;
-    for (std::size_t b = 0; b < 3; ++b) {
-        const auto a = material.absorption[b], loss = material.transmissionLossDb[b];
-        if (!isFinite(a) || a < 0 || a > 1 || !isFinite(loss) || loss < 0 || loss > 300)
+    for (std::size_t b = 0; b < 3; ++b)
+        if (!isFinite(material.absorption[b]) || material.absorption[b] < 0 ||
+            material.absorption[b] > 1 || !isFinite(material.transmissionLossDb[b]) ||
+            material.transmissionLossDb[b] < 0 || material.transmissionLossDb[b] > 300)
             return Status::invalid_argument;
-        const double scale = thickness / material.referenceThicknessMetres;
-        const double base = 1 - a;
-        const double remaining = scale == 0    ? 1
-                                 : scale == 1  ? base
-                                 : scale == 2  ? base * base
-                                 : scale == .5 ? std::sqrt(base)
-                                               : std::pow(base, scale);
-        const double absorption = 1 - remaining;
-        const double transmission =
-            std::min(1 - absorption, detail::audioExp(-loss * scale * (std::numbers::ln10 / 10)));
-        result.transmission[b] = std::sqrt(transmission);
-        result.reflection[b] =
-            std::sqrt(std::max(0., 1 - absorption - transmission) * (1 - material.scattering));
+    MaterialResponse result;
+    const bool identical = material.absorption[0] == material.absorption[1] &&
+                           material.absorption[0] == material.absorption[2] &&
+                           material.transmissionLossDb[0] == material.transmissionLossDb[1] &&
+                           material.transmissionLossDb[0] == material.transmissionLossDb[2];
+    if (identical) {
+        const auto band = evaluateMaterialBand(materialBand(material, 0), thickness);
+        result.transmission.fill(band.transmission);
+        result.reflection.fill(band.reflection);
+    } else {
+        const auto scale = thickness / material.referenceThicknessMetres;
+        for (std::size_t b = 0; b < 3; ++b) {
+            const auto base = 1 - material.absorption[b];
+            const auto remaining = scale == 0    ? 1
+                                   : scale == 1  ? base
+                                   : scale == 2  ? base * base
+                                   : scale == .5 ? std::sqrt(base)
+                                                 : std::pow(base, scale);
+            const double absorption = 1 - remaining;
+            const double transmission =
+                std::min(1 - absorption, detail::audioExp(-material.transmissionLossDb[b] * scale *
+                                                          (std::numbers::ln10 / 10)));
+            result.transmission[b] = std::sqrt(transmission);
+            result.reflection[b] =
+                std::sqrt(std::max(0., 1 - absorption - transmission) * (1 - material.scattering));
+        }
     }
     output = result;
+    return Status::ok;
+}
+Status DopplerPlan::prepare(double speed, double intensity, double limit) noexcept {
+    if (!isFinite(speed) || speed < 1 || speed > 10000 || !isFinite(intensity) || intensity < 0 ||
+        intensity > 4 || !isFinite(limit) || limit < 0 || limit > 96)
+        return Status::invalid_argument;
+    speed_ = speed;
+    intensity_ = intensity;
+    maximum_ = std::exp2(limit / 12);
+    prepared_ = true;
+    return Status::ok;
+}
+Status DopplerPlan::ratio(double sourceVelocity, double listenerVelocity,
+                          double& output) const noexcept {
+    if (!prepared_)
+        return Status::not_prepared;
+    if (!isFinite(sourceVelocity) || !isFinite(listenerVelocity) ||
+        std::abs(sourceVelocity) > 1e7 || std::abs(listenerVelocity) > 1e7)
+        return Status::invalid_argument;
+    const auto vs = std::clamp(sourceVelocity * intensity_, -.95 * speed_, .95 * speed_),
+               vl = std::clamp(listenerVelocity * intensity_, -.95 * speed_, .95 * speed_);
+    output = std::clamp((speed_ + vl) / (speed_ + vs), 1 / maximum_, maximum_);
     return Status::ok;
 }
 Status evaluatePropagation(const SpatialSource& source, const SpatialListener& listener,

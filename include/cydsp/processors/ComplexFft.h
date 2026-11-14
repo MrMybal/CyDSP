@@ -10,7 +10,7 @@ namespace detail {
 struct FftPlanAccess;
 }
 enum class FftDirection { forward, inverse };
-// Radix-2, contiguous per-stage twiddles, prepared SIMD butterfly selection.
+// Prepared radix-2 FFT with optional paired stages and contiguous SIMD twiddles.
 // Forward unscaled, inverse divided by N. Exact in-place is supported.
 template <Sample T>
     requires(!std::is_const_v<T>)

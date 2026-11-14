@@ -4,6 +4,7 @@
 #include "cydsp/processors/FilterBank.h"
 #include "cydsp/processors/Oversampler.h"
 #include "detail/Analysis.h"
+#include "detail/AudioMath.h"
 #include "detail/VectorTable.h"
 #include <algorithm>
 #include <array>
@@ -13,7 +14,8 @@
 namespace cydsp {
 namespace {
 bool validSaturation(const SaturationParameters& p) noexcept {
-    return unsigned(p.shape) <= unsigned(AdaaShape::hysteresis) && isFinite(p.drive) &&
+    return unsigned(p.math) <= unsigned(MathAccuracy::fast) &&
+           unsigned(p.shape) <= unsigned(AdaaShape::hysteresis) && isFinite(p.drive) &&
            p.drive >= .001 && p.drive <= 64 && isFinite(p.bias) && std::abs(p.bias) <= 4 &&
            isFinite(p.outputGain) && std::abs(p.outputGain) <= 16 && isFinite(p.hysteresisWidth) &&
            p.hysteresisWidth >= 0 && p.hysteresisWidth <= 4 && isFinite(p.hysteresisAmount) &&
@@ -118,6 +120,27 @@ template <Sample T> Status AdaaSaturator<T>::setParameters(const SaturationParam
 }
 template <Sample T>
 Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
+    return processImpl<false>(in, out, {}, 0, 1);
+}
+template <Sample T>
+Status AdaaSaturator<T>::processMixed(AudioBlock<const T> in, AudioBlock<T> out,
+                                      const SaturationInputStage& input, double dryGain,
+                                      double wetGain) noexcept {
+    // Snapshot controls before any caller-owned output can be written.
+    const auto inputSnapshot = input;
+    if (!isFinite(inputSnapshot.gain) || std::abs(inputSnapshot.gain) > 1e4 ||
+        !isFinite(inputSnapshot.bias) || std::abs(inputSnapshot.bias) > 1e3 ||
+        !isFinite(inputSnapshot.scale) || inputSnapshot.scale < 0 || inputSnapshot.scale > 64 ||
+        !isFinite(dryGain) || !isFinite(wetGain) || std::abs(dryGain) > 16 ||
+        std::abs(wetGain) > 16)
+        return Status::invalid_argument;
+    return processImpl<true>(in, out, inputSnapshot, dryGain, wetGain);
+}
+template <Sample T>
+template <bool Mixed>
+Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
+                                     const SaturationInputStage& inputStage, double dryGain,
+                                     double wetGain) noexcept {
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
@@ -127,13 +150,64 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
     status = detail::validateAnalysis(s.spec, in);
     if (status != Status::ok)
         return status;
-    const auto& p = s.p;
+    const auto p = s.p;
+    const auto driven = [&](T value) noexcept {
+        double sample = double(value);
+        if constexpr (Mixed)
+            sample = (sample * inputStage.gain + inputStage.bias) * inputStage.scale;
+        return std::clamp(sample * p.drive + p.bias, -1e6, 1e6);
+    };
+    const auto publish = [&](T dry, double value) noexcept {
+        if constexpr (Mixed)
+            return T(dryGain * double(dry) + wetGain * double(T(value)));
+        else
+            return T(value);
+    };
     const double dc = shape(p.shape, p.bias);
     const auto& table = detail::VectorAccess::table(s.ops);
-    const auto fold = p.shape == AdaaShape::wavefolder ? table.adaaFold
-                      : p.shape == AdaaShape::hardClip ? table.adaaClip
-                      : p.shape == AdaaShape::tanh     ? table.adaaTanh
-                                                       : nullptr;
+    if constexpr (!Mixed) {
+        const auto direct = detail::VectorAccess::kernels<T>(s.ops).clipDirect;
+        if (!p.antialias && p.shape == AdaaShape::hardClip && direct) {
+            for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+                const auto input = in.channel(ch);
+                auto output = out.channel(ch);
+                if (input.empty())
+                    continue;
+                const double last = driven(input.back());
+                direct(input.data(), output.data(), input.size(), p.drive, p.bias, dc,
+                       p.outputGain);
+                s.previous[ch] = last;
+                s.active[ch] = 1;
+                s.primitiveValid[ch] = 0;
+            }
+            return Status::ok;
+        }
+    }
+    auto fold = p.shape == AdaaShape::wavefolder                             ? table.adaaFold
+                : p.shape == AdaaShape::hardClip                             ? table.adaaClip
+                : p.shape == AdaaShape::tanh                                 ? table.adaaTanh
+                : p.shape == AdaaShape::atan && p.math == MathAccuracy::fast ? table.adaaAtanFast
+                                                                             : nullptr;
+    // A cheap policy choice may retain the precise scalar path on nearly
+    // stationary inputs. A false positive affects speed only, never quality.
+    if (p.antialias && p.shape == AdaaShape::atan && p.math == MathAccuracy::fast && fold &&
+        in.frames() >= 8) {
+        bool stationary = true;
+        for (std::size_t ch = 0; ch < in.channels() && stationary; ++ch) {
+            const auto source = in.channel(ch);
+            const auto reference = driven(source.front());
+            for (std::size_t j = 1; j <= 4; ++j) {
+                const auto value = driven(source[(source.size() - 1) * j / 4]);
+                if (std::abs(value - reference) >
+                    .01 * std::max({1., std::abs(value), std::abs(reference)})) {
+                    stationary = false;
+                    break;
+                }
+            }
+        }
+        if (stationary)
+            fold = nullptr;
+    }
     if (p.antialias && fold && in.frames() >= 4) {
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
             const auto source = in.channel(ch);
@@ -142,7 +216,8 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
                             [first = source.front()](T value) { return value == first; })) {
                 // A constant channel still has one possible transition from the
                 // retained driven input; every later sample uses the midpoint law.
-                const double x = std::clamp(double(source.front()) * p.drive + p.bias, -1e6, 1e6);
+                const T dry = source.front();
+                const double x = driven(dry);
                 const double previous = s.previous[ch], delta = x - previous;
                 double first = std::tanh(x);
                 if (s.active[ch]) {
@@ -155,9 +230,9 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
                         first = std::tanh(.5 * (x + previous));
                 }
                 auto destination = out.channel(ch);
-                destination.front() = T((first - dc) * p.outputGain);
+                destination.front() = publish(dry, (first - dc) * p.outputGain);
                 std::fill(destination.begin() + 1, destination.end(),
-                          T((std::tanh(x) - dc) * p.outputGain));
+                          publish(dry, (std::tanh(x) - dc) * p.outputGain));
                 s.previous[ch] = x;
                 s.active[ch] = 1;
                 s.primitiveValid[ch] = 0;
@@ -168,12 +243,12 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
             for (std::size_t offset = 0; offset < in.frames();) {
                 const auto count = std::min(s.foldInput.size(), in.frames() - offset);
                 for (std::size_t i = 0; i < count; ++i)
-                    s.foldInput[i] = std::clamp(
-                        double(in.channel(ch)[offset + i]) * p.drive + p.bias, -1e6, 1e6);
+                    s.foldInput[i] = driven(in.channel(ch)[offset + i]);
                 fold(s.foldInput.data(), s.foldOutput.data(), count, previous, active, dc,
                      p.outputGain);
                 for (std::size_t i = 0; i < count; ++i)
-                    out.channel(ch)[offset + i] = T(s.foldOutput[i]);
+                    out.channel(ch)[offset + i] =
+                        publish(in.channel(ch)[offset + i], s.foldOutput[i]);
                 previous = s.foldInput[count - 1];
                 active = true;
                 offset += count;
@@ -185,6 +260,55 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
         return Status::ok;
     }
     // Select the curve once, allowing each inner loop to inline its primitive.
+    if (!p.antialias && p.shape != AdaaShape::hysteresis) {
+        const auto directRun = [&]<AdaaShape type>() noexcept {
+            for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+                const auto input = in.channel(ch);
+                auto output = out.channel(ch);
+                if (input.empty())
+                    continue;
+                const double last = driven(input.back());
+                if constexpr (type == AdaaShape::hardClip) {
+                    if (!Mixed && p.drive == 1 && p.bias == 0 && p.outputGain == 1) {
+                        for (std::size_t i = 0; i < input.size(); ++i)
+                            output[i] = std::clamp(input[i] + T{0}, T{-1}, T{1});
+                    } else {
+                        for (std::size_t i = 0; i < input.size(); ++i) {
+                            const double x = driven(input[i]);
+                            output[i] = publish(input[i], (shape(type, x) - dc) * p.outputGain);
+                        }
+                    }
+                } else {
+                    for (std::size_t i = 0; i < input.size(); ++i) {
+                        const double x = driven(input[i]);
+                        output[i] = publish(input[i], (shape(type, x) - dc) * p.outputGain);
+                    }
+                }
+                s.previous[ch] = last;
+                s.primitiveValid[ch] = false;
+                s.active[ch] = true;
+            }
+            return;
+        };
+        switch (p.shape) {
+        case AdaaShape::atan:
+            directRun.template operator()<AdaaShape::atan>();
+            break;
+        case AdaaShape::cubic:
+            directRun.template operator()<AdaaShape::cubic>();
+            break;
+        case AdaaShape::hardClip:
+            directRun.template operator()<AdaaShape::hardClip>();
+            break;
+        case AdaaShape::wavefolder:
+            directRun.template operator()<AdaaShape::wavefolder>();
+            break;
+        default:
+            directRun.template operator()<AdaaShape::tanh>();
+            break;
+        }
+        return Status::ok;
+    }
     const auto run = [&]<AdaaShape type>() noexcept {
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
             auto previous = s.previous[ch], previousPrimitive = s.previousPrimitive[ch];
@@ -193,7 +317,7 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
             const auto input = in.channel(ch);
             auto output = out.channel(ch);
             for (std::size_t i = 0; i < in.frames(); ++i) {
-                const double x = std::clamp(double(input[i]) * p.drive + p.bias, -1e6, 1e6);
+                const double x = driven(input[i]);
                 double y;
                 if (type == AdaaShape::hysteresis) {
                     memory = std::clamp(memory, x - p.hysteresisWidth, x + p.hysteresisWidth);
@@ -220,7 +344,7 @@ Status AdaaSaturator<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noex
                 }
                 previous = x;
                 active = true;
-                output[i] = T(y * p.outputGain);
+                output[i] = publish(input[i], y * p.outputGain);
             }
             s.previous[ch] = previous;
             s.previousPrimitive[ch] = previousPrimitive;
@@ -421,17 +545,30 @@ Status TransientShaper<T>::setParameters(const TransientParameters& p) noexcept 
         std::abs(p.sustain) > 1 || !isFinite(p.fastMs) || p.fastMs < 0 || p.fastMs > 1000 ||
         !isFinite(p.slowMs) || p.slowMs < p.fastMs || p.slowMs > 10000 || !isFinite(p.releaseMs) ||
         p.releaseMs < 0 || p.releaseMs > 10000 || !isFinite(p.maximumGainDb) ||
-        p.maximumGainDb < 0 || p.maximumGainDb > 48)
+        p.maximumGainDb < 0 || p.maximumGainDb > 48 ||
+        unsigned(p.math) > unsigned(MathAccuracy::fast))
         return Status::invalid_argument;
     auto& s = *state_;
+    if (s.p.fastMs != p.fastMs)
+        s.fast = pole(p.fastMs, s.spec.sampleRate);
+    if (s.p.slowMs != p.slowMs)
+        s.slow = pole(p.slowMs, s.spec.sampleRate);
+    if (s.p.releaseMs != p.releaseMs)
+        s.release = pole(p.releaseMs, s.spec.sampleRate);
     s.p = p;
-    s.fast = pole(p.fastMs, s.spec.sampleRate);
-    s.slow = pole(p.slowMs, s.spec.sampleRate);
-    s.release = pole(p.releaseMs, s.spec.sampleRate);
     return Status::ok;
 }
 template <Sample T>
 Status TransientShaper<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
+    return processImpl(in, out, false);
+}
+template <Sample T>
+Status TransientShaper<T>::processGain(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
+    return processImpl(in, out, true);
+}
+template <Sample T>
+Status TransientShaper<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
+                                       bool gainOnly) noexcept {
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
@@ -441,19 +578,53 @@ Status TransientShaper<T>::process(AudioBlock<const T> in, AudioBlock<T> out) no
     status = detail::validateAnalysis(s.spec, in);
     if (status != Status::ok)
         return status;
-    for (std::size_t ch = 0; ch < in.channels(); ++ch)
-        for (std::size_t i = 0; i < in.frames(); ++i) {
-            const double x = in.channel(ch)[i], level = std::abs(x);
-            auto& f = s.f[ch];
-            auto& slow = s.s[ch];
-            f = level + (level > f ? s.fast : s.release) * (f - level);
-            slow = level + (level > slow ? s.slow : s.release) * (slow - level);
-            const double attack = std::clamp((f - slow) / std::max(1e-12, f), 0., 1.),
-                         sustain = std::clamp(slow / std::max(1e-12, f), 0., 1.) * (1 - attack);
-            const double db = s.p.maximumGainDb *
-                              std::clamp(s.p.attack * attack + s.p.sustain * sustain, -1., 1.);
-            out.channel(ch)[i] = T(x * std::pow(10., db / 20));
+    const auto p = s.p;
+    const auto fast = s.fast, slowCoefficient = s.slow, release = s.release;
+    const auto frames = in.frames();
+    const auto run = [&]<bool Fast, bool GainOnly>() noexcept {
+        for (std::size_t ch = 0; ch < in.channels(); ++ch) {
+            auto fastEnvelope = s.f[ch], slowEnvelope = s.s[ch];
+            const auto* source = in.channel(ch).data();
+            auto* destination = out.channel(ch).data();
+            for (std::size_t i = 0; i < frames; ++i) {
+                const double x = source[i], level = std::abs(x);
+                fastEnvelope =
+                    level + (level > fastEnvelope ? fast : release) * (fastEnvelope - level);
+                slowEnvelope = level + (level > slowEnvelope ? slowCoefficient : release) *
+                                           (slowEnvelope - level);
+                const double attack = std::clamp((fastEnvelope - slowEnvelope) /
+                                                     std::max(1e-12, fastEnvelope),
+                                                 0., 1.),
+                             sustain =
+                                 std::clamp(slowEnvelope / std::max(1e-12, fastEnvelope), 0., 1.) *
+                                 (1 - attack);
+                const double db =
+                    p.maximumGainDb * std::clamp(p.attack * attack + p.sustain * sustain, -1., 1.);
+                double gain;
+                if constexpr (Fast)
+                    gain = detail::audioExp(db * (std::numbers::ln10 / 20));
+                else
+                    gain = std::pow(10., db / 20);
+                if constexpr (GainOnly)
+                    destination[i] = T(gain);
+                else
+                    destination[i] = T(x * gain);
+            }
+            s.f[ch] = fastEnvelope;
+            s.s[ch] = slowEnvelope;
         }
+    };
+    if (p.math == MathAccuracy::fast) {
+        if (gainOnly)
+            run.template operator()<true, true>();
+        else
+            run.template operator()<true, false>();
+    } else {
+        if (gainOnly)
+            run.template operator()<false, true>();
+        else
+            run.template operator()<false, false>();
+    }
     return Status::ok;
 }
 template <Sample T> void TransientShaper<T>::reset() noexcept {

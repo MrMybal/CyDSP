@@ -75,6 +75,18 @@ struct DistanceAttenuation {
                                   double& gain) noexcept;
 [[nodiscard]] Status dopplerRatio(const RelativeSource&, const AcousticMedium&, double& ratio,
                                   double intensity = 1, double maximumSemitones = 24) noexcept;
+// Prepared limit and sound speed; no full acoustic-medium validation on each update.
+class DopplerPlan {
+  public:
+    [[nodiscard]] Status prepare(double speedMetresPerSecond = 343, double intensity = 1,
+                                 double maximumSemitones = 24) noexcept;
+    [[nodiscard]] Status ratio(double sourceRadialVelocity, double listenerRadialVelocity,
+                               double& output) const noexcept;
+
+  private:
+    double speed_ = 343, intensity_ = 1, maximum_ = 1;
+    bool prepared_ = false;
+};
 enum class DirectivityPattern {
     omni,
     subcardioid,
@@ -101,6 +113,33 @@ struct MaterialResponse {
 };
 [[nodiscard]] Status materialResponse(const AcousticMaterial&, double thicknessMetres,
                                       MaterialResponse&) noexcept;
+struct AcousticMaterialBand {
+    double absorption = .2, transmissionLossDb = 30;
+    double referenceThicknessMetres = .2, scattering = .2;
+};
+struct MaterialBandResponse {
+    double transmission = 0, reflection = 0;
+};
+[[nodiscard]] Status materialBandResponse(const AcousticMaterialBand&, double thicknessMetres,
+                                          MaterialBandResponse&) noexcept;
+class PreparedMaterialBand {
+  public:
+    [[nodiscard]] Status prepare(const AcousticMaterialBand&) noexcept;
+    [[nodiscard]] Status response(double thicknessMetres, MaterialBandResponse&) const noexcept;
+
+  private:
+    AcousticMaterialBand material_;
+    bool prepared_ = false;
+};
+class PreparedAcousticMaterial {
+  public:
+    [[nodiscard]] Status prepare(const AcousticMaterial&) noexcept;
+    [[nodiscard]] Status response(double thicknessMetres, MaterialResponse&) const noexcept;
+
+  private:
+    AcousticMaterial material_;
+    bool prepared_ = false, identicalBands_ = false;
+};
 struct PropagationResult {
     RelativeSource relative;
     AcousticTravel travel;

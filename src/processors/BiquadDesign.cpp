@@ -87,6 +87,28 @@ Status designPeakingBiquad(double sampleRate, double frequency, double q, double
     return publishEq(1 + alpha / a, {1 + alpha * a, -2 * cs, 1 - alpha * a, -2 * cs, 1 - alpha / a},
                      result);
 }
+Status PeakingBiquadDesigner::prepare(double sampleRate, double frequency, double q) noexcept {
+    if (!validEq(sampleRate, frequency, q, 0))
+        return Status::invalid_argument;
+    const auto angle = 2 * std::numbers::pi * (frequency / sampleRate);
+    const auto cosine = std::cos(angle), alpha = std::sin(angle) / (2 * q);
+    if (!isFinite(alpha))
+        return Status::invalid_argument;
+    cosine_ = cosine;
+    alpha_ = alpha;
+    prepared_ = true;
+    return Status::ok;
+}
+Status PeakingBiquadDesigner::design(double gain, BiquadCoefficients& result) const noexcept {
+    if (!prepared_)
+        return Status::not_prepared;
+    if (!isFinite(gain) || gain < -120 || gain > 120)
+        return Status::invalid_argument;
+    const auto a = detail::audioExp(gain * (std::numbers::ln10 / 40));
+    return publishEq(1 + alpha_ / a,
+                     {1 + alpha_ * a, -2 * cosine_, 1 - alpha_ * a, -2 * cosine_, 1 - alpha_ / a},
+                     result);
+}
 Status designShelfBiquad(bool high, double sampleRate, double frequency, double slope, double gain,
                          BiquadCoefficients& result) noexcept {
     if (!validEq(sampleRate, frequency, slope, gain) || slope > 1)

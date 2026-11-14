@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import shutil
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 errors = []
@@ -64,10 +66,10 @@ for folder in ('include', 'src', 'tests', 'examples'):
         for target in re.findall(r'^#include ["<](cydsp/[^">]+|detail/[^">]+)[">]', content, re.M):
             require(any((base / target).is_file() for base in (ROOT / 'include', ROOT / 'src', path.parent)),
                     'Missing include ' + target + ' in ' + str(path))
-        if path.name not in ('Avx2.cpp', 'Avx512.cpp', 'Sve.cpp', 'Sse2.cpp', 'Neon.cpp') and path not in (ROOT / 'src/detail/AdaaAvx.h', ROOT / 'src/detail/FirAvx.h', ROOT / 'src/detail/DynamicsAvx.h', ROOT / 'src/detail/CurveAvx.h'):
+        if path.name not in ('Avx2.cpp', 'Avx512.cpp', 'Sve.cpp', 'Sse2.cpp', 'Neon.cpp') and path not in (ROOT / 'src/detail/AdaaAvx.h', ROOT / 'src/detail/FirAvx.h', ROOT / 'src/detail/DynamicsAvx.h', ROOT / 'src/detail/CurveAvx.h', ROOT / 'src/detail/FftAvx.h', ROOT / 'src/detail/AtanAvx.h'):
             require(not any(header in content for header in ('immintrin.h', 'arm_neon.h', 'arm64_neon.h', 'arm_sve.h')),
                     'ISA intrinsics outside private kernels: ' + str(path))
-        if any(h in content for h in ('#include "detail/AdaaAvx.h"', '#include "detail/FirAvx.h"', '#include "detail/DynamicsAvx.h"')):
+        if any(h in content for h in ('#include "detail/AdaaAvx.h"', '#include "detail/FirAvx.h"', '#include "detail/DynamicsAvx.h"', '#include "detail/FftAvx.h"', '#include "detail/AtanAvx.h"')):
             require(path in (ROOT / 'src/math/Avx2.cpp', ROOT / 'src/math/Avx512.cpp'),
                     'Private ADAA intrinsics included outside ISA translation units: ' + str(path))
         if folder == 'include':
@@ -100,7 +102,20 @@ presets = json.loads((ROOT / 'CMakePresets.json').read_text(encoding='utf-8'))
 for preset in presets['configurePresets']:
     require(preset.get('cacheVariables', {}).get('CYDSP_BUILD_TESTS', 'OFF') == 'OFF',
             'Native tests enabled by preset: ' + preset['name'])
-for path in [ROOT / 'README.md', ROOT / 'README.fr.md', ROOT / 'VERSION.md', ROOT / 'VERSION.fr.md', *(ROOT / 'docs').glob('*.md')]:
+documentation = [ROOT / 'README.md', ROOT / 'README.fr.md', ROOT / 'VERSION.md', ROOT / 'VERSION.fr.md', *(ROOT / 'docs').glob('*.md')]
+# Ignored local notes are not published documentation. Tracked files are never
+# skipped by check-ignore; exported source packages work without Git as before.
+ignored_documentation = set()
+if (ROOT / '.git').exists() and shutil.which('git'):
+    result = subprocess.run(['git', '--no-optional-locks', '-C', str(ROOT), '-c',
+                             'safe.directory=' + ROOT.as_posix(), 'check-ignore', '-z', '--stdin'],
+                            input='\0'.join(p.relative_to(ROOT).as_posix() for p in documentation) + '\0',
+                            text=True, capture_output=True)
+    require(result.returncode in (0, 1), 'Unable to inspect local documentation exclusions')
+    ignored_documentation = set(result.stdout.split('\0'))
+for path in documentation:
+    if path.relative_to(ROOT).as_posix() in ignored_documentation:
+        continue
     for target in re.findall(r'\[[^\]]+\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
         if '://' in target or target.startswith('#'):
             continue

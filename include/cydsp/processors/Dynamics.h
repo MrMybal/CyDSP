@@ -40,6 +40,12 @@ template <Sample T> class Dynamics {
     // Sidechain must be disjoint from output unless it is the program block.
     [[nodiscard]] Status process(AudioBlock<const T> program, AudioBlock<const T> sidechain,
                                  AudioBlock<T>) noexcept;
+    // Linear gains, finite with magnitude <=16. Dry follows the configured
+    // lookahead delay and resets with it; gain meters describe wet dynamics before mixing.
+    [[nodiscard]] Status processMixed(AudioBlock<const T>, AudioBlock<T>, double dryGain,
+                                      double wetGain) noexcept;
+    [[nodiscard]] Status processMixed(AudioBlock<const T>, AudioBlock<const T> sidechain,
+                                      AudioBlock<T>, double dryGain, double wetGain) noexcept;
     [[nodiscard]] double gainReductionDb() const noexcept;
     // Minimum detector gain including makeup in the last nonempty successful block,
     // before the limiter ceiling. Owner-serialized; no output/input division needed.
@@ -47,6 +53,9 @@ template <Sample T> class Dynamics {
     [[nodiscard]] std::size_t latencyFrames() const noexcept;
 
   private:
+    template <bool Mixed>
+    [[nodiscard]] Status processImpl(AudioBlock<const T>, AudioBlock<const T>, AudioBlock<T>,
+                                     double dryGain, double wetGain) noexcept;
     struct State;
     std::unique_ptr<State> state_;
 };

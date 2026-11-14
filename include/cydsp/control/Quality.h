@@ -16,6 +16,8 @@ struct QualitySettings {
     SampleInterpolation sampleInterpolation = SampleInterpolation::bandLimited;
     FdnConfig reverb;
     unsigned oversampling = 4, truePeakFactor = 4;
+    bool saturationAntialias = true;
+    MathAccuracy saturationMath = MathAccuracy::precise, transientMath = MathAccuracy::precise;
     std::size_t suggestedMaximumGrains = 128, transitionFrames = 256;
 };
 // A coherent preparation policy, not a global mutable quality switch. The host

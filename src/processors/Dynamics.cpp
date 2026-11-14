@@ -1,6 +1,7 @@
 #include "cydsp/processors/Dynamics.h"
 #include "detail/Analysis.h"
 #include "detail/AudioMath.h"
+#include "detail/CompressorCurve.h"
 #include "detail/VectorTable.h"
 #include <algorithm>
 #include <array>
@@ -87,6 +88,7 @@ template <Sample T> struct Dynamics<T>::State {
     DynamicsMode mode;
     DynamicsParameters p;
     VectorOps ops;
+    detail::CompressorCurve curve{};
     std::array<double, 64> curveInput{}, curveOutput{};
     std::vector<double> values, gateGain;
     std::vector<std::uint64_t> hold;
@@ -131,6 +133,8 @@ Status Dynamics<T>::prepare(const ProcessSpec& spec, DynamicsMode mode,
         next->peakTimes.resize(spec.channels * next->delayCapacity);
         next->peakRead.resize(spec.channels);
         next->peakCount.resize(spec.channels);
+        next->curve = detail::makeCompressorCurve(next->p.thresholdDb, next->p.ratio,
+                                                  next->p.kneeDb, mode == DynamicsMode::limiter);
         next->attack = coefficient(next->p.attackMs, spec.sampleRate);
         next->release = coefficient(next->p.releaseMs, spec.sampleRate);
         state_.swap(next);
@@ -164,10 +168,16 @@ template <Sample T> Status Dynamics<T>::setParameters(const DynamicsParameters& 
         std::fill(s.peakCount.begin(), s.peakCount.end(), 0);
         s.clock = 0;
     }
+    if (s.p.thresholdDb != p.thresholdDb || s.p.ratio != p.ratio || s.p.kneeDb != p.kneeDb)
+        s.curve = detail::makeCompressorCurve(p.thresholdDb, p.ratio, p.kneeDb,
+                                              s.mode == DynamicsMode::limiter);
+    if (s.p.attackMs != p.attackMs)
+        s.attack = coefficient(p.attackMs, s.spec.sampleRate);
+    if (s.p.releaseMs != p.releaseMs)
+        s.release = coefficient(p.releaseMs, s.spec.sampleRate);
+    if (s.p.makeupDb != p.makeupDb)
+        s.makeup = std::pow(10.0, p.makeupDb / 20);
     s.p = p;
-    s.attack = coefficient(p.attackMs, s.spec.sampleRate);
-    s.release = coefficient(p.releaseMs, s.spec.sampleRate);
-    s.makeup = std::pow(10.0, p.makeupDb / 20);
     return Status::ok;
 }
 template <Sample T> void Dynamics<T>::reset() noexcept {
@@ -201,6 +211,31 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept 
 template <Sample T>
 Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
                             AudioBlock<T> out) noexcept {
+    return processImpl<false>(in, side, out, 0, 1);
+}
+template <Sample T>
+Status Dynamics<T>::processMixed(AudioBlock<const T> in, AudioBlock<T> out, double dryGain,
+                                 double wetGain) noexcept {
+    return processMixed(in, in, out, dryGain, wetGain);
+}
+template <Sample T>
+Status Dynamics<T>::processMixed(AudioBlock<const T> in, AudioBlock<const T> side,
+                                 AudioBlock<T> out, double dryGain, double wetGain) noexcept {
+    if (!isFinite(dryGain) || !isFinite(wetGain) || std::abs(dryGain) > 16 ||
+        std::abs(wetGain) > 16)
+        return Status::invalid_argument;
+    return processImpl<true>(in, side, out, dryGain, wetGain);
+}
+template <Sample T>
+template <bool Mixed>
+Status Dynamics<T>::processImpl(AudioBlock<const T> in, AudioBlock<const T> side, AudioBlock<T> out,
+                                double dryGain, double wetGain) noexcept {
+    const auto publish = [=](double dry, double value) noexcept {
+        if constexpr (Mixed)
+            return T(dryGain * dry + wetGain * double(T(value)));
+        else
+            return T(value);
+    };
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
@@ -233,9 +268,8 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
                                 ? std::uint64_t(std::ceil(s.p.holdMs * s.spec.sampleRate / 1000))
                                 : 0;
     const double halfKnee = s.p.kneeDb * 0.5;
-    const double slope = s.mode == DynamicsMode::limiter ? -1.0 : 1.0 / s.p.ratio - 1;
-    const double ceiling =
-        s.mode == DynamicsMode::limiter ? std::pow(10.0, s.p.thresholdDb / 20) : 1;
+    const double slope = s.curve.slope;
+    const double ceiling = s.mode == DynamicsMode::limiter ? s.curve.threshold : 1;
     // With linked channels and equal retained envelopes, a zero-lookahead
     // compressor/limiter has one detector and one transfer curve per frame.
     // After unlinked operation the envelopes may differ: retain the general
@@ -247,18 +281,25 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
                     [&](double v) { return v == s.values.front(); });
     if (linkedCurve) {
         double envelopeState = s.values.front(), db = s.reduction, lastEnvelope = 0;
-        const double lowerKnee = std::pow(10.0, (s.p.thresholdDb - halfKnee) / 20);
-        const double upperKnee = std::pow(10.0, (s.p.thresholdDb + halfKnee) / 20);
-        const double threshold = std::pow(10.0, s.p.thresholdDb / 20);
-        const auto curve = detail::VectorAccess::table(s.ops).compressorGain;
-        if (curve && in.frames() >= 4) {
+        const double lowerKnee = s.curve.lower, upperKnee = s.curve.upper,
+                     threshold = s.curve.threshold;
+        const auto& table = detail::VectorAccess::table(s.ops);
+        const auto curve = table.compressorGain;
+        const auto preparedCurve = table.compressorGainPrepared;
+        if ((curve || preparedCurve) && in.frames() >= 4) {
             for (std::size_t offset = 0; offset < in.frames();) {
                 const auto count = std::min(s.curveInput.size(), in.frames() - offset);
+                const auto* first = side.channel(0).data() + offset;
+                const auto* second =
+                    side.channels() == 2 ? side.channel(1).data() + offset : nullptr;
                 for (std::size_t i = 0; i < count; ++i) {
-                    double magnitude = 0;
-                    for (std::size_t ch = 0; ch < side.channels(); ++ch)
-                        magnitude =
-                            std::max(magnitude, std::abs(double(side.channel(ch)[offset + i])));
+                    double magnitude = std::abs(double(first[i]));
+                    if (second)
+                        magnitude = std::max(magnitude, std::abs(double(second[i])));
+                    else if (side.channels() > 2)
+                        for (std::size_t ch = 1; ch < side.channels(); ++ch)
+                            magnitude =
+                                std::max(magnitude, std::abs(double(side.channel(ch)[offset + i])));
                     const double detector =
                         s.p.detector == DetectorMode::rms ? magnitude * magnitude : magnitude;
                     envelopeState = advance(detector, envelopeState, s.attack, s.release);
@@ -267,8 +308,11 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
                                           : envelopeState;
                 }
                 lastEnvelope = s.curveInput[count - 1];
-                curve(s.curveInput.data(), s.curveOutput.data(), count, s.p.thresholdDb, s.p.ratio,
-                      s.p.kneeDb, s.mode == DynamicsMode::limiter);
+                if (preparedCurve)
+                    preparedCurve(s.curveInput.data(), s.curveOutput.data(), count, s.curve);
+                else
+                    curve(s.curveInput.data(), s.curveOutput.data(), count, s.p.thresholdDb,
+                          s.p.ratio, s.p.kneeDb, s.mode == DynamicsMode::limiter);
                 for (std::size_t i = 0; i < count; ++i)
                     minimumGain = std::min(minimumGain, s.curveOutput[i] * s.makeup);
                 for (std::size_t ch = 0; ch < in.channels(); ++ch) {
@@ -278,7 +322,7 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
                         double value = double(source[i]) * s.curveOutput[i] * s.makeup;
                         if (s.mode == DynamicsMode::limiter)
                             value = std::clamp(value, -ceiling, ceiling);
-                        destination[i] = T(value);
+                        destination[i] = publish(double(source[i]), value);
                     }
                 }
                 offset += count;
@@ -331,7 +375,7 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
                     double value = double(in.channel(ch)[i]) * gain * s.makeup;
                     if (s.mode == DynamicsMode::limiter)
                         value = std::clamp(value, -ceiling, ceiling);
-                    out.channel(ch)[i] = static_cast<T>(value);
+                    out.channel(ch)[i] = publish(double(in.channel(ch)[i]), value);
                 }
             }
         std::fill(s.values.begin(), s.values.end(), envelopeState);
@@ -421,7 +465,7 @@ Status Dynamics<T>::process(AudioBlock<const T> in, AudioBlock<const T> side,
             double value = delayed * gain * s.makeup;
             if (s.mode == DynamicsMode::limiter)
                 value = std::clamp(value, -ceiling, ceiling);
-            out.channel(ch)[i] = static_cast<T>(value);
+            out.channel(ch)[i] = publish(delayed, value);
         }
         s.head = (s.head + 1) % s.delayCapacity;
         ++s.clock;

@@ -1,6 +1,6 @@
 #pragma once
 #include "cydsp/processors/RealFft.h"
-#include "detail/VectorTable.h"
+#include "detail/FftRuntime.h"
 namespace cydsp::detail {
 // Private immutable plan access; the incremental convolver owns its RealFft workspace.
 struct FftPlanAccess {
@@ -11,10 +11,7 @@ struct FftPlanAccess {
                                           std::span<std::complex<T>> data, bool inverse) noexcept {
         const auto weights = std::span<const std::complex<T>>(plan.twiddles_);
         const auto& table = kernels(plan);
-        for (std::size_t half = 1; half < data.size(); half *= 2)
-            table.fftStage(reinterpret_cast<T*>(data.data()),
-                           reinterpret_cast<const T*>(weights.data() + half - 1), data.size(), half,
-                           inverse);
+        fftRuntimeStages<T>(data, weights, table, inverse);
     }
     template <Sample T>
     static std::span<const std::size_t> reverse(const ComplexFft<T>& plan) noexcept {

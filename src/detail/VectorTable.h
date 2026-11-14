@@ -18,6 +18,15 @@ template <class T> struct Kernels {
     void (*fftStage)(T*, const T*, std::size_t, std::size_t, bool) noexcept;
     // Optional time-parallel direct convolution; adds into disjoint output.
     void (*firHead)(const T*, const T*, T*, std::size_t, std::size_t) noexcept = nullptr;
+    // Two adjacent radix-2 stages held in registers, with the same twiddles.
+    void (*fftPair)(T*, const T*, const T*, std::size_t, std::size_t, bool) noexcept = nullptr;
+    void (*realSplit)(const T*, const T*, T*, std::size_t) noexcept = nullptr;
+    void (*clipDirect)(const T*, T*, std::size_t, double, double, double,
+                       double) noexcept = nullptr;
+};
+struct CompressorCurve {
+    double thresholdDb, ratio, kneeDb, lower, upper, threshold, slope;
+    bool limiter;
 };
 struct VectorTable {
     CpuBackend backend;
@@ -34,6 +43,10 @@ struct VectorTable {
                      double) noexcept = nullptr;
     void (*compressorGain)(const double*, double*, std::size_t, double, double, double,
                            bool) noexcept = nullptr;
+    void (*compressorGainPrepared)(const double*, double*, std::size_t,
+                                   const CompressorCurve&) noexcept = nullptr;
+    void (*adaaAtanFast)(const double*, double*, std::size_t, double, bool, double,
+                         double) noexcept = nullptr;
 };
 struct VectorAccess {
     template <class T> static const Kernels<T>& kernels(const VectorOps& ops) noexcept {

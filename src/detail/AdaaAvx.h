@@ -209,5 +209,36 @@ inline void adaaTanhAvx2(const double* x, double* y, std::size_t n, double previ
         y[i] = (v - dc) * gain;
     }
 }
+inline void clipDirectF32(const float* x, float* y, std::size_t n, double drive, double bias,
+                          double dc, double gain) noexcept {
+    std::size_t i = 0;
+    for (; n - i >= 4; i += 4) {
+        const auto value = _mm256_add_pd(
+            _mm256_mul_pd(_mm256_cvtps_pd(_mm_loadu_ps(x + i)), _mm256_set1_pd(drive)),
+            _mm256_set1_pd(bias));
+        const auto clipped =
+            _mm256_min_pd(_mm256_set1_pd(1), _mm256_max_pd(_mm256_set1_pd(-1), value));
+        const auto result =
+            _mm256_mul_pd(_mm256_sub_pd(clipped, _mm256_set1_pd(dc)), _mm256_set1_pd(gain));
+        _mm_storeu_ps(y + i, _mm256_cvtpd_ps(result));
+    }
+    for (; i < n; ++i)
+        y[i] = float((std::clamp(double(x[i]) * drive + bias, -1., 1.) - dc) * gain);
+}
+inline void clipDirectF64(const double* x, double* y, std::size_t n, double drive, double bias,
+                          double dc, double gain) noexcept {
+    std::size_t i = 0;
+    for (; n - i >= 4; i += 4) {
+        const auto value = _mm256_add_pd(
+            _mm256_mul_pd(_mm256_loadu_pd(x + i), _mm256_set1_pd(drive)), _mm256_set1_pd(bias));
+        const auto clipped =
+            _mm256_min_pd(_mm256_set1_pd(1), _mm256_max_pd(_mm256_set1_pd(-1), value));
+        const auto result =
+            _mm256_mul_pd(_mm256_sub_pd(clipped, _mm256_set1_pd(dc)), _mm256_set1_pd(gain));
+        _mm256_storeu_pd(y + i, result);
+    }
+    for (; i < n; ++i)
+        y[i] = double((std::clamp(double(x[i]) * drive + bias, -1., 1.) - dc) * gain);
+}
 } // namespace
 } // namespace cydsp::detail

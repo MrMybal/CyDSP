@@ -11,6 +11,10 @@ template <Sample T> constexpr bool isFinite(T value) noexcept {
     return value == value && value >= -std::numeric_limits<T>::max() &&
            value <= std::numeric_limits<T>::max();
 }
+// Per-processor arithmetic policy; precise retains its reference algorithm.
+// Fast approximations require explicit opt-in and never change global FP flags.
+enum class MathAccuracy { precise, fast };
+
 enum class Status {
     ok,
     invalid_spec,

@@ -12,6 +12,11 @@ Status qualitySettings(QualityProfile profile, double rate, QualitySettings& out
         return Status::invalid_argument;
     QualitySettings s;
     s.profile = profile;
+    s.saturationAntialias = profile != QualityProfile::economy;
+    s.transientMath =
+        profile == QualityProfile::economy ? MathAccuracy::fast : MathAccuracy::precise;
+    s.saturationMath =
+        profile == QualityProfile::economy ? MathAccuracy::fast : MathAccuracy::precise;
     const double seconds = profile == QualityProfile::economy        ? .012
                            : profile == QualityProfile::realtimeHigh ? .024
                                                                      : .06;

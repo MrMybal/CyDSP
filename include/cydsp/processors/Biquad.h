@@ -19,6 +19,29 @@ struct BiquadCoefficients {
                                          double gainDb, BiquadCoefficients&) noexcept;
 [[nodiscard]] Status designShelfBiquad(bool highShelf, double sampleRate, double frequency,
                                        double slope, double gainDb, BiquadCoefficients&) noexcept;
+// Cache the frequency/Q part of a bell for gain automation and shared channel designs.
+class PeakingBiquadDesigner {
+  public:
+    [[nodiscard]] Status prepare(double sampleRate, double frequencyHz, double q) noexcept;
+    [[nodiscard]] Status design(double gainDb, BiquadCoefficients&) const noexcept;
+    template <Sample T>
+    [[nodiscard]] Status designFor(double gainDb, BiquadCoefficients& output) const noexcept {
+        BiquadCoefficients next;
+        const auto status = design(gainDb, next);
+        if (status != Status::ok)
+            return status;
+        const BiquadCoefficients rounded{T(next.b0), T(next.b1), T(next.b2), T(next.a1),
+                                         T(next.a2)};
+        if (!rounded.isStable())
+            return Status::invalid_argument;
+        output = rounded;
+        return Status::ok;
+    }
+
+  private:
+    double cosine_ = 1, alpha_ = 0;
+    bool prepared_ = false;
+};
 template <Sample T>
     requires(!std::is_const_v<T>)
 class Biquad {

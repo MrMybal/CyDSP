@@ -1,5 +1,6 @@
 #pragma once
 #include "CurveAvx.h"
+#include "detail/CompressorCurve.h"
 #include <algorithm>
 #include <cmath>
 #include <immintrin.h>
@@ -7,13 +8,12 @@
 namespace cydsp::detail {
 namespace {
 // Envelope is finite in [0,1e100], output is disjoint; gain is always normal.
-inline void compressorGainAvx2(const double* envelope, double* gains, std::size_t count,
-                               double thresholdDb, double ratio, double kneeDb,
-                               bool limiter) noexcept {
-    const double half = kneeDb * .5, slope = limiter ? -1 : 1 / ratio - 1;
-    const double lower = std::pow(10., (thresholdDb - half) / 20),
-                 upper = std::pow(10., (thresholdDb + half) / 20),
-                 threshold = std::pow(10., thresholdDb / 20);
+inline void compressorGainPreparedAvx2(const double* envelope, double* gains, std::size_t count,
+                                       const CompressorCurve& curve) noexcept {
+    const auto thresholdDb = curve.thresholdDb, ratio = curve.ratio, kneeDb = curve.kneeDb;
+    const auto half = kneeDb * .5, slope = curve.slope;
+    const auto lower = curve.lower, upper = curve.upper, threshold = curve.threshold;
+    const bool limiter = curve.limiter;
     std::size_t i = 0;
     for (; count - i >= 4; i += 4) {
         const auto env = _mm256_max_pd(_mm256_loadu_pd(envelope + i), _mm256_set1_pd(1e-12));
@@ -58,6 +58,12 @@ inline void compressorGainAvx2(const double* envelope, double* gains, std::size_
             db = slope * over;
         gains[i] = std::pow(10., db / 20);
     }
+}
+inline void compressorGainAvx2(const double* envelope, double* gains, std::size_t count,
+                               double thresholdDb, double ratio, double kneeDb,
+                               bool limiter) noexcept {
+    const auto curve = makeCompressorCurve(thresholdDb, ratio, kneeDb, limiter);
+    compressorGainPreparedAvx2(envelope, gains, count, curve);
 }
 } // namespace
 } // namespace cydsp::detail

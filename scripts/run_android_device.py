@@ -14,6 +14,7 @@ p.add_argument('--abi',choices=['arm64-v8a','armeabi-v7a'],default='arm64-v8a')
 p.add_argument('--adb',default=str(android_adb()))
 p.add_argument('--serial')
 p.add_argument('--measure',action='store_true')
+p.add_argument('--prepared-measure',action='store_true', help='Run prepared/FFT measurements after regressions')
 a=p.parse_args()
 folder=ROOT/'build'/('android-'+a.abi);digest=source_digest()
 compiled=json.loads((folder/'report.json').read_text())
@@ -36,7 +37,7 @@ if not re.fullmatch(r'/data/local/tmp/cydsp-[a-f0-9]{12}-[a-z0-9-]+-[a-f0-9]{8}'
 report={'sourceSha256':digest,'model':model,'abi':a.abi,'sdk':invoke([*base,'shell','getprop','ro.build.version.sdk']).strip(),
         'timeUtc':datetime.now(timezone.utc).isoformat(),'status':'running','nativeRuntimeExecuted':True,'installedApplication':False}
 logs=ROOT/'build/device-logs';logs.mkdir(parents=True,exist_ok=True)
-files=['cydsp_tests']+(['cydsp_measurements'] if a.measure else [])
+files=['cydsp_tests']+(['cydsp_measurements'] if a.measure else [])+(['cydsp_prepared_measurements'] if a.prepared_measure else [])
 try:
     invoke([*base,'shell','mkdir',remote])
     for name in files:
@@ -48,6 +49,10 @@ try:
     if a.measure:
         text=invoke([*base,'shell',remote+'/cydsp_measurements'],600)
         (logs/(a.abi+'-measurements.log')).write_text(text,encoding='utf-8');report['measurements']=json.loads(text)
+    if a.prepared_measure:
+        text=invoke([*base,'shell',remote+'/cydsp_prepared_measurements','--advanced'],600)
+        (logs/(a.abi+'-prepared-measurements.log')).write_text(text,encoding='utf-8')
+        report['preparedMeasurements']=json.loads(text)
     report['status']='passed'
 except Exception as error:report.update(status='failed',error=str(error))
 finally:
