@@ -231,7 +231,7 @@ template <Sample T>
 template <bool Mixed>
 Status Dynamics<T>::processImpl(AudioBlock<const T> in, AudioBlock<const T> side, AudioBlock<T> out,
                                 double dryGain, double wetGain) noexcept {
-    const auto publish = [=](double dry, double value) noexcept {
+    const auto publish = [=]([[maybe_unused]] double dry, double value) noexcept {
         if constexpr (Mixed)
             return T(dryGain * dry + wetGain * double(T(value)));
         else

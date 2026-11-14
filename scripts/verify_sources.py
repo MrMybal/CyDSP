@@ -79,6 +79,16 @@ for path in (ROOT / 'scripts').glob('*.py'):
     ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
 cmake = (ROOT / 'CMakeLists.txt').read_text(encoding='utf-8')
 require('add_library(CyDSP STATIC' in cmake, 'Production target must be static')
+project_version = re.search(r'project\(CyDSP VERSION (\d+)\.(\d+)\.(\d+) ', cmake)
+version_header = (ROOT / 'include/cydsp/core/Version.h').read_text(encoding='utf-8')
+require(bool(project_version), 'Missing CMake project version')
+version = project_version.groups() if project_version else ('', '', '')
+for name, value in zip(('MAJOR', 'MINOR', 'PATCH'), version):
+    require(('#define CYDSP_VERSION_' + name + ' ' + value + '\n') in version_header,
+            'cydsp/core/Version.h does not match the CMake project version')
+for name in ('VERSION.md', 'VERSION.fr.md'):
+    require((ROOT / name).read_text(encoding='utf-8').startswith('# CyDSP ' + '.'.join(version) + '\n'),
+            name + ' title does not match the CMake project version')
 for option in ('CYDSP_BUILD_TESTS', 'CYDSP_COMPILE_CHECKS'):
     require(bool(re.search(r'option\(' + option + r' [^\n]+ OFF\)', cmake)), option + ' must be opt-in')
 require('add_custom_target' not in cmake and 'POST_BUILD' not in cmake,

@@ -112,7 +112,7 @@ Status SpectralEffects<T>::setParameters(const SpectralEffectParameters& p) noex
         p.mix > 1 || p.envelopeRadiusBins > 256)
         return Status::invalid_argument;
     if (state_->p.mode != p.mode)
-        std::fill(state_->captured.begin(), state_->captured.end(), 0);
+        std::fill(state_->captured.begin(), state_->captured.end(), static_cast<unsigned char>(0));
     state_->p = p;
     return Status::ok;
 }
@@ -166,7 +166,7 @@ template <Sample T> void SpectralEffects<T>::reset() noexcept {
         s.stft.reset();
         for (auto* v : {&s.side, &s.previous, &s.magnitude, &s.increment, &s.phase})
             std::fill(v->begin(), v->end(), 0);
-        std::fill(s.captured.begin(), s.captured.end(), 0);
+        std::fill(s.captured.begin(), s.captured.end(), static_cast<unsigned char>(0));
     }
 }
 template <Sample T> std::size_t SpectralEffects<T>::latencyFrames() const noexcept {

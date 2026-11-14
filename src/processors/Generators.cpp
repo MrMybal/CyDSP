@@ -75,6 +75,42 @@ double Adsr::next() noexcept {
     }
     return value_;
 }
+template <class T> void Adsr::render(std::span<T> output) noexcept {
+    std::size_t done = 0;
+    while (done < output.size()) {
+        if (!remaining_) {
+            // Sustain and idle hold one value until the next note command.
+            std::fill(output.begin() + static_cast<std::ptrdiff_t>(done), output.end(),
+                      static_cast<T>(value_));
+            return;
+        }
+        const auto count = static_cast<std::size_t>(
+            std::min<std::uint64_t>(remaining_, output.size() - done));
+        // Same running sum as next(), so both forms return identical values.
+        double value = value_;
+        const double step = step_;
+        for (std::size_t i = 0; i < count; ++i) {
+            value += step;
+            output[done + i] = static_cast<T>(value);
+        }
+        value_ = value;
+        done += count;
+        remaining_ -= count;
+        if (!remaining_) {
+            value_ = target_;
+            output[done - 1] = static_cast<T>(value_);
+            enter(stage_ == Stage::attack  ? Stage::decay
+                  : stage_ == Stage::decay ? Stage::sustain
+                                           : Stage::idle);
+        }
+    }
+}
+void Adsr::process(std::span<float> output) noexcept {
+    render(output);
+}
+void Adsr::process(std::span<double> output) noexcept {
+    render(output);
+}
 
 template <Sample T> Status Oscillator<T>::prepare(const ProcessSpec& spec) noexcept {
     if (!spec.isValid())

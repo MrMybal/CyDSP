@@ -4,6 +4,7 @@
 #include "cydsp/core/AudioLayout.h"
 #include "cydsp/core/Cpu.h"
 #include "cydsp/core/Types.h"
+#include "cydsp/core/Version.h"
 #include "cydsp/math/VectorOps.h"
 #include "cydsp/math/Window.h"
 #include "cydsp/processors/AsyncConvolver.h"

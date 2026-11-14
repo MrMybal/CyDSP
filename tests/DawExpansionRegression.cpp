@@ -198,6 +198,62 @@ template <Sample T> void synthesis() {
     ok(loopSample.setLoop(0, 8, 2));
     require(loopSample.value(0, 6) == T{-1} && loopSample.value(0, 7) == T{0},
             "loop linear crossfade");
+    // Block playback must return the samples of the per-frame calls it replaces.
+    AudioBuffer<T> stereo, rendered;
+    ok(stereo.resize(2, 96));
+    ok(rendered.resize(3, 43));
+    for (std::size_t i = 0; i < 96; ++i) {
+        stereo.block().channel(0)[i] = static_cast<T>(std::sin(.37 * double(i)));
+        stereo.block().channel(1)[i] = static_cast<T>(std::cos(.11 * double(i)));
+    }
+    SampleData<T> playback;
+    ok(playback.prepare(stereo.block(), 48000));
+    struct Range {
+        std::size_t first, end, crossfade;
+    };
+    for (const Range range : {Range{0, 0, 0}, Range{8, 64, 0}, Range{8, 64, 12}})
+        for (const double ratio : {.37, 1., 2.6, 7.3})
+            for (const auto mode :
+                 {SampleInterpolation::linear, SampleInterpolation::bandLimited}) {
+                ok(playback.setLoop(range.first, range.end, range.crossfade));
+                double position = 0, reference = 0;
+                for (unsigned pass = 0; pass < 12; ++pass) {
+                    const std::size_t frames = 1 + (pass * 13) % 40;
+                    const auto block = rendered.block().subBlock(pass % 3, frames);
+                    std::size_t inside = 0, expectedInside = frames;
+                    ok(playback.render(position, ratio, mode, block, inside));
+                    for (std::size_t i = 0; i < frames; ++i) {
+                        if (range.end && reference >= double(range.end))
+                            reference =
+                                double(range.first + range.crossfade) +
+                                std::fmod(reference - double(range.end),
+                                          double(range.end - range.first - range.crossfade));
+                        const bool within = reference < 96.0;
+                        if (!within && expectedInside == frames)
+                            expectedInside = i;
+                        for (std::size_t ch = 0; ch < 3; ++ch)
+                            require(block.channel(ch)[i] ==
+                                        (within ? playback.value(std::min<std::size_t>(ch, 1),
+                                                                 reference, ratio, mode)
+                                                : T{}),
+                                    "sampler block playback equals value");
+                        reference += ratio;
+                    }
+                    require(inside == expectedInside && position == reference,
+                            "sampler block position");
+                }
+            }
+    double untouched = 3;
+    std::size_t inside = 7;
+    require(playback.render(untouched, 0, SampleInterpolation::linear, rendered.block(), inside) ==
+                    Status::invalid_argument &&
+                untouched == 3 && inside == 0,
+            "sampler block invalid ratio");
+    SampleData<T> unprepared;
+    require(unprepared.render(untouched, 1, SampleInterpolation::linear, rendered.block(),
+                              inside) == Status::not_prepared &&
+                untouched == 3,
+            "sampler block unprepared");
 }
 void gates() {
     Dynamics<double> gate;

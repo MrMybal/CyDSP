@@ -1,8 +1,11 @@
-# CyDSP 0.2.0
+# CyDSP 0.3.0
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
+
+- Version 0.3.0. Le numéro de paquet était resté à 0.2.0 malgré plusieurs ajouts d’API ; il couvre désormais tout ce qui est listé ci-dessous. `find_package` n’accepte qu’une même version mineure : les consommateurs demandent `CyDSP 0.3` et recompilent leurs archives avec ces en-têtes. `cydsp/core/Version.h` donne la version à la compilation.
+- Ajout de formes par bloc qui renvoient les mêmes échantillons que leurs appels unitaires : `Adsr::process` et `SampleData::render` (un seul choix de niveau mip par bloc, bouclage et fondu de boucle compris). `SpscQueue` avance ses index sans division entière.
 
 - Saturation et dynamique évaluées par tuiles de 64 frames avec des noyaux x64 génériques en largeur (quatre doubles en AVX2, huit en AVX-512). Les ADAA tanh et atan renvoient la moyenne exacte entre échantillons consécutifs (erreur absolue proche de 1e-15, sans repli scalaire) ; les dynamiques non liées, avec sidechain, lookahead, expandeur et gate, l’égaliseur dynamique et le gain transitoire `fast` utilisent des courbes de transfert vectorielles ; la validation des entrées est sans branche. Résultats : [rapport des noyaux par tuiles](docs/TileKernelOptimization.fr.md).
 - Ajout de l’option `ConvolutionConfig::spectralHead` pour MatrixConvolver : les partitions précoces entières convoluent leurs premiers taps avec les transformées du niveau précoce au lieu de la FIR directe, sans latence.

@@ -30,7 +30,7 @@ class SpscQueue {
     bool push(const T& value) noexcept {
         if (storage_.empty())
             return false;
-        const auto w = write_.load(std::memory_order_relaxed), next = (w + 1) % storage_.size();
+        const auto w = write_.load(std::memory_order_relaxed), next = following(w);
         if (next == read_.load(std::memory_order_acquire))
             return false;
         storage_[w] = value;
@@ -47,8 +47,7 @@ class SpscQueue {
     bool discard() noexcept {
         if (!peek())
             return false;
-        read_.store((read_.load(std::memory_order_relaxed) + 1) % storage_.size(),
-                    std::memory_order_release);
+        read_.store(following(read_.load(std::memory_order_relaxed)), std::memory_order_release);
         return true;
     }
     bool pop(T& value) noexcept {
@@ -63,6 +62,10 @@ class SpscQueue {
     }
 
   private:
+    // Indices stay below storage_.size(); a compare replaces the integer division.
+    std::size_t following(std::size_t index) const noexcept {
+        return index + 1 == storage_.size() ? 0 : index + 1;
+    }
     std::vector<T> storage_;
     std::atomic<std::size_t> read_{0};
     std::array<std::byte, 128> separator_{};

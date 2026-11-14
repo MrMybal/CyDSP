@@ -1,8 +1,11 @@
-# CyDSP 0.2.0
+# CyDSP 0.3.0
 
 **IN DEVELOPMENT.** Source distribution; no binary release is published.
 
 ## Changes
+
+- Version 0.3.0. The package version had stayed at 0.2.0 through several API additions; it now covers everything listed below. `find_package` accepts one minor version only, so consumers request `CyDSP 0.3` and rebuild their archives with these headers. `cydsp/core/Version.h` gives the version at compile time.
+- Add block forms that return the same samples as their per-sample calls: `Adsr::process` and `SampleData::render` (one mip selection per block, loop wrap and crossfade included). `SpscQueue` advances its indices without an integer division.
 
 - Evaluate saturation and dynamics as 64-frame tiles with width-generic x64 kernels (four doubles in AVX2, eight in AVX-512). Tanh and atan ADAA return the exact mean between consecutive samples (absolute error near 1e-15, no scalar fallback); unlinked, sidechained, lookahead, expander and gate dynamics, the dynamic equalizer and the `fast` transient gain use vector transfer curves; input validation is branch-free. Results: [tile kernel report](docs/TileKernelOptimization.fr.md).
 - Add the opt-in `ConvolutionConfig::spectralHead` for MatrixConvolver: whole early partitions convolve their first taps with the early tier's own transforms instead of the direct FIR, at zero latency.

@@ -1,6 +1,7 @@
 #pragma once
 #include "cydsp/core/AudioBlock.h"
 #include <cstdint>
+#include <span>
 namespace cydsp {
 struct AdsrParameters {
     double attackSeconds = 0.01, decaySeconds = 0.1, sustain = 0.7, releaseSeconds = 0.2;
@@ -13,6 +14,9 @@ class Adsr {
     void noteOn() noexcept;
     void noteOff() noexcept;
     [[nodiscard]] double next() noexcept;
+    // Block form: writes exactly the values of output.size() successive next() calls.
+    void process(std::span<float> output) noexcept;
+    void process(std::span<double> output) noexcept;
     [[nodiscard]] bool active() const noexcept {
         return stage_ != Stage::idle;
     }
@@ -23,6 +27,7 @@ class Adsr {
   private:
     enum class Stage { idle, attack, decay, sustain, release };
     void enter(Stage) noexcept;
+    template <class T> void render(std::span<T>) noexcept;
     AdsrParameters parameters_{};
     double sampleRate_ = 0, value_ = 0, step_ = 0, target_ = 0;
     std::uint64_t remaining_ = 0;

@@ -595,7 +595,8 @@ preparation, outside the audio callback.
 
 `DspMath.h`: dB conversion, polynomial evaluation, immutable lookup interpolation,
 linear/multiplicative `SmoothedValue`. `Adsr` has linear segments with exact sample
-endpoints; zero-duration stages advance immediately. `Oscillator<T>` offers sine,
+endpoints; zero-duration stages advance immediately. `Adsr::process` fills a float or
+double span with the values of successive `next` calls. `Oscillator<T>` offers sine,
 triangle, PolyBLEP saw/square and deterministic white noise. Triangle is not
 band-limited. No generator promises alias-free output at arbitrary frequencies.
 
@@ -659,7 +660,11 @@ access remain the caller's responsibility; no audio-rate frequency modulation is
 implied by this block path.
 SampleData::prepare owns immutable sample/mip storage; value selects a prepared
 level for the ratio and interpolates without allocation. Loop boundaries are
-exclusive and optional loop crossfades retain their existing behavior. MIDI voice
+exclusive and optional loop crossfades retain their existing behavior.
+`SampleData::render` plays a block from a caller-owned position: it selects the mip
+level once, wraps an enabled loop, writes every output channel (extra channels repeat
+the last source channel), zero-fills past the end and reports the frames read before
+it. Each sample equals the matching `value` call. MIDI voice
 allocation, instruments/presets, source workers and transport now belong to CyAudioCore.
 See [migration](Migration.fr.md) for headers, namespaces and package integration.
 

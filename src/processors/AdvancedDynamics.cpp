@@ -115,7 +115,8 @@ template <Sample T> Status AdaaSaturator<T>::setParameters(const SaturationParam
     // The primitive depends on the shape; the stored driven sample remains valid
     // across drive/bias/AA edits and must not be reset by automation.
     if (state_->p.shape != p.shape)
-        std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(), 0);
+        std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(),
+                  static_cast<unsigned char>(0));
     state_->p = p;
     return Status::ok;
 }
@@ -158,7 +159,7 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
             sample = (sample * inputStage.gain + inputStage.bias) * inputStage.scale;
         return std::clamp(sample * p.drive + p.bias, -1e6, 1e6);
     };
-    const auto publish = [&](T dry, double value) noexcept {
+    const auto publish = [&]([[maybe_unused]] T dry, double value) noexcept {
         if constexpr (Mixed)
             return T(dryGain * double(dry) + wetGain * double(T(value)));
         else
@@ -284,7 +285,10 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
                     continue;
                 const double last = driven(input.back());
                 if constexpr (type == AdaaShape::hardClip) {
-                    if (!Mixed && p.drive == 1 && p.bias == 0 && p.outputGain == 1) {
+                    bool identity = false;
+                    if constexpr (!Mixed)
+                        identity = p.drive == 1 && p.bias == 0 && p.outputGain == 1;
+                    if (identity) {
                         for (std::size_t i = 0; i < input.size(); ++i)
                             output[i] = std::clamp(input[i] + T{0}, T{-1}, T{1});
                     } else {
@@ -334,7 +338,7 @@ Status AdaaSaturator<T>::processImpl(AudioBlock<const T> in, AudioBlock<T> out,
             for (std::size_t i = 0; i < in.frames(); ++i) {
                 const double x = driven(input[i]);
                 double y;
-                if (type == AdaaShape::hysteresis) {
+                if constexpr (type == AdaaShape::hysteresis) {
                     memory = std::clamp(memory, x - p.hysteresisWidth, x + p.hysteresisWidth);
                     y = std::tanh(x + p.hysteresisAmount * memory) - dc;
                     primitiveValid = false;
@@ -394,8 +398,10 @@ template <Sample T> void AdaaSaturator<T>::reset() noexcept {
     if (state_) {
         std::fill(state_->previous.begin(), state_->previous.end(), 0);
         std::fill(state_->memory.begin(), state_->memory.end(), 0);
-        std::fill(state_->active.begin(), state_->active.end(), 0);
-        std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(), 0);
+        std::fill(state_->active.begin(), state_->active.end(),
+                  static_cast<unsigned char>(0));
+        std::fill(state_->primitiveValid.begin(), state_->primitiveValid.end(),
+                  static_cast<unsigned char>(0));
     }
 }
 

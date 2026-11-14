@@ -33,6 +33,15 @@ template <Sample T> class SampleData {
     }
     [[nodiscard]] T value(std::size_t channel, double position, double ratio = 1,
                           SampleInterpolation = SampleInterpolation::bandLimited) const noexcept;
+    // Sequential block playback. For each output frame: wrap an enabled loop when
+    // position >= loopEnd() to loopStart() + loopCrossfade(), write
+    // value(min(channel, channels - 1), position, ratio, mode) to every output
+    // channel, then advance position by ratio. Frames at or past the end are
+    // zero and still advance. The mip level is selected once for the block;
+    // every sample equals value(). inside reports the leading frames read
+    // before the end. Invalid requests preserve position and output.
+    Status render(double& position, double ratio, SampleInterpolation, AudioBlock<T> output,
+                  std::size_t& inside) const noexcept;
 
   private:
     AudioBuffer<T> audio_;

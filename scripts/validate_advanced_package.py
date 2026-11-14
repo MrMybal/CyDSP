@@ -26,7 +26,7 @@ try:
     assert len(list((prefix/'share/CyDSP/licenses').glob('*.txt')))==5
     (consumer/'CMakeLists.txt').write_text("""cmake_minimum_required(VERSION 3.24)
 project(AdvancedCyDSPConsumer LANGUAGES CXX)
-find_package(CyDSP 0.2 CONFIG REQUIRED)
+find_package(CyDSP 0.3 CONFIG REQUIRED)
 add_executable(consumer main.cpp)
 target_link_libraries(consumer PRIVATE CyDSP::CyDSP)
 """,encoding='utf-8')

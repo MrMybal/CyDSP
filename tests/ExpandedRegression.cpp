@@ -67,6 +67,37 @@ void designs() {
     for (double expected : {.375, .25, .125, 0.})
         require(std::abs(envelope.next() - expected) < 1e-12, "ADSR release");
     require(!envelope.active(), "ADSR inactive");
+    // The block form must return the values of next() across stages and note commands.
+    for (const auto& shape : {AdsrParameters{.004, .002, .5, .004}, AdsrParameters{0, 0, 1, 0},
+                              AdsrParameters{.0105, .0033, .25, .0071}}) {
+        Adsr single, block;
+        ok(single.prepare(1000));
+        ok(block.prepare(1000));
+        ok(single.setParameters(shape));
+        ok(block.setParameters(shape));
+        single.noteOn();
+        block.noteOn();
+        std::array<double, 7> wide{};
+        std::array<float, 5> narrow{};
+        for (unsigned pass = 0; pass < 12; ++pass) {
+            if (pass == 5) {
+                single.noteOff();
+                block.noteOff();
+            }
+            if (pass & 1) {
+                block.process(std::span<float>(narrow));
+                for (const float value : narrow)
+                    require(value == static_cast<float>(single.next()), "ADSR float block");
+            } else {
+                block.process(std::span<double>(wide));
+                for (const double value : wide)
+                    require(value == single.next(), "ADSR double block");
+            }
+            block.process(std::span<double>{});
+            require(block.active() == single.active() && block.value() == single.value(),
+                    "ADSR block state");
+        }
+    }
     SmoothedValue ramp;
     ok(ramp.reset(1, SmoothingCurve::multiplicative));
     ok(ramp.setTarget(16, 4));
