@@ -361,20 +361,17 @@ unused old-partition job list. The temporary filter time buffer is released duri
 prepare. Configured hybrid/nonuniform/scheduled modes retain their distinct cost
 profiles and the previous MatrixConvolver overload still chooses nonuniform.
 
-## Project boundary
+## Library integration
 
-CyDSP is the standalone numerical layer, namespace `cydsp`, with no dependency on
-CyAudioCore, device discovery, file codecs, MIDI protocols or plugin SDKs. Its DSP
-graph composes processors. It retains Wavetable, WavetableOscillator, SampleData,
-prepared sample interpolation/mips and the optional Stretch algorithm.
+CyDSP is a standalone C++20 DSP library in namespace `cydsp`. Consumers include
+public headers from `cydsp/` and link `CyDSP::CyDSP`; `CyDSP::Stretch` supplies
+the optional time/pitch/formant algorithm. Its DSP graph composes numerical
+processors, including filters, synthesis, SampleData, resampling and spatial audio.
 
-CyAudioCore consumes the installed public API. It owns sources/transport,
-MIDI/MPE/UMP/MIDI-CI, polyphonic instrument orchestration, devices, files and
-plugin hosting/isolation. Applications choose their GUI independently.
-
-The prepared aliases for AudioBlock/AudioBuffer/Status/ProcessSpec in CyAudioCore
-are the same CyDSP types. No conversion layer or second SIMD dispatcher is added.
-See [migration](Migration.fr.md) for the breaking package/header changes.
+Applications own the audio callback, source lifetimes and coordination with their
+other services. They pass planar blocks into prepared processors. CyAudioCore is
+one project using this public API and its AudioBlock/AudioBuffer/Status/ProcessSpec
+types directly; no additional conversion layer or SIMD dispatcher is required.
 
 ## Expanded numerical modules
 

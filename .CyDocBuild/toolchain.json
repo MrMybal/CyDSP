@@ -1,0 +1,11 @@
+{
+  "generator": "CyDoc",
+  "version": "0.1.0",
+  "sourceRepository": "https://github.com/MrMybal/CyDoc",
+  "sourceRevision": "93f64486d61dae27a94ae1e5a05a20f6edd99914",
+  "packageArchive": "vendor/cydoc-0.1.0.tgz",
+  "archiveSha256": "1095ac2afb5f958c22e56cc187e4a60fb4d5fed79a6c0d2b639bc8b9b5586193",
+  "nodeMinimumVersion": "22",
+  "optionalMediaModules": [],
+  "runtimeNotice": "assets/notices/CyDoc-MIT.txt"
+}

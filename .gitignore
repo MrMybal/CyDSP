@@ -9,3 +9,8 @@ __pycache__/
 /scripts/compare_juce.py
 /scripts/report_juce.py
 /docs/JuceComparison.md
+
+# CyDoc generation cache and private working evidence
+/.CyDocBuild/node_modules/
+/.CyDocBuild/internal/
+/.CyDocBuild/vendor/

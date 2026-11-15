@@ -1,2 +1,4 @@
 * text=auto eol=lf
 third_party/** -text
+.CyDocBuild/assets/notices/** -text -whitespace
+Documentation/DocData/assets/notices/** -text -whitespace

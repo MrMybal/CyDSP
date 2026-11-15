@@ -1,5 +1,7 @@
-# IntegrationRemediation
+# Checking a CyDSP integration
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+Build the static archive and consumers with matching public headers. Match
+`ProcessSpec` to the blocks supplied by the application, check returned `Status`
+values and keep preparation outside the audio callback. See
+[library integration](Architecture.md#library-integration),
+[module contracts](Modules.md) and [version notes](../VERSION.md).

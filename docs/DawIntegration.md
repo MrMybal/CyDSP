@@ -1,5 +1,7 @@
-# DawIntegration
+# Using CyDSP in a DAW
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+Prepare processors outside the audio callback, then pass planar audio blocks
+through the public C++ API. The application owns transport, devices, file I/O,
+MIDI and plugin hosting. CyAudioCore is one consumer of CyDSP. See
+[library integration](Architecture.md#library-integration),
+[module contracts](Modules.md) and the [processing example](../examples/Processing.cpp).

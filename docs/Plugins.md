@@ -1,5 +1,7 @@
-# Plugins
+# Using CyDSP in audio plugins
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+Link `CyDSP::CyDSP` into the plugin and use its prepared processors from the
+plugin's audio callback. The plugin supplies its format adapter, parameter mapping
+and interface. See the [processing example](../examples/Processing.cpp),
+[module contracts](Modules.md) and
+[library integration](Architecture.md#library-integration).

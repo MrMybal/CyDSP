@@ -1,5 +1,7 @@
-# ExecutionPlan
+# Preparing a DSP processing chain
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+Select the sample rate, maximum block size and channel count through
+`ProcessSpec`. Prepare processors and buffers before processing, then account for
+each processor's latency and tail when connecting branches. See
+[lifecycle and memory](Architecture.md#lifecycle-and-memory),
+[module contracts](Modules.md) and the [processing example](../examples/Processing.cpp).

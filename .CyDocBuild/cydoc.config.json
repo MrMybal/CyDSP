@@ -1,0 +1,20 @@
+{
+  "name": "CyDSP",
+  "version": "0.3.2",
+  "defaultLocale": "en",
+  "locales": [
+    {
+      "code": "en",
+      "label": "English"
+    },
+    {
+      "code": "fr",
+      "label": "Français"
+    }
+  ],
+  "homePage": "overview",
+  "content": "manual",
+  "assets": "assets",
+  "out": "../Documentation",
+  "modules": []
+}

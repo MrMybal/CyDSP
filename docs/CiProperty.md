@@ -1,5 +1,5 @@
-# CiProperty
+# Continuous integration policy
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+GitHub Actions are paused by the owner. Source and provenance checks are
+available through `scripts/verify_sources.py`; native checks use separate,
+explicit validation builds. See [current validation](Validation.md).

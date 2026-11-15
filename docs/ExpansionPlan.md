@@ -1,5 +1,7 @@
-# ExpansionPlan
+# DSP extensions
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+Available DSP and spatial modules are described in the
+[DSP/spatial guide](ExpansionGuide.fr.md) and
+[advanced API guide](AdvancedExpansionGuide.fr.md). Their preparation, data
+ownership, numerical limits and timing contracts apply when composing processors.
+See the [module index](Modules.md) for the public API.

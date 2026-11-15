@@ -183,6 +183,8 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfigVersion.
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CyDSP)
 install(DIRECTORY third_party/licenses/ DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP/licenses)
 install(FILES LICENSE third_party/manifest.json docs/Licensing.md DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP)
+# Ship the complete offline reader; documentation generation remains explicit.
+install(DIRECTORY Documentation/ DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP/Documentation COMPONENT Documentation)
 set(cydsp_test_sources
  tests/PreparedOptimizationRegression.cpp
  tests/AdvancedExpansionContracts.cpp

@@ -1,5 +1,6 @@
-# Coverage
+# DSP coverage
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+The [module contracts](Modules.md) describe the available numerical processors.
+See the [DSP/spatial guide](ExpansionGuide.fr.md) and
+[advanced API guide](AdvancedExpansionGuide.fr.md) for supported configurations,
+and [validation](Validation.md) for the coverage of each recorded snapshot.

@@ -25,7 +25,7 @@
 
 - Add original granular synthesis and audio-analysis APIs: levels/correlation, true peak, spectra/features, Mel/log bands, constant-Q and LUFS/LRA. Reuse CyDSP numerical kernels and bounded prepared storage; see [contracts and limits](docs/GranulationAndAnalysis.md).
 
-- Separate numerical DSP into CyDSP and audio services into CyAudioCore, with distinct headers, namespaces and CMake targets. See the [migration guide](docs/Migration.fr.md).
+- Provide a standalone numerical DSP library through the `cydsp` namespace, public `cydsp/` headers and exported CMake targets.
 - Select wavetable harmonic banks once per block, calculate gate gains directly and reduce repeated dynamics calculations.
 - Optimize AVX-512 copy, scale, scaled accumulation and fill while retaining bounds-masked tails.
 - Add repeated before/after measurements and independent numerical, lifecycle and realtime regression coverage. Detailed results and workload limits are in [Measurements.md](docs/Measurements.md).
@@ -34,7 +34,7 @@
 
 Windows x64 MSVC/clang-cl and Android ARM64 on Quest 3 have executed regression coverage. Windows ARM64 has static compilation coverage. SVE compiles and links for Android ARM64, but execution and vector-length coverage require compatible hardware. macOS, desktop Linux and Windows ARM64 execution remain unverified; x86 and ARM32 have not been rerun for this snapshot. See [Validation.md](docs/Validation.md).
 
-CyDSP provides numerical processing. Audio devices, MIDI, file formats, transport and plugin interfaces belong to CyAudioCore. Existing applications must adapt to the 0.2.0 package and namespace boundary. Performance depends on CPU, backend, block dimensions and algorithm settings; measured gains do not apply to the entire library.
+CyDSP provides numerical audio processing through its public C++ API. Performance depends on CPU, backend, block dimensions and algorithm settings; measured gains do not apply to the entire library.
 
 
 HRTF datasets are supplied by the host. Diffraction uses a thin-screen approximation, echo cancellation assumes a linear path and aligned reference, and formant/transient/music processing needs source-specific assessment. The [advanced contracts](docs/AdvancedExpansionGuide.fr.md) detail these limits.

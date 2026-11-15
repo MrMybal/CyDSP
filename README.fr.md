@@ -1,8 +1,7 @@
 <table width="100%">
   <tr>
     <td width="300" align="left" valign="top">
-      <a href="docs/Modules.md">Documentation</a><br>
-      <a href="docs/Migration.fr.md">Migration</a><br>
+      <a href="Documentation/Documentation.html#/fr/overview">Documentation</a><br>
       <a href="https://github.com/MrMybal/CyDSP">Dépôt</a><br><br>
       <sub>README</sub><br>
       <a href="README.md">English</a> · <a href="README.fr.md">Français</a>
@@ -17,19 +16,19 @@
 
 <h1 align="center">CyDSP</h1>
 
-Bibliothèque C++20 de calcul DSP audio pour les DAW, effets, synthétiseurs et jeux vidéo. Construire des chaînes de traitement, rendre de nombreuses sources et travailler le son spatial avec une API float/double commune, un stockage préparé et des implémentations SIMD pour x64 et ARM64.
+**CyDSP est une bibliothèque C++20 de traitement numérique du signal audio.** Elle fournit des algorithmes réutilisables pour les effets, l’égalisation, la synthèse, l’analyse audio et le son 3D, avec une API float/double commune et des implémentations SIMD pour x64 et ARM64.
 
 > **EN DÉVELOPPEMENT · 0.3.2**
 >
-> Disponible sous forme de sources ; aucune release binaire publiée. Consulter les [notes de version et limites des plateformes](VERSION.fr.md).
+> Le dépôt des sources est actuellement privé. La bibliothèque se compile depuis une copie obtenue avec un accès autorisé ; consulter les [notes de version et limites des plateformes](VERSION.fr.md).
 
 ## À propos de CyDSP
 
-CyDSP fournit les briques numériques des applications audio : filtres et dynamique, synthèse et sampling, traitement spectral, analyse, restauration et son 3D. Combiner les vues planaires `AudioBlock`, le stockage aligné `AudioBuffer` et un `ProcessSpec` commun ; préparer les algorithmes et la mémoire avant le callback audio. Le traitement et la remise à zéro conservent le stockage préparé, sans allocation, verrou ou I/O dans ces chemins. Le [guide d’architecture](docs/Architecture.md) décrit la propriété des paramètres et le cycle de vie.
+CyDSP permet de filtrer, transformer, générer, analyser et spatialiser l’audio dans un DAW, un jeu vidéo, un plugin audio ou un moteur personnalisé. Ses processeurs partagent les mêmes vues audio planaires, conventions de préparation et briques numériques : FFT, filtres, convolution, rééchantillonnage, interpolation et opérations vectorielles.
 
-Les tables, samples et HRTF préparés peuvent être partagés entre sources. Les graphes gèrent les sidechains explicites, la compensation de latence entre branches et les transitions entre états préparés. Les profils économie, temps réel haute qualité et hors ligne fournissent une politique de préparation commune.
+Les processeurs et leur stockage se préparent avant le callback audio, puis traitent les blocs au moyen de `AudioBlock<float>` ou `AudioBlock<double>`. `ProcessSpec` décrit la fréquence d’échantillonnage, la taille maximale des blocs et le nombre de canaux ; `AudioBuffer` fournit un stockage propriétaire aligné. Le traitement et la remise à zéro réutilisent la mémoire préparée, sans allocation, verrou ni entrée/sortie. Le [guide des contrats de traitement](Documentation/Documentation.html#/fr/contracts) précise les durées de vie, les changements de paramètres et la propriété entre threads.
 
-Les périphériques audio, le MIDI, les entrées/sorties de fichiers audio, le transport de lecture, l’hébergement de plugins et l’interface relèvent du moteur consommateur ou de **CyAudioCore**. CyDSP peut être utilisé indépendamment dans un DAW, un jeu, un effet ou un synthétiseur.
+Les processeurs peuvent être assemblés directement ou dans des graphes DSP multibus avec sidechains explicites, compensation de latence et transitions entre états préparés. Les samples, tables d’ondes et HRTF préparés peuvent être partagés entre sources ; chaque processeur conserve son propre état de traitement mutable.
 
 ## Fonctionnalités
 
@@ -53,9 +52,19 @@ Les périphériques audio, le MIDI, les entrées/sorties de fichiers audio, le t
 | **Son 3D et spatialisation** | Distance/directivité, atmosphère/milieux, Doppler, chemins acoustiques, pièces/portails, binaural analytique, HRTF partagées avec alignement des onsets/conversion/interpolation, VBAP, Ambisonics ACN/SN3D jusqu’à l’ordre 7, binaural HOA et approximation de diffraction sur écran mince. |
 | **Infrastructure temps réel** | Lots de sources avec récurrences sinus SIMD et données partagées, mixage vectoriel, buffers/rampes, événements de paramètres à l’échantillon, graphes multibus, alignement sidechain/PDC, fondus de graphes et profils de qualité communs. |
 
-Les implémentations scalaire, SSE2, AVX2, AVX-512, NEON et SVE optionnel sont sélectionnées à la préparation selon le code compilé et les capacités CPU/OS. Un backend disponible peut être demandé explicitement. Le code propre aux ISA reste dans des fichiers d’implémentation privés.
+## Traitement temps réel et architectures CPU
 
-L’[index des modules](docs/Modules.md), le [guide DSP/spatial](docs/ExpansionGuide.fr.md) et le [guide des API avancées](docs/AdvancedExpansionGuide.fr.md) précisent les limites, la propriété et les latences. Plusieurs modèles physiques et musicaux sont des approximations ; les choisir et les évaluer selon la source et la scène visées.
+CyDSP se compile en bibliothèque statique pour l’architecture cible. Les noyaux scalaires, SSE2, AVX2 et AVX-512 servent les cibles x64 ; NEON et SVE optionnel servent les cibles ARM64. La sélection se fait à la préparation selon le code compilé et les capacités CPU/OS. Un backend disponible peut aussi être demandé explicitement.
+
+Le SIMD s’applique aux opérations adaptées, tandis que les filtres récursifs et les enveloppes conservent l’ordre de leurs états de traitement. Les réglages de qualité et de précision appartiennent aux processeurs concernés ; la bibliothèque portable conserve une compilation flottante précise, sans fast-math ni option globale propre au CPU local.
+
+Windows x64 et Android ARM64 disposent d’une couverture en exécution. Windows ARM64 dispose d’une couverture de compilation statique ; l’exécution SVE, macOS et Linux desktop demandent encore une validation sur cible. Les [notes de version](VERSION.fr.md) précisent les limites actuelles des plateformes.
+
+## Projets utilisant CyDSP
+
+**CyAudioCore** utilise CyDSP pour ses traitements audio numériques. Les applications et plugins peuvent également utiliser CyDSP directement au moyen de son API C++ publique.
+
+Le [manuel CyDoc](Documentation/Documentation.html#/fr/overview) décrit les contrats des processeurs, les configurations prises en charge et les latences, avec une [référence des API C++ publiques](Documentation/Documentation.html#/fr/api) et des [guides de son spatial](Documentation/Documentation.html#/fr/spatial). Les jeux de données HRTF sont fournis par l’application ; les modèles physiques et musicaux ont les limites précisées dans ces guides.
 
 ---
 
@@ -73,7 +82,7 @@ target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
 
-Les en-têtes publics se trouvent sous `cydsp/` ; `cydsp/CyDSP.h` les regroupe. Commencer avec l’[exemple de traitement](examples/Processing.cpp), l’[exemple granulation/analyse](examples/GranulationAndAnalysis.cpp), l’[exemple spatial/DAW](examples/SpatialAndDaw.cpp) ou l’[exemple HRTF partagées/sources groupées](examples/AdvancedAudio.cpp). Le [guide de migration](docs/Migration.fr.md) accompagne les applications existantes.
+Les en-têtes publics se trouvent sous `cydsp/` ; `cydsp/CyDSP.h` les regroupe. Commencer avec l’[exemple de traitement](examples/Processing.cpp), l’[exemple granulation/analyse](examples/GranulationAndAnalysis.cpp), l’[exemple spatial/DAW](examples/SpatialAndDaw.cpp) ou l’[exemple HRTF partagées/sources groupées](examples/AdvancedAudio.cpp).
 
 ## Sources, compilation et bibliothèques nécessaires
 
@@ -107,7 +116,10 @@ CyDSP utilise la [licence MIT](LICENSE), copyright © 2026 MrMybal CyberAlien. S
 
 ## Références et liens
 
-- [Index des modules et contrats d’API](docs/Modules.md) · [Architecture](docs/Architecture.md).
-- [Granulation et analyse](docs/GranulationAndAnalysis.md) · [Intégration DSP/spatial](docs/ExpansionGuide.fr.md) · [API avancées](docs/AdvancedExpansionGuide.fr.md).
-- [Guide de migration](docs/Migration.fr.md) · [Notes de version](VERSION.fr.md).
+Ouvrir `Documentation/Documentation.html` depuis une copie locale du dépôt pour consulter le manuel CyDoc complet hors ligne. Conserver tout le dossier `Documentation/` ; GitHub affiche le code HTML sans exécuter le lecteur.
+
+- [Manuel CyDoc complet](Documentation/Documentation.html#/fr/overview) — guides et API C++ publique.
+- [Contrats de traitement](Documentation/Documentation.html#/fr/contracts) · [API C++ publique](Documentation/Documentation.html#/fr/api).
+- [Granulation](Documentation/Documentation.html#/fr/granular) · [Analyse audio](Documentation/Documentation.html#/fr/analysis) · [Son spatial](Documentation/Documentation.html#/fr/spatial).
+- [Notes de version](VERSION.fr.md).
 - [Dépôt des sources](https://github.com/MrMybal/CyDSP) · [Suivi des problèmes](https://github.com/MrMybal/CyDSP/issues).

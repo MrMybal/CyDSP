@@ -1,5 +1,7 @@
-# Midi2
+# Controlling DSP from MIDI
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+The application translates MIDI messages into DSP parameter changes or
+synthesis events. Use the prepared parameter/event primitives when sample timing
+is required; serialize changes according to each processor's ownership contract.
+See [parameter and processing contracts](Modules.md) and
+[architecture](Architecture.md). MIDI devices and protocols are application services.

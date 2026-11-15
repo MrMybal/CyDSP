@@ -1,5 +1,7 @@
-# Roadmap
+# DSP development
 
-The audio services previously documented here now belong to CyAudioCore.
-See [project migration](Migration.fr.md), [numeric modules](Modules.md) and
-[current validation](Validation.md). Previous full documents remain in repository history.
+The [module index](Modules.md) and [version notes](../VERSION.md) describe
+implemented functionality and current limits. SVE execution, Windows ARM64
+execution, macOS and desktop Linux validation still require the corresponding
+targets; compilation alone does not establish runtime support. See
+[validation](Validation.md) for recorded evidence.
