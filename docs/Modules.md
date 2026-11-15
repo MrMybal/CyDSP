@@ -2,15 +2,15 @@
 
 The complete usage guides and public C++ API reference are in the **CyDoc manual**:
 
-- [English manual](../Documentation/Documentation.html#/en/overview)
-- [Manuel en français](../Documentation/Documentation.html#/fr/overview)
-- [Processing contracts](../Documentation/Documentation.html#/en/contracts) · [Contrats de traitement](../Documentation/Documentation.html#/fr/contracts)
-- [Public C++ API](../Documentation/Documentation.html#/en/api) · [API C++ publique](../Documentation/Documentation.html#/fr/api)
+- [English manual](https://mrmybal.github.io/CyDSP/Documentation.html#/en/overview)
+- [Manuel en français](https://mrmybal.github.io/CyDSP/Documentation.html#/fr/overview)
+- [Processing contracts](https://mrmybal.github.io/CyDSP/Documentation.html#/en/contracts) · [Contrats de traitement](https://mrmybal.github.io/CyDSP/Documentation.html#/fr/contracts)
+- [Public C++ API](https://mrmybal.github.io/CyDSP/Documentation.html#/en/api) · [API C++ publique](https://mrmybal.github.io/CyDSP/Documentation.html#/fr/api)
 
-Open `Documentation/Documentation.html` from a local checkout and keep the entire
-`Documentation/` folder together. GitHub displays the HTML source rather than
-running the reader.
+Read the [online CyDoc manual](https://mrmybal.github.io/CyDSP/), or open
+`Documentation/Documentation.html` from a local checkout while keeping the entire
+`Documentation/` folder together.
 
-Ouvrir `Documentation/Documentation.html` depuis une copie locale du dépôt en
-conservant tout le dossier `Documentation/`. GitHub affiche le code HTML sans
-exécuter le lecteur.
+Consulter le [manuel CyDoc en ligne](https://mrmybal.github.io/CyDSP/Documentation.html#/fr/overview),
+ou ouvrir `Documentation/Documentation.html` depuis une copie locale du dépôt en
+conservant tout le dossier `Documentation/`.

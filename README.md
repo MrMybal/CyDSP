@@ -1,7 +1,7 @@
 <table width="100%">
   <tr>
     <td width="300" align="left" valign="top">
-      <a href="Documentation/Documentation.html#/en/overview">Documentation</a><br>
+      <a href="https://mrmybal.github.io/CyDSP/Documentation.html#/en/overview">Documentation</a><br>
       <a href="https://github.com/MrMybal/CyDSP">Repository</a><br><br>
       <sub>README</sub><br>
       <a href="README.md">English</a> · <a href="README.fr.md">Français</a>
@@ -20,13 +20,13 @@
 
 > **IN DEVELOPMENT · 0.3.2**
 >
-> The source repository is currently private. Build the library from an authorized checkout; read the [version notes and platform limitations](VERSION.md).
+> The source repository is available on GitHub. Build the library from a local checkout; read the [version notes and platform limitations](VERSION.md).
 
 ## About CyDSP
 
 Use CyDSP to filter, transform, generate, analyze and spatialize audio in a DAW, a game, an audio plugin or a custom engine. Its processors share the same planar audio views, preparation conventions and numerical building blocks: FFTs, filters, convolution, resampling, interpolation and vector operations.
 
-Prepare processors and storage before entering the audio callback, then process blocks through `AudioBlock<float>` or `AudioBlock<double>`. `ProcessSpec` describes the sample rate, maximum block size and channel count; `AudioBuffer` supplies aligned owning storage. Processing and reset reuse prepared memory without allocation, locks or I/O. The [processing contracts](Documentation/Documentation.html#/en/contracts) describes lifetimes, parameter updates and thread ownership.
+Prepare processors and storage before entering the audio callback, then process blocks through `AudioBlock<float>` or `AudioBlock<double>`. `ProcessSpec` describes the sample rate, maximum block size and channel count; `AudioBuffer` supplies aligned owning storage. Processing and reset reuse prepared memory without allocation, locks or I/O. The [processing contracts](https://mrmybal.github.io/CyDSP/Documentation.html#/en/contracts) describe lifetimes, parameter updates and thread ownership.
 
 Combine processors directly or build multibus DSP graphs with explicit sidechains, latency compensation and transitions between prepared states. Prepared samples, wavetables and HRTFs can be shared across sources, while each processor retains its own mutable signal state.
 
@@ -64,7 +64,7 @@ Windows x64 and Android ARM64 have runtime coverage. Windows ARM64 has static co
 
 **CyAudioCore** uses CyDSP for its numerical audio processing. CyDSP is also usable directly by applications and plugins through its public C++ API.
 
-The [CyDoc manual](Documentation/Documentation.html#/en/overview) documents processor contracts, supported configurations and latency, with a [public C++ API reference](Documentation/Documentation.html#/en/api) and [spatial audio guides](Documentation/Documentation.html#/en/spatial). HRTF datasets are supplied by the application; physical and musical models have the limits documented in those guides.
+The [CyDoc manual](https://mrmybal.github.io/CyDSP/Documentation.html#/en/overview) documents processor contracts, supported configurations and latency, with a [public C++ API reference](https://mrmybal.github.io/CyDSP/Documentation.html#/en/api) and [spatial audio guides](https://mrmybal.github.io/CyDSP/Documentation.html#/en/spatial). HRTF datasets are supplied by the application; physical and musical models have the limits documented in those guides.
 
 ---
 
@@ -116,10 +116,10 @@ CyDSP uses the [MIT license](LICENSE), copyright © 2026 MrMybal CyberAlien. Com
 
 ## References and links
 
-Open `Documentation/Documentation.html` from a local checkout to read the complete offline CyDoc manual. Keep the entire `Documentation/` folder together; GitHub displays the HTML source rather than running the reader.
+Read the [online CyDoc manual](https://mrmybal.github.io/CyDSP/). For offline use, open `Documentation/Documentation.html` from a local checkout and keep the entire `Documentation/` folder together.
 
-- [Complete CyDoc manual](Documentation/Documentation.html#/en/overview) — guides and public C++ API.
-- [Processing contracts](Documentation/Documentation.html#/en/contracts) · [Public C++ API](Documentation/Documentation.html#/en/api).
-- [Granulation](Documentation/Documentation.html#/en/granular) · [Audio analysis](Documentation/Documentation.html#/en/analysis) · [Spatial audio](Documentation/Documentation.html#/en/spatial).
+- [Complete CyDoc manual](https://mrmybal.github.io/CyDSP/Documentation.html#/en/overview) — guides and public C++ API.
+- [Processing contracts](https://mrmybal.github.io/CyDSP/Documentation.html#/en/contracts) · [Public C++ API](https://mrmybal.github.io/CyDSP/Documentation.html#/en/api).
+- [Granulation](https://mrmybal.github.io/CyDSP/Documentation.html#/en/granular) · [Audio analysis](https://mrmybal.github.io/CyDSP/Documentation.html#/en/analysis) · [Spatial audio](https://mrmybal.github.io/CyDSP/Documentation.html#/en/spatial).
 - [Version notes](VERSION.md).
 - [Source repository](https://github.com/MrMybal/CyDSP) · [Issue tracker](https://github.com/MrMybal/CyDSP/issues).

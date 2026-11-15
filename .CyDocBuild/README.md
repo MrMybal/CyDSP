@@ -37,3 +37,17 @@ parity, all 88 headers and 2006 current public declarations, local assets, ignor
 internal material and self-contained reader resources. Browser checks remain
 separate: open the real file URL and exercise search, tree, anchors and both locales.
 No commit, push, GitHub workflow or deployment is part of this generator.
+
+## Hosted manual
+
+The online reader is https://mrmybal.github.io/CyDSP/Documentation.html.
+GitHub Pages publishes the root of the dedicated gh-pages branch. That branch
+contains only the complete Documentation export, an index.html entry that keeps
+the locale/page fragment, and .nojekyll. Main keeps the offline Documentation/
+layout. Source changes on main do not automatically regenerate or publish Pages.
+
+To update the site, regenerate/check the manual locally, review and scan the
+complete export, then publish its contents to gh-pages with a normal fast-forward
+commit. Preserve the index entry, .nojekyll and all notices. The GitHub Pages
+built-in deployment serves this prebuilt static export; no custom CI or remote
+compilation is used. Never publish the repository root or authoring workspace.
