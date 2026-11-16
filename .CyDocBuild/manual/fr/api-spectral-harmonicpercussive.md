@@ -3,7 +3,7 @@ id: api-spectral-harmonicpercussive
 title: HarmonicPercussive
 description: Séparation causale par médianes temps/fréquence avec sorties harmonique/percussive complémentaires.
 section: Référence API
-order: 1176
+order: 1177
 sourceRevision: 1
 parent: api-spectral
 symbol: cydsp::HarmonicPercussive

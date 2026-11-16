@@ -23,10 +23,10 @@ try:
     assert not list(production.rglob('cydsp_tests.exe')) and not list(production.rglob('cydsp_measurements.exe'))
     run('install',[CMAKE,'--install',production,'--config','Release'])
     assert (prefix/'share/CyDSP/LICENSE').is_file()
-    assert len(list((prefix/'share/CyDSP/licenses').glob('*.txt')))==5
+    assert {p.name for p in (prefix/'share/CyDSP/licenses').glob('*.txt')} == {p.name for p in (ROOT/'third_party/licenses').glob('*.txt')}
     (consumer/'CMakeLists.txt').write_text("""cmake_minimum_required(VERSION 3.24)
 project(AdvancedCyDSPConsumer LANGUAGES CXX)
-find_package(CyDSP 0.3 CONFIG REQUIRED)
+find_package(CyDSP 0.4 CONFIG REQUIRED)
 add_executable(consumer main.cpp)
 target_link_libraries(consumer PRIVATE CyDSP::CyDSP)
 """,encoding='utf-8')

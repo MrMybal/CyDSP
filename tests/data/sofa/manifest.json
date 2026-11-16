@@ -1,0 +1,23 @@
+{
+  "license": "MIT",
+  "description": "Original synthetic CyDSP unit impulses. No measured dataset.",
+  "generator": "scripts/generate_sofa_fixtures.py",
+  "files": {
+    "bigendian.sofa": "45edbcd84106bd01b20c4bf6e1fcff9b5967df4bf965336a62f829944f4139d8",
+    "compact-f32.sofa": "f79aad1c720749d3fe7a918a6c7cff645083092646424164f4f781b515da5ba2",
+    "compact-v1-chunks.sofa": "e17c1cf3a81088b534fb2b75ea278b3cdc496be739655c9948ee2a417288c713",
+    "compact-v2.sofa": "493b4de00ad8bab658feb2ff73d06dfaa64ed360538c13ff1d5a8b06e6205465",
+    "deflate-only.sofa": "eadaadfc1e09e5cb893fea6f826ddddcd5a1bf4ebdefc5ff6c74428cada3084f",
+    "empty-attributes.sofa": "426fba95ff46969356a9bfcd4d8ec61f625c5ff50da8d6748f37c70e3d6fe7c1",
+    "general-fir.sofa": "5e9c0ec5c3708832686c8dfd9ee83b8b7db4c4550f4949faaf1cda6eac75394d",
+    "invalid-receiver.sofa": "2683dad782708cbc1e6e80ef8132c804f02de37f70a6d222489deab227517231",
+    "legacy-v0.sofa": "91ddffdcc3b2e007aa3dd86ebf879673e9d764c9903ed59ff0b4a33c9f895a15",
+    "modern-dense.sofa": "5f5bf0320ea5b33e7b64986f11309c2e184b4de47adb476336f77eec51a2372d",
+    "modern-extensible.sofa": "88629f6348429c546f2cb5b9d8c81537b588e18561e64159186bdbbf24942026",
+    "modern-fixed.sofa": "8ce38d2913d1b7b589bb0b01d20ce82799a03bfeaf50b23a14c35c7443be2d56",
+    "modern-single.sofa": "58ba0e50d48eb2790386b7a4634f00dada0a3d2f50b13dc8aac31ad1c590dc55",
+    "rotated.sofa": "011d6e33643581a11b603265bc55717b3ed49e53130b0e2539c26051cb26f496",
+    "unsupported.sofa": "00a508a492fac4a52fb635a8903fe2c1271153f1cdbf0e8d518879d1dc4071fe",
+    "varying-rate.sofa": "f418c5d440d5d72fdb583434edda4004f52f54139ad06d30401a13989199b3b2"
+  }
+}

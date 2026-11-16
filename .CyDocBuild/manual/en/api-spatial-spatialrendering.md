@@ -3,7 +3,7 @@ id: api-spatial-spatialrendering
 title: SpatialRendering
 description: Analytic/measured binaural, shared HRTF preparation, VBAP and order-7 ACN/SN3D Ambisonics.
 section: API reference
-order: 1175
+order: 1176
 revision: 1
 parent: api-spatial
 symbol: cydsp::BinauralEmitter
@@ -147,6 +147,143 @@ template <Sample T> struct HrirPoint;
 | `leftDelayFrames` | `double` | `0` | Frame count or offset; one frame contains one sample per channel. |
 | `rightDelayFrames` | `double` | `0` | Frame count or offset; one frame contains one sample per channel. |
 
+## `sphericalFibonacci` {#symbol-sphericalfibonacci}
+
+```cpp
+Status sphericalFibonacci(std::span<Vec3> directions, std::span<double> solidAngles = {}) noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+| Parameter | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `directions` | `std::span<Vec3>` | — | Borrowed contiguous range with the element type and constness shown; preserve its lifetime. |
+| `solidAngles` | `std::span<double>` | `= {}` | Borrowed contiguous range with the element type and constness shown; preserve its lifetime. |
+
+Return: `Status` — Check Status; ok reports success.
+
+## `AnalyticHrirOptions` {#symbol-analytichriroptions}
+
+```cpp
+struct AnalyticHrirOptions;
+```
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `sampleRate` | `double` | `48000` | Frequency in Hz; use the supported sample-rate/Nyquist range. |
+| `headRadiusMetres` | `double` | `.0875` | Length in metres. |
+| `soundSpeed` | `double` | `343` | Value/configuration in the declared type; apply the linked module contract. |
+| `distanceMetres` | `double` | `1` | Length in metres. |
+| `taps` | `std::size_t` | `256` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumStorageBytes` | `std::size_t` | `512u * 1024u * 1024u` | Value/configuration in the declared type; apply the linked module contract. |
+
+## `AnalyticHrirReport` {#symbol-analytichrirreport}
+
+```cpp
+struct AnalyticHrirReport;
+```
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `points` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `taps` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumTailSample` | `double` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+
+## `analyticHrirs` {#symbol-analytichrirs}
+
+```cpp
+template <Sample T> [[nodiscard]] Status analyticHrirs(const AnalyticHrirOptions& options, std::span<const Vec3> directions, HrirBank<T>& out, AnalyticHrirReport* report = nullptr) noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+| Parameter | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `options` | `const AnalyticHrirOptions &` | — | Value/configuration in the declared type; apply the linked module contract. |
+| `directions` | `std::span<const Vec3>` | — | Borrowed contiguous range with the element type and constness shown; preserve its lifetime. |
+| `out` | `HrirBank<T> &` | — | Mutable reference; inspect the declaration and guide for output/state ownership. |
+| `report` | `AnalyticHrirReport *` | `nullptr` | Value/configuration in the declared type; apply the linked module contract. |
+
+Return: `Status` — Check Status; ok reports success.
+
+## `HrirBank` {#symbol-hrirbank}
+
+```cpp
+template <Sample T> class HrirBank;
+```
+
+### `HrirBank::HrirBank<T>` {#symbol-hrirbank-hrirbank-t}
+
+```cpp
+HrirBank();
+```
+
+Construct an instance; prepare it before processing when the API requires preparation.
+
+### `HrirBank::~HrirBank<T>` {#symbol-hrirbank-hrirbank-t-2}
+
+```cpp
+~HrirBank();
+```
+
+Destroy only when no processing or borrowed users remain; destruction may release storage.
+
+### `HrirBank::HrirBank<T>` {#symbol-hrirbank-hrirbank-t-3}
+
+```cpp
+HrirBank(HrirBank&&) noexcept;
+```
+
+Construct an instance; prepare it before processing when the API requires preparation.
+
+| Parameter | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `argument 1` | `HrirBank<T> &&` | — | Mutable reference; inspect the declaration and guide for output/state ownership. |
+
+### `HrirBank::operator=` {#symbol-hrirbank-operator}
+
+```cpp
+HrirBank& operator=(HrirBank&&) noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+| Parameter | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `argument 1` | `HrirBank<T> &&` | — | Mutable reference; inspect the declaration and guide for output/state ownership. |
+
+Return: `HrirBank<T> &` — Returned value/view; respect borrowed lifetime and the units named by this API.
+
+### `HrirBank::points` {#symbol-hrirbank-points}
+
+```cpp
+std::span<const HrirPoint<T>> points() const noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+Return: `std::span<const HrirPoint<T>>` — Returned value/view; respect borrowed lifetime and the units named by this API.
+
+### `HrirBank::sampleRate` {#symbol-hrirbank-samplerate}
+
+```cpp
+double sampleRate() const noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+Return: `double` — Returned value/view; respect borrowed lifetime and the units named by this API.
+
+### `HrirBank::taps` {#symbol-hrirbank-taps}
+
+```cpp
+std::size_t taps() const noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+Return: `std::size_t` — Returned value/view; respect borrowed lifetime and the units named by this API.
+
 ## `HrtfPreparation` {#symbol-hrtfpreparation}
 
 ```cpp
@@ -161,6 +298,51 @@ struct HrtfPreparation;
 | `onsetThresholdDb` | `double` | `-40` | Logarithmic level in the indicated dB reference. |
 | `angularWidthRadians` | `double` | `.7` | Angle in radians. |
 | `maximumTaps` | `std::size_t` | `2048` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumPoints` | `std::size_t` | `2048` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumInputTaps` | `std::size_t` | `32768` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumStorageBytes` | `std::size_t` | `512u * 1024u * 1024u` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumDelaySeconds` | `double` | `.1` | Duration or position in seconds. |
+| `resampleHalfLength` | `std::size_t` | `32` | Value/configuration in the declared type; apply the linked module contract. |
+| `interpolationPoints` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `fractionalDelayTaps` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `rejectTruncation` | `bool` | `false` | Explicit true/false option or predicate. |
+
+## `HrtfQuality` {#symbol-hrtfquality}
+
+```cpp
+enum class HrtfQuality { economy, realtimeHigh, reference };
+```
+
+## `hrtfPreparation` {#symbol-hrtfpreparation-2}
+
+```cpp
+Status hrtfPreparation(HrtfQuality quality, double targetSampleRate, HrtfPreparation& out) noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+| Parameter | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `quality` | `HrtfQuality` | — | Value/configuration in the declared type; apply the linked module contract. |
+| `targetSampleRate` | `double` | — | Value/configuration in the declared type; apply the linked module contract. |
+| `out` | `HrtfPreparation &` | — | Mutable reference; inspect the declaration and guide for output/state ownership. |
+
+Return: `Status` — Check Status; ok reports success.
+
+## `HrtfStorageReport` {#symbol-hrtfstoragereport}
+
+```cpp
+struct HrtfStorageReport;
+```
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `points` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `taps` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `coefficientBytes` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `interpolationPoints` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `fractionalDelayTaps` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `truncated` | `bool` | `false` | Explicit true/false option or predicate. |
 
 ## `HrtfSet` {#symbol-hrtfset}
 
@@ -232,6 +414,16 @@ bool truncated() const noexcept;
 Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
 
 Return: `bool` — Returned value/view; respect borrowed lifetime and the units named by this API.
+
+### `HrtfSet::storageReport` {#symbol-hrtfset-storagereport}
+
+```cpp
+HrtfStorageReport storageReport() const noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+Return: `HrtfStorageReport` — Returned value/view; respect borrowed lifetime and the units named by this API.
 
 ## `HrirBinaural` {#symbol-hrirbinaural}
 
@@ -649,6 +841,49 @@ Use the declared inputs and returned type with the module contract below; getter
 
 Return: `std::size_t` — Returned value/view; respect borrowed lifetime and the units named by this API.
 
+## `HoaDecoderMethod` {#symbol-hoadecodermethod}
+
+```cpp
+enum class HoaDecoderMethod { leastSquares, magLS };
+```
+
+## `HoaDecoderDesign` {#symbol-hoadecoderdesign}
+
+```cpp
+struct HoaDecoderDesign;
+```
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `method` | `HoaDecoderMethod` | `HoaDecoderMethod::magLS` | Value/configuration in the declared type; apply the linked module contract. |
+| `crossoverHz` | `double` | `2000` | Frequency in Hz; use the supported sample-rate/Nyquist range. |
+| `transitionHz` | `double` | `500` | Frequency in Hz; use the supported sample-rate/Nyquist range. |
+| `maxRe` | `bool` | `false` | Explicit true/false option or predicate. |
+| `regularization` | `double` | `1e-6` | Value/configuration in the declared type; apply the linked module contract. |
+| `iterations` | `std::size_t` | `12` | Value/configuration in the declared type; apply the linked module contract. |
+| `fftSize` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumFftSize` | `std::size_t` | `65536` | Value/configuration in the declared type; apply the linked module contract. |
+| `maximumStorageBytes` | `std::size_t` | `512u * 1024u * 1024u` | Value/configuration in the declared type; apply the linked module contract. |
+| `spatialWeights` | `std::span<const double>` | — | Borrowed contiguous range with the element type and constness shown; preserve its lifetime. |
+
+## `HoaDecoderReport` {#symbol-hoadecoderreport}
+
+```cpp
+struct HoaDecoderReport;
+```
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `method` | `HoaDecoderMethod` | `HoaDecoderMethod::leastSquares` | Value/configuration in the declared type; apply the linked module contract. |
+| `fftSize` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `filterTaps` | `std::size_t` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `latencyFrames` | `std::size_t` | `0` | Frame count or offset; one frame contains one sample per channel. |
+| `lowBandComplexError` | `double` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `highBandMagnitudeError` | `double` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `initialHighBandMagnitudeError` | `double` | `0` | Value/configuration in the declared type; apply the linked module contract. |
+| `maxRe` | `bool` | `false` | Explicit true/false option or predicate. |
+| `spectralMetricsAvailable` | `bool` | `false` | Explicit true/false option or predicate. |
+
 ## `HoaBinaural` {#symbol-hoabinaural}
 
 ```cpp
@@ -714,6 +949,34 @@ Prepare outside the audio callback; check Status before using the new configurat
 | `argument 5` | `CpuBackend` | `CpuBackend::automatic` | Compiled CPU/OS-supported kernel choice; automatic selects during preparation. |
 
 Return: `Status` — Check Status; ok reports success.
+
+### `HoaBinaural::prepare` {#symbol-hoabinaural-prepare-2}
+
+```cpp
+Status prepare(const ProcessSpec& ambisonic, unsigned order, const HrtfSet<T>& data, const HoaDecoderDesign& design, CpuBackend backend = CpuBackend::automatic) noexcept;
+```
+
+Prepare outside the audio callback; check Status before using the new configuration.
+
+| Parameter | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `ambisonic` | `const ProcessSpec &` | — | Prepared rate, maximum block size and channel count. |
+| `order` | `unsigned int` | — | Value/configuration in the declared type; apply the linked module contract. |
+| `data` | `const HrtfSet<T> &` | — | Value/configuration in the declared type; apply the linked module contract. |
+| `design` | `const HoaDecoderDesign &` | — | Value/configuration in the declared type; apply the linked module contract. |
+| `backend` | `CpuBackend` | `CpuBackend::automatic` | Compiled CPU/OS-supported kernel choice; automatic selects during preparation. |
+
+Return: `Status` — Check Status; ok reports success.
+
+### `HoaBinaural::designReport` {#symbol-hoabinaural-designreport}
+
+```cpp
+HoaDecoderReport designReport() const noexcept;
+```
+
+Use the declared inputs and returned type with the module contract below; getters do not synchronize access.
+
+Return: `HoaDecoderReport` — Returned value/view; respect borrowed lifetime and the units named by this API.
 
 ### `HoaBinaural::setRotation` {#symbol-hoabinaural-setrotation}
 

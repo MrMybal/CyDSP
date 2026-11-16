@@ -3,7 +3,7 @@ id: api-synthesis-sampledata
 title: SampleData
 description: Copied in-memory samples, prepared antialiasing mips, interpolation and loop crossfades.
 section: API reference
-order: 1185
+order: 1186
 revision: 1
 parent: api-synthesis
 symbol: cydsp::SampleData

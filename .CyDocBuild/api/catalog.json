@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "libraryVersion": "0.3.2",
+  "libraryVersion": "0.4.0",
   "headers": [
     {
       "header": "cydsp/analysis/ConstantQAnalyzer.h",
@@ -4248,7 +4248,7 @@
     },
     {
       "header": "cydsp/core/Version.h",
-      "sha256": "b37f37a5f27c5280dc749ce25014b3fbb587895263fdbc0430833505e63ba677",
+      "sha256": "5800eb724526ed89ef0d8311d569c0960e7ae1b864e00364c5ad3a526810cdf2",
       "symbols": [
         {
           "name": "cydsp::versionMajor",
@@ -4282,11 +4282,11 @@
         ],
         [
           "CYDSP_VERSION_MINOR",
-          "3"
+          "4"
         ],
         [
           "CYDSP_VERSION_PATCH",
-          "2"
+          "0"
         ]
       ]
     },
@@ -19262,6 +19262,673 @@
       ]
     },
     {
+      "header": "cydsp/spatial/Sofa.h",
+      "sha256": "eb7fd17ec8293b491060e0d05a7e9e43fd57e6ad44e0bc06da322ec577dc7478",
+      "symbols": [
+        {
+          "name": "cydsp::SofaBackend",
+          "kind": "EnumDecl",
+          "line": 10,
+          "signature": "enum class SofaBackend { automatic, compact, complete };"
+        },
+        {
+          "name": "cydsp::SofaError",
+          "kind": "EnumDecl",
+          "line": 11,
+          "signature": "enum class SofaError { none, invalid_file, unsupported_convention, unsupported_storage, invalid_dimensions, invalid_coordinates, invalid_sampling_rate, invalid_delay, invalid_samples, limit_exceeded, precision_loss, backend_unavailable, allocation_failed };"
+        },
+        {
+          "name": "cydsp::SofaLoadReport",
+          "kind": "CXXRecordDecl",
+          "line": 26,
+          "signature": "struct SofaLoadReport;",
+          "members": [
+            {
+              "name": "cydsp::SofaLoadReport::backend",
+              "kind": "FieldDecl",
+              "line": 27,
+              "signature": "SofaBackend backend = SofaBackend::automatic;",
+              "type": "SofaBackend",
+              "default": "SofaBackend::automatic"
+            },
+            {
+              "name": "cydsp::SofaLoadReport::error",
+              "kind": "FieldDecl",
+              "line": 28,
+              "signature": "SofaError error = SofaError::none;",
+              "type": "SofaError",
+              "default": "SofaError::none"
+            },
+            {
+              "name": "cydsp::SofaLoadReport::sourcePrecisionBits",
+              "kind": "FieldDecl",
+              "line": 29,
+              "signature": "unsigned int sourcePrecisionBits = 0;",
+              "type": "unsigned int",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::SofaLoadReport::precisionReduced",
+              "kind": "FieldDecl",
+              "line": 30,
+              "signature": "bool precisionReduced = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::SofaLoadReport::receiversSwapped",
+              "kind": "FieldDecl",
+              "line": 30,
+              "signature": "bool receiversSwapped = false;",
+              "type": "bool",
+              "default": "false"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::SofaInflate",
+          "kind": "TypeAliasDecl",
+          "line": 32,
+          "signature": "using SofaInflate = Status (*)(std::span<const std::byte> input, std::span<std::byte> output, void* context) noexcept;"
+        },
+        {
+          "name": "cydsp::SofaLoadOptions",
+          "kind": "CXXRecordDecl",
+          "line": 34,
+          "signature": "struct SofaLoadOptions;",
+          "members": [
+            {
+              "name": "cydsp::SofaLoadOptions::backend",
+              "kind": "FieldDecl",
+              "line": 35,
+              "signature": "SofaBackend backend = SofaBackend::automatic;",
+              "type": "SofaBackend",
+              "default": "SofaBackend::automatic"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::maximumFileBytes",
+              "kind": "FieldDecl",
+              "line": 36,
+              "signature": "std::size_t maximumFileBytes = 128u * 1024u * 1024u;",
+              "type": "std::size_t",
+              "default": "128u * 1024u * 1024u"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::maximumDecodedBytes",
+              "kind": "FieldDecl",
+              "line": 37,
+              "signature": "std::size_t maximumDecodedBytes = 512u * 1024u * 1024u;",
+              "type": "std::size_t",
+              "default": "512u * 1024u * 1024u"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::maximumPoints",
+              "kind": "FieldDecl",
+              "line": 38,
+              "signature": "std::size_t maximumPoints = 100000;",
+              "type": "std::size_t",
+              "default": "100000"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::maximumTaps",
+              "kind": "FieldDecl",
+              "line": 38,
+              "signature": "std::size_t maximumTaps = 32768;",
+              "type": "std::size_t",
+              "default": "32768"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::maximumMetadataBytes",
+              "kind": "FieldDecl",
+              "line": 39,
+              "signature": "std::size_t maximumMetadataBytes = 65536;",
+              "type": "std::size_t",
+              "default": "65536"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::allowGeneralFir",
+              "kind": "FieldDecl",
+              "line": 40,
+              "signature": "bool allowGeneralFir = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::allowPrecisionLoss",
+              "kind": "FieldDecl",
+              "line": 40,
+              "signature": "bool allowPrecisionLoss = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::inflate",
+              "kind": "FieldDecl",
+              "line": 41,
+              "signature": "SofaInflate inflate = nullptr;",
+              "type": "SofaInflate",
+              "default": "nullptr"
+            },
+            {
+              "name": "cydsp::SofaLoadOptions::inflateContext",
+              "kind": "FieldDecl",
+              "line": 42,
+              "signature": "void * inflateContext = nullptr;",
+              "type": "void *",
+              "default": "nullptr"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::BasicSofaHrtf",
+          "kind": "CXXRecordDecl",
+          "line": 44,
+          "signature": "template <Sample T> struct BasicSofaHrtf;",
+          "members": [
+            {
+              "name": "cydsp::BasicSofaHrtf::sampleRate",
+              "kind": "FieldDecl",
+              "line": 45,
+              "signature": "double sampleRate = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::directions",
+              "kind": "FieldDecl",
+              "line": 46,
+              "signature": "std::vector<Vec3> directions;",
+              "type": "std::vector<Vec3>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::distancesMetres",
+              "kind": "FieldDecl",
+              "line": 47,
+              "signature": "std::vector<double> distancesMetres;",
+              "type": "std::vector<double>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::left",
+              "kind": "FieldDecl",
+              "line": 48,
+              "signature": "std::vector<T> left;",
+              "type": "std::vector<T>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::right",
+              "kind": "FieldDecl",
+              "line": 48,
+              "signature": "std::vector<T> right;",
+              "type": "std::vector<T>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::leftDelay",
+              "kind": "FieldDecl",
+              "line": 49,
+              "signature": "std::vector<double> leftDelay;",
+              "type": "std::vector<double>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::rightDelay",
+              "kind": "FieldDecl",
+              "line": 49,
+              "signature": "std::vector<double> rightDelay;",
+              "type": "std::vector<double>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::points",
+              "kind": "FieldDecl",
+              "line": 50,
+              "signature": "std::size_t points = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::taps",
+              "kind": "FieldDecl",
+              "line": 50,
+              "signature": "std::size_t taps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::convention",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::string convention;",
+              "type": "std::string",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::title",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::string title;",
+              "type": "std::string",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::database",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::string database;",
+              "type": "std::string",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::listener",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::string listener;",
+              "type": "std::string",
+              "default": ""
+            },
+            {
+              "name": "cydsp::BasicSofaHrtf::license",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::string license;",
+              "type": "std::string",
+              "default": ""
+            }
+          ]
+        },
+        {
+          "name": "cydsp::SofaHrtf",
+          "kind": "TypeAliasDecl",
+          "line": 53,
+          "signature": "using SofaHrtf = BasicSofaHrtf<float>;"
+        },
+        {
+          "name": "cydsp::SofaHrtf64",
+          "kind": "TypeAliasDecl",
+          "line": 54,
+          "signature": "using SofaHrtf64 = BasicSofaHrtf<double>;"
+        },
+        {
+          "name": "cydsp::loadSofa",
+          "kind": "FunctionDecl",
+          "line": 57,
+          "signature": "Status loadSofa(std::span<const std::byte> file, SofaHrtf& out, const SofaLoadOptions& options = {}, SofaLoadReport* report = nullptr) noexcept;",
+          "parameters": [
+            {
+              "name": "file",
+              "type": "std::span<const std::byte>",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "SofaHrtf &",
+              "default": ""
+            },
+            {
+              "name": "options",
+              "type": "const SofaLoadOptions &",
+              "default": "{}"
+            },
+            {
+              "name": "report",
+              "type": "SofaLoadReport *",
+              "default": "nullptr"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::loadSofa",
+          "kind": "FunctionDecl",
+          "line": 60,
+          "signature": "Status loadSofa(std::span<const std::byte> file, SofaHrtf64& out, const SofaLoadOptions& options = {}, SofaLoadReport* report = nullptr) noexcept;",
+          "parameters": [
+            {
+              "name": "file",
+              "type": "std::span<const std::byte>",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "SofaHrtf64 &",
+              "default": ""
+            },
+            {
+              "name": "options",
+              "type": "const SofaLoadOptions &",
+              "default": "{}"
+            },
+            {
+              "name": "report",
+              "type": "SofaLoadReport *",
+              "default": "nullptr"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::sofaBackendAvailable",
+          "kind": "FunctionDecl",
+          "line": 63,
+          "signature": "bool sofaBackendAvailable(SofaBackend backend) noexcept;",
+          "parameters": [
+            {
+              "name": "backend",
+              "type": "SofaBackend",
+              "default": ""
+            }
+          ],
+          "returnType": "bool",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::HrtfLevelNormalization",
+          "kind": "EnumDecl",
+          "line": 64,
+          "signature": "enum class HrtfLevelNormalization { none, frontalEnergy };"
+        },
+        {
+          "name": "cydsp::SofaPreparationReport",
+          "kind": "CXXRecordDecl",
+          "line": 65,
+          "signature": "struct SofaPreparationReport;",
+          "members": [
+            {
+              "name": "cydsp::SofaPreparationReport::selectedPoints",
+              "kind": "FieldDecl",
+              "line": 66,
+              "signature": "std::size_t selectedPoints = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::inputTaps",
+              "kind": "FieldDecl",
+              "line": 66,
+              "signature": "std::size_t inputTaps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::preparedTaps",
+              "kind": "FieldDecl",
+              "line": 66,
+              "signature": "std::size_t preparedTaps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::distanceMetres",
+              "kind": "FieldDecl",
+              "line": 67,
+              "signature": "double distanceMetres = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::appliedGain",
+              "kind": "FieldDecl",
+              "line": 67,
+              "signature": "double appliedGain = 1;",
+              "type": "double",
+              "default": "1"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::truncated",
+              "kind": "FieldDecl",
+              "line": 68,
+              "signature": "bool truncated = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::diffuseFieldEqualized",
+              "kind": "FieldDecl",
+              "line": 68,
+              "signature": "bool diffuseFieldEqualized = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::SofaPreparationReport::uniformDiffuseWeights",
+              "kind": "FieldDecl",
+              "line": 68,
+              "signature": "bool uniformDiffuseWeights = false;",
+              "type": "bool",
+              "default": "false"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::SofaPreparation",
+          "kind": "CXXRecordDecl",
+          "line": 70,
+          "signature": "struct SofaPreparation;",
+          "members": [
+            {
+              "name": "cydsp::SofaPreparation::hrtf",
+              "kind": "FieldDecl",
+              "line": 71,
+              "signature": "HrtfPreparation hrtf;",
+              "type": "HrtfPreparation",
+              "default": ""
+            },
+            {
+              "name": "cydsp::SofaPreparation::distanceMetres",
+              "kind": "FieldDecl",
+              "line": 72,
+              "signature": "double distanceMetres = 1;",
+              "type": "double",
+              "default": "1"
+            },
+            {
+              "name": "cydsp::SofaPreparation::distanceToleranceMetres",
+              "kind": "FieldDecl",
+              "line": 72,
+              "signature": "double distanceToleranceMetres = .001;",
+              "type": "double",
+              "default": ".001"
+            },
+            {
+              "name": "cydsp::SofaPreparation::diffuseFieldEqualization",
+              "kind": "FieldDecl",
+              "line": 73,
+              "signature": "bool diffuseFieldEqualization = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::SofaPreparation::diffuseFieldWeights",
+              "kind": "FieldDecl",
+              "line": 74,
+              "signature": "std::span<const double> diffuseFieldWeights;",
+              "type": "std::span<const double>",
+              "default": ""
+            },
+            {
+              "name": "cydsp::SofaPreparation::equalizationTaps",
+              "kind": "FieldDecl",
+              "line": 75,
+              "signature": "std::size_t equalizationTaps = 129;",
+              "type": "std::size_t",
+              "default": "129"
+            },
+            {
+              "name": "cydsp::SofaPreparation::maximumEqualizationDb",
+              "kind": "FieldDecl",
+              "line": 76,
+              "signature": "double maximumEqualizationDb = 12;",
+              "type": "double",
+              "default": "12"
+            },
+            {
+              "name": "cydsp::SofaPreparation::normalization",
+              "kind": "FieldDecl",
+              "line": 77,
+              "signature": "HrtfLevelNormalization normalization = HrtfLevelNormalization::none;",
+              "type": "HrtfLevelNormalization",
+              "default": "HrtfLevelNormalization::none"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::prepareSofaHrtf",
+          "kind": "FunctionDecl",
+          "line": 82,
+          "signature": "Status prepareSofaHrtf(const SofaHrtf& asset, HrtfSet<float>& out, const SofaPreparation& options = {}, SofaPreparationReport* report = nullptr) noexcept;",
+          "parameters": [
+            {
+              "name": "asset",
+              "type": "const SofaHrtf &",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "HrtfSet<float> &",
+              "default": ""
+            },
+            {
+              "name": "options",
+              "type": "const SofaPreparation &",
+              "default": "{}"
+            },
+            {
+              "name": "report",
+              "type": "SofaPreparationReport *",
+              "default": "nullptr"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::prepareSofaHrtf",
+          "kind": "FunctionDecl",
+          "line": 85,
+          "signature": "Status prepareSofaHrtf(const SofaHrtf64& asset, HrtfSet<double>& out, const SofaPreparation& options = {}, SofaPreparationReport* report = nullptr) noexcept;",
+          "parameters": [
+            {
+              "name": "asset",
+              "type": "const SofaHrtf64 &",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "HrtfSet<double> &",
+              "default": ""
+            },
+            {
+              "name": "options",
+              "type": "const SofaPreparation &",
+              "default": "{}"
+            },
+            {
+              "name": "report",
+              "type": "SofaPreparationReport *",
+              "default": "nullptr"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::encodeHrtfAsset",
+          "kind": "FunctionDecl",
+          "line": 90,
+          "signature": "Status encodeHrtfAsset(const SofaHrtf& asset, std::vector<std::byte>& out) noexcept;",
+          "parameters": [
+            {
+              "name": "asset",
+              "type": "const SofaHrtf &",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "std::vector<std::byte> &",
+              "default": ""
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::encodeHrtfAsset",
+          "kind": "FunctionDecl",
+          "line": 91,
+          "signature": "Status encodeHrtfAsset(const SofaHrtf64& asset, std::vector<std::byte>& out) noexcept;",
+          "parameters": [
+            {
+              "name": "asset",
+              "type": "const SofaHrtf64 &",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "std::vector<std::byte> &",
+              "default": ""
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::decodeHrtfAsset",
+          "kind": "FunctionDecl",
+          "line": 92,
+          "signature": "Status decodeHrtfAsset(std::span<const std::byte> file, SofaHrtf& out, const SofaLoadOptions& options = {}) noexcept;",
+          "parameters": [
+            {
+              "name": "file",
+              "type": "std::span<const std::byte>",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "SofaHrtf &",
+              "default": ""
+            },
+            {
+              "name": "options",
+              "type": "const SofaLoadOptions &",
+              "default": "{}"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::decodeHrtfAsset",
+          "kind": "FunctionDecl",
+          "line": 94,
+          "signature": "Status decodeHrtfAsset(std::span<const std::byte> file, SofaHrtf64& out, const SofaLoadOptions& options = {}) noexcept;",
+          "parameters": [
+            {
+              "name": "file",
+              "type": "std::span<const std::byte>",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "SofaHrtf64 &",
+              "default": ""
+            },
+            {
+              "name": "options",
+              "type": "const SofaLoadOptions &",
+              "default": "{}"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        }
+      ]
+    },
+    {
       "header": "cydsp/spatial/SpatialMath.h",
       "sha256": "4f0fae5f897433f83b10d2832679c25a3e7267937a41e5eda66ddb12809d9c4f",
       "symbols": [
@@ -20512,7 +21179,7 @@
     },
     {
       "header": "cydsp/spatial/SpatialRendering.h",
-      "sha256": "ca954540ad149d1822e6e78ccb565befd1e1cb79e4c5450a4a2eeeb0a95c108a",
+      "sha256": "430421153657318df39f9e4996837905036fe80be63960e682e9ab3d5f6180a2",
       "symbols": [
         {
           "name": "cydsp::BinauralEmitter",
@@ -20725,15 +21392,236 @@
           ]
         },
         {
+          "name": "cydsp::sphericalFibonacci",
+          "kind": "FunctionDecl",
+          "line": 43,
+          "signature": "Status sphericalFibonacci(std::span<Vec3> directions, std::span<double> solidAngles = {}) noexcept;",
+          "parameters": [
+            {
+              "name": "directions",
+              "type": "std::span<Vec3>",
+              "default": ""
+            },
+            {
+              "name": "solidAngles",
+              "type": "std::span<double>",
+              "default": "= {}"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::AnalyticHrirOptions",
+          "kind": "CXXRecordDecl",
+          "line": 45,
+          "signature": "struct AnalyticHrirOptions;",
+          "members": [
+            {
+              "name": "cydsp::AnalyticHrirOptions::sampleRate",
+              "kind": "FieldDecl",
+              "line": 46,
+              "signature": "double sampleRate = 48000;",
+              "type": "double",
+              "default": "48000"
+            },
+            {
+              "name": "cydsp::AnalyticHrirOptions::headRadiusMetres",
+              "kind": "FieldDecl",
+              "line": 46,
+              "signature": "double headRadiusMetres = .0875;",
+              "type": "double",
+              "default": ".0875"
+            },
+            {
+              "name": "cydsp::AnalyticHrirOptions::soundSpeed",
+              "kind": "FieldDecl",
+              "line": 46,
+              "signature": "double soundSpeed = 343;",
+              "type": "double",
+              "default": "343"
+            },
+            {
+              "name": "cydsp::AnalyticHrirOptions::distanceMetres",
+              "kind": "FieldDecl",
+              "line": 47,
+              "signature": "double distanceMetres = 1;",
+              "type": "double",
+              "default": "1"
+            },
+            {
+              "name": "cydsp::AnalyticHrirOptions::taps",
+              "kind": "FieldDecl",
+              "line": 48,
+              "signature": "std::size_t taps = 256;",
+              "type": "std::size_t",
+              "default": "256"
+            },
+            {
+              "name": "cydsp::AnalyticHrirOptions::maximumStorageBytes",
+              "kind": "FieldDecl",
+              "line": 48,
+              "signature": "std::size_t maximumStorageBytes = 512u * 1024u * 1024u;",
+              "type": "std::size_t",
+              "default": "512u * 1024u * 1024u"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::AnalyticHrirReport",
+          "kind": "CXXRecordDecl",
+          "line": 50,
+          "signature": "struct AnalyticHrirReport;",
+          "members": [
+            {
+              "name": "cydsp::AnalyticHrirReport::points",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::size_t points = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::AnalyticHrirReport::taps",
+              "kind": "FieldDecl",
+              "line": 51,
+              "signature": "std::size_t taps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::AnalyticHrirReport::maximumTailSample",
+              "kind": "FieldDecl",
+              "line": 54,
+              "signature": "double maximumTailSample = 0;",
+              "type": "double",
+              "default": "0"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::analyticHrirs",
+          "kind": "FunctionDecl",
+          "line": 58,
+          "signature": "template <Sample T> [[nodiscard]] Status analyticHrirs(const AnalyticHrirOptions& options, std::span<const Vec3> directions, HrirBank<T>& out, AnalyticHrirReport* report = nullptr) noexcept;",
+          "parameters": [
+            {
+              "name": "options",
+              "type": "const AnalyticHrirOptions &",
+              "default": ""
+            },
+            {
+              "name": "directions",
+              "type": "std::span<const Vec3>",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "HrirBank<T> &",
+              "default": ""
+            },
+            {
+              "name": "report",
+              "type": "AnalyticHrirReport *",
+              "default": "nullptr"
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::HrirBank",
+          "kind": "CXXRecordDecl",
+          "line": 62,
+          "signature": "template <Sample T> class HrirBank;",
+          "members": [
+            {
+              "name": "cydsp::HrirBank::HrirBank<T>",
+              "kind": "CXXConstructorDecl",
+              "line": 64,
+              "signature": "HrirBank();",
+              "parameters": [],
+              "returnType": "",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBank::~HrirBank<T>",
+              "kind": "CXXDestructorDecl",
+              "line": 65,
+              "signature": "~HrirBank();",
+              "parameters": [],
+              "returnType": "",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBank::HrirBank<T>",
+              "kind": "CXXConstructorDecl",
+              "line": 66,
+              "signature": "HrirBank(HrirBank&&) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "HrirBank<T> &&",
+                  "default": ""
+                }
+              ],
+              "returnType": "",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBank::operator=",
+              "kind": "CXXMethodDecl",
+              "line": 67,
+              "signature": "HrirBank& operator=(HrirBank&&) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "HrirBank<T> &&",
+                  "default": ""
+                }
+              ],
+              "returnType": "HrirBank<T> &",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBank::points",
+              "kind": "CXXMethodDecl",
+              "line": 68,
+              "signature": "std::span<const HrirPoint<T>> points() const noexcept;",
+              "parameters": [],
+              "returnType": "std::span<const HrirPoint<T>>",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBank::sampleRate",
+              "kind": "CXXMethodDecl",
+              "line": 69,
+              "signature": "double sampleRate() const noexcept;",
+              "parameters": [],
+              "returnType": "double",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBank::taps",
+              "kind": "CXXMethodDecl",
+              "line": 70,
+              "signature": "std::size_t taps() const noexcept;",
+              "parameters": [],
+              "returnType": "std::size_t",
+              "deleted": false
+            }
+          ]
+        },
+        {
           "name": "cydsp::HrtfPreparation",
           "kind": "CXXRecordDecl",
-          "line": 41,
+          "line": 79,
           "signature": "struct HrtfPreparation;",
           "members": [
             {
               "name": "cydsp::HrtfPreparation::sourceSampleRate",
               "kind": "FieldDecl",
-              "line": 42,
+              "line": 80,
               "signature": "double sourceSampleRate = 48000;",
               "type": "double",
               "default": "48000"
@@ -20741,7 +21629,7 @@
             {
               "name": "cydsp::HrtfPreparation::targetSampleRate",
               "kind": "FieldDecl",
-              "line": 42,
+              "line": 80,
               "signature": "double targetSampleRate = 48000;",
               "type": "double",
               "default": "48000"
@@ -20749,7 +21637,7 @@
             {
               "name": "cydsp::HrtfPreparation::detectOnsets",
               "kind": "FieldDecl",
-              "line": 43,
+              "line": 81,
               "signature": "bool detectOnsets = true;",
               "type": "bool",
               "default": "true"
@@ -20757,7 +21645,7 @@
             {
               "name": "cydsp::HrtfPreparation::onsetThresholdDb",
               "kind": "FieldDecl",
-              "line": 44,
+              "line": 82,
               "signature": "double onsetThresholdDb = -40;",
               "type": "double",
               "default": "-40"
@@ -20765,7 +21653,7 @@
             {
               "name": "cydsp::HrtfPreparation::angularWidthRadians",
               "kind": "FieldDecl",
-              "line": 44,
+              "line": 82,
               "signature": "double angularWidthRadians = .7;",
               "type": "double",
               "default": ".7"
@@ -20773,23 +21661,174 @@
             {
               "name": "cydsp::HrtfPreparation::maximumTaps",
               "kind": "FieldDecl",
-              "line": 45,
+              "line": 83,
               "signature": "std::size_t maximumTaps = 2048;",
               "type": "std::size_t",
               "default": "2048"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::maximumPoints",
+              "kind": "FieldDecl",
+              "line": 84,
+              "signature": "std::size_t maximumPoints = 2048;",
+              "type": "std::size_t",
+              "default": "2048"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::maximumInputTaps",
+              "kind": "FieldDecl",
+              "line": 84,
+              "signature": "std::size_t maximumInputTaps = 32768;",
+              "type": "std::size_t",
+              "default": "32768"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::maximumStorageBytes",
+              "kind": "FieldDecl",
+              "line": 85,
+              "signature": "std::size_t maximumStorageBytes = 512u * 1024u * 1024u;",
+              "type": "std::size_t",
+              "default": "512u * 1024u * 1024u"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::maximumDelaySeconds",
+              "kind": "FieldDecl",
+              "line": 86,
+              "signature": "double maximumDelaySeconds = .1;",
+              "type": "double",
+              "default": ".1"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::resampleHalfLength",
+              "kind": "FieldDecl",
+              "line": 87,
+              "signature": "std::size_t resampleHalfLength = 32;",
+              "type": "std::size_t",
+              "default": "32"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::interpolationPoints",
+              "kind": "FieldDecl",
+              "line": 90,
+              "signature": "std::size_t interpolationPoints = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::fractionalDelayTaps",
+              "kind": "FieldDecl",
+              "line": 93,
+              "signature": "std::size_t fractionalDelayTaps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfPreparation::rejectTruncation",
+              "kind": "FieldDecl",
+              "line": 94,
+              "signature": "bool rejectTruncation = false;",
+              "type": "bool",
+              "default": "false"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::HrtfQuality",
+          "kind": "EnumDecl",
+          "line": 96,
+          "signature": "enum class HrtfQuality { economy, realtimeHigh, reference };"
+        },
+        {
+          "name": "cydsp::hrtfPreparation",
+          "kind": "FunctionDecl",
+          "line": 98,
+          "signature": "Status hrtfPreparation(HrtfQuality quality, double targetSampleRate, HrtfPreparation& out) noexcept;",
+          "parameters": [
+            {
+              "name": "quality",
+              "type": "HrtfQuality",
+              "default": ""
+            },
+            {
+              "name": "targetSampleRate",
+              "type": "double",
+              "default": ""
+            },
+            {
+              "name": "out",
+              "type": "HrtfPreparation &",
+              "default": ""
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::HrtfStorageReport",
+          "kind": "CXXRecordDecl",
+          "line": 100,
+          "signature": "struct HrtfStorageReport;",
+          "members": [
+            {
+              "name": "cydsp::HrtfStorageReport::points",
+              "kind": "FieldDecl",
+              "line": 101,
+              "signature": "std::size_t points = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfStorageReport::taps",
+              "kind": "FieldDecl",
+              "line": 101,
+              "signature": "std::size_t taps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfStorageReport::coefficientBytes",
+              "kind": "FieldDecl",
+              "line": 101,
+              "signature": "std::size_t coefficientBytes = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfStorageReport::interpolationPoints",
+              "kind": "FieldDecl",
+              "line": 102,
+              "signature": "std::size_t interpolationPoints = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfStorageReport::fractionalDelayTaps",
+              "kind": "FieldDecl",
+              "line": 102,
+              "signature": "std::size_t fractionalDelayTaps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HrtfStorageReport::truncated",
+              "kind": "FieldDecl",
+              "line": 103,
+              "signature": "bool truncated = false;",
+              "type": "bool",
+              "default": "false"
             }
           ]
         },
         {
           "name": "cydsp::HrtfSet",
           "kind": "CXXRecordDecl",
-          "line": 51,
+          "line": 109,
           "signature": "template <Sample T> class HrtfSet;",
           "members": [
             {
               "name": "cydsp::HrtfSet::prepare",
               "kind": "CXXMethodDecl",
-              "line": 53,
+              "line": 111,
               "signature": "Status prepare(std::span<const HrirPoint<T>>, const HrtfPreparation& = {}) noexcept;",
               "parameters": [
                 {
@@ -20809,7 +21848,7 @@
             {
               "name": "cydsp::HrtfSet::points",
               "kind": "CXXMethodDecl",
-              "line": 55,
+              "line": 113,
               "signature": "std::size_t points() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -20818,7 +21857,7 @@
             {
               "name": "cydsp::HrtfSet::taps",
               "kind": "CXXMethodDecl",
-              "line": 56,
+              "line": 114,
               "signature": "std::size_t taps() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -20827,7 +21866,7 @@
             {
               "name": "cydsp::HrtfSet::sampleRate",
               "kind": "CXXMethodDecl",
-              "line": 57,
+              "line": 115,
               "signature": "double sampleRate() const noexcept;",
               "parameters": [],
               "returnType": "double",
@@ -20836,7 +21875,7 @@
             {
               "name": "cydsp::HrtfSet::latencyFrames",
               "kind": "CXXMethodDecl",
-              "line": 59,
+              "line": 117,
               "signature": "std::size_t latencyFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -20845,10 +21884,19 @@
             {
               "name": "cydsp::HrtfSet::truncated",
               "kind": "CXXMethodDecl",
-              "line": 60,
+              "line": 118,
               "signature": "bool truncated() const noexcept;",
               "parameters": [],
               "returnType": "bool",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrtfSet::storageReport",
+              "kind": "CXXMethodDecl",
+              "line": 119,
+              "signature": "HrtfStorageReport storageReport() const noexcept;",
+              "parameters": [],
+              "returnType": "HrtfStorageReport",
               "deleted": false
             }
           ]
@@ -20856,13 +21904,13 @@
         {
           "name": "cydsp::HrirBinaural",
           "kind": "CXXRecordDecl",
-          "line": 68,
+          "line": 127,
           "signature": "template <Sample T> class HrirBinaural;",
           "members": [
             {
               "name": "cydsp::HrirBinaural::HrirBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 70,
+              "line": 129,
               "signature": "HrirBinaural();",
               "parameters": [],
               "returnType": "",
@@ -20871,7 +21919,7 @@
             {
               "name": "cydsp::HrirBinaural::~HrirBinaural<T>",
               "kind": "CXXDestructorDecl",
-              "line": 71,
+              "line": 130,
               "signature": "~HrirBinaural();",
               "parameters": [],
               "returnType": "",
@@ -20880,7 +21928,7 @@
             {
               "name": "cydsp::HrirBinaural::HrirBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 72,
+              "line": 131,
               "signature": "HrirBinaural(HrirBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -20895,7 +21943,7 @@
             {
               "name": "cydsp::HrirBinaural::operator=",
               "kind": "CXXMethodDecl",
-              "line": 73,
+              "line": 132,
               "signature": "HrirBinaural& operator=(HrirBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -20910,7 +21958,7 @@
             {
               "name": "cydsp::HrirBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 74,
+              "line": 133,
               "signature": "Status prepare(const ProcessSpec& mono, std::span<const HrirPoint<T>>, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -20935,7 +21983,7 @@
             {
               "name": "cydsp::HrirBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 76,
+              "line": 135,
               "signature": "Status prepare(const ProcessSpec& mono, const HrtfSet<T>&, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -20960,7 +22008,7 @@
             {
               "name": "cydsp::HrirBinaural::setDirection",
               "kind": "CXXMethodDecl",
-              "line": 82,
+              "line": 142,
               "signature": "Status setDirection(Vec3, std::size_t transitionFrames = 256) noexcept;",
               "parameters": [
                 {
@@ -20980,7 +22028,7 @@
             {
               "name": "cydsp::HrirBinaural::process",
               "kind": "CXXMethodDecl",
-              "line": 83,
+              "line": 143,
               "signature": "Status process(AudioBlock<const T>, AudioBlock<T> stereo) noexcept;",
               "parameters": [
                 {
@@ -21000,7 +22048,7 @@
             {
               "name": "cydsp::HrirBinaural::reset",
               "kind": "CXXMethodDecl",
-              "line": 84,
+              "line": 144,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",
@@ -21009,7 +22057,7 @@
             {
               "name": "cydsp::HrirBinaural::tailFrames",
               "kind": "CXXMethodDecl",
-              "line": 85,
+              "line": 145,
               "signature": "std::size_t tailFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -21018,7 +22066,7 @@
             {
               "name": "cydsp::HrirBinaural::latencyFrames",
               "kind": "CXXMethodDecl",
-              "line": 86,
+              "line": 146,
               "signature": "std::size_t latencyFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -21029,13 +22077,13 @@
         {
           "name": "cydsp::VbapLayout",
           "kind": "CXXRecordDecl",
-          "line": 95,
+          "line": 155,
           "signature": "class VbapLayout;",
           "members": [
             {
               "name": "cydsp::VbapLayout::VbapLayout",
               "kind": "CXXConstructorDecl",
-              "line": 97,
+              "line": 157,
               "signature": "VbapLayout();",
               "parameters": [],
               "returnType": "",
@@ -21044,7 +22092,7 @@
             {
               "name": "cydsp::VbapLayout::~VbapLayout",
               "kind": "CXXDestructorDecl",
-              "line": 98,
+              "line": 158,
               "signature": "~VbapLayout();",
               "parameters": [],
               "returnType": "",
@@ -21053,7 +22101,7 @@
             {
               "name": "cydsp::VbapLayout::VbapLayout",
               "kind": "CXXConstructorDecl",
-              "line": 99,
+              "line": 159,
               "signature": "VbapLayout(VbapLayout&&) noexcept;",
               "parameters": [
                 {
@@ -21068,7 +22116,7 @@
             {
               "name": "cydsp::VbapLayout::operator=",
               "kind": "CXXMethodDecl",
-              "line": 100,
+              "line": 160,
               "signature": "VbapLayout& operator=(VbapLayout&&) noexcept;",
               "parameters": [
                 {
@@ -21083,7 +22131,7 @@
             {
               "name": "cydsp::VbapLayout::prepare",
               "kind": "CXXMethodDecl",
-              "line": 101,
+              "line": 161,
               "signature": "Status prepare(std::span<const Vec3> speakers, bool threeDimensional, bool nearestFallback = false) noexcept;",
               "parameters": [
                 {
@@ -21108,7 +22156,7 @@
             {
               "name": "cydsp::VbapLayout::gains",
               "kind": "CXXMethodDecl",
-              "line": 103,
+              "line": 163,
               "signature": "Status gains(Vec3 direction, std::span<double>) const noexcept;",
               "parameters": [
                 {
@@ -21128,7 +22176,7 @@
             {
               "name": "cydsp::VbapLayout::speakers",
               "kind": "CXXMethodDecl",
-              "line": 104,
+              "line": 164,
               "signature": "std::size_t speakers() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -21139,7 +22187,7 @@
         {
           "name": "cydsp::ambisonicCoefficients",
           "kind": "FunctionDecl",
-          "line": 111,
+          "line": 171,
           "signature": "Status ambisonicCoefficients(unsigned order, Vec3 direction, std::span<double>) noexcept;",
           "parameters": [
             {
@@ -21164,7 +22212,7 @@
         {
           "name": "cydsp::ambisonicRotation",
           "kind": "FunctionDecl",
-          "line": 115,
+          "line": 175,
           "signature": "Status ambisonicRotation(unsigned order, Quaternion, std::span<double>) noexcept;",
           "parameters": [
             {
@@ -21189,13 +22237,13 @@
         {
           "name": "cydsp::AmbisonicRenderer",
           "kind": "CXXRecordDecl",
-          "line": 116,
+          "line": 176,
           "signature": "template <Sample T> class AmbisonicRenderer;",
           "members": [
             {
               "name": "cydsp::AmbisonicRenderer::AmbisonicRenderer<T>",
               "kind": "CXXConstructorDecl",
-              "line": 118,
+              "line": 178,
               "signature": "AmbisonicRenderer();",
               "parameters": [],
               "returnType": "",
@@ -21204,7 +22252,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::~AmbisonicRenderer<T>",
               "kind": "CXXDestructorDecl",
-              "line": 119,
+              "line": 179,
               "signature": "~AmbisonicRenderer();",
               "parameters": [],
               "returnType": "",
@@ -21213,7 +22261,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::AmbisonicRenderer<T>",
               "kind": "CXXConstructorDecl",
-              "line": 120,
+              "line": 180,
               "signature": "AmbisonicRenderer(AmbisonicRenderer&&) noexcept;",
               "parameters": [
                 {
@@ -21228,7 +22276,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::operator=",
               "kind": "CXXMethodDecl",
-              "line": 121,
+              "line": 181,
               "signature": "AmbisonicRenderer& operator=(AmbisonicRenderer&&) noexcept;",
               "parameters": [
                 {
@@ -21243,7 +22291,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::prepare",
               "kind": "CXXMethodDecl",
-              "line": 122,
+              "line": 182,
               "signature": "Status prepare(const ProcessSpec& mono, unsigned order, std::span<const Vec3> speakers, double regularization = 1e-6, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -21278,7 +22326,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::setDirection",
               "kind": "CXXMethodDecl",
-              "line": 125,
+              "line": 185,
               "signature": "Status setDirection(Vec3) noexcept;",
               "parameters": [
                 {
@@ -21293,7 +22341,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::setRotation",
               "kind": "CXXMethodDecl",
-              "line": 126,
+              "line": 186,
               "signature": "Status setRotation(Quaternion) noexcept;",
               "parameters": [
                 {
@@ -21308,7 +22356,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::encode",
               "kind": "CXXMethodDecl",
-              "line": 127,
+              "line": 187,
               "signature": "Status encode(AudioBlock<const T> mono, AudioBlock<T> ambisonic) noexcept;",
               "parameters": [
                 {
@@ -21328,7 +22376,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::rotateField",
               "kind": "CXXMethodDecl",
-              "line": 128,
+              "line": 188,
               "signature": "Status rotateField(AudioBlock<const T>, AudioBlock<T>) noexcept;",
               "parameters": [
                 {
@@ -21348,7 +22396,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::decode",
               "kind": "CXXMethodDecl",
-              "line": 129,
+              "line": 189,
               "signature": "Status decode(AudioBlock<const T>, AudioBlock<T> speakers) noexcept;",
               "parameters": [
                 {
@@ -21368,7 +22416,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::reset",
               "kind": "CXXMethodDecl",
-              "line": 130,
+              "line": 190,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",
@@ -21377,7 +22425,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::channels",
               "kind": "CXXMethodDecl",
-              "line": 131,
+              "line": 191,
               "signature": "std::size_t channels() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -21386,15 +22434,189 @@
           ]
         },
         {
+          "name": "cydsp::HoaDecoderMethod",
+          "kind": "EnumDecl",
+          "line": 197,
+          "signature": "enum class HoaDecoderMethod { leastSquares, magLS };"
+        },
+        {
+          "name": "cydsp::HoaDecoderDesign",
+          "kind": "CXXRecordDecl",
+          "line": 198,
+          "signature": "struct HoaDecoderDesign;",
+          "members": [
+            {
+              "name": "cydsp::HoaDecoderDesign::method",
+              "kind": "FieldDecl",
+              "line": 199,
+              "signature": "HoaDecoderMethod method = HoaDecoderMethod::magLS;",
+              "type": "HoaDecoderMethod",
+              "default": "HoaDecoderMethod::magLS"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::crossoverHz",
+              "kind": "FieldDecl",
+              "line": 200,
+              "signature": "double crossoverHz = 2000;",
+              "type": "double",
+              "default": "2000"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::transitionHz",
+              "kind": "FieldDecl",
+              "line": 200,
+              "signature": "double transitionHz = 500;",
+              "type": "double",
+              "default": "500"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::maxRe",
+              "kind": "FieldDecl",
+              "line": 202,
+              "signature": "bool maxRe = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::regularization",
+              "kind": "FieldDecl",
+              "line": 203,
+              "signature": "double regularization = 1e-6;",
+              "type": "double",
+              "default": "1e-6"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::iterations",
+              "kind": "FieldDecl",
+              "line": 204,
+              "signature": "std::size_t iterations = 12;",
+              "type": "std::size_t",
+              "default": "12"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::fftSize",
+              "kind": "FieldDecl",
+              "line": 204,
+              "signature": "std::size_t fftSize = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::maximumFftSize",
+              "kind": "FieldDecl",
+              "line": 205,
+              "signature": "std::size_t maximumFftSize = 65536;",
+              "type": "std::size_t",
+              "default": "65536"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::maximumStorageBytes",
+              "kind": "FieldDecl",
+              "line": 205,
+              "signature": "std::size_t maximumStorageBytes = 512u * 1024u * 1024u;",
+              "type": "std::size_t",
+              "default": "512u * 1024u * 1024u"
+            },
+            {
+              "name": "cydsp::HoaDecoderDesign::spatialWeights",
+              "kind": "FieldDecl",
+              "line": 206,
+              "signature": "std::span<const double> spatialWeights;",
+              "type": "std::span<const double>",
+              "default": ""
+            }
+          ]
+        },
+        {
+          "name": "cydsp::HoaDecoderReport",
+          "kind": "CXXRecordDecl",
+          "line": 208,
+          "signature": "struct HoaDecoderReport;",
+          "members": [
+            {
+              "name": "cydsp::HoaDecoderReport::method",
+              "kind": "FieldDecl",
+              "line": 209,
+              "signature": "HoaDecoderMethod method = HoaDecoderMethod::leastSquares;",
+              "type": "HoaDecoderMethod",
+              "default": "HoaDecoderMethod::leastSquares"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::fftSize",
+              "kind": "FieldDecl",
+              "line": 210,
+              "signature": "std::size_t fftSize = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::filterTaps",
+              "kind": "FieldDecl",
+              "line": 210,
+              "signature": "std::size_t filterTaps = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::latencyFrames",
+              "kind": "FieldDecl",
+              "line": 210,
+              "signature": "std::size_t latencyFrames = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::lowBandComplexError",
+              "kind": "FieldDecl",
+              "line": 212,
+              "signature": "double lowBandComplexError = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::highBandMagnitudeError",
+              "kind": "FieldDecl",
+              "line": 212,
+              "signature": "double highBandMagnitudeError = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::initialHighBandMagnitudeError",
+              "kind": "FieldDecl",
+              "line": 213,
+              "signature": "double initialHighBandMagnitudeError = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::maxRe",
+              "kind": "FieldDecl",
+              "line": 214,
+              "signature": "bool maxRe = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::spectralMetricsAvailable",
+              "kind": "FieldDecl",
+              "line": 215,
+              "signature": "bool spectralMetricsAvailable = false;",
+              "type": "bool",
+              "default": "false"
+            }
+          ]
+        },
+        {
           "name": "cydsp::HoaBinaural",
           "kind": "CXXRecordDecl",
-          "line": 141,
+          "line": 221,
           "signature": "template <Sample T> class HoaBinaural;",
           "members": [
             {
               "name": "cydsp::HoaBinaural::HoaBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 143,
+              "line": 223,
               "signature": "HoaBinaural();",
               "parameters": [],
               "returnType": "",
@@ -21403,7 +22625,7 @@
             {
               "name": "cydsp::HoaBinaural::~HoaBinaural<T>",
               "kind": "CXXDestructorDecl",
-              "line": 144,
+              "line": 224,
               "signature": "~HoaBinaural();",
               "parameters": [],
               "returnType": "",
@@ -21412,7 +22634,7 @@
             {
               "name": "cydsp::HoaBinaural::HoaBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 145,
+              "line": 225,
               "signature": "HoaBinaural(HoaBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -21427,7 +22649,7 @@
             {
               "name": "cydsp::HoaBinaural::operator=",
               "kind": "CXXMethodDecl",
-              "line": 146,
+              "line": 226,
               "signature": "HoaBinaural& operator=(HoaBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -21442,7 +22664,7 @@
             {
               "name": "cydsp::HoaBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 147,
+              "line": 227,
               "signature": "Status prepare(const ProcessSpec& ambisonic, unsigned order, const HrtfSet<T>&, double regularization = 1e-6, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -21475,9 +22697,53 @@
               "deleted": false
             },
             {
+              "name": "cydsp::HoaBinaural::prepare",
+              "kind": "CXXMethodDecl",
+              "line": 232,
+              "signature": "Status prepare(const ProcessSpec& ambisonic, unsigned order, const HrtfSet<T>& data, const HoaDecoderDesign& design, CpuBackend backend = CpuBackend::automatic) noexcept;",
+              "parameters": [
+                {
+                  "name": "ambisonic",
+                  "type": "const ProcessSpec &",
+                  "default": ""
+                },
+                {
+                  "name": "order",
+                  "type": "unsigned int",
+                  "default": ""
+                },
+                {
+                  "name": "data",
+                  "type": "const HrtfSet<T> &",
+                  "default": ""
+                },
+                {
+                  "name": "design",
+                  "type": "const HoaDecoderDesign &",
+                  "default": ""
+                },
+                {
+                  "name": "backend",
+                  "type": "CpuBackend",
+                  "default": "CpuBackend::automatic"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HoaBinaural::designReport",
+              "kind": "CXXMethodDecl",
+              "line": 235,
+              "signature": "HoaDecoderReport designReport() const noexcept;",
+              "parameters": [],
+              "returnType": "HoaDecoderReport",
+              "deleted": false
+            },
+            {
               "name": "cydsp::HoaBinaural::setRotation",
               "kind": "CXXMethodDecl",
-              "line": 150,
+              "line": 236,
               "signature": "Status setRotation(Quaternion) noexcept;",
               "parameters": [
                 {
@@ -21492,7 +22758,7 @@
             {
               "name": "cydsp::HoaBinaural::process",
               "kind": "CXXMethodDecl",
-              "line": 151,
+              "line": 237,
               "signature": "Status process(AudioBlock<const T>, AudioBlock<T> stereo) noexcept;",
               "parameters": [
                 {
@@ -21512,7 +22778,7 @@
             {
               "name": "cydsp::HoaBinaural::reset",
               "kind": "CXXMethodDecl",
-              "line": 152,
+              "line": 238,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",
@@ -21521,7 +22787,7 @@
             {
               "name": "cydsp::HoaBinaural::tailFrames",
               "kind": "CXXMethodDecl",
-              "line": 153,
+              "line": 239,
               "signature": "std::size_t tailFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -21530,7 +22796,7 @@
             {
               "name": "cydsp::HoaBinaural::latencyFrames",
               "kind": "CXXMethodDecl",
-              "line": 154,
+              "line": 240,
               "signature": "std::size_t latencyFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",

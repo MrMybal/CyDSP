@@ -3,7 +3,7 @@ id: api-synthesis-sampledata
 title: SampleData
 description: Samples copiés en mémoire, mips antirepliement préparés, interpolation et fondus de boucles.
 section: Référence API
-order: 1185
+order: 1186
 sourceRevision: 1
 parent: api-synthesis
 symbol: cydsp::SampleData

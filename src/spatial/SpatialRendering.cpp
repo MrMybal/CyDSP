@@ -4,12 +4,15 @@
 #include "cydsp/math/VectorOps.h"
 #include "cydsp/processors/MatrixConvolver.h"
 #include "detail/Analysis.h"
+#include "detail/HoaDecoder.h"
 #include "detail/VectorTable.h"
 #include "detail/WindowedSinc.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <numbers>
+#include <numeric>
 #include <vector>
 namespace cydsp {
 namespace {
@@ -227,42 +230,107 @@ template <Sample T> struct HrtfSet<T>::State {
     double rate = 0, width = .7;
     std::size_t taps = 0, tail = 0, latency = 0;
     bool truncated = false;
+    std::size_t neighbours = 0, fractionalTaps = 0;
+    struct Node {
+        std::size_t point, left, right;
+        unsigned axis;
+    };
+    std::vector<Node> tree;
+    static constexpr std::size_t absent = std::numeric_limits<std::size_t>::max();
+    std::size_t root = absent;
+    static double coordinate(Vec3 d, unsigned a) {
+        return a == 0 ? d.x : a == 1 ? d.y : d.z;
+    }
+    std::size_t build(std::vector<std::size_t>& ids, std::size_t begin, std::size_t end,
+                      unsigned depth) {
+        if (begin == end)
+            return absent;
+        const auto mid = begin + (end - begin) / 2;
+        const unsigned axis = depth % 3;
+        std::nth_element(ids.begin() + begin, ids.begin() + mid, ids.begin() + end,
+                         [&](auto a, auto b) {
+                             const double x = coordinate(points[a].direction, axis),
+                                          y = coordinate(points[b].direction, axis);
+                             return x == y ? a < b : x < y;
+                         });
+        const auto index = tree.size();
+        tree.push_back({ids[mid], absent, absent, axis});
+        const auto left = build(ids, begin, mid, depth + 1),
+                   right = build(ids, mid + 1, end, depth + 1);
+        tree[index].left = left;
+        tree[index].right = right;
+        return index;
+    }
+    void nearest(Vec3 d, std::span<std::size_t> ids, std::span<double> distances) const noexcept {
+        std::fill(distances.begin(), distances.end(), std::numeric_limits<double>::infinity());
+        const auto visit = [&](auto&& self, std::size_t index) -> void {
+            if (index == absent)
+                return;
+            const auto& node = tree[index];
+            const auto p = points[node.point].direction;
+            const double dx = d.x - p.x, dy = d.y - p.y, dz = d.z - p.z,
+                         dist = dx * dx + dy * dy + dz * dz;
+            if (dist < distances.back()) {
+                auto i = distances.size() - 1;
+                while (i && dist < distances[i - 1]) {
+                    distances[i] = distances[i - 1];
+                    ids[i] = ids[i - 1];
+                    --i;
+                }
+                distances[i] = dist;
+                ids[i] = node.point;
+            }
+            const double delta = coordinate(d, node.axis) - coordinate(p, node.axis);
+            self(self, delta < 0 ? node.left : node.right);
+            if (delta * delta <= distances.back())
+                self(self, delta < 0 ? node.right : node.left);
+        };
+        visit(visit, root);
+    }
 };
 template <Sample T>
 Status HrtfSet<T>::prepare(std::span<const HrirPoint<T>> points,
                            const HrtfPreparation& config) noexcept {
-    if (points.empty() || points.size() > 2048 || !isFinite(config.sourceSampleRate) ||
-        !isFinite(config.targetSampleRate) || config.sourceSampleRate < 8000 ||
-        config.sourceSampleRate > 768000 || config.targetSampleRate < 8000 ||
-        config.targetSampleRate > 768000 ||
+    if (points.empty() || points.size() > config.maximumPoints ||
+        !isFinite(config.sourceSampleRate) || !isFinite(config.targetSampleRate) ||
+        config.sourceSampleRate < 8000 || config.sourceSampleRate > 768000 ||
+        config.targetSampleRate < 8000 || config.targetSampleRate > 768000 ||
         config.targetSampleRate / config.sourceSampleRate < .125 ||
         config.targetSampleRate / config.sourceSampleRate > 8 || !config.maximumTaps ||
-        config.maximumTaps > 2048 || !isFinite(config.onsetThresholdDb) ||
-        config.onsetThresholdDb < -100 || config.onsetThresholdDb > -3 ||
-        !isFinite(config.angularWidthRadians) || config.angularWidthRadians < .05 ||
-        config.angularWidthRadians > 3.2)
+        config.maximumTaps > 65536 || !config.maximumPoints || config.maximumPoints > 100000 ||
+        !config.maximumInputTaps || config.maximumInputTaps > 65536 ||
+        !config.maximumStorageBytes || !isFinite(config.maximumDelaySeconds) ||
+        config.maximumDelaySeconds < 0 || config.maximumDelaySeconds > 2 ||
+        config.resampleHalfLength < 8 || config.resampleHalfLength > 256 ||
+        config.interpolationPoints > 64 ||
+        (config.fractionalDelayTaps &&
+         (config.fractionalDelayTaps < 3 || config.fractionalDelayTaps > 129 ||
+          !(config.fractionalDelayTaps & 1))) ||
+        !isFinite(config.onsetThresholdDb) || config.onsetThresholdDb < -100 ||
+        config.onsetThresholdDb > -3 || !isFinite(config.angularWidthRadians) ||
+        config.angularWidthRadians < .05 || config.angularWidthRadians > 3.2)
         return Status::invalid_spec;
     try {
         auto s = std::make_shared<State>();
         s->rate = config.targetSampleRate;
         s->width = config.angularWidthRadians;
+        s->neighbours = config.interpolationPoints;
+        s->fractionalTaps = config.fractionalDelayTaps;
         const double ratio = config.sourceSampleRate / config.targetSampleRate;
-        const double half = 32 * std::max(1., ratio);
+        const double half = double(config.resampleHalfLength) * std::max(1., ratio);
         s->latency = ratio == 1 ? 0 : std::size_t(std::ceil(half / ratio));
         for (const auto& p : points) {
             typename State::Point q;
             if (!unit(p.direction, q.direction))
                 return Status::invalid_argument;
-            for (auto& prior : s->points)
-                if (dot(prior.direction, q.direction) > 1 - 1e-12)
-                    return Status::invalid_argument;
             const std::array<std::span<const T>, 2> ears{p.left, p.right};
             const std::array<double, 2> delays{p.leftDelayFrames, p.rightDelayFrames};
             std::array<std::vector<double>, 2> converted;
             for (std::size_t ear = 0; ear < 2; ++ear) {
                 auto ir = ears[ear];
-                if (ir.empty() || ir.size() > 16384 || !isFinite(delays[ear]) || delays[ear] < 0 ||
-                    delays[ear] > config.sourceSampleRate * .02)
+                if (ir.empty() || ir.size() > config.maximumInputTaps || !isFinite(delays[ear]) ||
+                    delays[ear] < 0 ||
+                    delays[ear] > config.sourceSampleRate * config.maximumDelaySeconds)
                     return Status::invalid_argument;
                 double peak = 0;
                 for (T x : ir) {
@@ -282,6 +350,10 @@ Status HrtfSet<T>::prepare(std::span<const HrirPoint<T>> points,
                     double(s->latency));
                 const auto count = std::min(config.maximumTaps, natural);
                 s->truncated = s->truncated || natural > count;
+                if (config.rejectTruncation && natural > count)
+                    return Status::invalid_spec;
+                if (count > config.maximumStorageBytes / (2 * sizeof(double)) / points.size())
+                    return Status::invalid_spec;
                 converted[ear].resize(count);
                 const double cutoff = .95 / std::max(1., ratio);
                 for (std::size_t i = 0; i < count; ++i) {
@@ -309,6 +381,18 @@ Status HrtfSet<T>::prepare(std::span<const HrirPoint<T>> points,
             // Temporarily retain each point's own stride; pad once the global stride is known.
             s->points.push_back(std::move(q));
         }
+        std::vector<std::size_t> ids(s->points.size());
+        std::iota(ids.begin(), ids.end(), 0);
+        s->tree.reserve(ids.size());
+        s->root = s->build(ids, 0, ids.size(), 0);
+        if (ids.size() > 1)
+            for (const auto& point : s->points) {
+                std::array<std::size_t, 2> nearest{};
+                std::array<double, 2> distances{};
+                s->nearest(point.direction, nearest, distances);
+                if (dot(point.direction, s->points[nearest[1]].direction) > 1 - 1e-12)
+                    return Status::invalid_argument;
+            }
         for (auto& q : s->points) {
             const auto old = q.fir.size() / 2;
             if (old != s->taps) {
@@ -342,10 +426,47 @@ template <Sample T> bool HrtfSet<T>::truncated() const noexcept {
     return state_ && state_->truncated;
 }
 
+Status hrtfPreparation(HrtfQuality quality, double rate, HrtfPreparation& out) noexcept {
+    if (unsigned(quality) > unsigned(HrtfQuality::reference) || !isFinite(rate) || rate < 8000 ||
+        rate > 768000)
+        return Status::invalid_argument;
+    HrtfPreparation c;
+    c.targetSampleRate = rate;
+    if (quality == HrtfQuality::economy) {
+        c.maximumTaps = 256;
+        c.interpolationPoints = 4;
+        c.resampleHalfLength = 16;
+    } else if (quality == HrtfQuality::realtimeHigh) {
+        c.maximumTaps = 2048;
+        c.maximumPoints = 16384;
+        c.interpolationPoints = 8;
+        c.fractionalDelayTaps = 17;
+        c.resampleHalfLength = 64;
+    } else {
+        c.maximumTaps = 65536;
+        c.maximumInputTaps = 65536;
+        c.maximumPoints = 100000;
+        c.interpolationPoints = 0;
+        c.fractionalDelayTaps = 65;
+        c.resampleHalfLength = 128;
+        c.rejectTruncation = true;
+    }
+    out = c;
+    return Status::ok;
+}
+template <Sample T> HrtfStorageReport HrtfSet<T>::storageReport() const noexcept {
+    if (!state_)
+        return {};
+    const auto& s = *state_;
+    return {s.points.size(), s.taps,           s.points.size() * s.taps * 2 * sizeof(double),
+            s.neighbours,    s.fractionalTaps, s.truncated};
+}
+
 template <Sample T> struct HrirBinaural<T>::State {
     ProcessSpec spec;
     std::shared_ptr<const typename HrtfSet<T>::State> data;
-    std::vector<double> current, next, scratch;
+    std::vector<double> current, next, scratch, sourceFir, kernel, weights;
+    std::vector<std::size_t> neighbours;
     CircularHistory<T> history;
     VectorOps ops;
     std::array<double, 2> delay{}, nextDelay{};
@@ -393,8 +514,15 @@ Status HrirBinaural<T>::prepare(const ProcessSpec& spec, const HrtfSet<T>& data,
         auto s = std::make_unique<State>();
         s->spec = spec;
         s->data = data.state_;
-        s->taps = s->data->taps;
-        s->tail = s->data->tail;
+        s->taps = s->data->taps + (s->data->fractionalTaps ? s->data->fractionalTaps - 1 : 0);
+        s->tail = s->data->tail + (s->data->fractionalTaps ? s->data->fractionalTaps - 1 : 0);
+        const auto count = data.state_->neighbours
+                               ? std::min(data.state_->neighbours, data.state_->points.size())
+                               : data.state_->points.size();
+        s->weights.resize(count);
+        s->neighbours.resize(count);
+        s->sourceFir.resize(data.state_->taps * 2);
+        s->kernel.resize(data.state_->fractionalTaps);
         s->current.resize(2 * s->taps);
         s->next.resize(2 * s->taps);
         s->scratch.resize(s->taps + 1);
@@ -404,9 +532,12 @@ Status HrirBinaural<T>::prepare(const ProcessSpec& spec, const HrtfSet<T>& data,
         status = s->history.prepare(1, s->tail + 2);
         if (status != Status::ok)
             return status;
-        s->current = s->next = s->data->points.front().fir;
-        s->delay = s->nextDelay = s->data->points.front().delays;
-        state_.swap(s);
+        HrirBinaural<T> prepared;
+        prepared.state_ = std::move(s);
+        status = prepared.setDirection(prepared.state_->data->points.front().direction, 0);
+        if (status != Status::ok)
+            return status;
+        state_.swap(prepared.state_);
         return Status::ok;
     } catch (...) {
         return Status::allocation_failed;
@@ -417,45 +548,72 @@ template <Sample T> Status HrirBinaural<T>::setDirection(Vec3 dir, std::size_t f
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
-    Vec3 d;
-    if (!unit(dir, d) || fade > (1u << 30))
+    if (!unit(dir, dir) || fade > (1u << 30))
         return Status::invalid_argument;
     if (s.remaining)
         return Status::transition_in_progress;
-    double sum = 0, closest = 1e100;
-    std::size_t exact = s.data->points.size();
-    std::array<double, 2048> weights{};
-    for (std::size_t i = 0; i < s.data->points.size(); ++i) {
-        const double angle = std::acos(std::clamp(dot(d, s.data->points[i].direction), -1., 1.));
+    const auto count = s.weights.size();
+    auto& weights = s.weights;
+    auto& ids = s.neighbours;
+    if (s.data->neighbours)
+        s.data->nearest(dir, ids, weights);
+    else
+        std::iota(ids.begin(), ids.end(), 0);
+    std::size_t exact = count;
+    double closest = std::numeric_limits<double>::infinity(), sum = 0;
+    for (std::size_t j = 0; j < count; ++j) {
+        const double angle =
+            std::acos(std::clamp(dot(dir, s.data->points[ids[j]].direction), -1., 1.));
         if (angle < 1e-7) {
-            exact = i;
+            exact = j;
             break;
         }
-        const double distance = angle * angle;
-        weights[i] = distance;
-        closest = std::min(closest, distance);
+        weights[j] = angle * angle;
+        closest = std::min(closest, weights[j]);
     }
-    if (exact == s.data->points.size())
-        for (std::size_t i = 0; i < s.data->points.size(); ++i) {
-            const double distance = weights[i];
-            weights[i] =
-                std::exp(-(distance - closest) / (s.data->width * s.data->width)) / distance;
-            sum += weights[i];
+    if (exact == count)
+        for (auto& distance : weights) {
+            distance = std::exp(-(distance - closest) / (s.data->width * s.data->width)) / distance;
+            sum += distance;
         }
-    std::fill(s.next.begin(), s.next.end(), 0.);
+    std::fill(s.sourceFir.begin(), s.sourceFir.end(), 0.);
     s.nextDelay = {};
-    if (exact < s.data->points.size()) {
-        std::copy(s.data->points[exact].fir.begin(), s.data->points[exact].fir.end(),
-                  s.next.begin());
-        s.nextDelay = s.data->points[exact].delays;
+    if (exact < count) {
+        const auto& p = s.data->points[ids[exact]];
+        std::copy(p.fir.begin(), p.fir.end(), s.sourceFir.begin());
+        s.nextDelay = p.delays;
     } else
-        for (std::size_t j = 0; j < s.data->points.size(); ++j) {
-            const auto& p = s.data->points[j];
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto& p = s.data->points[ids[j]];
             const double w = weights[j] / sum;
-            (void)s.ops.addScaled(std::span<const double>(p.fir), std::span<double>(s.next), w);
-            for (std::size_t e = 0; e < 2; ++e)
+            (void)s.ops.addScaled(std::span<const double>(p.fir), std::span<double>(s.sourceFir),
+                                  w);
+            for (unsigned e = 0; e < 2; ++e)
                 s.nextDelay[e] += w * p.delays[e];
         }
+    if (s.kernel.empty())
+        std::copy(s.sourceFir.begin(), s.sourceFir.end(), s.next.begin());
+    else {
+        std::fill(s.next.begin(), s.next.end(), 0.);
+        const auto n = s.kernel.size(), half = n / 2, raw = s.data->taps;
+        for (unsigned ear = 0; ear < 2; ++ear) {
+            const double integer = std::floor(s.nextDelay[ear]),
+                         fraction = s.nextDelay[ear] - integer;
+            double total = 0;
+            for (std::size_t j = 0; j < n; ++j) {
+                s.kernel[j] = fraction == 0
+                                  ? (j == half ? 1. : 0.)
+                                  : detail::windowedSinc(double(j) - double(half) - fraction, 1.,
+                                                         double(half));
+                total += s.kernel[j];
+            }
+            for (std::size_t j = 0; j < n; ++j)
+                (void)s.ops.addScaled(std::span<const double>(s.sourceFir).subspan(ear * raw, raw),
+                                      std::span<double>(s.next).subspan(ear * s.taps + j, raw),
+                                      s.kernel[j] / total);
+            s.nextDelay[ear] = integer;
+        }
+    }
     s.remaining = s.total = fade;
     if (!fade) {
         std::copy(s.next.begin(), s.next.end(), s.current.begin());
@@ -463,6 +621,7 @@ template <Sample T> Status HrirBinaural<T>::setDirection(Vec3 dir, std::size_t f
     }
     return Status::ok;
 }
+
 template <Sample T>
 Status HrirBinaural<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
     if (!state_)
@@ -498,7 +657,7 @@ template <Sample T> void HrirBinaural<T>::reset() noexcept {
     }
 }
 template <Sample T> std::size_t HrirBinaural<T>::latencyFrames() const noexcept {
-    return state_ ? state_->data->latency : 0;
+    return state_ ? state_->data->latency + state_->kernel.size() / 2 : 0;
 }
 template <Sample T> std::size_t HrirBinaural<T>::tailFrames() const noexcept {
     return state_ ? state_->tail : 0;
@@ -796,6 +955,7 @@ template <Sample T> struct HoaBinaural<T>::State {
     VectorOps ops;
     AudioBuffer<T> rotated;
     MatrixConvolver<T> convolution;
+    HoaDecoderReport report;
 };
 template <Sample T> HoaBinaural<T>::HoaBinaural() = default;
 template <Sample T> HoaBinaural<T>::~HoaBinaural() = default;
@@ -813,8 +973,11 @@ Status HoaBinaural<T>::prepare(const ProcessSpec& spec, unsigned order, const Hr
         auto s = std::make_unique<State>();
         s->spec = spec;
         s->order = order;
-        s->tail = data.state_->tail + 1;
-        s->latency = data.latencyFrames();
+        const auto kernelTaps = data.state_->fractionalTaps;
+        s->tail = data.state_->tail + (kernelTaps ? kernelTaps - 1 : 1);
+        s->latency = data.latencyFrames() + kernelTaps / 2;
+        s->report.filterTaps = s->tail;
+        s->report.latencyFrames = s->latency;
         std::vector<Vec3> directions;
         for (auto& p : data.state_->points)
             directions.push_back(p.direction);
@@ -839,11 +1002,28 @@ Status HoaBinaural<T>::prepare(const ProcessSpec& spec, unsigned order, const Hr
                     const double weight = decoder[i * spec.channels + ch];
                     const auto delay = std::size_t(p.delays[ear]);
                     const double fraction = p.delays[ear] - double(delay);
-                    for (std::size_t t = 0; t < data.taps(); ++t) {
-                        const double h = p.fir[ear * data.taps() + t] * weight;
-                        ir[delay + t] += T(h * (1 - fraction));
-                        ir[delay + t + 1] += T(h * fraction);
-                    }
+                    if (kernelTaps) {
+                        std::array<double, 129> kernel{};
+                        double total = 0;
+                        for (std::size_t j = 0; j < kernelTaps; ++j) {
+                            kernel[j] = fraction == 0
+                                            ? (j == kernelTaps / 2 ? 1. : 0.)
+                                            : detail::windowedSinc(
+                                                  double(j) - double(kernelTaps / 2) - fraction, 1.,
+                                                  double(kernelTaps / 2));
+                            total += kernel[j];
+                        }
+                        for (std::size_t t = 0; t < data.taps(); ++t) {
+                            const double h = p.fir[ear * data.taps() + t] * weight / total;
+                            for (std::size_t j = 0; j < kernelTaps; ++j)
+                                ir[delay + t + j] += T(h * kernel[j]);
+                        }
+                    } else
+                        for (std::size_t t = 0; t < data.taps(); ++t) {
+                            const double h = p.fir[ear * data.taps() + t] * weight;
+                            ir[delay + t] += T(h * (1 - fraction));
+                            ir[delay + t + 1] += T(h * fraction);
+                        }
                 }
                 routes.push_back({ch, ear, ir});
             }
@@ -856,6 +1036,65 @@ Status HoaBinaural<T>::prepare(const ProcessSpec& spec, unsigned order, const Hr
     } catch (...) {
         return Status::allocation_failed;
     }
+}
+template <Sample T>
+Status HoaBinaural<T>::prepare(const ProcessSpec& spec, unsigned order, const HrtfSet<T>& data,
+                               const HoaDecoderDesign& design, CpuBackend backend) noexcept {
+    if (!detail::validAnalysisSpec(spec) || order > 7 ||
+        spec.channels != (order + 1) * (order + 1) || !data.state_ ||
+        data.sampleRate() != spec.sampleRate)
+        return Status::invalid_spec;
+    try {
+        auto s = std::make_unique<State>();
+        s->spec = spec;
+        s->order = order;
+        std::vector<HrirPoint<double>> points;
+        points.reserve(data.points());
+        for (const auto& p : data.state_->points)
+            points.push_back({p.direction,
+                              {p.fir.data(), data.taps()},
+                              {p.fir.data() + data.taps(), data.taps()},
+                              p.delays[0],
+                              p.delays[1]});
+        std::vector<std::vector<double>> filters;
+        auto status = detail::designHoaFilters(order, spec.sampleRate, points, design, filters,
+                                               s->report, backend);
+        if (status != Status::ok)
+            return status;
+        s->latency = data.latencyFrames() + s->report.latencyFrames;
+        s->report.latencyFrames = s->latency;
+        s->tail = s->report.filterTaps;
+        status = VectorOps::create(backend, s->ops);
+        if (status != Status::ok)
+            return status;
+        status = s->rotated.resize(spec.channels, spec.maxBlockFrames);
+        if (status != Status::ok)
+            return status;
+        std::vector<std::vector<T>> typed(filters.size(), std::vector<T>(s->tail));
+        std::vector<ConvolutionRoute<T>> routes;
+        routes.reserve(typed.size());
+        for (std::size_t i = 0; i < filters.size(); ++i) {
+            for (std::size_t t = 0; t < s->tail; ++t) {
+                if (std::abs(filters[i][t]) > std::numeric_limits<T>::max())
+                    return Status::invalid_argument;
+                typed[i][t] = T(filters[i][t]);
+            }
+            routes.push_back({i / 2, i % 2, typed[i]});
+        }
+        status = s->convolution.prepare(spec, 2, routes, 128, 1024, backend);
+        if (status != Status::ok)
+            return status;
+        (void)ambisonicRotation(order, {}, {s->rotation.data(), spec.channels * spec.channels});
+        state_.swap(s);
+        return Status::ok;
+    } catch (const std::bad_alloc&) {
+        return Status::allocation_failed;
+    } catch (...) {
+        return Status::invalid_argument;
+    }
+}
+template <Sample T> HoaDecoderReport HoaBinaural<T>::designReport() const noexcept {
+    return state_ ? state_->report : HoaDecoderReport{};
 }
 template <Sample T> Status HoaBinaural<T>::setRotation(Quaternion q) noexcept {
     if (!state_)

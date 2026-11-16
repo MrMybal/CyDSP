@@ -18,4 +18,4 @@ Tous les modules DSP publics au moyen d’un seul include.
 
 [Utilisation et contrats](doc:overview) · [Règles communes de traitement](doc:contracts)
 
-Cet en-tête regroupe tous les modules publics CyDSP. Utilisez les en-têtes individuels pour limiter le coût d’inclusion.
+Cet en-tête regroupe les modules numériques CyDSP. Incluez séparément cydsp/spatial/Sofa.h pour les API optionnelles de banques/import. Utilisez les en-têtes individuels pour limiter le coût d’inclusion.

@@ -1,4 +1,10 @@
 * text=auto eol=lf
-third_party/** -text
+third_party/** -text -whitespace
 .CyDocBuild/assets/notices/** -text -whitespace
 Documentation/DocData/assets/notices/** -text -whitespace
+tests/data/sofa/*.sofa -text
+# Generated legal pages reproduce the upstream notices verbatim.
+.CyDocBuild/manual/**/licensing.md -whitespace
+
+# Preserve the unmodified upstream endian portability header byte-for-byte.
+src/sofa/compact/hrtf/portable_endian.h -text -whitespace

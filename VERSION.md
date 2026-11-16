@@ -1,8 +1,12 @@
-# CyDSP 0.3.2
+# CyDSP 0.4.0
+
 
 **IN DEVELOPMENT.** Source distribution; no binary release is published.
 
 ## Changes
+
+- 0.4.0: Optional memory-only SOFA import, decoded HRTF cache, diffuse-field EQ, common level normalization, nearest-direction index and explicit HRTF quality profiles. Core MIT; optional reader notices accompany the library.
+- 0.4.0: Original MagLS/weighted HOA decoder design, optional max-rE, owned analytic HRIR generation and a procedural Fibonacci grid; explicit latency and numerical diagnostics.
 
 - 0.3.2: fuse the direct wavefolder input/shape/mix in the x64 and ARM64 SIMD backends. Cache the saturation DC compensation when its shape/bias changes.
 - 0.3.2: vectorize the precise transient's rational/decibel stage while retaining each scalar `std::pow(10, exponent)` and its original exponent. Two-lane NEON retains the faster original scalar precise loop measured on Quest 3. Process independent dynamic-EQ channels in pairs, with unchanged ordered double filter/envelope recurrences; cache unchanged band coefficients and time constants.

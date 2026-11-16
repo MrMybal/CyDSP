@@ -3,7 +3,7 @@ id: api-spatial-spatialrendering
 title: SpatialRendering
 description: Binaural analytique/mesuré, préparation HRTF partagée, VBAP et Ambisonics ACN/SN3D d’ordre 7.
 section: Référence API
-order: 1175
+order: 1176
 sourceRevision: 1
 parent: api-spatial
 symbol: cydsp::BinauralEmitter
@@ -147,6 +147,143 @@ template <Sample T> struct HrirPoint;
 | `leftDelayFrames` | `double` | `0` | Compte ou offset de frames ; une frame contient un échantillon par canal. |
 | `rightDelayFrames` | `double` | `0` | Compte ou offset de frames ; une frame contient un échantillon par canal. |
 
+## `sphericalFibonacci` {#symbol-sphericalfibonacci}
+
+```cpp
+Status sphericalFibonacci(std::span<Vec3> directions, std::span<double> solidAngles = {}) noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `directions` | `std::span<Vec3>` | — | Plage contiguë empruntée de type/constance indiqués ; conserver sa durée de vie. |
+| `solidAngles` | `std::span<double>` | `= {}` | Plage contiguë empruntée de type/constance indiqués ; conserver sa durée de vie. |
+
+Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+## `AnalyticHrirOptions` {#symbol-analytichriroptions}
+
+```cpp
+struct AnalyticHrirOptions;
+```
+
+| Champ | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `sampleRate` | `double` | `48000` | Fréquence en Hz ; respecter la plage de taux/Nyquist autorisée. |
+| `headRadiusMetres` | `double` | `.0875` | Longueur en mètres. |
+| `soundSpeed` | `double` | `343` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `distanceMetres` | `double` | `1` | Longueur en mètres. |
+| `taps` | `std::size_t` | `256` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumStorageBytes` | `std::size_t` | `512u * 1024u * 1024u` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+
+## `AnalyticHrirReport` {#symbol-analytichrirreport}
+
+```cpp
+struct AnalyticHrirReport;
+```
+
+| Champ | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `points` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `taps` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumTailSample` | `double` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+
+## `analyticHrirs` {#symbol-analytichrirs}
+
+```cpp
+template <Sample T> [[nodiscard]] Status analyticHrirs(const AnalyticHrirOptions& options, std::span<const Vec3> directions, HrirBank<T>& out, AnalyticHrirReport* report = nullptr) noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `options` | `const AnalyticHrirOptions &` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `directions` | `std::span<const Vec3>` | — | Plage contiguë empruntée de type/constance indiqués ; conserver sa durée de vie. |
+| `out` | `HrirBank<T> &` | — | Référence mutable ; la déclaration et le guide précisent la propriété de sortie/état. |
+| `report` | `AnalyticHrirReport *` | `nullptr` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+
+Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+## `HrirBank` {#symbol-hrirbank}
+
+```cpp
+template <Sample T> class HrirBank;
+```
+
+### `HrirBank::HrirBank<T>` {#symbol-hrirbank-hrirbank-t}
+
+```cpp
+HrirBank();
+```
+
+Construire une instance ; la préparer avant traitement lorsque son API exige une préparation.
+
+### `HrirBank::~HrirBank<T>` {#symbol-hrirbank-hrirbank-t-2}
+
+```cpp
+~HrirBank();
+```
+
+Détruire seulement après arrêt des traitements/utilisateurs empruntés ; la destruction peut libérer du stockage.
+
+### `HrirBank::HrirBank<T>` {#symbol-hrirbank-hrirbank-t-3}
+
+```cpp
+HrirBank(HrirBank&&) noexcept;
+```
+
+Construire une instance ; la préparer avant traitement lorsque son API exige une préparation.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `argument 1` | `HrirBank<T> &&` | — | Référence mutable ; la déclaration et le guide précisent la propriété de sortie/état. |
+
+### `HrirBank::operator=` {#symbol-hrirbank-operator}
+
+```cpp
+HrirBank& operator=(HrirBank&&) noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `argument 1` | `HrirBank<T> &&` | — | Référence mutable ; la déclaration et le guide précisent la propriété de sortie/état. |
+
+Retour : `HrirBank<T> &` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
+
+### `HrirBank::points` {#symbol-hrirbank-points}
+
+```cpp
+std::span<const HrirPoint<T>> points() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `std::span<const HrirPoint<T>>` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
+
+### `HrirBank::sampleRate` {#symbol-hrirbank-samplerate}
+
+```cpp
+double sampleRate() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `double` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
+
+### `HrirBank::taps` {#symbol-hrirbank-taps}
+
+```cpp
+std::size_t taps() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `std::size_t` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
+
 ## `HrtfPreparation` {#symbol-hrtfpreparation}
 
 ```cpp
@@ -161,6 +298,51 @@ struct HrtfPreparation;
 | `onsetThresholdDb` | `double` | `-40` | Niveau logarithmique selon la référence dB indiquée. |
 | `angularWidthRadians` | `double` | `.7` | Angle en radians. |
 | `maximumTaps` | `std::size_t` | `2048` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumPoints` | `std::size_t` | `2048` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumInputTaps` | `std::size_t` | `32768` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumStorageBytes` | `std::size_t` | `512u * 1024u * 1024u` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumDelaySeconds` | `double` | `.1` | Durée ou position en secondes. |
+| `resampleHalfLength` | `std::size_t` | `32` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `interpolationPoints` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `fractionalDelayTaps` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `rejectTruncation` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
+
+## `HrtfQuality` {#symbol-hrtfquality}
+
+```cpp
+enum class HrtfQuality { economy, realtimeHigh, reference };
+```
+
+## `hrtfPreparation` {#symbol-hrtfpreparation-2}
+
+```cpp
+Status hrtfPreparation(HrtfQuality quality, double targetSampleRate, HrtfPreparation& out) noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `quality` | `HrtfQuality` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `targetSampleRate` | `double` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `out` | `HrtfPreparation &` | — | Référence mutable ; la déclaration et le guide précisent la propriété de sortie/état. |
+
+Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+## `HrtfStorageReport` {#symbol-hrtfstoragereport}
+
+```cpp
+struct HrtfStorageReport;
+```
+
+| Champ | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `points` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `taps` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `coefficientBytes` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `interpolationPoints` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `fractionalDelayTaps` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `truncated` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
 
 ## `HrtfSet` {#symbol-hrtfset}
 
@@ -232,6 +414,16 @@ bool truncated() const noexcept;
 Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
 
 Retour : `bool` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
+
+### `HrtfSet::storageReport` {#symbol-hrtfset-storagereport}
+
+```cpp
+HrtfStorageReport storageReport() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `HrtfStorageReport` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
 
 ## `HrirBinaural` {#symbol-hrirbinaural}
 
@@ -649,6 +841,49 @@ Utiliser les entrées et le type retourné selon le contrat du module lié ; les
 
 Retour : `std::size_t` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
 
+## `HoaDecoderMethod` {#symbol-hoadecodermethod}
+
+```cpp
+enum class HoaDecoderMethod { leastSquares, magLS };
+```
+
+## `HoaDecoderDesign` {#symbol-hoadecoderdesign}
+
+```cpp
+struct HoaDecoderDesign;
+```
+
+| Champ | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `method` | `HoaDecoderMethod` | `HoaDecoderMethod::magLS` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `crossoverHz` | `double` | `2000` | Fréquence en Hz ; respecter la plage de taux/Nyquist autorisée. |
+| `transitionHz` | `double` | `500` | Fréquence en Hz ; respecter la plage de taux/Nyquist autorisée. |
+| `maxRe` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
+| `regularization` | `double` | `1e-6` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `iterations` | `std::size_t` | `12` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `fftSize` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumFftSize` | `std::size_t` | `65536` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumStorageBytes` | `std::size_t` | `512u * 1024u * 1024u` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `spatialWeights` | `std::span<const double>` | — | Plage contiguë empruntée de type/constance indiqués ; conserver sa durée de vie. |
+
+## `HoaDecoderReport` {#symbol-hoadecoderreport}
+
+```cpp
+struct HoaDecoderReport;
+```
+
+| Champ | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `method` | `HoaDecoderMethod` | `HoaDecoderMethod::leastSquares` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `fftSize` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `filterTaps` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `latencyFrames` | `std::size_t` | `0` | Compte ou offset de frames ; une frame contient un échantillon par canal. |
+| `lowBandComplexError` | `double` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `highBandMagnitudeError` | `double` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `initialHighBandMagnitudeError` | `double` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maxRe` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
+| `spectralMetricsAvailable` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
+
 ## `HoaBinaural` {#symbol-hoabinaural}
 
 ```cpp
@@ -714,6 +949,34 @@ Préparer hors callback audio ; vérifier Status avant d’utiliser la nouvelle 
 | `argument 5` | `CpuBackend` | `CpuBackend::automatic` | Choix de noyaux compilés disponibles pour CPU/OS ; sélection automatique à la préparation. |
 
 Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+### `HoaBinaural::prepare` {#symbol-hoabinaural-prepare-2}
+
+```cpp
+Status prepare(const ProcessSpec& ambisonic, unsigned order, const HrtfSet<T>& data, const HoaDecoderDesign& design, CpuBackend backend = CpuBackend::automatic) noexcept;
+```
+
+Préparer hors callback audio ; vérifier Status avant d’utiliser la nouvelle configuration.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `ambisonic` | `const ProcessSpec &` | — | Taux, bloc maximal et nombre de canaux préparés. |
+| `order` | `unsigned int` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `data` | `const HrtfSet<T> &` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `design` | `const HoaDecoderDesign &` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `backend` | `CpuBackend` | `CpuBackend::automatic` | Choix de noyaux compilés disponibles pour CPU/OS ; sélection automatique à la préparation. |
+
+Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+### `HoaBinaural::designReport` {#symbol-hoabinaural-designreport}
+
+```cpp
+HoaDecoderReport designReport() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `HoaDecoderReport` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
 
 ### `HoaBinaural::setRotation` {#symbol-hoabinaural-setrotation}
 

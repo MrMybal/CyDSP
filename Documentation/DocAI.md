@@ -5,7 +5,7 @@ This file is for assistants working on the application's documentation. The huma
 ```json
 {
   "application": "CyDSP",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "entry": "Documentation.html",
   "manifest": "DocData/manifest.json",
   "defaultLocale": "en",
@@ -43,7 +43,7 @@ Use Documentation.html#/LOCALE/PAGE/ANCHOR for contextual help, with correctly e
 
 ## CyDSP authoring and API rules
 
-The source project is CyDSP 0.3.2, a standalone C++20 numerical DSP library.
+The source project is CyDSP 0.4.0, a standalone C++20 numerical DSP library.
 CyAudioCore may be mentioned as a consumer; do not turn this manual into an engine
 migration guide. Work only in CyDSP and respect its AGENTS.md.
 
@@ -51,7 +51,7 @@ migration guide. Work only in CyDSP and respect its AGENTS.md.
   every guide into French with the same page and anchor IDs.
 - Public header explanations live in .CyDocBuild/tools/header_notes.py. The API
   catalog in .CyDocBuild/api/catalog.json records public declarations only. It
-  must match all 88 public header hashes before publication.
+  must match all public header hashes before publication.
 - To refresh declarations, run tools/extract_api.py with Clang in a C++20 developer
   environment. Never export private members, implementation bodies or raw sources.
 - tools/author.py writes bilingual source Markdown under manual/en and manual/fr.

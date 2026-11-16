@@ -182,6 +182,7 @@ void musicalPhysicalRegression();
 void creativeRegression();
 void advancedDynamicsRegression();
 void spatialRenderingRegression();
+void hoaDesignRegression();
 void acousticRegression();
 void spatialFoundationRegression();
 void multiBusGraphRegression();
@@ -205,6 +206,7 @@ int main() {
         creativeRegression();
         advancedDynamicsRegression();
         spatialRenderingRegression();
+        hoaDesignRegression();
         acousticRegression();
         spatialFoundationRegression();
         multiBusGraphRegression();

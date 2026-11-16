@@ -3,7 +3,7 @@
 Original CyDSP code is distributed under the MIT license.
 Copyright (c) 2026 MrMybal CyberAlien. The complete grant is in the root LICENSE
 file, also installed beside this document in CMake packages. Adapted third-party
-code retains its original copyright and complete MIT notices below.
+code retains its original copyright and complete permissive notices below.
 
 | Upstream MIT component | Adapted scope | Source in CyDSP |
 | --- | --- | --- |
@@ -34,7 +34,7 @@ a separate per-file and dependency review; a repository label alone is insuffici
 ## Project split
 
 Audio devices, file codecs, MIDI system declarations and plugin runtimes now belong
-to CyAudioCore. CyDSP contains only the five MIT numerical adaptations listed above.
+to CyAudioCore. The core retains the five MIT numerical adaptations listed above. Optional SOFA readers are described below.
 Each original notice and pinned upstream file remains with its owning project.
 
 ## Ten-lot numerical extension
@@ -48,3 +48,29 @@ data remains the host’s licensing responsibility.
 The second advanced extension adds original MIT CyDSP algorithms and reuses the
 existing five pinned adaptations; no new third-party source or HRTF dataset is
 imported. See [the advanced guide](AdvancedExpansionGuide.fr.md).
+
+## Optional SOFA import (0.4.0)
+
+The core and decoded-asset/cache target do not depend on a file-format library.
+CyDSP::Sofa optionally adds a memory-only reader adapted from libmysofa
+(BSD-3-Clause), its portable-endian permissive grant, and miniz (MIT) for inflate.
+Only the listed reader files are included, not libmysofa's renderer, resampler,
+normalization or datasets. Original CyDSP code remains MIT; upstream parts retain
+their own licenses/notices.
+
+The complete reader optionally links external HDF5 (BSD-3-Clause) and zlib
+(Zlib license). Neither SDK is vendored or downloaded by CMake. Supplied SDK notices
+correspond to reviewed HDF5 2.2.0/zlib 1.3.1; distributors must retain notices for
+their actual SDK build and enabled dependencies. No GPL/AGPL/LGPL component is added.
+
+These legal texts are installed under share/CyDSP/licenses and included in CyDoc.
+Measured HRTF banks have separate rights; none is shipped. Test fixtures are
+original synthetic CyDSP signals covered by the root MIT license.
+
+## Original HOA decoder and analytic HRIR additions
+
+The MagLS/weighted-LS designer, max-rE Legendre taper, Fibonacci generator and
+owning analytic HRIR helper are original CyDSP MIT code using its existing FFT,
+matrix convolution and analytic binaural processor. The DAGA 2018 publication is
+a mathematical reference. No IEM/SPARTA implementation, extra dependency or
+measured HRTF dataset is included.

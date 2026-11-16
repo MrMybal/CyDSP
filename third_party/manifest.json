@@ -271,6 +271,145 @@
       "copyrights": [
         "Copyright (c) 2022 Geraint Luff / Signalsmith Audio Ltd."
       ]
+    },
+    {
+      "name": "libmysofa",
+      "license": "BSD-3-Clause AND MIT",
+      "repository": "https://github.com/hoene/libmysofa",
+      "revision": "648eed03472e6720a1ea45d1a1f86c4efb569ff9",
+      "files": [
+        {
+          "upstreamPath": "LICENSE",
+          "archivePath": "third_party/libmysofa/upstream/LICENSE",
+          "sha256": "9c8713ccc5d6d93d20c7a1cfcb876e64baf551bfbe67faa4e60d39cda9ffd023",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/LICENSE"
+        },
+        {
+          "upstreamPath": "src/hrtf/mysofa.h",
+          "archivePath": "third_party/libmysofa/upstream/src/hrtf/mysofa.h",
+          "sha256": "fe24a1a424dae943624b942723af48b0f345d8d13911be88b0202096e546f834",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hrtf/mysofa.h"
+        },
+        {
+          "upstreamPath": "src/hrtf/portable_endian.h",
+          "archivePath": "third_party/libmysofa/upstream/src/hrtf/portable_endian.h",
+          "sha256": "da61f6c288c67953f0dc7c869495213cc5b5d231de047fe0d40a5589ed4b2411",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hrtf/portable_endian.h"
+        },
+        {
+          "upstreamPath": "src/hrtf/reader.c",
+          "archivePath": "third_party/libmysofa/upstream/src/hrtf/reader.c",
+          "sha256": "7c1cc180b4c051b068dabe38553219f0bd60c271c7c925a042992de4d9e59e8f",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hrtf/reader.c"
+        },
+        {
+          "upstreamPath": "src/hdf/reader.h",
+          "archivePath": "third_party/libmysofa/upstream/src/hdf/reader.h",
+          "sha256": "ec6a3a98dacea6b0bbfb56a80ee1f5845b5c5868359346c0b0b457d244bf9ef3",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hdf/reader.h"
+        },
+        {
+          "upstreamPath": "src/hdf/superblock.c",
+          "archivePath": "third_party/libmysofa/upstream/src/hdf/superblock.c",
+          "sha256": "a7a7a47e8af3e79fa8732eb90ab8626ba5094fd3997f468410abf68e6329551d",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hdf/superblock.c"
+        },
+        {
+          "upstreamPath": "src/hdf/dataobject.c",
+          "archivePath": "third_party/libmysofa/upstream/src/hdf/dataobject.c",
+          "sha256": "d3a1a87949d017484a18fa808f8baa14e7cd0cdc217109a6f081116dbda4e291",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hdf/dataobject.c"
+        },
+        {
+          "upstreamPath": "src/hdf/btree.c",
+          "archivePath": "third_party/libmysofa/upstream/src/hdf/btree.c",
+          "sha256": "36e78e053d1e878108fc60d504623011dd0f017b7ce200802bea23ebc8745659",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hdf/btree.c"
+        },
+        {
+          "upstreamPath": "src/hdf/fractalhead.c",
+          "archivePath": "third_party/libmysofa/upstream/src/hdf/fractalhead.c",
+          "sha256": "040623348d84c6e8a01eaf1dd5e3cfd8dbf0152dde33f313bf0ac3c4438ee6c5",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hdf/fractalhead.c"
+        },
+        {
+          "upstreamPath": "src/hdf/gcol.c",
+          "archivePath": "third_party/libmysofa/upstream/src/hdf/gcol.c",
+          "sha256": "eee6901aeb66f18338a08ee8d19e1f0fad50c7a3161f604055c63dda1af56389",
+          "url": "https://raw.githubusercontent.com/hoene/libmysofa/648eed03472e6720a1ea45d1a1f86c4efb569ff9/src/hdf/gcol.c"
+        }
+      ],
+      "adaptedFiles": [
+        "src/sofa/compact/hdf/btree.c",
+        "src/sofa/compact/hdf/dataobject.c",
+        "src/sofa/compact/hdf/fractalhead.c",
+        "src/sofa/compact/hdf/gcol.c",
+        "src/sofa/compact/hdf/reader.h",
+        "src/sofa/compact/hdf/superblock.c",
+        "src/sofa/compact/hrtf/mysofa.h",
+        "src/sofa/compact/hrtf/reader.c"
+      ],
+      "scope": "Optional compact memory-only reader subset; bounded allocations/I/O/recursion, private symbols and float32 support. No upstream renderer, normalization, resampler or dataset.",
+      "noticePath": "third_party/licenses/libmysofa.txt",
+      "copyrights": [
+        "Copyright (c) 2016-2017, Symonics GmbH, Christian Hoene"
+      ]
+    },
+    {
+      "name": "miniz",
+      "license": "MIT",
+      "repository": "https://github.com/richgel999/miniz",
+      "revision": "2c50092b3a4010760df02e7842960abdc3f25ee3",
+      "files": [
+        {
+          "upstreamPath": "LICENSE",
+          "archivePath": "third_party/miniz/LICENSE",
+          "sha256": "0115478d567121238cf6cc1c0c361926cf07a49d9e4c9e66da97fac6a01646b3",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/LICENSE"
+        },
+        {
+          "upstreamPath": "miniz.h",
+          "archivePath": "third_party/miniz/miniz.h",
+          "sha256": "2b9c48355793988f0d12b3cef357e52b741d744385157b59cb422237ea226501",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/miniz.h"
+        },
+        {
+          "upstreamPath": "miniz_common.h",
+          "archivePath": "third_party/miniz/miniz_common.h",
+          "sha256": "d0770cc478923e33bf22820fc51bbe22b6b99c3230ce4f5fc10eea3debc75623",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/miniz_common.h"
+        },
+        {
+          "upstreamPath": "miniz_tinfl.h",
+          "archivePath": "third_party/miniz/miniz_tinfl.h",
+          "sha256": "2c89615a4cbc5de4eac5b861051849392ec698264ee7dd399ea587c592cf68d1",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/miniz_tinfl.h"
+        },
+        {
+          "upstreamPath": "miniz_tinfl.c",
+          "archivePath": "third_party/miniz/miniz_tinfl.c",
+          "sha256": "7113a08a7722d671ce89b8de61fe6d02d0cadca0ff274ba357bf2a9dc85745ca",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/miniz_tinfl.c"
+        },
+        {
+          "sha256": "123050e3c876519828d3934899e0b003ad13a98114919d94f1e06b4b9d02a925",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/miniz_tdef.h",
+          "archivePath": "third_party/miniz/miniz_tdef.h",
+          "upstreamPath": "miniz_tdef.h"
+        },
+        {
+          "sha256": "43d09867f79993a9ba1627cb1f3bbd78d3bf5ee0c91cd6e7527aa9ca1e3aed44",
+          "url": "https://raw.githubusercontent.com/richgel999/miniz/2c50092b3a4010760df02e7842960abdc3f25ee3/miniz_zip.h",
+          "archivePath": "third_party/miniz/miniz_zip.h",
+          "upstreamPath": "miniz_zip.h"
+        }
+      ],
+      "adaptedFiles": [],
+      "scope": "Optional compact reader zlib/deflate decompression only; no ZIP, compression, filesystem or renderer.",
+      "noticePath": "third_party/licenses/miniz.txt",
+      "copyrights": [
+        "Copyright 2013-2014 RAD Game Tools and Valve Software"
+      ]
     }
   ]
 }

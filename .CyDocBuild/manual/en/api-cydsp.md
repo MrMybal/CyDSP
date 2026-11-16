@@ -18,4 +18,4 @@ All public DSP modules through one include.
 
 [Usage and contracts](doc:overview) · [Common processing rules](doc:contracts)
 
-This umbrella header includes every public CyDSP module. Use individual headers to reduce inclusion costs.
+This umbrella header includes the numerical CyDSP modules. Include cydsp/spatial/Sofa.h separately for optional asset/import APIs. Use individual headers to reduce inclusion costs.

@@ -3,7 +3,7 @@ id: api-synthesis-physicalmodels
 title: PhysicalModels
 description: Karplus–Strong/waveguide strings and tubes, modal banks and membrane/plate modes.
 section: API reference
-order: 1184
+order: 1185
 revision: 1
 parent: api-synthesis
 symbol: cydsp::ResonantMode

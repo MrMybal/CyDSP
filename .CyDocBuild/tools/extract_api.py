@@ -94,14 +94,14 @@ def extract(ast):
         for child in namespace.get('inner',[]): visit(child,['cydsp'])
     # Version macros have no namespace AST declaration. The umbrella exports headers.
     groups['cydsp/core/Version.h']['macros']=re.findall(r'^#define\s+(CYDSP_VERSION_\w+)\s+(.+)$',(ROOT/'include/cydsp/core/Version.h').read_text(),re.M)
-    return {'schemaVersion':1,'libraryVersion':'0.3.2','headers':list(groups.values())}
+    return {'schemaVersion':1,'libraryVersion':'0.4.0','headers':list(groups.values())}
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ast',type=Path);parser.add_argument('--clang',type=Path);args=parser.parse_args()
     if args.ast: ast=args.ast.read_text(encoding='utf-8')
     else:
         clang=args.clang or Path(os.environ.get('CLANG_CL','C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/Llvm/x64/bin/clang-cl.exe'))
-        unit=WORK/'internal/api.cpp';unit.parent.mkdir(parents=True,exist_ok=True);unit.write_text('#include <cydsp/CyDSP.h>\n')
+        unit=WORK/'internal/api.cpp';unit.parent.mkdir(parents=True,exist_ok=True);unit.write_text('#include <cydsp/CyDSP.h>\n#include <cydsp/spatial/Sofa.h>\n')
         result=subprocess.run([str(clang),'/nologo','/std:c++20','/EHsc','/Zs','/I'+str(ROOT/'include'),'/clang:-Xclang','/clang:-ast-dump=json','/clang:-Xclang','/clang:-ast-dump-filter=cydsp',str(unit)],cwd=ROOT,text=True,encoding='utf-8',capture_output=True,check=True)
         ast=result.stdout
     catalog=extract(ast);(WORK/'api').mkdir(exist_ok=True)

@@ -88,4 +88,5 @@ HEADER_NOTES = {
 'PhysicalModels': ('Karplus–Strong/waveguide strings and tubes, modal banks and membrane/plate modes.', 'Cordes et tubes Karplus–Strong/guides d’ondes, banques modales et modes de membranes/plaques.', 'physical'),
 'ContactExciter': ('Force/velocity/impulse contact excitation for impacts, sliding, rolling and bowing.', 'Excitation de contact en force/vitesse/impulsion pour impacts, glissement, roulement et archet.', 'physical'),
 'SourceBatch': ('Fixed source slots, shared sample/wavetable banks, SIMD sine voices and multichannel gains.', 'Emplacements de sources fixes, banques de samples/tables partagées, voix sinus SIMD et gains multicanaux.', 'sources'),
+'Sofa': ('Optional memory-only SOFA import, float64 preparation and portable HRTF cache.', 'Import SOFA optionnel depuis la mémoire, préparation float64 et cache HRTF portable.', 'sofa'),
 }

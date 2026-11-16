@@ -3,7 +3,7 @@ id: api-spatial-spatialmath
 title: SpatialMath
 description: Géométrie source/auditeur en mètres/radians, milieux, distance, Doppler, directivité et matériaux.
 section: Référence API
-order: 1174
+order: 1175
 sourceRevision: 1
 parent: api-spatial
 symbol: cydsp::Vec3

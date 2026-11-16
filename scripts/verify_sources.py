@@ -34,11 +34,11 @@ manifest = json.loads((ROOT / 'third_party/manifest.json').read_text(encoding='u
 require(manifest['schemaVersion'] == 1, 'Unknown manifest schema')
 for component in manifest['components']:
     name = component['name']
-    require(component['license'] in ('MIT', 'MIT-0', 'ISC', 'Apache-2.0 AND Zlib AND MIT AND ISC AND (GPL-2.0-or-later WITH Bison-exception-2.2)', 'ISC AND BSD-3-Clause AND LicenseRef-minimp3-Public-Domain'), 'Unexpected third-party license: ' + name)
+    require(component['license'] in ('MIT', 'MIT-0', 'ISC', 'BSD-3-Clause AND MIT', 'Apache-2.0 AND Zlib AND MIT AND ISC AND (GPL-2.0-or-later WITH Bison-exception-2.2)', 'ISC AND BSD-3-Clause AND LicenseRef-minimp3-Public-Domain'), 'Unexpected third-party license: ' + name)
     require(bool(re.fullmatch(r'[0-9a-f]{40}', component['revision'])), 'Unpinned revision: ' + name)
     require(bool(component['scope']), 'Missing adaptation scope: ' + name)
     notice = project_file(component['noticePath']).read_text(encoding='utf-8')
-    require(('Apache License' in notice or 'Permission is hereby granted' in notice or 'Permission to use, copy, modify' in notice) and 'THE SOFTWARE IS PROVIDED' in notice,
+    require(('Apache License' in notice or 'Permission is hereby granted' in notice or 'Permission to use, copy, modify' in notice or 'Redistribution and use in source and binary forms' in notice) and ('THE SOFTWARE IS PROVIDED' in notice or 'THIS SOFTWARE IS PROVIDED' in notice),
             'Incomplete permissive notice: ' + name)
     if name == 'choc':
         require(all(x in notice for x in ('Josh Coalson', 'Xiph.org Foundation', 'Jutta Degener', 'public domain worldwide')), 'Missing embedded codec notice')
@@ -52,6 +52,13 @@ for component in manifest['components']:
         for copyright_line in component['copyrights']:
             require(copyright_line in source, 'Missing original attribution: ' + relative)
         require(component['noticePath'] in source, 'Missing notice reference: ' + relative)
+
+# Original SOFA fixtures are source assets, with no imported measurement rights.
+fixtures=json.loads(project_file('tests/data/sofa/manifest.json').read_text(encoding='utf-8'))
+require(fixtures['license']=='MIT', 'Unexpected fixture license')
+for name,digest in fixtures['files'].items():
+    file=project_file('tests/data/sofa/'+name)
+    require(hashlib.sha256(file.read_bytes()).hexdigest()==digest, 'Changed synthetic SOFA fixture: '+name)
 
 count = 0
 sources = []

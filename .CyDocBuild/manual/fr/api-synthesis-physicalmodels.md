@@ -3,7 +3,7 @@ id: api-synthesis-physicalmodels
 title: PhysicalModels
 description: Cordes et tubes Karplus–Strong/guides d’ondes, banques modales et modes de membranes/plaques.
 section: Référence API
-order: 1184
+order: 1185
 sourceRevision: 1
 parent: api-synthesis
 symbol: cydsp::ResonantMode

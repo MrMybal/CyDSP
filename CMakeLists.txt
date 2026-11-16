@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(CyDSP VERSION 0.3.2 LANGUAGES CXX)
+project(CyDSP VERSION 0.4.0 LANGUAGES CXX)
 if(CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64EC" OR CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "ARM64EC")
     message(FATAL_ERROR "ARM64EC needs a separate CyDSP ABI/dispatch implementation")
 endif()
@@ -37,6 +37,8 @@ add_library(CyDSP STATIC
     src/processors/AdvancedEffects.cpp
     src/processors/AdvancedDynamics.cpp
     src/spatial/HybridReverb.cpp
+    src/spatial/AnalyticHrirs.cpp
+    src/spatial/HoaDecoder.cpp
     src/spatial/SpatialRendering.cpp
     src/spatial/AcousticRooms.cpp
     src/spatial/FdnReverb.cpp
@@ -175,6 +177,8 @@ if(CYDSP_BUILD_STRETCH)
     install(TARGETS CyDSPStretch EXPORT CyDSPTargets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
+include(cmake/Sofa.cmake)
+
 install(TARGETS CyDSP EXPORT CyDSPTargets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT CyDSPTargets NAMESPACE CyDSP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CyDSP)
@@ -195,6 +199,7 @@ set(cydsp_test_sources
  tests/CreativeRegression.cpp
  tests/HotspotRegression.cpp
  tests/AdvancedDynamicsRegression.cpp
+ tests/HoaDesignRegression.cpp
  tests/SpatialRenderingRegression.cpp
  tests/AcousticRegression.cpp
  tests/SpatialFoundationRegression.cpp
@@ -269,7 +274,7 @@ foreach(t IN ITEMS cydsp_prepared_measurements cydsp_hotspot_measurements cydsp_
  endif()
 endforeach()
 if(CYDSP_SANITIZE_ADDRESS)
- foreach(t IN ITEMS CyDSP CyDSPStretch cydsp_prepared_measurements cydsp_hotspot_measurements cydsp_tests cydsp_measurements cydsp_focused_measurements)
+ foreach(t IN ITEMS CyDSP CyDSPStretch CyDSPHrtfAssets CyDSPSofa cydsp_sofa_tests cydsp_prepared_measurements cydsp_hotspot_measurements cydsp_tests cydsp_measurements cydsp_focused_measurements)
   if(TARGET ${t})
    if(MSVC)
     target_compile_options(${t} PRIVATE /fsanitize=address /Zi)

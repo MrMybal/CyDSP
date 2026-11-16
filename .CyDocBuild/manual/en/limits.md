@@ -19,7 +19,7 @@ parent: overview
 | macOS / desktop Linux | Source targets; execution remains to validate for this version. |
 | x86 / ARM32 | Compatibility paths exist; they were not rerun for this snapshot. ARM32 double kernels can fall back to scalar. |
 
-No ABI is interchangeable with another. Version 0.3.2 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
+No ABI is interchangeable with another. Version 0.4.0 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
 
 ## Prepared capacities {#capacities}
 
@@ -30,7 +30,7 @@ No ABI is interchangeable with another. Version 0.3.2 is in development; target 
 | Granulator | Up to 4096 slots; no implicit voice stealing. |
 | Spatial paths / rooms | 64 paths and 10 s prepared path delay; up to 32 room responses. |
 | Ambisonics | Orders 0–7, 1–64 ACN/SN3D channels. |
-| HRTF | 2048 directions; 16384 input frames/ear; prepared FIR cap 2048. |
+| HRTF | Default 2048 directions/32768 input frames/2048 output taps; explicit reference caps 100000/65536/65536. See [SOFA](doc:sofa). |
 | Graphs | MultiBusGraph: 256 nodes, 4096 connections and 32 buses/layout. |
 
 ## Interpret models correctly {#models}

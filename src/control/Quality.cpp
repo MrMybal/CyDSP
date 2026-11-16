@@ -30,9 +30,13 @@ Status qualitySettings(QualityProfile profile, double rate, QualitySettings& out
         : profile == QualityProfile::realtimeHigh ? 17
                                                   : 31;
     s.hrtf.sourceSampleRate = s.hrtf.targetSampleRate = rate;
-    s.hrtf.maximumTaps = profile == QualityProfile::economy        ? 256
-                         : profile == QualityProfile::realtimeHigh ? 1024
-                                                                   : 2048;
+    const auto hrtfQuality = profile == QualityProfile::economy        ? HrtfQuality::economy
+                             : profile == QualityProfile::realtimeHigh ? HrtfQuality::realtimeHigh
+                                                                       : HrtfQuality::reference;
+    const auto hrtfStatus = hrtfPreparation(hrtfQuality, rate, s.hrtf);
+    if (hrtfStatus != Status::ok)
+        return hrtfStatus;
+    s.hrtf.sourceSampleRate = rate;
     s.resampling = profile == QualityProfile::economy        ? ResampleQuality::economy
                    : profile == QualityProfile::realtimeHigh ? ResampleQuality::balanced
                                                              : ResampleQuality::high;

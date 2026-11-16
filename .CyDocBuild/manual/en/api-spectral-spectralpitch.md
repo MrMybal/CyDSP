@@ -3,7 +3,7 @@ id: api-spectral-spectralpitch
 title: SpectralPitch
 description: Phase-vocoder pitch shifting with linked channel phases, formant compensation and transient protection.
 section: API reference
-order: 1178
+order: 1179
 revision: 1
 parent: api-spectral
 symbol: cydsp::SpectralPitchParameters

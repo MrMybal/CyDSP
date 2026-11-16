@@ -3,7 +3,7 @@ PAGES=[]
 def add(id,en_title,fr_title,en_desc,fr_desc,parent,en,fr):
     PAGES.append(dict(id=id,title=(en_title,fr_title),description=(en_desc,fr_desc),parent=parent,body=(en.strip(),fr.strip())))
 
-add('overview','CyDSP 0.3.2','CyDSP 0.3.2','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
+add('overview','CyDSP 0.4.0','CyDSP 0.4.0','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
 ## What you can build {#purpose}
 
 CyDSP is a C++20 audio digital signal processing library. Use its float/double processors in an effect, synthesizer, DAW, game or audio engine. It supplies filters, dynamics, convolution, spectral processing, synthesis, sampling, analysis, restoration and 3D sound through prepared storage and a common planar API.
@@ -24,7 +24,7 @@ Start with [installation](doc:installation), then build a [first processing chai
 
 CyDSP processes in-memory audio. Your application supplies the audio callback, stream ownership and surrounding services. CyAudioCore is one project using its public API. You can link CyDSP directly into another application.
 
-Version 0.3.2 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
+Version 0.4.0 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
 ''',r'''
 ## Ce que vous pouvez construire {#purpose}
 
@@ -46,7 +46,7 @@ Commencez par l’[installation](doc:installation), puis une [première chaîne 
 
 CyDSP traite l’audio en mémoire. L’application fournit le callback audio, possède les flux et gère les services qui les entourent. CyAudioCore est un projet utilisant son API publique. CyDSP peut être lié directement à une autre application.
 
-La version 0.3.2 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
+La version 0.4.0 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
 ''')
 
 add('installation','Build and link CyDSP','Compiler et lier CyDSP','Build the static libraries and use their CMake targets.','Compiler les bibliothèques statiques et utiliser leurs cibles CMake.','overview',r'''
@@ -73,7 +73,7 @@ Production builds create static libraries; native tests and measurements are opt
 Point `CMAKE_PREFIX_PATH` at the absolute install prefix. After defining the application's target:
 
 ```cmake
-find_package(CyDSP 0.3.2 CONFIG REQUIRED)
+find_package(CyDSP 0.4.0 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -103,7 +103,7 @@ Les builds de production créent des bibliothèques statiques ; tests natifs et 
 Faites pointer `CMAKE_PREFIX_PATH` vers le préfixe d’installation absolu. Après définition de la cible de l’application :
 
 ```cmake
-find_package(CyDSP 0.3.2 CONFIG REQUIRED)
+find_package(CyDSP 0.4.0 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -1224,13 +1224,13 @@ Choisissez les [Ambisonics](doc:ambisonics) pour partager un champ intermédiair
 add('hrtf','Prepare and share HRTFs','Préparer et partager les HRTF','Separate onsets, convert FIR rates and retain immutable prepared banks.','Séparer les onsets, convertir les FIR et partager les banques préparées immuables.','binaural',r'''
 ## In-memory measurements {#prepare}
 
-HrtfSet accepts up to 2048 distinct directions and 16384 input frames per ear. The application loads the data and supplies its license. No HRIR dataset or SOFA decoder is bundled. By default the first crossing of a threshold relative to the peak (-40 dB) defines an integer onset; supplied fractional delays remain separate.
+HrtfSet defaults to 2048 directions and 32768 input frames/ear; explicit limits permit 100000 points and 65536 frames. The [optional SOFA importer](doc:sofa) reads measurements from memory. No measured dataset is bundled. By default the first crossing of a threshold relative to the peak (-40 dB) defines an integer onset; supplied fractional delays remain separate.
 
 Preparation removes that onset and resamples FIRs with windowed sinc when needed. Rates are 8–768 kHz and the conversion ratio is 1/8–8. Conversion preserves IR DC gain and exposes a common causal conversion latency through latencyFrames. Acoustic directional onsets remain distinct from that common latency.
 
 ## Capacity and sharing {#sharing}
 
-Prepared FIR length is configurable up to 2048 taps. Check truncated(), especially after rate conversion. Renderer tail bounds include FIR, acoustic delays and conversion latency.
+Prepared FIR length defaults to 2048 taps and is configurable up to 65536. Use rejectTruncation or check truncated(). See the [quality guide](doc:sofa#prepare). Renderer tail bounds include FIR, acoustic delays and conversion latency.
 
 Renderers acquire a shared immutable prepared state during prepare; they retain independent mutable histories/filter fades. Repreparing or destroying the original HrtfSet does not invalidate already prepared renderers. This differs from raw SampleData/Wavetable borrowing.
 
@@ -1238,13 +1238,13 @@ Direction interpolation uses normalized spherical Shepard weights with Gaussian 
 ''',r'''
 ## Mesures en mémoire {#prepare}
 
-HrtfSet accepte jusqu’à 2048 directions distinctes et 16384 frames d’entrée par oreille. L’application charge les données et fournit leur licence. Aucun jeu HRIR ni décodeur SOFA n’est inclus. Par défaut, le premier dépassement d’un seuil relatif au pic (-40 dB) définit un onset entier ; les retards fractionnaires fournis restent séparés.
+HrtfSet accepte par défaut 2048 directions et 32768 frames/oreille ; les bornes explicites vont à 100000 points et 65536 frames. L’[importeur SOFA optionnel](doc:sofa) lit les mesures en mémoire. Aucun jeu mesuré n’est inclus. Par défaut, le premier dépassement d’un seuil relatif au pic (-40 dB) définit un onset entier ; les retards fractionnaires fournis restent séparés.
 
 La préparation retire l’onset et rééchantillonne les FIR par sinc fenêtrée si nécessaire. Les taux vont de 8 à 768 kHz et le ratio de conversion de 1/8 à 8. La conversion conserve le gain DC de l’IR et expose sa latence causale commune via latencyFrames. Les onsets acoustiques directionnels restent distincts de cette latence.
 
 ## Capacité et partage {#sharing}
 
-La longueur FIR préparée est configurable jusqu’à 2048 taps. Vérifiez truncated(), notamment après conversion. Les bornes de queue des renderers comprennent FIR, retards acoustiques et latence de conversion.
+La FIR préparée vaut au maximum 2048 taps par défaut, configurable jusqu’à 65536. Utilisez rejectTruncation ou vérifiez truncated(). Voir le [guide de qualité](doc:sofa#prepare). Les bornes de queue des renderers comprennent FIR, retards acoustiques et latence de conversion.
 
 Les renderers acquièrent un état préparé immuable partagé pendant prepare ; leurs historiques/fondus restent indépendants. Repréparer ou détruire le HrtfSet original n’invalide pas les renderers déjà préparés. Ce contrat diffère de l’emprunt brut de SampleData/Wavetable.
 
@@ -1387,7 +1387,7 @@ add('limits','Platforms, capacities and model limits','Plateformes, capacités e
 | macOS / desktop Linux | Source targets; execution remains to validate for this version. |
 | x86 / ARM32 | Compatibility paths exist; they were not rerun for this snapshot. ARM32 double kernels can fall back to scalar. |
 
-No ABI is interchangeable with another. Version 0.3.2 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
+No ABI is interchangeable with another. Version 0.4.0 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
 
 ## Prepared capacities {#capacities}
 
@@ -1398,7 +1398,7 @@ No ABI is interchangeable with another. Version 0.3.2 is in development; target 
 | Granulator | Up to 4096 slots; no implicit voice stealing. |
 | Spatial paths / rooms | 64 paths and 10 s prepared path delay; up to 32 room responses. |
 | Ambisonics | Orders 0–7, 1–64 ACN/SN3D channels. |
-| HRTF | 2048 directions; 16384 input frames/ear; prepared FIR cap 2048. |
+| HRTF | Default 2048 directions/32768 input frames/2048 output taps; explicit reference caps 100000/65536/65536. See [SOFA](doc:sofa). |
 | Graphs | MultiBusGraph: 256 nodes, 4096 connections and 32 buses/layout. |
 
 ## Interpret models correctly {#models}
@@ -1416,7 +1416,7 @@ No HRTF dataset is supplied; its source/license and listener suitability are app
 | macOS / Linux desktop | Cibles de sources ; exécution à valider pour cette version. |
 | x86 / ARM32 | Chemins de compatibilité existants ; non réexécutés pour cet état. Les noyaux double ARM32 peuvent revenir au scalaire. |
 
-Les ABI ne sont pas interchangeables. La version 0.3.2 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
+Les ABI ne sont pas interchangeables. La version 0.4.0 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
 
 ## Capacités préparées {#capacities}
 
@@ -1427,7 +1427,7 @@ Les ABI ne sont pas interchangeables. La version 0.3.2 est en développement ; u
 | Granulator | Jusqu’à 4096 emplacements ; aucun vol de voix implicite. |
 | Chemins / pièces | 64 chemins et 10 s de retard préparé ; jusqu’à 32 réponses de pièces. |
 | Ambisonics | Ordres 0–7, 1–64 canaux ACN/SN3D. |
-| HRTF | 2048 directions ; 16384 frames d’entrée/oreille ; FIR préparée limitée à 2048. |
+| HRTF | Défaut 2048 directions/32768 frames d’entrée/2048 taps ; bornes de référence explicites 100000/65536/65536. Voir [SOFA](doc:sofa). |
 | Graphes | MultiBusGraph : 256 nœuds, 4096 connexions et 32 bus/disposition. |
 
 ## Interpréter les modèles {#models}
@@ -1449,6 +1449,8 @@ CyDSP uses the MIT license, copyright © 2026 MrMybal CyberAlien. The complete t
 | r8brain-free-src | MIT | Window/sinc equations; not the complete upstream SRC algorithm. |
 | signalsmith-linear | MIT | FFT reconstruction and STFT/window normalization. |
 | signalsmith-stretch | MIT | Optional CyDSP::Stretch time/pitch/formant target. |
+| libmysofa reader / miniz | BSD-3-Clause / MIT | Optional compact memory reader; no upstream renderer or dataset. |
+| External HDF5 / zlib | BSD-3-Clause / Zlib | Optional complete SDK, not vendored. |
 
 Pinned provenance and complete notices accompany the sources and installed library. This table is an index; it does not replace the texts. Host-provided samples, IRs and HRTF datasets retain their own licenses.
 
@@ -1469,10 +1471,319 @@ CyDSP utilise la licence MIT, copyright © 2026 MrMybal CyberAlien. Son texte co
 | r8brain-free-src | MIT | Équations de fenêtres/sinc ; pas l’algorithme SRC amont complet. |
 | signalsmith-linear | MIT | Reconstruction FFT et normalisation STFT/fenêtres. |
 | signalsmith-stretch | MIT | Cible optionnelle CyDSP::Stretch de durée/hauteur/formants. |
+| Lecteur libmysofa / miniz | BSD-3-Clause / MIT | Lecteur compact optionnel ; aucun renderer ou jeu amont. |
+| HDF5 / zlib externes | BSD-3-Clause / Zlib | SDK complet optionnel, non inclus. |
 
 Provenances figées et notices complètes accompagnent sources et bibliothèque installée. Ce tableau est un index, pas un remplacement des textes. Samples, IR et jeux HRTF apportés par l’hôte gardent leurs propres licences.
 
 ## Lecteur de documentation {#reader}
 
 Le lecteur généré utilise CyDoc 0.1.0 sous MIT. L’export contient sa notice complète ainsi que celles de CyDSP et des composants numériques. Les outils de génération documentaire sont distincts de la bibliothèque C++ et ne sont pas une dépendance d’exécution des applications liées à CyDSP.
+''')
+
+add('sofa','SOFA import and HRTF assets','Import SOFA et banques HRTF','Import measurements optionally; prepare quality and portable caches.','Importer les mesures en option ; préparer la qualité et les caches portables.','hrtf',r'''
+## Optional targets {#targets}
+
+| Build switch | Link target | Dependencies |
+| --- | --- | --- |
+| Default core | CyDSP::CyDSP | No SOFA/file-format dependency |
+| CYDSP_BUILD_HRTF_ASSETS=ON | CyDSP::HrtfAssets | Core only |
+| CYDSP_BUILD_SOFA=ON | CyDSP::Sofa | Private compact BSD-3-Clause libmysofa reader + MIT miniz |
+| Also CYDSP_SOFA_COMPLETE=ON | CyDSP::Sofa | External HDF5 ≥1.14.6 and zlib SDKs |
+
+All production targets are static. SOFA and assets default OFF; the compact backend defaults ON within an enabled importer. Automatic selects the complete reader if built, otherwise compact. No SDK is downloaded by CMake. The complete SDK must be present at the final link step; declare C and C++ languages and use CMAKE_PREFIX_PATH to locate it.
+
+~~~cmake
+# Source build:
+set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
+add_subdirectory(CyDSP)
+target_link_libraries(editor PRIVATE CyDSP::Sofa)
+# Installed package:
+find_package(CyDSP 0.4.0 CONFIG REQUIRED COMPONENTS Sofa)
+~~~
+
+A separately configured game build may enable HrtfAssets alone and consume decoded caches without either file-format reader.
+
+## Memory import and errors {#import}
+
+Include cydsp/spatial/Sofa.h. The host supplies bytes; loadSofa performs no application file reads. Import, preparation, EQ and cache loading allocate and belong in a worker/editor, never the audio callback. Failure preserves the previous output; SofaLoadReport supplies a specific error.
+
+~~~cpp
+cydsp::SofaHrtf asset;
+cydsp::SofaLoadOptions options;
+cydsp::SofaLoadReport diagnostic;
+const auto status = cydsp::loadSofa(fileBytes, asset, options, &diagnostic);
+~~~
+
+SimpleFreeFieldHRIR requires M×2×N IRs. GeneralFIR requires allowGeneralFir=true and two-ear receiver geometry. Other conventions fail explicitly. Source spherical degrees/radians or Cartesian metres/cm/mm become unit directions relative to ListenerPosition/View/Up (+X front, +Y left, +Z up). Missing listener vectors use convention defaults. ReceiverPosition identifies left/right by local Y. Nonzero EmitterPosition and multi-emitter data are unsupported.
+
+Data.Delay is read as source-rate frames from 1×2 or M×2 and expanded per point. It remains separate from FIR onset detection. SamplingRate must be constant (8–768 kHz). Imported distances and original metadata/license are retained.
+
+The complete SDK backend supports superblocks 0/2/3, object headers 1/2, compact/dense links and attributes, contiguous/chunked data including single/fixed/extensible modern indexes, float32/64 and fixed/variable strings. Deflate, shuffle and Fletcher32 are allowed. External links/storage, virtual datasets and unknown filters are rejected before data reads; CyDSP has no custom filter loading path.
+
+The compact reader covers object header v2, layout v3, legacy chunk B-tree v1 with shuffle then deflate (other filter pipelines fail), contiguous arrays and supported compact/dense metadata. Use complete for old object header v1 or modern layout/index v4. Compact converts arrays to float32. SofaHrtf64 therefore requires complete or explicit allowPrecisionLoss=true. Reports disclose precision reduction; float output deliberately narrows float64 input. A noexcept inflate callback may use host zlib; it must return ok only for an exact output size and checksum-verified zlib stream.
+
+Default limits: 128 MiB file, 512 MiB decoded buffers, 64 KiB metadata, 100000 points, 32768 taps. Samples and output coordinate/delay arrays share a budget. The compact parser also bounds allocations, read iterations and recursion. These are CyDSP buffer bounds, not a process-wide cap on SDK caches, file-image copies and temporary FFT storage. Use the host worker/sandbox's overall resource limits for untrusted imports.
+
+## Preparation and quality {#prepare}
+
+~~~cpp
+cydsp::SofaPreparation settings;
+const auto quality = cydsp::hrtfPreparation(
+    cydsp::HrtfQuality::realtimeHigh, 48000, settings.hrtf);
+if (quality != cydsp::Status::ok) return quality;
+settings.diffuseFieldEqualization = true; // optional common-ear correction
+settings.normalization = cydsp::HrtfLevelNormalization::frontalEnergy;
+cydsp::HrtfSet<float> bank;
+cydsp::SofaPreparationReport report;
+const auto prepared = cydsp::prepareSofaHrtf(asset, bank, settings, &report);
+~~~
+
+Preparation selects the measured distance closest to distanceMetres (default 1 m), retaining points within distanceToleranceMetres of that shell. It neither mixes duplicate directions across radii nor invents missing measurements.
+
+Optional diffuse-field EQ averages both ears' power, smooths log power over one-third octave, clamps inverse gain (default ±12 dB), then creates a common minimum-phase FIR through CyDSP FFT/filter primitives. Provide per-original-point solid-angle weights for irregular grids; empty weights mean equal weights, reported explicitly. This is an approximate correction model, not headphone calibration or exact integration of an irregular grid.
+
+FrontalEnergy applies one common gain so that mean left/right impulse energy at the nearest frontal point is one, preserving interaural level differences. It does not flatten the frontal spectrum. EQ grows the FIR; inspect selected distance, gain and truncation in the report.
+
+| HrtfQuality | FIR cap | Direction interpolation | Fractional delay / SRC sinc half-length |
+| --- | --- | --- | --- |
+| economy | 256 taps | 4 nearest | Linear / 16 |
+| realtimeHigh | 2048 taps | 8 nearest | 17-tap sinc / 64 |
+| reference | 65536 taps | All points | 65-tap sinc / 128 |
+
+reference rejects truncation, permits up to 100000 points and retains double precision with SofaHrtf64/HrtfSet<double>. Bounds are configurable within header limits and the coefficient budget. Default HrtfPreparation retains the prior all-point/linear behavior; presets are explicit. QualityProfile maps its three levels to these presets. Multiple profiles can coexist in one application.
+
+Nearest modes use a prepared balanced spatial index and normalized Shepard weights. A finite neighbor set can change at boundaries; crossfade direction changes. All-point weighting retains full-bank continuity. HrirBinaural bakes the fractional-delay kernel during setDirection; The legacy HoaBinaural overload applies it during preparation. Its spectral design overload instead evaluates fractional delays by frequency-bin phase and declares its own additional latency. Extra common latency is kernel length divided by two, rounded down, exposed by each renderer.
+
+HrirBinaural uses direct FIR convolution: very long reference FIRs and all-point updates target offline/editor budgets. A quality label does not promise faster CPU execution or perceptually better localization for every dataset. HoaBinaural uses existing matrix convolution. Prepared process/reset/setDirection allocate no memory; serialize updates with audio on the same instance. Shared HrtfSet coefficients are immutable; voice histories and fades are independent.
+
+## Portable cache and rights {#cache}
+
+encodeHrtfAsset stores decoded measurements and original metadata in a versioned little-endian float32/64 cache with CRC32. decodeHrtfAsset validates sizes, checksum and data transactionally, requiring only CyDSP::HrtfAssets. Narrowing a double cache requires allowPrecisionLoss. This serializes decoded measurements, not a renderer or EQ result; call prepareSofaHrtf after loading with the chosen quality/EQ. CRC detects accidental corruption, not malicious replacement.
+
+No measured HRTF dataset is distributed. Test fixtures are original synthetic MIT signals. Original CyDSP code stays MIT; optional reader/SDK notices retain their permissive licenses. Dataset rights remain separate: verify each distributed HRTF bank's terms and retain [component notices](doc:licensing).
+''',r'''
+## Cibles optionnelles {#targets}
+
+| Option de compilation | Cible liée | Dépendances |
+| --- | --- | --- |
+| Cœur par défaut | CyDSP::CyDSP | Aucune dépendance SOFA/format de fichier |
+| CYDSP_BUILD_HRTF_ASSETS=ON | CyDSP::HrtfAssets | Cœur uniquement |
+| CYDSP_BUILD_SOFA=ON | CyDSP::Sofa | Lecteur compact privé libmysofa BSD-3-Clause + miniz MIT |
+| Aussi CYDSP_SOFA_COMPLETE=ON | CyDSP::Sofa | SDK externes HDF5 ≥1.14.6 et zlib |
+
+Toutes les cibles de production sont statiques. SOFA et assets valent OFF par défaut ; le lecteur compact vaut ON dans un importeur activé. Automatic choisit le lecteur complet s’il est compilé, sinon le compact. CMake ne télécharge aucun SDK. Le SDK complet doit être présent à l’édition de liens finale ; déclarez C et C++ et utilisez CMAKE_PREFIX_PATH pour le localiser.
+
+~~~cmake
+# Depuis les sources :
+set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
+add_subdirectory(CyDSP)
+target_link_libraries(editor PRIVATE CyDSP::Sofa)
+# Depuis un paquet installé :
+find_package(CyDSP 0.4.0 CONFIG REQUIRED COMPONENTS Sofa)
+~~~
+
+Une compilation distincte pour le jeu peut activer seulement HrtfAssets et charger les caches décodés sans aucun lecteur de format.
+
+## Import mémoire et erreurs {#import}
+
+Incluez cydsp/spatial/Sofa.h. L’hôte fournit les octets ; loadSofa ne lit aucun fichier applicatif. Import, préparation, EQ et lecture du cache allouent : utilisez un worker/éditeur, jamais le callback audio. Un échec préserve la sortie précédente ; SofaLoadReport donne une erreur précise.
+
+~~~cpp
+cydsp::SofaHrtf asset;
+cydsp::SofaLoadOptions options;
+cydsp::SofaLoadReport diagnostic;
+const auto status = cydsp::loadSofa(fileBytes, asset, options, &diagnostic);
+~~~
+
+SimpleFreeFieldHRIR exige des IR M×2×N. GeneralFIR exige allowGeneralFir=true et une géométrie de récepteurs à deux oreilles. Les autres conventions échouent explicitement. Les sources sphériques en degrés/radians ou cartésiennes en mètres/cm/mm deviennent des directions unitaires relatives à ListenerPosition/View/Up (+X avant, +Y gauche, +Z haut). Les vecteurs d’écoute absents prennent les défauts de convention. ReceiverPosition identifie les oreilles par Y local. EmitterPosition non nul et les données multi-émetteurs ne sont pas pris en charge.
+
+Data.Delay est lu en frames au taux source depuis 1×2 ou M×2, puis étendu par point. Il reste distinct de la détection d’onset des FIR. SamplingRate doit être constant (8–768 kHz). Distances et métadonnées/licence d’origine sont conservées.
+
+Le lecteur complet gère les superblocs 0/2/3, objets 1/2, liens/attributs compacts ou denses, données contiguës/en blocs avec index modernes single/fixed/extensible, float32/64 et chaînes fixes/variables. Deflate, shuffle et Fletcher32 sont autorisés. Liens/stockages externes, datasets virtuels et filtres inconnus sont rejetés avant lecture ; CyDSP n’a pas de chargement de filtre personnalisé.
+
+Le lecteur compact couvre les objets v2, disposition v3, index de blocs B-tree v1 avec shuffle puis deflate (les autres pipelines échouent), tableaux contigus et métadonnées compactes/denses prises en charge. Utilisez le complet pour les anciens objets v1 ou disposition/index v4. Le compact convertit les tableaux en float32. SofaHrtf64 exige donc le complet ou allowPrecisionLoss=true explicitement. Les rapports exposent la perte de précision ; une sortie float réduit volontairement une entrée float64. Un callback inflate noexcept peut utiliser zlib de l’hôte ; il doit retourner ok uniquement pour une longueur exacte et un flux zlib dont le checksum a été vérifié.
+
+Limites par défaut : fichier 128 Mio, buffers décodés 512 Mio, métadonnées 64 Kio, 100000 points, 32768 taps. Échantillons et tableaux de coordonnées/délais partagent un budget. Le parseur compact borne aussi allocations, itérations de lecture et récursion. Ce sont des bornes de buffers CyDSP, pas de toute la mémoire du processus, des caches SDK, copies d’image de fichier et temporaires FFT. Utilisez les limites globales du worker/sandbox de l’hôte pour un import non fiable.
+
+## Préparation et qualité {#prepare}
+
+~~~cpp
+cydsp::SofaPreparation settings;
+const auto quality = cydsp::hrtfPreparation(
+    cydsp::HrtfQuality::realtimeHigh, 48000, settings.hrtf);
+if (quality != cydsp::Status::ok) return quality;
+settings.diffuseFieldEqualization = true; // correction commune optionnelle
+settings.normalization = cydsp::HrtfLevelNormalization::frontalEnergy;
+cydsp::HrtfSet<float> bank;
+cydsp::SofaPreparationReport report;
+const auto prepared = cydsp::prepareSofaHrtf(asset, bank, settings, &report);
+~~~
+
+La préparation sélectionne la distance mesurée la plus proche de distanceMetres (1 m par défaut), puis les points à distanceToleranceMetres de cette couche. Elle ne mélange pas les directions identiques mesurées à plusieurs rayons et ne crée pas de mesures manquantes.
+
+L’EQ optionnelle en champ diffus moyenne la puissance des deux oreilles, lisse la puissance logarithmique au tiers d’octave, borne le gain inverse (±12 dB par défaut), puis crée une FIR commune à phase minimale avec les primitives FFT/filtres CyDSP. Fournissez les poids d’angle solide par point d’origine pour une grille irrégulière ; une liste vide signifie des poids égaux, signalés dans le rapport. C’est une correction approchée, pas une calibration de casque ni une intégration exacte d’une grille irrégulière.
+
+FrontalEnergy applique un gain commun pour que l’énergie impulsionnelle moyenne gauche/droite du point le plus frontal vaille un, en préservant les différences de niveau entre oreilles. Cela n’aplatit pas le spectre frontal. L’EQ allonge la FIR ; vérifiez distance, gain et troncature dans le rapport.
+
+| HrtfQuality | FIR maximale | Interpolation de direction | Délai fractionnaire / demi-longueur sinc de conversion |
+| --- | --- | --- | --- |
+| economy | 256 taps | 4 voisins | Linéaire / 16 |
+| realtimeHigh | 2048 taps | 8 voisins | Sinc à 17 taps / 64 |
+| reference | 65536 taps | Tous les points | Sinc à 65 taps / 128 |
+
+reference rejette la troncature, accepte jusqu’à 100000 points et conserve la double précision avec SofaHrtf64/HrtfSet<double>. Les bornes se règlent dans les limites de l’en-tête et du budget de coefficients. HrtfPreparation par défaut conserve le comportement global/linéaire existant ; les profils sont explicites. QualityProfile associe ses trois niveaux à ces profils. Plusieurs profils peuvent coexister dans une application.
+
+Les modes à voisins utilisent un index spatial équilibré préparé et des poids de Shepard normalisés. Un ensemble fini peut changer aux frontières ; fondez les changements de direction. La pondération globale conserve la continuité sur toute la banque. HrirBinaural incorpore le noyau de délai fractionnaire pendant setDirection ; L’ancienne surcharge HoaBinaural l’applique en préparation. La conception spectrale évalue plutôt les délais fractionnaires par la phase des bins et déclare sa propre latence ajoutée. La latence commune ajoutée vaut la moitié entière de la longueur du noyau et est exposée par chaque renderer.
+
+HrirBinaural utilise une convolution FIR directe : les longues FIR de référence et les mises à jour globales visent l’éditeur/offline. Un profil de qualité ne promet ni un calcul plus rapide ni une meilleure localisation perçue pour toute mesure. HoaBinaural utilise la convolution matricielle existante. Process/reset/setDirection préparés n’allouent pas ; sérialisez paramètres et traitement d’une même instance. Les coefficients HrtfSet partagés sont immuables ; historiques et fondus restent propres aux voix.
+
+## Cache portable et droits {#cache}
+
+encodeHrtfAsset stocke les mesures décodées et leurs métadonnées dans un cache versionné little-endian float32/64 avec CRC32. decodeHrtfAsset vérifie tailles, checksum et données avant de remplacer la sortie, avec seulement CyDSP::HrtfAssets. Réduire un cache double exige allowPrecisionLoss. Ce sont des mesures décodées, pas un renderer ni un résultat d’EQ sérialisé ; appelez prepareSofaHrtf après chargement avec la qualité/EQ choisies. Le CRC détecte une corruption accidentelle, pas un remplacement malveillant.
+
+Aucun jeu HRTF mesuré n’est distribué. Les tests utilisent des signaux synthétiques originaux MIT. Le code CyDSP original reste MIT ; lecteurs/SDK optionnels conservent leurs licences permissives. Les droits des mesures restent distincts : vérifiez les termes de chaque banque distribuée et conservez les [notices des composants](doc:licensing).
+''')
+
+# Original HOA/analytic-HRIR additions; paired public anchors.
+for page in PAGES:
+    if page['id']=='ambisonics':
+        page['body']=(page['body'][0]+r'''
+## Choose the binaural filter design {#design}
+
+The existing prepare(spec, order, bank, regularization, backend) keeps its time-domain least-squares projection. It is useful for compatibility and low added latency. Low-order projection of direction-dependent HRIR phase can lose high-frequency energy; increasing gain alone does not fix its direction-dependent coloration.
+
+The explicit HoaDecoderDesign overload adds weighted spectral least squares and MagLS. The implementation is original MIT C++ based on the [published objective](https://pub.dega-akustik.de/DAGA_2018/data/articles/000301.pdf), using CyDSP FFTs and MatrixConvolver. It imports no IEM/SPARTA implementation or new dependency.
+
+~~~cpp
+#include <cydsp/spatial/SpatialRendering.h>
+cydsp::HoaDecoderDesign design;
+design.method = cydsp::HoaDecoderMethod::magLS;
+design.crossoverHz = 2000;
+design.transitionHz = 500;
+design.maxRe = false;
+cydsp::HoaBinaural<float> renderer;
+const auto status = renderer.prepare({48000, 256, 4}, 1, bank, design);
+if (status != cydsp::Status::ok) return status;
+const auto report = renderer.designReport();
+~~~
+
+Below the transition, fitting uses the complex HRTF response, including direction-dependent ear arrival delays. Across the transition it blends complex and magnitude errors; above it, alternating projection fits magnitudes using frequency-continuous phase initialization. Iterations are bounded (default 12, 1–256), and a local solution is obtained, not a guaranteed global optimum. The default band spans 1750–2250 Hz; choose it for the material, order and listener. Relaxing high-band phase preserves the low-band LS fit, not every perceptual cue or exact spatial resolution.
+
+The spectral designer uses every supplied bank point with its design weights; direct-renderer neighbor counts and fractional-delay kernel lengths do not control this projection. Fractional delays are evaluated spectrally at the design bins.
+
+An ITD belongs to a direction. A scene with several directions cannot recover all original ITDs by adding one output-ear delay after mixing. This design retains complex low-band targets and relaxes high-band phase instead; there is no claim of a universal remove/reinsert ITD operation.
+
+maxRe optionally tapers high-band harmonic degrees by the max-rE Legendre weights. It broadens the angular response and may change magnitude fit/levels. It is separate from MagLS, defaults OFF and is not a replacement for high-band magnitude optimization.
+
+Spatial weights are empty for equal weighting, or contain one nonnegative weight per bank point. They are normalized internally. Use appropriate solid-angle weights for irregular measured grids. Regularization is applied to this normalized Gram matrix, so its scale is independent of grid point count; it is not numerically identical to the legacy overload's unnormalized regularization.
+
+## Latency, memory and diagnostics {#design-limits}
+
+The spectral designer runs only in prepare, on a worker/editor. It retains the whole designed FIR, with no silent truncation. Auto FFT size is the next power of two at least twice the full delayed HRIR length (minimum 32, maximum 65536). An explicit FFT must satisfy the same lower bound. The causal circular shift adds FFT-size/2 frames; latencyFrames includes this and prior HRTF sample-rate-conversion latency. For example, 2048 FFT frames add 1024 frames: 23.22 ms at 44.1 kHz. This is a processing-latency tradeoff, not a zero-latency algorithm. Very long delayed banks exceeding the FFT bound fail explicitly; the legacy projection remains a separate choice.
+
+maximumStorageBytes (default 512 MiB) bounds estimated designer-owned matrices, spectra and FIR buffers; it is not a cap on the complete renderer, typed filter copies, convolver storage or the whole process. Dense grids, large FFTs and high orders increase preparation work substantially. Audio rendering reuses the prepared MIMO convolver; process/reset/setRotation allocate no memory. Serialize updates with processing on one instance.
+
+designReport reports FFT size, FIR length, total declared latency and relative weighted RMS errors. lowBandComplexError measures complex error below the transition. highBandMagnitudeError measures magnitude error above it; initialHighBandMagnitudeError is the spectral LS baseline for the same design data. These are dimensionless errors over design directions and non-endpoint FFT bins, before float filter quantization, not speed ratios, listening scores or independent validation. spectralMetricsAvailable is false for the legacy overload: its zero-initialized error fields are not measurements. MagLS is not an individualized HRTF or a guarantee against coloration; evaluate actual content and listener motion.
+''',page['body'][1]+r'''
+## Choisir la conception des filtres binauraux {#design}
+
+L’appel existant prepare(spec, order, bank, regularization, backend) conserve la projection temporelle par moindres carrés. Il reste utile pour la compatibilité et une faible latence ajoutée. Aux faibles ordres, projeter la phase des HRIR dépendante de la direction peut perdre de l’énergie dans les aigus ; augmenter le gain ne corrige pas toute la coloration directionnelle.
+
+La surcharge explicite HoaDecoderDesign ajoute les moindres carrés spectraux pondérés et MagLS. L’implémentation est du C++ MIT original fondé sur l’[objectif publié](https://pub.dega-akustik.de/DAGA_2018/data/articles/000301.pdf), avec les FFT et MatrixConvolver CyDSP. Aucun code IEM/SPARTA ni nouvelle dépendance n’est importé.
+
+~~~cpp
+#include <cydsp/spatial/SpatialRendering.h>
+cydsp::HoaDecoderDesign design;
+design.method = cydsp::HoaDecoderMethod::magLS;
+design.crossoverHz = 2000;
+design.transitionHz = 500;
+design.maxRe = false;
+cydsp::HoaBinaural<float> renderer;
+const auto status = renderer.prepare({48000, 256, 4}, 1, bank, design);
+if (status != cydsp::Status::ok) return status;
+const auto report = renderer.designReport();
+~~~
+
+Sous la transition, l’ajustement utilise la réponse HRTF complexe, avec les délais d’arrivée propres aux directions et oreilles. Dans la transition il mélange erreurs complexe et d’amplitude ; au-dessus, des projections alternées ajustent les amplitudes avec une initialisation de phase continue entre fréquences. Les itérations sont bornées (12 par défaut, 1–256) ; la solution est locale, pas un optimum global garanti. La bande par défaut va de 1750 à 2250 Hz ; choisissez-la selon contenu, ordre et auditeur. Relâcher la phase aiguë conserve l’ajustement LS grave, pas tous les indices perceptifs ni la résolution spatiale exacte.
+
+La conception spectrale utilise tous les points fournis avec leurs poids ; le nombre de voisins du renderer direct et la longueur de son noyau de délai ne pilotent pas cette projection. Les délais fractionnaires sont évalués spectralement aux bins de conception.
+
+Une ITD appartient à une direction. Avec plusieurs directions mélangées, un délai unique par oreille en sortie ne restitue pas toutes les ITD d’origine. La conception conserve les cibles complexes graves et relâche la phase aiguë ; elle ne prétend pas fournir une opération universelle de retrait/réinjection d’ITD.
+
+maxRe atténue en option les degrés harmoniques aigus par les poids de Legendre max-rE. Il élargit la réponse angulaire et peut modifier l’ajustement d’amplitude/niveau. Ce réglage distinct de MagLS vaut OFF par défaut et ne remplace pas l’optimisation d’amplitude aiguë.
+
+Les poids spatiaux sont vides pour une pondération égale, ou contiennent un poids non négatif par point de la banque. Ils sont normalisés en interne. Utilisez des poids d’angle solide adaptés aux grilles mesurées irrégulières. La régularisation agit sur cette matrice de Gram normalisée, indépendamment du nombre de points ; sa valeur n’est pas numériquement identique à la régularisation non normalisée de l’ancienne surcharge.
+
+## Latence, mémoire et diagnostics {#design-limits}
+
+La conception spectrale s’exécute seulement dans prepare, sur worker/éditeur. Elle conserve toute la FIR conçue, sans troncature silencieuse. La taille FFT automatique est la puissance de deux suivante au moins égale au double de la HRIR complète avec délais (minimum 32, maximum 65536). Une taille explicite doit respecter la même borne basse. Le décalage circulaire causal ajoute taille-FFT/2 frames ; latencyFrames inclut cela et la latence de conversion de fréquence de la HRTF. Par exemple, une FFT de 2048 ajoute 1024 frames : 23,22 ms à 44,1 kHz. C’est un compromis de latence de traitement, pas un algorithme à latence nulle. Une banque trop longue pour la borne FFT échoue explicitement ; la projection historique reste un choix séparé.
+
+maximumStorageBytes (512 Mio par défaut) borne l’estimation des matrices, spectres et FIR du concepteur ; il ne plafonne pas tout le renderer, les copies de filtres typés, la convolution ou le processus. Grilles denses, grandes FFT et ordres élevés alourdissent nettement la préparation. Le rendu audio réutilise le convolver MIMO préparé ; process/reset/setRotation n’allouent pas. Sérialisez paramètres et traitement d’une même instance.
+
+designReport fournit FFT, longueur FIR, latence totale déclarée et erreurs RMS relatives pondérées. lowBandComplexError mesure l’erreur complexe sous la transition. highBandMagnitudeError mesure l’erreur d’amplitude au-dessus ; initialHighBandMagnitudeError donne la référence LS spectrale sur les mêmes données. Ce sont des erreurs sans unité sur les directions de conception et bins FFT hors extrémités, avant quantification des filtres float : ni rapports de vitesse, ni notes d’écoute, ni validation indépendante. spectralMetricsAvailable vaut false pour l’ancienne surcharge : ses champs d’erreur initialisés à zéro ne sont pas des mesures. MagLS ne personnalise pas la HRTF et ne garantit pas l’absence de coloration ; évaluez contenus et mouvements d’auditeur.
+''')
+    if page['id']=='hrtf':
+        page['body']=(page['body'][0]+r'''
+## Generate analytic HRIRs and a grid {#analytic}
+
+sphericalFibonacci fills caller-owned direction and optional solid-angle spans, without allocation. Directions use the CyDSP listener frame; weights are equal, sum to 4π and only approximate spherical integration. This is neither an exact spherical t-design nor a Lebedev rule. Use a sufficiently dense grid or supply a different grid/weights for precise quadrature.
+
+~~~cpp
+#include <cydsp/spatial/SpatialRendering.h>
+#include <vector>
+std::vector<cydsp::Vec3> directions(256);
+std::vector<double> weights(256);
+const auto grid = cydsp::sphericalFibonacci(directions, weights);
+if (grid != cydsp::Status::ok) return grid;
+cydsp::AnalyticHrirOptions options;
+options.sampleRate = 48000;
+options.taps = 256;
+cydsp::HrirBank<float> owned;
+cydsp::AnalyticHrirReport diagnostic;
+const auto generated = cydsp::analyticHrirs(options, directions, owned, &diagnostic);
+if (generated != cydsp::Status::ok) return generated;
+cydsp::HrtfSet<float> bank;
+cydsp::HrtfPreparation preparation;
+preparation.sourceSampleRate = owned.sampleRate();
+preparation.targetSampleRate = 48000;
+const auto ready = bank.prepare(owned.points(), preparation);
+~~~
+
+analyticHrirs excites the existing AnalyticBinaural processor with unit impulses and copies the selected finite FIRs into an owning HrirBank<float/double>. Each point includes its acoustic delay in the FIR and has zero separate delay. HrtfSet can subsequently separate integer onsets during its usual preparation; do not add the same delays twice.
+
+The owning bank retains the sample rate, taps and views. Views survive moving the owner, and remain valid until it is destroyed or successfully replaced. Failed generation preserves the previous bank. Generation allocates, so run it outside audio. The maximum 100000 directions/65536 taps are also constrained by a default 512 MiB sample/view budget.
+
+The model is the existing generic head-shadow/ITD approximation, named AnalyticBinaural in this repository. There is no CuedBinaural class here, individualized ear/pinna geometry or measured elevation detail. Increasing taps does not create such cues. maximumTailSample inspects the next 64 output frames beyond the retained FIR: it is a diagnostic, not a bound on all omitted energy. Choose taps for the model/rate and check the tail.
+''',page['body'][1]+r'''
+## Générer des HRIR analytiques et une grille {#analytic}
+
+sphericalFibonacci remplit des spans de directions et éventuellement de poids d’angle solide fournis par l’appelant, sans allocation. Les directions suivent le repère d’écoute CyDSP ; les poids égaux somment à 4π et donnent seulement une intégration approchée. Ce n’est ni un t-design sphérique exact ni une règle de Lebedev. Utilisez une grille suffisamment dense ou fournissez une autre grille/pondération pour une quadrature précise.
+
+~~~cpp
+#include <cydsp/spatial/SpatialRendering.h>
+#include <vector>
+std::vector<cydsp::Vec3> directions(256);
+std::vector<double> weights(256);
+const auto grid = cydsp::sphericalFibonacci(directions, weights);
+if (grid != cydsp::Status::ok) return grid;
+cydsp::AnalyticHrirOptions options;
+options.sampleRate = 48000;
+options.taps = 256;
+cydsp::HrirBank<float> owned;
+cydsp::AnalyticHrirReport diagnostic;
+const auto generated = cydsp::analyticHrirs(options, directions, owned, &diagnostic);
+if (generated != cydsp::Status::ok) return generated;
+cydsp::HrtfSet<float> bank;
+cydsp::HrtfPreparation preparation;
+preparation.sourceSampleRate = owned.sampleRate();
+preparation.targetSampleRate = 48000;
+const auto ready = bank.prepare(owned.points(), preparation);
+~~~
+
+analyticHrirs excite le processeur AnalyticBinaural existant par des impulsions unitaires et copie les FIR finies choisies dans un HrirBank<float/double> propriétaire. Chaque point contient son délai acoustique dans la FIR et un délai séparé nul. HrtfSet peut ensuite séparer les onsets entiers pendant sa préparation habituelle ; n’ajoutez pas deux fois les mêmes délais.
+
+La banque possède taux, taps et vues. Les vues survivent au déplacement de leur propriétaire et restent valides jusqu’à destruction ou remplacement réussi. Un échec préserve la banque précédente. La génération alloue : exécutez-la hors audio. Les maxima 100000 directions/65536 taps restent contraints par le budget de samples/vues, 512 Mio par défaut.
+
+Le modèle est l’approximation générique d’ombre de tête/ITD existante, nommée AnalyticBinaural dans ce dépôt. Il n’y a ici ni classe CuedBinaural, ni géométrie individuelle de pavillon/oreille, ni détails d’élévation mesurés. Ajouter des taps ne crée pas ces indices. maximumTailSample inspecte les 64 frames après la FIR retenue : c’est un diagnostic, pas une borne de toute l’énergie omise. Choisissez les taps selon modèle/taux et vérifiez la queue.
 ''')

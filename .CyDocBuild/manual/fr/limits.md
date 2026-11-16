@@ -19,7 +19,7 @@ parent: overview
 | macOS / Linux desktop | Cibles de sources ; exécution à valider pour cette version. |
 | x86 / ARM32 | Chemins de compatibilité existants ; non réexécutés pour cet état. Les noyaux double ARM32 peuvent revenir au scalaire. |
 
-Les ABI ne sont pas interchangeables. La version 0.3.2 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
+Les ABI ne sont pas interchangeables. La version 0.4.0 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
 
 ## Capacités préparées {#capacities}
 
@@ -30,7 +30,7 @@ Les ABI ne sont pas interchangeables. La version 0.3.2 est en développement ; u
 | Granulator | Jusqu’à 4096 emplacements ; aucun vol de voix implicite. |
 | Chemins / pièces | 64 chemins et 10 s de retard préparé ; jusqu’à 32 réponses de pièces. |
 | Ambisonics | Ordres 0–7, 1–64 canaux ACN/SN3D. |
-| HRTF | 2048 directions ; 16384 frames d’entrée/oreille ; FIR préparée limitée à 2048. |
+| HRTF | Défaut 2048 directions/32768 frames d’entrée/2048 taps ; bornes de référence explicites 100000/65536/65536. Voir [SOFA](doc:sofa). |
 | Graphes | MultiBusGraph : 256 nœuds, 4096 connexions et 32 bus/disposition. |
 
 ## Interpréter les modèles {#models}

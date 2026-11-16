@@ -3,7 +3,7 @@ id: api-synthesis-sourcebatch
 title: SourceBatch
 description: Fixed source slots, shared sample/wavetable banks, SIMD sine voices and multichannel gains.
 section: API reference
-order: 1186
+order: 1187
 revision: 1
 parent: api-synthesis
 symbol: cydsp::SourceBatch

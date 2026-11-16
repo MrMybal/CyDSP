@@ -3,7 +3,7 @@ id: api-spectral-spectraleffects
 title: SpectralEffects
 description: STFT freeze, vocoder, morph/filter effects and a Hilbert-based frequency shifter.
 section: API reference
-order: 1177
+order: 1178
 revision: 1
 parent: api-spectral
 symbol: cydsp::SpectralEffects

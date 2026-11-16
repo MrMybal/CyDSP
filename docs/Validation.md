@@ -1,3 +1,76 @@
+# HOA filter design and analytic HRIR validation — 2026-11-16
+
+MSVC x64 Release and AddressSanitizer pass the full regression suite with the
+new tests in tests/HoaDesignRegression.cpp. Existing HrirBinaural/HoaBinaural
+tests remain in SpatialRenderingRegression.cpp, AdvancedExpansionRegression.cpp
+and the optional SofaRegression.cpp.
+
+Original synthetic checks cover owned analytic FIRs versus the streaming model,
+mirror/front symmetry, bank moves and transactional failure, Fibonacci unit
+vectors/area, weighted LS/MagLS at orders 1–3 in float/double, low-band complex
+agreement, held-out directions and frequencies between design bins, max-rE,
+rotations, block splitting, failed preparation and realtime allocation/free.
+
+The following independent installed-consumer measurement used real KEMAR
+responses: 608 design directions and 102 held out, at 44100 Hz, 12 iterations,
+2048-point FFT, no max-rE and equal directional weights. Values are normalized
+RMS MAGNITUDE errors over both ears from 3 to 16 kHz; lower is better.
+They are not speed ratios, dB, listening scores or a general perceptual guarantee.
+
+| Ambisonic order | Spectral LS error | MagLS error |
+| --- | --- | --- |
+| 1 | 83.53% | 34.71% |
+| 2 | 78.61% | 25.47% |
+| 3 | 73.74% | 18.17% |
+
+Both spectral designs add 1024 declared frames (23.22 ms at 44100 Hz); the legacy
+overload keeps its previous latency. These are finite frequency-domain designs,
+not an assertion of phase-perfect interpolation or individual listener matching.
+The real dataset remains ignored because its metadata requests permission.
+No listening test, new platform execution or plugin integration is claimed.
+The implementation adds no third-party code dependency.
+The updated assets-only installed consumer compiles/links without HDF5; its new
+runtime launch remained blocked by a Windows sharing-violation file lock. No lock
+or antivirus setting was changed. The full installed consumer ran the measurements
+above, and native regression/ASan execution succeeded.
+
+---
+
+# CyDSP 0.4.0 SOFA/HRTF validation — 2026-11-16
+
+Windows x64 Release (MSVC): the full DSP regression and optional SOFA regression
+pass. The latter covers 16 original MIT synthetic SOFA files: old and modern
+HDF5 layouts/indexes, float32/64 and big-endian data, compressed arrays, dense
+metadata, empty attributes, listener transforms, receiver order, delays, rejected
+formats/rates/budgets, cache integrity, distance selection, common-ear EQ and level
+normalization. Unsupported compact filter pipelines fail rather than misdecode.
+
+The compact build also passes these applicable tests and 3000 deterministic
+single-byte mutations under AddressSanitizer. This is bounded regression coverage,
+not a proof against every malformed HDF5 file. Complete SDK internal allocations
+are outside the application buffer budgets.
+
+Nearest-direction lookup agrees with exhaustive search over 3001 directions.
+The scalar complex-response error for a half-frame delay at 9.6 kHz / 48 kHz
+is 0.190983 (economy), 0.000318535 (realtimeHigh), 0.00000665728 (reference).
+These are dimensionless numerical errors, not speed ratios or listening scores.
+HRIR and order-zero HOA impulse outputs agree; realtime updates/process/reset
+pass the allocation/free audit.
+
+Production assets-only compilation and individual public-header/contract checks
+pass without HDF5. Independent installed consumers link/run with assets only
+and with the complete importer; exported CyDSP targets contain no SDK build path.
+The tested external SDK is static HDF5 2.2.0 with zlib 1.3.1.
+
+A real MIT KEMAR file imports as 710 points × 512 taps at 44100 Hz through the
+complete reader. It remains in the ignored validation folder: its metadata requests
+the author's permission, and no measured dataset is redistributed.
+
+No new macOS/Linux/ARM execution or CyMetaSound integration is claimed here.
+Code notices and dataset rights are documented in the bilingual SOFA guide.
+
+---
+
 # CyDSP 0.3.2 optimization validation — 2026-11-14
 
 Compiler-input SHA-256: `114977a9b190a6dd11a017bddf6c144cbc5d69230976cb0ef419782ec3a73bd7`.

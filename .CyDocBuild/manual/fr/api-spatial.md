@@ -16,5 +16,6 @@ parent: api
 | [Doppler.h](doc:api-spatial-doppler) | Doppler par rééchantillonnage variable préparé et comptes explicites de flux. |
 | [FdnReverb.h](doc:api-spatial-fdnreverb) | Réseaux de retards à rétroaction orthogonaux avec décroissance par bandes, diffusion et freeze. |
 | [HybridReverb.h](doc:api-spatial-hybridreverb) | Réponse précoce par convolution préparée combinée à une queue FDN contrôlée indépendamment. |
+| [Sofa.h](doc:api-spatial-sofa) | Import SOFA optionnel depuis la mémoire, préparation float64 et cache HRTF portable. |
 | [SpatialMath.h](doc:api-spatial-spatialmath) | Géométrie source/auditeur en mètres/radians, milieux, distance, Doppler, directivité et matériaux. |
 | [SpatialRendering.h](doc:api-spatial-spatialrendering) | Binaural analytique/mesuré, préparation HRTF partagée, VBAP et Ambisonics ACN/SN3D d’ordre 7. |

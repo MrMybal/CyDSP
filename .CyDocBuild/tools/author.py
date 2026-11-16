@@ -133,7 +133,7 @@ def main():
         for i in range(2):
             body=note[i]+'\n\n## '+('Include','Inclusion')[i]+' {#include}\n\n```cpp\n#include <'+h['header']+'>\n```\n\n'
             body+=link(('Usage and contracts','Utilisation et contrats')[i],note[2])+' · '+link(('Common processing rules','Règles communes de traitement')[i],'contracts')+'\n\n'
-            if not h['symbols']:body+=('This umbrella header includes every public CyDSP module. Use individual headers to reduce inclusion costs.','Cet en-tête regroupe tous les modules publics CyDSP. Utilisez les en-têtes individuels pour limiter le coût d’inclusion.')[i]+'\n'
+            if not h['symbols']:body+=('This umbrella header includes the numerical CyDSP modules. Include cydsp/spatial/Sofa.h separately for optional asset/import APIs. Use individual headers to reduce inclusion costs.','Cet en-tête regroupe les modules numériques CyDSP. Incluez séparément cydsp/spatial/Sofa.h pour les API optionnelles de banques/import. Utilisez les en-têtes individuels pour limiter le coût d’inclusion.')[i]+'\n'
             anchors={}
             for symbol in h['symbols']:body+=render_symbol(symbol,i,anchors)
             if h.get('macros'):

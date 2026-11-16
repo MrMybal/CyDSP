@@ -1,8 +1,12 @@
-# CyDSP 0.3.2
+# CyDSP 0.4.0
+
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
+
+- 0.4.0: Import SOFA optionnel depuis la mémoire, cache HRTF, égalisation en champ diffus, normalisation commune, index des directions voisines et profils de qualité HRTF explicites. Cœur MIT ; notices des lecteurs optionnels fournies.
+- 0.4.0: Conception HOA MagLS/pondérée originale, max-rE optionnel, génération de banques HRIR analytiques et grille procédurale de Fibonacci ; latence et diagnostics numériques explicites.
 
 - 0.3.2 : fusion SIMD du drive, du wavefolder direct et du mixage sur x64/ARM64. Compensation DC mise en cache lorsque la forme ou le biais change.
 - 0.3.2 : quotients et calcul en dB du transient précis vectorisés, en conservant chaque appel scalaire à `std::pow(10, exposant)` et son exposant d’origine. Le mode précis NEON à deux voies conserve la boucle scalaire d’origine, plus rapide sur le Quest 3. EQ dynamique par paires de canaux indépendants, avec les mêmes récurrences doubles et le cache des coefficients/constantes inchangés.

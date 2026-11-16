@@ -3,7 +3,7 @@ id: api-synthesis-granulator
 title: Granulator
 description: Bounded offline-sample grain voices and deterministic scheduled clouds.
 section: API reference
-order: 1182
+order: 1183
 revision: 1
 parent: api-synthesis
 symbol: cydsp::Granulator

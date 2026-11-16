@@ -58,8 +58,8 @@ cœur spatial : +X devant, +Y à gauche, +Z en haut, mètres.
 
 ## 2. Préparation HRTF et interpolation en mouvement
 
-`HrtfSet<T>` reçoit les mesures en mémoire : jusqu’à 2048 directions distinctes,
-16384 frames par oreille en entrée. Il détecte le premier dépassement d’un seuil
+`HrtfSet<T>` reçoit les mesures en mémoire : par défaut 2048 directions distinctes,
+32768 frames par oreille (bornes explicites : 100000 points/65536 frames). Il détecte le premier dépassement d’un seuil
 relatif au pic (−40 dB par défaut), retire cet onset entier et conserve le délai.
 Les délais fractionnaires explicitement fournis restent pris en compte.
 La détection automatique n’est pas une estimation sous-échantillon ni un système
@@ -73,7 +73,7 @@ conserve son pré/post-ringing causal : le retard commun est exposé par
 `latencyFrames()` sur la banque, le rendu HRIR et le rendu HOA. À fréquence égale,
 il vaut zéro. Les onsets acoustiques par direction restent des délais distincts.
 
-La limite de FIR préparée est configurable, jusqu’à 2048 taps. `truncated()`
+La limite de FIR préparée est configurable, jusqu’à 65536 taps (2048 par défaut). `truncated()`
 signale une troncature ; il faut la vérifier, notamment après conversion.
 `tailFrames()` des renderers donne une borne conservative comprenant les FIR,
 les délais acoustiques et le retard de conversion.
@@ -90,7 +90,7 @@ La direction d’un point mesuré reproduit ce point. Cette interpolation contin
 évite le changement abrupt d’appartenance des trois voisins de l’ancien mode.
 `angularWidthRadians` règle la localité ; elle ne remplace pas des mesures denses.
 Les changements sont fondus ; une nouvelle demande pendant un fondu retourne
-`transition_in_progress`. Aucun fichier SOFA ni jeu de données HRTF n’est fourni.
+`transition_in_progress`. Un importeur SOFA optionnel et les profils HRTF sont décrits dans le [guide CyDoc](../Documentation/Documentation.html#/fr/sofa). Aucun jeu HRTF mesuré n’est fourni.
 
 ## 3. Ambisonics et binaural HOA
 
