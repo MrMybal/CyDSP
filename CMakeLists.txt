@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(CyDSP VERSION 0.4.4 LANGUAGES CXX)
+project(CyDSP VERSION 0.4.5 LANGUAGES CXX)
 if(CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64EC" OR CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "ARM64EC")
     message(FATAL_ERROR "ARM64EC needs a separate CyDSP ABI/dispatch implementation")
 endif()
@@ -192,6 +192,7 @@ install(FILES LICENSE third_party/manifest.json docs/Licensing.md DESTINATION ${
 # Ship the complete offline reader; documentation generation remains explicit.
 install(DIRECTORY Documentation/ DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP/Documentation COMPONENT Documentation)
 set(cydsp_test_sources
+ tests/HrtfTimingRegression.cpp
  tests/NeuralOptimizationRegression.cpp
  tests/NeuralHrtfRegression.cpp
  tests/PreparedOptimizationRegression.cpp

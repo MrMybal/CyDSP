@@ -3,7 +3,7 @@ PAGES=[]
 def add(id,en_title,fr_title,en_desc,fr_desc,parent,en,fr):
     PAGES.append(dict(id=id,title=(en_title,fr_title),description=(en_desc,fr_desc),parent=parent,body=(en.strip(),fr.strip())))
 
-add('overview','CyDSP 0.4.4','CyDSP 0.4.4','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
+add('overview','CyDSP 0.4.5','CyDSP 0.4.5','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
 ## What you can build {#purpose}
 
 CyDSP is a C++20 audio digital signal processing library. Use its float/double processors in an effect, synthesizer, DAW, game or audio engine. It supplies filters, dynamics, convolution, spectral processing, synthesis, sampling, analysis, restoration and 3D sound through prepared storage and a common planar API.
@@ -24,7 +24,7 @@ Start with [installation](doc:installation), then build a [first processing chai
 
 CyDSP processes in-memory audio. Your application supplies the audio callback, stream ownership and surrounding services. CyAudioCore is one project using its public API. You can link CyDSP directly into another application.
 
-Version 0.4.4 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
+Version 0.4.5 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
 ''',r'''
 ## Ce que vous pouvez construire {#purpose}
 
@@ -46,7 +46,7 @@ Commencez par l’[installation](doc:installation), puis une [première chaîne 
 
 CyDSP traite l’audio en mémoire. L’application fournit le callback audio, possède les flux et gère les services qui les entourent. CyAudioCore est un projet utilisant son API publique. CyDSP peut être lié directement à une autre application.
 
-La version 0.4.4 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
+La version 0.4.5 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
 ''')
 
 add('installation','Build and link CyDSP','Compiler et lier CyDSP','Build the static libraries and use their CMake targets.','Compiler les bibliothèques statiques et utiliser leurs cibles CMake.','overview',r'''
@@ -73,7 +73,7 @@ Production builds create static libraries; native tests and measurements are opt
 Point `CMAKE_PREFIX_PATH` at the absolute install prefix. After defining the application's target:
 
 ```cmake
-find_package(CyDSP 0.4.4 CONFIG REQUIRED)
+find_package(CyDSP 0.4.5 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -103,7 +103,7 @@ Les builds de production créent des bibliothèques statiques ; tests natifs et 
 Faites pointer `CMAKE_PREFIX_PATH` vers le préfixe d’installation absolu. Après définition de la cible de l’application :
 
 ```cmake
-find_package(CyDSP 0.4.4 CONFIG REQUIRED)
+find_package(CyDSP 0.4.5 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -1228,6 +1228,30 @@ HrtfSet defaults to 2048 directions and 32768 input frames/ear; explicit limits 
 
 Preparation removes that onset and resamples FIRs with windowed sinc when needed. Rates are 8–768 kHz and the conversion ratio is 1/8–8. Conversion preserves IR DC gain and exposes a common causal conversion latency through latencyFrames. Acoustic directional onsets remain distinct from that common latency.
 
+## Common measurement delay {#common-delay}
+
+Set `HrtfPreparation::removeCommonDelay = true` to advance the entire prepared bank by its earliest extracted ear arrival. The default is false. The minimum includes **all points and both ears**, combining supplied delay and detected integer onset, then converted to target-rate frames. The same offset is subtracted everywhere: ITD and relative direction timing remain intact, including interpolation. The aligned FIR coefficients are unchanged. Query `bank.removedCommonDelayFrames()` for the actual advance, or divide by `bank.sampleRate()` for seconds. An unprepared bank and the default policy report zero.
+
+```cpp
+cydsp::SofaPreparation preparation;
+preparation.hrtf.targetSampleRate = 48000;
+preparation.hrtf.maximumPoints = 16384; // includes D1/D2 from the optional bank
+preparation.hrtf.detectOnsets = true;
+preparation.hrtf.removeCommonDelay = true;
+cydsp::HrtfSet<float> bank;
+const auto status = cydsp::prepareSofaHrtf(asset, bank, preparation);
+if (status == cydsp::Status::ok) {
+    const double removedSeconds = bank.removedCommonDelayFrames() / bank.sampleRate();
+    // Prepare HrirBinaural or HoaBinaural from bank; neither reapplies this offset.
+}
+```
+
+The example needs the optional SOFA API and an already decoded `SofaHrtf asset`. With raw HrirPoint spans, set the same field on HrtfPreparation and call HrtfSet::prepare. With detectOnsets=false, only supplied explicit delays participate: silence embedded in the FIR is not discovered. A silent ear contributes its supplied delay conservatively; a zero-delay silent measurement can prevent any common advance.
+
+This estimates an onset, not the loudspeaker distance or the time of the largest peak. The default -40 dB threshold retains more precursors than a higher threshold; raising onsetThresholdDb can discard actual pre-arrival signal during onset extraction. In the bundled D2 48 kHz file, the default finds a minimum of 5 frames (0.104 ms), while the nearest frontal peaks are at 107/110 frames. Removing the peak time would cut earlier content and is not an equivalent pure delay correction. A globally aligned bank also retains direction-dependent residual arrivals. It does not guarantee an instantaneous frontal peak.
+
+This policy does not remove SRC/fractional-delay-kernel latency or the spectral MagLS design delay, which remain in each renderer's latencyFrames report. Automatic FFT sizing may choose a different size after the acoustic tail shrinks. Fractional residual delays still use the selected linear/sinc reconstruction; their final waveform is an approximation to an ideal fractional time shift. It adds no audio-thread work or buffer. The renderer tail reflects the reduced acoustic delays. Keep the host's physical path propagation separate: add distance delay once if the game/DAW requires it. SOFA imports and decoded caches retain their original data; choose the policy each time you prepare. Reprepare off the audio thread; already prepared voices retain their previous shared bank and must be replaced or crossfaded by the host to change policy.
+
 ## Capacity and sharing {#sharing}
 
 Prepared FIR length defaults to 2048 taps and is configurable up to 65536. Use rejectTruncation or check truncated(). See the [quality guide](doc:sofa#prepare). Renderer tail bounds include FIR, acoustic delays and conversion latency.
@@ -1241,6 +1265,30 @@ Direction interpolation uses normalized spherical Shepard weights with Gaussian 
 HrtfSet accepte par défaut 2048 directions et 32768 frames/oreille ; les bornes explicites vont à 100000 points et 65536 frames. L’[importeur SOFA optionnel](doc:sofa) lit les mesures en mémoire. Une petite [sélection SADIE II optionnelle](doc:sofa#bundled) est fournie séparément du code. Par défaut, le premier dépassement d’un seuil relatif au pic (-40 dB) définit un onset entier ; les retards fractionnaires fournis restent séparés.
 
 La préparation retire l’onset et rééchantillonne les FIR par sinc fenêtrée si nécessaire. Les taux vont de 8 à 768 kHz et le ratio de conversion de 1/8 à 8. La conversion conserve le gain DC de l’IR et expose sa latence causale commune via latencyFrames. Les onsets acoustiques directionnels restent distincts de cette latence.
+
+## Délai commun de mesure {#common-delay}
+
+Activez `HrtfPreparation::removeCommonDelay = true` pour avancer toute la banque préparée de sa première arrivée d’oreille extraite. La valeur par défaut est false. Le minimum comprend **tous les points et les deux oreilles**, en combinant délai fourni et onset entier détecté, puis en convertissant en frames au taux cible. Ce même décalage est soustrait partout : ITD et écarts entre directions restent conservés, y compris à l’interpolation. Les coefficients FIR alignés restent inchangés. Consultez `bank.removedCommonDelayFrames()` pour connaître l’avance réelle, ou divisez par `bank.sampleRate()` pour des secondes. Une banque non préparée et la politique par défaut rapportent zéro.
+
+```cpp
+cydsp::SofaPreparation preparation;
+preparation.hrtf.targetSampleRate = 48000;
+preparation.hrtf.maximumPoints = 16384; // inclut D1/D2 de la banque optionnelle
+preparation.hrtf.detectOnsets = true;
+preparation.hrtf.removeCommonDelay = true;
+cydsp::HrtfSet<float> bank;
+const auto status = cydsp::prepareSofaHrtf(asset, bank, preparation);
+if (status == cydsp::Status::ok) {
+    const double removedSeconds = bank.removedCommonDelayFrames() / bank.sampleRate();
+    // Préparer HrirBinaural ou HoaBinaural depuis bank ; le décalage reste retiré.
+}
+```
+
+Cet exemple demande l’API SOFA optionnelle et un `SofaHrtf asset` déjà décodé. Avec des spans de HrirPoint, activez le même champ de HrtfPreparation puis appelez HrtfSet::prepare. Avec detectOnsets=false, seuls les délais explicites participent : le silence inclus dans la FIR n’est pas détecté. Une oreille silencieuse contribue prudemment avec son délai fourni ; une mesure silencieuse sans délai peut empêcher toute avance commune.
+
+Il s’agit d’une estimation d’onset, pas de la distance du haut-parleur ni de l’instant du plus grand pic. Le seuil par défaut de -40 dB conserve davantage de précurseurs qu’un seuil supérieur ; augmenter onsetThresholdDb peut supprimer un signal réel avant l’arrivée principale pendant l’extraction. Le fichier D2 48 kHz fourni donne un minimum de 5 frames (0,104 ms) au seuil par défaut, alors que les pics de face les plus proches se trouvent aux frames 107/110. Retirer le temps du pic couperait du contenu antérieur et ne serait pas une simple correction de délai équivalente. Une banque globalement alignée conserve aussi les arrivées résiduelles propres aux directions. Elle ne garantit pas un pic frontal instantané.
+
+Cette politique ne retire ni la latence de SRC/noyau de délai fractionnaire ni celle de conception MagLS spectral, toujours exposées par latencyFrames de chaque renderer. Le dimensionnement automatique de FFT peut choisir une autre taille après réduction de la queue acoustique. Les délais résiduels fractionnaires utilisent toujours la reconstruction linéaire/sinc choisie ; leur forme d’onde finale approxime un décalage temporel fractionnaire idéal. Elle n’ajoute aucun calcul au thread audio ni tampon. La queue du renderer tient compte des délais acoustiques réduits. Gardez la propagation physique des trajets de l’hôte séparée : ajoutez le délai de distance une seule fois si le jeu/DAW en a besoin. L’import SOFA et les caches décodés conservent leurs données originales ; choisissez la politique à chaque préparation. Repréparez hors du thread audio ; les voix déjà préparées gardent leur ancienne banque partagée et l’hôte doit les remplacer ou appliquer un fondu pour changer de politique.
 
 ## Capacité et partage {#sharing}
 
@@ -1387,7 +1435,7 @@ add('limits','Platforms, capacities and model limits','Plateformes, capacités e
 | macOS / desktop Linux | Source targets; execution remains to validate for this version. |
 | x86 / ARM32 | Compatibility paths exist; they were not rerun for this snapshot. ARM32 double kernels can fall back to scalar. |
 
-No ABI is interchangeable with another. Version 0.4.4 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
+No ABI is interchangeable with another. Version 0.4.5 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
 
 ## Prepared capacities {#capacities}
 
@@ -1416,7 +1464,7 @@ The optional [SADIE II selection](doc:sofa#bundled) carries its own Apache-2.0 d
 | macOS / Linux desktop | Cibles de sources ; exécution à valider pour cette version. |
 | x86 / ARM32 | Chemins de compatibilité existants ; non réexécutés pour cet état. Les noyaux double ARM32 peuvent revenir au scalaire. |
 
-Les ABI ne sont pas interchangeables. La version 0.4.4 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
+Les ABI ne sont pas interchangeables. La version 0.4.5 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
 
 ## Capacités préparées {#capacities}
 
@@ -1501,7 +1549,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Installed package:
-find_package(CyDSP 0.4.4 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.5 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 A separately configured game build may enable HrtfAssets alone and consume decoded caches without either file-format reader.
@@ -1656,7 +1704,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Depuis un paquet installé :
-find_package(CyDSP 0.4.4 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.5 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 Une compilation distincte pour le jeu peut activer seulement HrtfAssets et charger les caches décodés sans aucun lecteur de format.

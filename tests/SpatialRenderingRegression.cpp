@@ -277,7 +277,9 @@ template <class T> void interpolationAndFft() {
             }
 }
 } // namespace
+void hrtfTimingRegression();
 void spatialRenderingRegression() {
+    hrtfTimingRegression();
     interpolationAndFft<float>();
     interpolationAndFft<double>();
     transforms();

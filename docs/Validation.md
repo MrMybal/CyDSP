@@ -1,3 +1,34 @@
+# CyDSP 0.4.5 : référence temporelle HRTF — 2026-11-17
+
+Retrait optionnel du minimum des arrivées extraites de toute la banque, deux
+oreilles et toutes les directions. Le délai fourni et l’onset détecté participent
+avant conversion dans les unités du taux cible. Préparation conservatrice par
+défaut ; le rapport removedCommonDelayFrames expose l’avance réellement appliquée.
+Les FIR alignées restent identiques ; les délais résiduels conservent ITD et
+écarts entre directions. La politique ne supprime pas les latences de conception
+SRC/noyau fractionnaire/MagLS. Aucune nouvelle dépendance ni code externe.
+
+PASS Windows x64 Release et AddressSanitizer : float/double, délais explicites
+fractionnaires, attaques connues, interpolation, taux 48/96/44,1 kHz, silence,
+seuils d’onset, échec transactionnel et remise à zéro du rapport. Les rendus
+HRIR direct/FFT et HOA LS correspondent au décalage entier de la référence ;
+les noyaux fractionnaires 0/17, blocs variables et audits sans allocation passent.
+
+PASS import/cache/préparation/rendu SOFA et banque D1/D2/H10 sur les lecteurs
+compact et complet. Au seuil -40 dB à 48 kHz, les minima sont respectivement
+4, 5 et 3 frames. Dans D2, les pics de face sont aux indices 107/110 : le seuil
+prudent autorise seulement 0,104 ms d’avance commune, pas un retrait arbitraire
+de 2,5 ms. Un seuil plus agressif change l’extraction et peut tronquer des
+précurseurs. La banque originale et ses notices restent inchangées.
+
+Archive de production Windows x64 reconstruite avec tests/mesures désactivés.
+Manuel CyDoc régénéré : 288 pages, 144 paires EN/FR, 90 en-têtes, 2197
+signatures publiques, 4492 liens et 3644 ancres appariées. Contrôles sources,
+versions, provenance et diff passés. Pas de nouveau contrôle visuel du lecteur.
+ARM/Quest/SVE/Linux/macOS non réexécutés pour cette modification de préparation.
+
+---
+
 # CyDSP 0.4.4 : cascade neuronale, lots SIMD et rejeu des transitions — 2026-11-17
 
 Poids L4 D2 conservés, aucun réentraînement. Le rendu spécialisé réutilise les

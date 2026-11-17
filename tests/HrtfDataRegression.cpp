@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -100,6 +101,49 @@ void check(const char* filename, std::size_t expectedPoints) {
                 for (auto value : output.block(128).channel(ear))
                     require(std::isfinite(value), "Nonfinite moving measured render");
         }
+        // The importer must forward the optional timing policy to HrtfSet.
+        config.detectOnsets = true;
+        HrtfSet<float> preserved, advanced;
+        ok(preserved.prepare(points, config), "Preserve detected measured onsets");
+        SofaPreparation alignedOptions;
+        alignedOptions.hrtf = config;
+        alignedOptions.hrtf.removeCommonDelay = true;
+        ok(prepareSofaHrtf(data, advanced, alignedOptions), "SOFA common delay removal");
+        double expectedCommon = std::numeric_limits<double>::infinity();
+        for (const auto& point : points) {
+            const std::array<std::span<const float>, 2> ears{point.left, point.right};
+            const std::array<double, 2> explicitDelay{point.leftDelayFrames,
+                                                      point.rightDelayFrames};
+            for (std::size_t e = 0; e < 2; ++e) {
+                double peak = 0;
+                for (float sample : ears[e])
+                    peak = std::max(peak, std::abs(double(sample)));
+                std::size_t onset = 0;
+                if (peak > 0)
+                    while (onset + 1 < ears[e].size() &&
+                           std::abs(double(ears[e][onset])) < .01 * peak)
+                        ++onset;
+                expectedCommon = std::min(expectedCommon, explicitDelay[e] + double(onset));
+            }
+        }
+        require(advanced.removedCommonDelayFrames() == expectedCommon &&
+                    advanced.points() == preserved.points() && advanced.taps() == preserved.taps(),
+                "Measured earliest common arrival reported");
+        std::vector<float> oldL(preserved.taps()), oldR(oldL.size()), newL(oldL.size()),
+            newR(oldL.size());
+        for (auto index : {std::size_t(0), data.points / 3, data.points - 1}) {
+            std::array<double, 2> oldDelay{}, newDelay{};
+            ok(preserved.interpolate(data.directions[index], oldL, oldR, oldDelay),
+               "Measured old timing");
+            ok(advanced.interpolate(data.directions[index], newL, newR, newDelay),
+               "Measured new timing");
+            require(oldL == newL && oldR == newR,
+                    "SOFA timing option leaves FIR coefficients intact");
+            for (std::size_t ear = 0; ear < 2; ++ear)
+                require(std::abs(oldDelay[ear] - newDelay[ear] - expectedCommon) < 1e-12,
+                        "SOFA option preserves relative ear/direction timing");
+        }
+        std::cout << "PASS common arrival " << filename << ": " << expectedCommon << " frames\n";
         if (backend == SofaBackend::complete) {
             SofaHrtf64 precise;
             options.allowPrecisionLoss = false;

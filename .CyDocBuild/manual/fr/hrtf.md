@@ -14,6 +14,30 @@ HrtfSet accepte par défaut 2048 directions et 32768 frames/oreille ; les bornes
 
 La préparation retire l’onset et rééchantillonne les FIR par sinc fenêtrée si nécessaire. Les taux vont de 8 à 768 kHz et le ratio de conversion de 1/8 à 8. La conversion conserve le gain DC de l’IR et expose sa latence causale commune via latencyFrames. Les onsets acoustiques directionnels restent distincts de cette latence.
 
+## Délai commun de mesure {#common-delay}
+
+Activez `HrtfPreparation::removeCommonDelay = true` pour avancer toute la banque préparée de sa première arrivée d’oreille extraite. La valeur par défaut est false. Le minimum comprend **tous les points et les deux oreilles**, en combinant délai fourni et onset entier détecté, puis en convertissant en frames au taux cible. Ce même décalage est soustrait partout : ITD et écarts entre directions restent conservés, y compris à l’interpolation. Les coefficients FIR alignés restent inchangés. Consultez `bank.removedCommonDelayFrames()` pour connaître l’avance réelle, ou divisez par `bank.sampleRate()` pour des secondes. Une banque non préparée et la politique par défaut rapportent zéro.
+
+```cpp
+cydsp::SofaPreparation preparation;
+preparation.hrtf.targetSampleRate = 48000;
+preparation.hrtf.maximumPoints = 16384; // inclut D1/D2 de la banque optionnelle
+preparation.hrtf.detectOnsets = true;
+preparation.hrtf.removeCommonDelay = true;
+cydsp::HrtfSet<float> bank;
+const auto status = cydsp::prepareSofaHrtf(asset, bank, preparation);
+if (status == cydsp::Status::ok) {
+    const double removedSeconds = bank.removedCommonDelayFrames() / bank.sampleRate();
+    // Préparer HrirBinaural ou HoaBinaural depuis bank ; le décalage reste retiré.
+}
+```
+
+Cet exemple demande l’API SOFA optionnelle et un `SofaHrtf asset` déjà décodé. Avec des spans de HrirPoint, activez le même champ de HrtfPreparation puis appelez HrtfSet::prepare. Avec detectOnsets=false, seuls les délais explicites participent : le silence inclus dans la FIR n’est pas détecté. Une oreille silencieuse contribue prudemment avec son délai fourni ; une mesure silencieuse sans délai peut empêcher toute avance commune.
+
+Il s’agit d’une estimation d’onset, pas de la distance du haut-parleur ni de l’instant du plus grand pic. Le seuil par défaut de -40 dB conserve davantage de précurseurs qu’un seuil supérieur ; augmenter onsetThresholdDb peut supprimer un signal réel avant l’arrivée principale pendant l’extraction. Le fichier D2 48 kHz fourni donne un minimum de 5 frames (0,104 ms) au seuil par défaut, alors que les pics de face les plus proches se trouvent aux frames 107/110. Retirer le temps du pic couperait du contenu antérieur et ne serait pas une simple correction de délai équivalente. Une banque globalement alignée conserve aussi les arrivées résiduelles propres aux directions. Elle ne garantit pas un pic frontal instantané.
+
+Cette politique ne retire ni la latence de SRC/noyau de délai fractionnaire ni celle de conception MagLS spectral, toujours exposées par latencyFrames de chaque renderer. Le dimensionnement automatique de FFT peut choisir une autre taille après réduction de la queue acoustique. Les délais résiduels fractionnaires utilisent toujours la reconstruction linéaire/sinc choisie ; leur forme d’onde finale approxime un décalage temporel fractionnaire idéal. Elle n’ajoute aucun calcul au thread audio ni tampon. La queue du renderer tient compte des délais acoustiques réduits. Gardez la propagation physique des trajets de l’hôte séparée : ajoutez le délai de distance une seule fois si le jeu/DAW en a besoin. L’import SOFA et les caches décodés conservent leurs données originales ; choisissez la politique à chaque préparation. Repréparez hors du thread audio ; les voix déjà préparées gardent leur ancienne banque partagée et l’hôte doit les remplacer ou appliquer un fondu pour changer de politique.
+
 ## Capacité et partage {#sharing}
 
 La FIR préparée vaut au maximum 2048 taps par défaut, configurable jusqu’à 65536. Utilisez rejectTruncation ou vérifiez truncated(). Voir le [guide de qualité](doc:sofa#prepare). Les bornes de queue des renderers comprennent FIR, retards acoustiques et latence de conversion.

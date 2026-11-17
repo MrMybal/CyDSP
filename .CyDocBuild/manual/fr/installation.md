@@ -31,7 +31,7 @@ Les builds de production créent des bibliothèques statiques ; tests natifs et 
 Faites pointer `CMAKE_PREFIX_PATH` vers le préfixe d’installation absolu. Après définition de la cible de l’application :
 
 ```cmake
-find_package(CyDSP 0.4.4 CONFIG REQUIRED)
+find_package(CyDSP 0.4.5 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```

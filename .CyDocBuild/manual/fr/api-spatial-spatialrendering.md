@@ -306,6 +306,7 @@ struct HrtfPreparation;
 | `interpolationPoints` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
 | `fractionalDelayTaps` | `std::size_t` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
 | `rejectTruncation` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
+| `removeCommonDelay` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
 
 ## `HrtfQuality` {#symbol-hrtfquality}
 
@@ -404,6 +405,16 @@ std::size_t latencyFrames() const noexcept;
 Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
 
 Retour : `std::size_t` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
+
+### `HrtfSet::removedCommonDelayFrames` {#symbol-hrtfset-removedcommondelayframes}
+
+```cpp
+double removedCommonDelayFrames() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `double` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
 
 ### `HrtfSet::truncated` {#symbol-hrtfset-truncated}
 

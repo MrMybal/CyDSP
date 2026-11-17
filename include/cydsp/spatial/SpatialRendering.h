@@ -92,6 +92,12 @@ struct HrtfPreparation {
     // delay at direction updates, adding (taps-1)/2 common renderer latency.
     std::size_t fractionalDelayTaps = 0;
     bool rejectTruncation = false;
+    // Subtract the minimum extracted delay across ALL directions and both ears.
+    // Default preserves measurement timing. Uses supplied delays plus detected
+    // onsets; without detectOnsets, only supplied delays participate. Silent ears
+    // participate conservatively with their supplied delay (no detected onset).
+    // A higher onsetThresholdDb may discard more pre-arrival signal, as before.
+    bool removeCommonDelay = false;
 };
 enum class HrtfQuality { economy, realtimeHigh, reference };
 // Per-instance presets. No global quality state and no CPU-time guarantee.
@@ -105,7 +111,8 @@ struct HrtfStorageReport {
 // Immutable, reference-counted prepared IRs. Renderer preparation shares storage;
 // processing neither increments nor releases references. Onset removal is integer
 // sample threshold detection, before bandlimited sample-rate conversion. Original
-// explicit delays and detected onsets are retained in target-rate frame units.
+// explicit delays and detected onsets use target-rate frame units. Optional common
+// delay removal preserves ear/direction differences; it does not remove SRC latency.
 template <Sample T> class HrtfSet {
   public:
     [[nodiscard]] Status prepare(std::span<const HrirPoint<T>>,
@@ -115,6 +122,9 @@ template <Sample T> class HrtfSet {
     [[nodiscard]] double sampleRate() const noexcept;
     [[nodiscard]] std::size_t
     latencyFrames() const noexcept; // Common SRC FIR delay, zero at equal rates.
+    // Actually subtracted acoustic delay in target-rate frames, possibly fractional.
+    // Zero before preparation or when removal is disabled. Not renderer latency.
+    [[nodiscard]] double removedCommonDelayFrames() const noexcept;
     [[nodiscard]] bool truncated() const noexcept;
     [[nodiscard]] HrtfStorageReport storageReport() const noexcept;
     // Allocation-free, const and safe for concurrent independent destinations.
@@ -153,7 +163,7 @@ template <Sample T> class HrirBinaural {
     [[nodiscard]] HrirRenderConfig configuration() const noexcept;
     // Spherical Shepard interpolation with Gaussian locality; the prepared policy
     // chooses all points or a bounded nearest-neighbour subset.
-    // An exact measured direction reproduces its measured FIR and onset delay.
+    // An exact measured direction reproduces its prepared FIR and residual onset delay.
     // FIR/delay
     // endpoints are crossfaded; an edit during a fade returns transition_in_progress.
     [[nodiscard]] Status setDirection(Vec3, std::size_t transitionFrames = 256) noexcept;

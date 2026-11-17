@@ -227,7 +227,7 @@ template <Sample T> struct HrtfSet<T>::State {
         std::vector<double> fir;
     };
     std::vector<Point> points;
-    double rate = 0, width = .7;
+    double rate = 0, width = .7, removedCommonDelay = 0;
     std::size_t taps = 0, tail = 0, latency = 0;
     bool truncated = false;
     std::size_t neighbours = 0, fractionalTaps = 0;
@@ -446,6 +446,16 @@ Status HrtfSet<T>::prepare(std::span<const HrirPoint<T>> points,
             // Temporarily retain each point's own stride; pad once the global stride is known.
             s->points.push_back(std::move(q));
         }
+        if (config.removeCommonDelay) {
+            double common = std::numeric_limits<double>::infinity();
+            for (const auto& point : s->points)
+                for (double delay : point.delays)
+                    common = std::min(common, delay);
+            s->removedCommonDelay = common;
+            for (auto& point : s->points)
+                for (double& delay : point.delays)
+                    delay -= common;
+        }
         std::vector<std::size_t> ids(s->points.size());
         std::iota(ids.begin(), ids.end(), 0);
         s->tree.reserve(ids.size());
@@ -487,6 +497,10 @@ template <Sample T> double HrtfSet<T>::sampleRate() const noexcept {
 template <Sample T> std::size_t HrtfSet<T>::latencyFrames() const noexcept {
     return state_ ? state_->latency : 0;
 }
+template <Sample T> double HrtfSet<T>::removedCommonDelayFrames() const noexcept {
+    return state_ ? state_->removedCommonDelay : 0;
+}
+
 template <Sample T> bool HrtfSet<T>::truncated() const noexcept {
     return state_ && state_->truncated;
 }

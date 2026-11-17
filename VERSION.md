@@ -1,9 +1,11 @@
-# CyDSP 0.4.4
+# CyDSP 0.4.5
 
 
 **IN DEVELOPMENT.** Source distribution; no binary release is published.
 
 ## Changes
+
+- 0.4.5: Optional removal of the earliest common acoustic HRTF delay at preparation. One bank-wide offset preserves interaural and directional timing; `removedCommonDelayFrames()` reports the actual advance in target-rate frames. Measurement timing is retained by default.
 
 - 0.4.4: Specialized double-precision neural cascades on existing CyDSP SIMD kernels; explicit four-voice batch rendering and grouped design updates. Fading targets replay 512 retained input frames by default (configurable 0–65536); unchanged model assets and static transfer. Rebuild the static library and consumers together.
 

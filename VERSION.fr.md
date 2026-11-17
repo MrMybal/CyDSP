@@ -1,9 +1,11 @@
-# CyDSP 0.4.4
+# CyDSP 0.4.5
 
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
+
+- 0.4.5 : retrait optionnel du délai acoustique commun minimal pendant la préparation HRTF. Un même décalage pour toute la banque conserve les écarts entre oreilles et directions ; `removedCommonDelayFrames()` expose l’avance réelle en frames au taux cible. Le timing de mesure reste conservé par défaut.
 
 - 0.4.4 : Cascades neuronales spécialisées en double précision sur les noyaux SIMD CyDSP existants ; rendu explicite par groupes de quatre voix et mises à jour de designs groupées. Les cibles en fondu rejouent par défaut 512 échantillons d’entrée conservés (réglage 0–65536) ; poids et réponse statique inchangés. Recompiler ensemble bibliothèque statique et consommateurs.
 

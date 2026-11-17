@@ -43,5 +43,5 @@ inline constexpr int versionPatch = CYDSP_VERSION_PATCH;
 ```cpp
 #define CYDSP_VERSION_MAJOR 0
 #define CYDSP_VERSION_MINOR 4
-#define CYDSP_VERSION_PATCH 4
+#define CYDSP_VERSION_PATCH 5
 ```

@@ -14,6 +14,30 @@ HrtfSet defaults to 2048 directions and 32768 input frames/ear; explicit limits 
 
 Preparation removes that onset and resamples FIRs with windowed sinc when needed. Rates are 8–768 kHz and the conversion ratio is 1/8–8. Conversion preserves IR DC gain and exposes a common causal conversion latency through latencyFrames. Acoustic directional onsets remain distinct from that common latency.
 
+## Common measurement delay {#common-delay}
+
+Set `HrtfPreparation::removeCommonDelay = true` to advance the entire prepared bank by its earliest extracted ear arrival. The default is false. The minimum includes **all points and both ears**, combining supplied delay and detected integer onset, then converted to target-rate frames. The same offset is subtracted everywhere: ITD and relative direction timing remain intact, including interpolation. The aligned FIR coefficients are unchanged. Query `bank.removedCommonDelayFrames()` for the actual advance, or divide by `bank.sampleRate()` for seconds. An unprepared bank and the default policy report zero.
+
+```cpp
+cydsp::SofaPreparation preparation;
+preparation.hrtf.targetSampleRate = 48000;
+preparation.hrtf.maximumPoints = 16384; // includes D1/D2 from the optional bank
+preparation.hrtf.detectOnsets = true;
+preparation.hrtf.removeCommonDelay = true;
+cydsp::HrtfSet<float> bank;
+const auto status = cydsp::prepareSofaHrtf(asset, bank, preparation);
+if (status == cydsp::Status::ok) {
+    const double removedSeconds = bank.removedCommonDelayFrames() / bank.sampleRate();
+    // Prepare HrirBinaural or HoaBinaural from bank; neither reapplies this offset.
+}
+```
+
+The example needs the optional SOFA API and an already decoded `SofaHrtf asset`. With raw HrirPoint spans, set the same field on HrtfPreparation and call HrtfSet::prepare. With detectOnsets=false, only supplied explicit delays participate: silence embedded in the FIR is not discovered. A silent ear contributes its supplied delay conservatively; a zero-delay silent measurement can prevent any common advance.
+
+This estimates an onset, not the loudspeaker distance or the time of the largest peak. The default -40 dB threshold retains more precursors than a higher threshold; raising onsetThresholdDb can discard actual pre-arrival signal during onset extraction. In the bundled D2 48 kHz file, the default finds a minimum of 5 frames (0.104 ms), while the nearest frontal peaks are at 107/110 frames. Removing the peak time would cut earlier content and is not an equivalent pure delay correction. A globally aligned bank also retains direction-dependent residual arrivals. It does not guarantee an instantaneous frontal peak.
+
+This policy does not remove SRC/fractional-delay-kernel latency or the spectral MagLS design delay, which remain in each renderer's latencyFrames report. Automatic FFT sizing may choose a different size after the acoustic tail shrinks. Fractional residual delays still use the selected linear/sinc reconstruction; their final waveform is an approximation to an ideal fractional time shift. It adds no audio-thread work or buffer. The renderer tail reflects the reduced acoustic delays. Keep the host's physical path propagation separate: add distance delay once if the game/DAW requires it. SOFA imports and decoded caches retain their original data; choose the policy each time you prepare. Reprepare off the audio thread; already prepared voices retain their previous shared bank and must be replaced or crossfaded by the host to change policy.
+
 ## Capacity and sharing {#sharing}
 
 Prepared FIR length defaults to 2048 taps and is configurable up to 65536. Use rejectTruncation or check truncated(). See the [quality guide](doc:sofa#prepare). Renderer tail bounds include FIR, acoustic delays and conversion latency.

@@ -660,3 +660,15 @@ FIRs; the spectral path integrates weighted squared responses by Parseval includ
 DC/Nyquist. The suggested common-ear gain is diagnostic and is not applied by
 process. The causal LS path supplies the low-latency alternative; spectral MagLS
 retains its explicit half-FFT delay and phase policy.
+
+## HRTF acoustic timing reference
+
+HrtfPreparation::removeCommonDelay optionally subtracts one minimum extracted arrival
+across every direction and both ears, in target-rate frames. The prepared immutable
+state records this common offset through removedCommonDelayFrames; aligned FIRs,
+relative ear/direction delays, SRC latency and renderer fractional-kernel latency
+are unchanged. Tail bounds use the residual delays. Default preparation retains
+measurement timing. Onset threshold controls any pre-onset truncation as before;
+common-offset subtraction itself does not trim the aligned FIR. Silent ears retain
+their explicit delay for the minimum. No processing changes or runtime cost.
+SOFA preparation forwards this policy; decoded source assets/caches are unchanged.
