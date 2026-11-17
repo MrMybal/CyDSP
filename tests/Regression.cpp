@@ -194,8 +194,10 @@ void schedulingRegression();
 void matrixSchedulingRegression();
 void expandedRegression();
 void stretchFftRegression();
+void neuralHrtfRegression();
 int main() {
     try {
+        neuralHrtfRegression();
         preparedOptimizationRegression();
         hotspotRegression();
         advancedExpansionContracts();

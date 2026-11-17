@@ -3,7 +3,7 @@ id: api-spatial-sofa
 title: Sofa
 description: Import SOFA optionnel depuis la mémoire, préparation float64 et cache HRTF portable.
 section: Référence API
-order: 1174
+order: 1175
 sourceRevision: 1
 parent: api-spatial
 symbol: cydsp::SofaBackend

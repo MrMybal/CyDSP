@@ -3,7 +3,7 @@ PAGES=[]
 def add(id,en_title,fr_title,en_desc,fr_desc,parent,en,fr):
     PAGES.append(dict(id=id,title=(en_title,fr_title),description=(en_desc,fr_desc),parent=parent,body=(en.strip(),fr.strip())))
 
-add('overview','CyDSP 0.4.0','CyDSP 0.4.0','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
+add('overview','CyDSP 0.4.4','CyDSP 0.4.4','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
 ## What you can build {#purpose}
 
 CyDSP is a C++20 audio digital signal processing library. Use its float/double processors in an effect, synthesizer, DAW, game or audio engine. It supplies filters, dynamics, convolution, spectral processing, synthesis, sampling, analysis, restoration and 3D sound through prepared storage and a common planar API.
@@ -24,7 +24,7 @@ Start with [installation](doc:installation), then build a [first processing chai
 
 CyDSP processes in-memory audio. Your application supplies the audio callback, stream ownership and surrounding services. CyAudioCore is one project using its public API. You can link CyDSP directly into another application.
 
-Version 0.4.0 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
+Version 0.4.4 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
 ''',r'''
 ## Ce que vous pouvez construire {#purpose}
 
@@ -46,7 +46,7 @@ Commencez par l’[installation](doc:installation), puis une [première chaîne 
 
 CyDSP traite l’audio en mémoire. L’application fournit le callback audio, possède les flux et gère les services qui les entourent. CyAudioCore est un projet utilisant son API publique. CyDSP peut être lié directement à une autre application.
 
-La version 0.4.0 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
+La version 0.4.4 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
 ''')
 
 add('installation','Build and link CyDSP','Compiler et lier CyDSP','Build the static libraries and use their CMake targets.','Compiler les bibliothèques statiques et utiliser leurs cibles CMake.','overview',r'''
@@ -73,7 +73,7 @@ Production builds create static libraries; native tests and measurements are opt
 Point `CMAKE_PREFIX_PATH` at the absolute install prefix. After defining the application's target:
 
 ```cmake
-find_package(CyDSP 0.4.0 CONFIG REQUIRED)
+find_package(CyDSP 0.4.4 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -103,7 +103,7 @@ Les builds de production créent des bibliothèques statiques ; tests natifs et 
 Faites pointer `CMAKE_PREFIX_PATH` vers le préfixe d’installation absolu. Après définition de la cible de l’application :
 
 ```cmake
-find_package(CyDSP 0.4.0 CONFIG REQUIRED)
+find_package(CyDSP 0.4.4 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -1224,7 +1224,7 @@ Choisissez les [Ambisonics](doc:ambisonics) pour partager un champ intermédiair
 add('hrtf','Prepare and share HRTFs','Préparer et partager les HRTF','Separate onsets, convert FIR rates and retain immutable prepared banks.','Séparer les onsets, convertir les FIR et partager les banques préparées immuables.','binaural',r'''
 ## In-memory measurements {#prepare}
 
-HrtfSet defaults to 2048 directions and 32768 input frames/ear; explicit limits permit 100000 points and 65536 frames. The [optional SOFA importer](doc:sofa) reads measurements from memory. No measured dataset is bundled. By default the first crossing of a threshold relative to the peak (-40 dB) defines an integer onset; supplied fractional delays remain separate.
+HrtfSet defaults to 2048 directions and 32768 input frames/ear; explicit limits permit 100000 points and 65536 frames. The [optional SOFA importer](doc:sofa) reads measurements from memory. A small optional [SADIE II selection](doc:sofa#bundled) is supplied separately from the code. By default the first crossing of a threshold relative to the peak (-40 dB) defines an integer onset; supplied fractional delays remain separate.
 
 Preparation removes that onset and resamples FIRs with windowed sinc when needed. Rates are 8–768 kHz and the conversion ratio is 1/8–8. Conversion preserves IR DC gain and exposes a common causal conversion latency through latencyFrames. Acoustic directional onsets remain distinct from that common latency.
 
@@ -1238,7 +1238,7 @@ Direction interpolation uses normalized spherical Shepard weights with Gaussian 
 ''',r'''
 ## Mesures en mémoire {#prepare}
 
-HrtfSet accepte par défaut 2048 directions et 32768 frames/oreille ; les bornes explicites vont à 100000 points et 65536 frames. L’[importeur SOFA optionnel](doc:sofa) lit les mesures en mémoire. Aucun jeu mesuré n’est inclus. Par défaut, le premier dépassement d’un seuil relatif au pic (-40 dB) définit un onset entier ; les retards fractionnaires fournis restent séparés.
+HrtfSet accepte par défaut 2048 directions et 32768 frames/oreille ; les bornes explicites vont à 100000 points et 65536 frames. L’[importeur SOFA optionnel](doc:sofa) lit les mesures en mémoire. Une petite [sélection SADIE II optionnelle](doc:sofa#bundled) est fournie séparément du code. Par défaut, le premier dépassement d’un seuil relatif au pic (-40 dB) définit un onset entier ; les retards fractionnaires fournis restent séparés.
 
 La préparation retire l’onset et rééchantillonne les FIR par sinc fenêtrée si nécessaire. Les taux vont de 8 à 768 kHz et le ratio de conversion de 1/8 à 8. La conversion conserve le gain DC de l’IR et expose sa latence causale commune via latencyFrames. Les onsets acoustiques directionnels restent distincts de cette latence.
 
@@ -1387,7 +1387,7 @@ add('limits','Platforms, capacities and model limits','Plateformes, capacités e
 | macOS / desktop Linux | Source targets; execution remains to validate for this version. |
 | x86 / ARM32 | Compatibility paths exist; they were not rerun for this snapshot. ARM32 double kernels can fall back to scalar. |
 
-No ABI is interchangeable with another. Version 0.4.0 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
+No ABI is interchangeable with another. Version 0.4.4 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
 
 ## Prepared capacities {#capacities}
 
@@ -1403,7 +1403,7 @@ No ABI is interchangeable with another. Version 0.4.0 is in development; target 
 
 ## Interpret models correctly {#models}
 
-No HRTF dataset is supplied; its source/license and listener suitability are application concerns. Analytic binaural, thin-screen diffraction, room transfer, contact physics and musical estimates are reduced/heuristic models. True peak/loudness are not presented as certified broadcast products. Echo cancellation is linear and needs aligned clocks/reference. Choose limits from each header's configuration and assess realistic content rather than extrapolating from a single synthetic signal.
+The optional [SADIE II selection](doc:sofa#bundled) carries its own Apache-2.0 data license. Listener suitability and rights for other banks remain application concerns. Analytic binaural, thin-screen diffraction, room transfer, contact physics and musical estimates are reduced/heuristic models. True peak/loudness are not presented as certified broadcast products. Echo cancellation is linear and needs aligned clocks/reference. Choose limits from each header's configuration and assess realistic content rather than extrapolating from a single synthetic signal.
 ''',r'''
 ## Cibles {#platforms}
 
@@ -1416,7 +1416,7 @@ No HRTF dataset is supplied; its source/license and listener suitability are app
 | macOS / Linux desktop | Cibles de sources ; exécution à valider pour cette version. |
 | x86 / ARM32 | Chemins de compatibilité existants ; non réexécutés pour cet état. Les noyaux double ARM32 peuvent revenir au scalaire. |
 
-Les ABI ne sont pas interchangeables. La version 0.4.0 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
+Les ABI ne sont pas interchangeables. La version 0.4.4 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
 
 ## Capacités préparées {#capacities}
 
@@ -1432,7 +1432,7 @@ Les ABI ne sont pas interchangeables. La version 0.4.0 est en développement ; u
 
 ## Interpréter les modèles {#models}
 
-Aucun jeu HRTF n’est fourni ; sa provenance/licence et son adaptation à l’auditeur relèvent de l’application. Binaural analytique, diffraction sur écran mince, transferts de pièces, physique des contacts et estimations musicales sont des modèles réduits/heuristiques. True peak et sonie ne sont pas présentés comme des produits broadcast certifiés. L’annulation d’écho est linéaire et exige horloges/référence alignées. Choisissez les limites de chaque configuration et évaluez des contenus réalistes sans extrapoler depuis un signal synthétique unique.
+La [sélection SADIE II optionnelle](doc:sofa#bundled) possède sa propre licence de données Apache-2.0. L’adaptation à l’auditeur et les droits des autres banques relèvent de l’application. Binaural analytique, diffraction sur écran mince, transferts de pièces, physique des contacts et estimations musicales sont des modèles réduits/heuristiques. True peak et sonie ne sont pas présentés comme des produits broadcast certifiés. L’annulation d’écho est linéaire et exige horloges/référence alignées. Choisissez les limites de chaque configuration et évaluez des contenus réalistes sans extrapoler depuis un signal synthétique unique.
 ''')
 
 add('licensing','License and component notices','Licence et notices des composants','Retain CyDSP MIT and the notices for adapted numerical components.','Conserver la MIT CyDSP et les notices des composants numériques adaptés.','overview',r'''
@@ -1450,9 +1450,10 @@ CyDSP uses the MIT license, copyright © 2026 MrMybal CyberAlien. The complete t
 | signalsmith-linear | MIT | FFT reconstruction and STFT/window normalization. |
 | signalsmith-stretch | MIT | Optional CyDSP::Stretch time/pitch/formant target. |
 | libmysofa reader / miniz | BSD-3-Clause / MIT | Optional compact memory reader; no upstream renderer or dataset. |
+| SADIE II selection | Apache-2.0 | Optional measured data, separately installed; original files and notices. |
 | External HDF5 / zlib | BSD-3-Clause / Zlib | Optional complete SDK, not vendored. |
 
-Pinned provenance and complete notices accompany the sources and installed library. This table is an index; it does not replace the texts. Host-provided samples, IRs and HRTF datasets retain their own licenses.
+Pinned provenance and complete notices accompany the sources and installed library. This table is an index; it does not replace the texts. Host-provided samples, IRs and HRTF datasets retain their own licenses. The selected SADIE II data retain University of York copyright and Apache-2.0 terms; keep the complete LICENSE and attribution NOTICE with redistributed files, and identify later modifications. CyDSP code remains MIT. See [the measured bank](doc:sofa#bundled).
 
 ## Documentation reader {#reader}
 
@@ -1472,9 +1473,10 @@ CyDSP utilise la licence MIT, copyright © 2026 MrMybal CyberAlien. Son texte co
 | signalsmith-linear | MIT | Reconstruction FFT et normalisation STFT/fenêtres. |
 | signalsmith-stretch | MIT | Cible optionnelle CyDSP::Stretch de durée/hauteur/formants. |
 | Lecteur libmysofa / miniz | BSD-3-Clause / MIT | Lecteur compact optionnel ; aucun renderer ou jeu amont. |
+| Sélection SADIE II | Apache-2.0 | Mesures installées séparément en option ; fichiers originaux et notices. |
 | HDF5 / zlib externes | BSD-3-Clause / Zlib | SDK complet optionnel, non inclus. |
 
-Provenances figées et notices complètes accompagnent sources et bibliothèque installée. Ce tableau est un index, pas un remplacement des textes. Samples, IR et jeux HRTF apportés par l’hôte gardent leurs propres licences.
+Provenances figées et notices complètes accompagnent sources et bibliothèque installée. Ce tableau est un index, pas un remplacement des textes. Samples, IR et jeux HRTF apportés par l’hôte gardent leurs propres licences. Les mesures SADIE II sélectionnées conservent le copyright University of York et Apache-2.0 ; joindre LICENSE et NOTICE d’attribution aux données redistribuées, et signaler les modifications ultérieures. Le code CyDSP reste MIT. Voir [la banque mesurée](doc:sofa#bundled).
 
 ## Lecteur de documentation {#reader}
 
@@ -1499,7 +1501,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Installed package:
-find_package(CyDSP 0.4.0 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.4 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 A separately configured game build may enable HrtfAssets alone and consume decoded caches without either file-format reader.
@@ -1555,13 +1557,87 @@ reference rejects truncation, permits up to 100000 points and retains double pre
 
 Nearest modes use a prepared balanced spatial index and normalized Shepard weights. A finite neighbor set can change at boundaries; crossfade direction changes. All-point weighting retains full-bank continuity. HrirBinaural bakes the fractional-delay kernel during setDirection; The legacy HoaBinaural overload applies it during preparation. Its spectral design overload instead evaluates fractional delays by frequency-bin phase and declares its own additional latency. Extra common latency is kernel length divided by two, rounded down, exposed by each renderer.
 
-HrirBinaural uses direct FIR convolution: very long reference FIRs and all-point updates target offline/editor budgets. A quality label does not promise faster CPU execution or perceptually better localization for every dataset. HoaBinaural uses existing matrix convolution. Prepared process/reset/setDirection allocate no memory; serialize updates with audio on the same instance. Shared HrtfSet coefficients are immutable; voice histories and fades are independent.
+HrirBinaural selects direct or double-precision FFT overlap-save convolution. Automatic uses FFT for FIRs of at least 96 taps and calls of at least 32 frames when the plan fits its limit and delay/tap ratio. Short calls and oversized plans retain direct processing. Very long reference FIRs and all-point updates can still require offline/editor budgets. A quality label does not promise faster CPU execution or perceptually better localization for every dataset. HoaBinaural uses existing matrix convolution. Prepared process/reset/setDirection allocate no memory; serialize updates with audio on the same instance. Shared HrtfSet coefficients are immutable; voice histories and fades are independent.
 
 ## Portable cache and rights {#cache}
 
 encodeHrtfAsset stores decoded measurements and original metadata in a versioned little-endian float32/64 cache with CRC32. decodeHrtfAsset validates sizes, checksum and data transactionally, requiring only CyDSP::HrtfAssets. Narrowing a double cache requires allowPrecisionLoss. This serializes decoded measurements, not a renderer or EQ result; call prepareSofaHrtf after loading with the chosen quality/EQ. CRC detects accidental corruption, not malicious replacement.
 
-No measured HRTF dataset is distributed. Test fixtures are original synthetic MIT signals. Original CyDSP code stays MIT; optional reader/SDK notices retain their permissive licenses. Dataset rights remain separate: verify each distributed HRTF bank's terms and retain [component notices](doc:licensing).
+The optional SADIE II selection is described below. Synthetic fixtures remain original MIT signals. Original CyDSP code stays MIT; optional reader/SDK notices retain their permissive licenses. Dataset rights remain separate: retain [component and data notices](doc:licensing).
+
+## Optional measured bank below 100 MB {#bundled}
+
+The repository includes three unmodified files from [SADIE II version 2-2](https://zenodo.org/records/12092466). Choose one alternative listener profile; the files are not combined automatically.
+
+| Profile | Subject | Directions | SOFA bytes |
+| --- | --- | --- | --- |
+| Neumann KU100 mannequin | D1 | 8802 | 36310650 |
+| KEMAR mannequin | D2 | 8802 | 36310650 |
+| Human listener | H10 | 2114 | 8753949 |
+
+All selected files contain original 48 kHz, 256-tap, two-ear float64 measurements (SimpleFreeFieldHRIR). Signal files total 81375249 bytes, or 81.38 decimal MB. The complete folder, including metadata and notices, must stay strictly below 100000000 bytes. No cropping, resampling, re-encoding, equalization or normalization was applied. The source filename mentions 24-bit recordings; the stored Data.IR arrays are float64.
+
+The folder is data/hrtf/sadie-ii-v2-2. Installation defaults OFF and does not embed data into the static library:
+
+~~~sh
+cmake -S . -B build/release -DCYDSP_INSTALL_HRTF_DATA=ON
+cmake --build build/release --config Release
+cmake --install build/release --config Release --prefix build/install
+# Or install only the measured-data component:
+cmake --install build/release --component HrtfData --prefix build/install
+~~~
+
+The default destination is share/CyDSP/hrtf/sadie-ii-v2-2. The installed package sets CyDSP_HRTF_DATA_DIR when the data option is enabled. The host chooses a filename, reads its bytes and passes them to loadSofa; there is no implicit disk access or default profile in audio rendering. All three profiles exceed HrtfPreparation's default 2048 directions: choose realtimeHigh (up to 16384) or set sufficient maximumPoints explicitly before prepareSofaHrtf. A bank's stored size is separate from decoded memory, preparation scratch and per-voice rendering cost. realtimeHigh at 48 kHz retains these 256 taps; EQ or conversion can extend them. The complete reader preserves float64 for editor/reference use; the compact reader converts to float32 for ordinary rendering. Share the prepared immutable HrtfSet between voices and crossfade direction changes.
+
+manifest.json pins the original archive/member, bytes and SHA-256 for every selected file. LICENSE.txt reproduces the original Apache-2.0 text; NOTICE.txt records University of York attribution and provenance. Keep these with distributed data; mark later modifications. The C++ code remains MIT. These profiles provide a starting choice, not a guarantee of individual fit or superior localization for every listener.
+
+## Separate training corpus {#training}
+
+More measured data can be used without increasing the shipped selection. The explicit Python standard-library fetcher uses a pinned catalog for all 20 SADIE II subjects (D1, D2 and H3–H20):
+
+~~~sh
+python scripts/fetch_hrtf_training.py --list
+python scripts/fetch_hrtf_training.py
+# Smaller explicit selection, if wanted:
+python scripts/fetch_hrtf_training.py --subjects H3 H4 H5 --rate 48000
+~~~
+
+The default is 96 kHz, 512 taps per ear: all 20 SOFA files total 498669509 bytes (498.67 MB). Verified source ZIPs total 267332358 bytes; keeping archives and extracted files takes about 766 MB, plus small indexes/notices. Outputs stay under ignored build/hrtf-training/sadie-ii-v2-2 and are excluded from the data install. The fetcher checks pinned archive size/checksum, extracts only the selected original member and records each SOFA SHA-256 with its data rights.
+
+The fetcher does not train a model. The separate experimental CUDA pilot fits one known listener with bounded peaking filters and low-band ITD. It uses an optional isolated PyTorch/NumPy/h5py environment; these tools are not C++ runtime dependencies. Run it explicitly with python scripts/train_hrtf_pilot.py --subject D2 --steps 30000 --batch-size 512. Its self-checks validate response equations, gradients, poles, known ITD and checkpoint serialization. Checkpoints, source snapshots, timing and held-out metrics stay under ignored build/hrtf-runs; the experimental native renderer API is described in [native neural HRTF](doc:neural-hrtf), with separate weights. The pilot measures within-listener directional interpolation, not full HRIR phase, listening quality or CPU speed.
+
+A multi-listener evaluation should split by listener, keeping all directions, sample rates and augmented copies of one person in the same partition. The catalog suggests H3–H16 for training, H17–H18 for validation, H19–H20 for held-out tests; D1/D2 are mannequin references. This is a preparation split, not a measured model result. A faster neural renderer would still need CPU, spectral/ITD and listening comparisons against the existing HRTF renderer.
+
+## Comparing experimental neural fields {#neural-quality}
+
+The optional comparison tool registers its cases and selection criterion before training. It evaluates logarithmic/hybrid filter centers, predictor capacity and 12/24 peaking sections per ear. The hybrid grid places more sections in the upper band; it does not claim a perceptually optimal distribution. The mixed objective balances logarithmic and uniform frequency sampling.
+
+~~~sh
+python scripts/compare_hrtf_quality.py --subject D2 --screen-steps 8000 --refine-steps 20000
+~~~
+
+Screening and refinement use validation only. One model per filter budget is chosen and both checkpoint hashes are frozen before reserved test evaluation. For manual experiments, --validation-only defers testing; --evaluate-run explicitly evaluates a frozen local run. --initial-weights fine-tunes compatible weights with a fresh optimizer/RNG state, preserving the original normalization and retaining the initial model if it remains better.
+
+All experiments stay under ignored build/hrtf-quality and build/hrtf-runs. The diagnostic tool fits free coefficients on training examples to inspect representation limits; those fits are neither a deployable field nor a proven optimum. check_hrtf_field.py verifies source/data hashes, predicted poles, a complex128 response oracle, CPU/GPU agreement and plain weight export without executing archived source.
+
+The network delay head predicts desired total ITD. The filters add their own interaural phase: the experimental compensated_delays_us helper subtracts the cascade phase-slope ITD before assigning nonnegative external ear delays. Use those residual delays instead of adding the raw head output as well. This analysis/preparation helper may allocate and is not an audio callback API. It aligns one low-band slope, not full HRIR phase. Restore magnitudeOffsetDb for absolute level. Current models target 96 kHz; another processing rate requires an adapted and validated design.
+
+## Colab / L4 and A100 training with Drive {#colab}
+
+The optional notebooks/CyDSP_HRTF_A100.ipynb accepts a CUDA GPU, including L4 or A100 40/80 GB, and Google Drive. Put the matching CyDSP-HRTF-Colab.zip from build/colab in MyDrive/CyDSP-HRTF, select an L4 or A100 runtime and execute its cells. The historical notebook filename is retained; REQUIRE_A100=False accepts L4 without changing the training recipe or existing source bundle. No private GitHub token is needed. PyTorch 2.9.1/CUDA 12.8 and NumPy/h5py come from official package indexes; pinned SADIE II SOFA data come from Zenodo. Only the optional Python tools use these dependencies.
+
+The default refines the selected D2 hybrid-24 field, width 96 and four direction feature bands, for 100000 further updates. Its reference weights have already been tested; final metrics track that test, not a fresh independent holdout. The batch benchmark measures training compute only. GPU memory capacity does not guarantee a speedup; float32 with TF32/AMP disabled is retained. Models remain per-listener and target 96 kHz.
+
+The notebook freezes an experiment plan, works on local storage, and uploads verified immutable checkpoints to Drive about every 60 seconds and on exit. resume.pt restores Adam, RNG, weights, best model and the original schedule; --initial-weights starts a new optimizer instead. A restart uses the same source bundle and PyTorch version. Changing the GPU can change rounding. Abrupt termination can lose work since the last successful backup. Earlier backup generations remain available. Colab GPU availability and session length are controlled by the service.
+
+For sessions where Drive authorization fails, notebooks/CyDSP_HRTF_L4_Direct.ipynb accepts the source ZIP directly and downloads a verified result ZIP with weights and resumable checkpoints. It never mounts Drive. Keep the downloaded archive before releasing the Colab VM; unexported checkpoints remain ephemeral. Rebuild with python scripts/make_hrtf_direct_colab.py.
+
+The separate notebooks/CyDSP_HRTF_L4_Quality.ipynb profile refines the validated 48 kHz D2 field for 140000 additional updates at lower learning rates (0.0003 to 0.00001). At the earlier L4 timing this estimates about 30 compute minutes, excluding setup/validation/Drive. Rebuild its separate notebook and ZIP with python scripts/make_hrtf_colab.py --profile l4-quality. It preserves the earlier experiment and the current integration assets; improved fidelity is assessed after validation and listening.
+
+python scripts/make_hrtf_colab.py rebuilds a matched notebook/source bundle. On a checkout without local experimental reference weights, add --without-reference-weights. The small bundle contains scripts/notices and optional frozen references, with no raw SOFA or CUDA binaries. The training bundle adds no C++ runtime dependency; the separate native API remains experimental.
+
+These are experimental filter budgets, not public C++ renderer quality modes or measured audio CPU speed ratios. Report spectral errors on both log and linear grids, low/high bands and ITD. Lower average error does not imply that every frequency improves. The measured SOFA renderer remains available; this workflow makes no listening, full-phase or unseen-listener quality claim.
+
 ''',r'''
 ## Cibles optionnelles {#targets}
 
@@ -1580,7 +1656,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Depuis un paquet installé :
-find_package(CyDSP 0.4.0 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.4 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 Une compilation distincte pour le jeu peut activer seulement HrtfAssets et charger les caches décodés sans aucun lecteur de format.
@@ -1636,13 +1712,87 @@ reference rejette la troncature, accepte jusqu’à 100000 points et conserve la
 
 Les modes à voisins utilisent un index spatial équilibré préparé et des poids de Shepard normalisés. Un ensemble fini peut changer aux frontières ; fondez les changements de direction. La pondération globale conserve la continuité sur toute la banque. HrirBinaural incorpore le noyau de délai fractionnaire pendant setDirection ; L’ancienne surcharge HoaBinaural l’applique en préparation. La conception spectrale évalue plutôt les délais fractionnaires par la phase des bins et déclare sa propre latence ajoutée. La latence commune ajoutée vaut la moitié entière de la longueur du noyau et est exposée par chaque renderer.
 
-HrirBinaural utilise une convolution FIR directe : les longues FIR de référence et les mises à jour globales visent l’éditeur/offline. Un profil de qualité ne promet ni un calcul plus rapide ni une meilleure localisation perçue pour toute mesure. HoaBinaural utilise la convolution matricielle existante. Process/reset/setDirection préparés n’allouent pas ; sérialisez paramètres et traitement d’une même instance. Les coefficients HrtfSet partagés sont immuables ; historiques et fondus restent propres aux voix.
+HrirBinaural choisit une convolution directe ou FFT overlap-save en double précision. Le mode automatique utilise la FFT à partir de 96 taps et 32 frames par appel si le plan respecte sa limite et le rapport délai/taps. Les appels courts et plans trop grands gardent le traitement direct. Les longues FIR de référence et mises à jour globales peuvent encore nécessiter un budget éditeur/offline. Un profil de qualité ne promet ni un calcul plus rapide ni une meilleure localisation perçue pour toute mesure. HoaBinaural utilise la convolution matricielle existante. Process/reset/setDirection préparés n’allouent pas ; sérialisez paramètres et traitement d’une même instance. Les coefficients HrtfSet partagés sont immuables ; historiques et fondus restent propres aux voix.
 
 ## Cache portable et droits {#cache}
 
 encodeHrtfAsset stocke les mesures décodées et leurs métadonnées dans un cache versionné little-endian float32/64 avec CRC32. decodeHrtfAsset vérifie tailles, checksum et données avant de remplacer la sortie, avec seulement CyDSP::HrtfAssets. Réduire un cache double exige allowPrecisionLoss. Ce sont des mesures décodées, pas un renderer ni un résultat d’EQ sérialisé ; appelez prepareSofaHrtf après chargement avec la qualité/EQ choisies. Le CRC détecte une corruption accidentelle, pas un remplacement malveillant.
 
-Aucun jeu HRTF mesuré n’est distribué. Les tests utilisent des signaux synthétiques originaux MIT. Le code CyDSP original reste MIT ; lecteurs/SDK optionnels conservent leurs licences permissives. Les droits des mesures restent distincts : vérifiez les termes de chaque banque distribuée et conservez les [notices des composants](doc:licensing).
+La sélection SADIE II optionnelle est décrite ci-dessous. Les fixtures synthétiques restent des signaux originaux MIT. Le code CyDSP original reste MIT ; les lecteurs/SDK optionnels conservent leurs licences permissives. Les droits des mesures sont distincts : conservez les [notices des composants et données](doc:licensing).
+
+## Banque mesurée optionnelle sous 100 Mo {#bundled}
+
+Le dépôt inclut trois fichiers inchangés de [SADIE II version 2-2](https://zenodo.org/records/12092466). Choisissez un profil d’auditeur parmi ces alternatives ; les fichiers ne sont pas combinés automatiquement.
+
+| Profil | Sujet | Directions | Octets SOFA |
+| --- | --- | --- | --- |
+| Mannequin Neumann KU100 | D1 | 8802 | 36310650 |
+| Mannequin KEMAR | D2 | 8802 | 36310650 |
+| Auditeur humain | H10 | 2114 | 8753949 |
+
+Tous les fichiers choisis contiennent les mesures originales à 48 kHz, 256 taps et deux oreilles en float64 (SimpleFreeFieldHRIR). Les signaux totalisent 81375249 octets, soit 81,38 Mo décimaux. Le dossier complet, métadonnées et notices comprises, doit rester strictement sous 100000000 octets. Aucun recadrage, rééchantillonnage, réencodage, EQ ou normalisation n’a été appliqué. Le nom d’origine mentionne des enregistrements sur 24 bits ; les tableaux Data.IR stockés sont en float64.
+
+Le dossier est data/hrtf/sadie-ii-v2-2. Son installation vaut OFF par défaut et n’intègre pas les données dans la bibliothèque statique :
+
+~~~sh
+cmake -S . -B build/release -DCYDSP_INSTALL_HRTF_DATA=ON
+cmake --build build/release --config Release
+cmake --install build/release --config Release --prefix build/install
+# Ou installer uniquement le composant de mesures :
+cmake --install build/release --component HrtfData --prefix build/install
+~~~
+
+La destination par défaut est share/CyDSP/hrtf/sadie-ii-v2-2. Le paquet installé définit CyDSP_HRTF_DATA_DIR lorsque l’option est activée. L’hôte choisit le fichier, lit ses octets et les passe à loadSofa ; le rendu n’effectue aucune lecture disque implicite et ne choisit aucun profil par défaut. Les trois profils dépassent les 2048 directions de HrtfPreparation par défaut : choisissez realtimeHigh (jusqu’à 16384) ou fixez maximumPoints avant prepareSofaHrtf. Le poids du fichier diffère de la mémoire décodée, des temporaires de préparation et du coût de rendu par voix. realtimeHigh à 48 kHz conserve ici les 256 taps ; EQ ou conversion peuvent les allonger. Le lecteur complet préserve float64 pour l’éditeur/référence ; le compact convertit en float32 pour le rendu courant. Partagez le HrtfSet préparé immuable entre voix et faites des fondus aux changements de direction.
+
+manifest.json fige archive/membre d’origine, taille et SHA-256 de chaque fichier choisi. LICENSE.txt reproduit le texte Apache-2.0 original ; NOTICE.txt conserve attribution University of York et provenance. Joignez-les aux mesures distribuées ; signalez les modifications ultérieures. Le code C++ reste MIT. Ces profils constituent un choix initial, sans garantie d’adaptation individuelle ou de meilleure localisation pour tous les auditeurs.
+
+## Corpus d’entraînement séparé {#training}
+
+Davantage de mesures peuvent être utilisées sans agrandir la sélection distribuée. Le script explicite, fondé sur la bibliothèque standard Python, utilise un catalogue figé des 20 sujets SADIE II (D1, D2 et H3–H20) :
+
+~~~sh
+python scripts/fetch_hrtf_training.py --list
+python scripts/fetch_hrtf_training.py
+# Sélection explicite plus petite, au besoin :
+python scripts/fetch_hrtf_training.py --subjects H3 H4 H5 --rate 48000
+~~~
+
+Le défaut est 96 kHz, 512 taps par oreille : les 20 SOFA totalisent 498669509 octets (498,67 Mo). Les ZIP d’origine vérifiés totalisent 267332358 octets ; conserver archives et fichiers extraits prend environ 766 Mo, hors petits index/notices. Les sorties restent sous build/hrtf-training/sadie-ii-v2-2 ignoré et sont exclues de l’installation des données. Le script contrôle taille/checksum des archives, extrait seulement le membre original choisi et enregistre le SHA-256 de chaque SOFA avec ses droits.
+
+Le téléchargement n’entraîne aucun modèle. Le pilote CUDA expérimental séparé ajuste un auditeur connu avec des filtres peaking bornés et un ITD basse fréquence. Son environnement isolé PyTorch/NumPy/h5py est optionnel ; ces outils ne sont pas des dépendances du runtime C++. Lancez-le explicitement avec python scripts/train_hrtf_pilot.py --subject D2 --steps 30000 --batch-size 512. Ses contrôles vérifient équations de réponse, gradients, pôles, ITD connu et sérialisation. Poids, sources du pilote, temps et métriques réservées restent sous build/hrtf-runs ignoré ; l’API native expérimentale est décrite dans [HRTF neuronale native](doc:neural-hrtf), avec des poids séparés. Le pilote mesure l’interpolation directionnelle pour un auditeur connu, sans valider phase complète, écoute ou vitesse CPU.
+
+L’évaluation de plusieurs auditeurs doit les séparer, en gardant toutes les directions, fréquences et copies augmentées d’une personne dans la même partition. Le catalogue propose H3–H16 pour l’entraînement, H17–H18 pour la validation, H19–H20 pour le test réservé ; D1/D2 sont des références mannequins. C’est une préparation du découpage, pas un résultat de modèle mesuré. Un renderer neuronal plus rapide demanderait encore des comparaisons CPU, spectre/ITD et écoute face au rendu HRTF existant.
+
+## Comparer les champs neuronaux expérimentaux {#neural-quality}
+
+L’outil de comparaison optionnel enregistre cas et critère de sélection avant l’entraînement. Il compare centres logarithmiques/hybrides, capacité du prédicteur et 12/24 filtres peaking par oreille. La grille hybride place davantage de filtres dans les aigus ; elle ne prétend pas être optimale perceptuellement. L’objectif mixte équilibre les fréquences échantillonnées logarithmiquement et uniformément.
+
+~~~sh
+python scripts/compare_hrtf_quality.py --subject D2 --screen-steps 8000 --refine-steps 20000
+~~~
+
+Présélection et affinage utilisent seulement la validation. Un modèle par budget de filtres est retenu et les deux hashes des poids sont figés avant l’évaluation du test réservé. Pour les essais manuels, --validation-only diffère le test ; --evaluate-run évalue explicitement une passe locale figée. --initial-weights affine des poids compatibles avec optimiseur/état aléatoire réinitialisés, conserve la normalisation d’origine et garde le modèle initial s’il reste meilleur.
+
+Les expériences restent sous build/hrtf-quality et build/hrtf-runs ignorés. L’outil de diagnostic ajuste des coefficients libres sur des exemples d’entraînement pour examiner les limites de représentation ; ces ajustements ne sont ni un champ déployable ni un optimum prouvé. check_hrtf_field.py vérifie hashes sources/données, pôles prédits, oracle de réponse complexe float64, accord CPU/GPU et export des poids sans exécuter de source archivée.
+
+La sortie de retard du réseau prédit l’ITD total souhaité. Les filtres ajoutent leur propre phase interaurale : l’outil expérimental compensated_delays_us retire cet ITD de pente de phase avant d’affecter des retards externes positifs aux oreilles. Utiliser ces retards résiduels au lieu d’ajouter aussi la sortie brute du réseau. Cet outil d’analyse/préparation peut allouer ; ce n’est pas une API de callback audio. Il aligne une pente basse fréquence, pas la phase HRIR complète. Rétablir magnitudeOffsetDb pour le niveau absolu. Les modèles actuels visent 96 kHz ; un autre taux exige une conception adaptée et validée.
+
+## Entraîner sur Colab / L4 et A100 avec Drive {#colab}
+
+Le notebook optionnel notebooks/CyDSP_HRTF_A100.ipynb accepte un GPU CUDA, dont L4 ou A100 40/80 Go, et Google Drive. Déposer son CyDSP-HRTF-Colab.zip associé, produit sous build/colab, dans MyDrive/CyDSP-HRTF, choisir un runtime L4 ou A100 et exécuter les cellules. Le nom historique du fichier est conservé ; REQUIRE_A100=False accepte la L4 sans changer la recette ni le paquet source déjà déposé. Aucun jeton GitHub privé n’est requis. PyTorch 2.9.1/CUDA 12.8 et NumPy/h5py viennent des index officiels ; les SOFA SADIE II épinglés viennent de Zenodo. Seuls les outils Python optionnels utilisent ces dépendances.
+
+Le défaut affine le champ D2 hybride-24 retenu, largeur 96 et quatre bandes directionnelles, pour 100000 mises à jour supplémentaires. Ses poids de référence ont déjà été testés : les mesures finales suivent ce même test, sans constituer un nouveau test indépendant. La mesure des batches concerne seulement le calcul d’entraînement. La quantité de mémoire GPU ne garantit pas d’accélération ; float32 avec TF32/AMP désactivés est conservé. Chaque modèle vise un auditeur connu à 96 kHz.
+
+Le notebook fige le plan d’expérience, travaille sur stockage local et envoie des checkpoints immuables vérifiés vers Drive environ toutes les 60 secondes et en sortie. resume.pt restaure Adam, états aléatoires, poids, meilleur modèle et calendrier initial ; --initial-weights lance au contraire un nouvel optimiseur. La reprise garde le même paquet source et la même version PyTorch. Changer de GPU peut changer les arrondis. Une coupure brutale peut perdre le travail depuis la dernière sauvegarde réussie. Les sauvegardes précédentes restent disponibles. La disponibilité du GPU et la durée de session dépendent de Colab.
+
+Si l’autorisation Drive échoue, notebooks/CyDSP_HRTF_L4_Direct.ipynb reçoit directement le ZIP source puis télécharge un ZIP de résultats vérifié avec poids et checkpoints de reprise. Il ne monte pas Drive. Conserver le fichier téléchargé avant de libérer la machine Colab ; les checkpoints non exportés restent temporaires. Reconstruire avec python scripts/make_hrtf_direct_colab.py.
+
+Le profil séparé notebooks/CyDSP_HRTF_L4_Quality.ipynb affine le champ D2 48 kHz validé sur 140000 étapes supplémentaires, avec un taux réduit (0,0003 à 0,00001). Le rythme L4 antérieur donne environ 30 minutes de calcul estimées, hors installation/validation/Drive. Reconstruire son notebook et son ZIP distincts avec python scripts/make_hrtf_colab.py --profile l4-quality. Il conserve l’expérience précédente et les poids d’intégration actuels ; la fidélité améliorée reste à mesurer puis écouter.
+
+python scripts/make_hrtf_colab.py reconstruit le couple notebook/paquet source. Sans poids expérimentaux de référence locaux, ajouter --without-reference-weights. Le petit paquet contient scripts/notices et références figées optionnelles, sans SOFA bruts ni binaires CUDA. Le paquet d’entraînement n’ajoute aucune dépendance au runtime C++ ; l’API native séparée reste expérimentale.
+
+Ce sont des budgets de filtres expérimentaux, pas des modes de qualité publics du renderer C++ ni des ratios de vitesse audio CPU mesurés. Présenter les erreurs spectrales sur grilles logarithmique et linéaire, les bandes graves/aiguës et l’ITD. Une meilleure moyenne ne garantit pas une amélioration à chaque fréquence. Le renderer SOFA mesuré reste disponible ; cette procédure ne revendique pas de qualité d’écoute, de phase complète ou d’auditeur inconnu.
+
 ''')
 
 # Original HOA/analytic-HRIR additions; paired public anchors.
@@ -1786,4 +1936,224 @@ analyticHrirs excite le processeur AnalyticBinaural existant par des impulsions 
 La banque possède taux, taps et vues. Les vues survivent au déplacement de leur propriétaire et restent valides jusqu’à destruction ou remplacement réussi. Un échec préserve la banque précédente. La génération alloue : exécutez-la hors audio. Les maxima 100000 directions/65536 taps restent contraints par le budget de samples/vues, 512 Mio par défaut.
 
 Le modèle est l’approximation générique d’ombre de tête/ITD existante, nommée AnalyticBinaural dans ce dépôt. Il n’y a ici ni classe CuedBinaural, ni géométrie individuelle de pavillon/oreille, ni détails d’élévation mesurés. Ajouter des taps ne crée pas ces indices. maximumTailSample inspecte les 64 frames après la FIR retenue : c’est un diagnostic, pas une borne de toute l’énergie omise. Choisissez les taps selon modèle/taux et vérifiez la queue.
+''')
+
+add('neural-hrtf','Native neural HRTF','HRTF neuronale native',
+    'Prepare a compact directional model and render its binaural filters.',
+    'Préparer un modèle directionnel compact et rendre ses filtres binauraux.',
+    'hrtf',r'''
+## What runs in the application {#runtime}
+
+NeuralHrtfModel predicts two cascades of bounded peaking sections, ear levels and the desired right-minus-left ITD from a listener-relative direction (+X front, +Y left, +Z up). NeuralBinaural<float/double> renders those parameters using CyDSP biquads and fractional delays. The C++ static library needs no PyTorch, Python, CUDA, ONNX or model download. Training/export tools are separate optional Python programs. Learned assets are experimental and are not automatically installed with CyDSP.
+
+The model approximates magnitude and low-band ITD for one known listener. It does not reconstruct the complete measured HRIR phase or supply a personalized HRTF for an arbitrary listener. Keep HrirBinaural with measured SOFA assets for the measured reference and demanding offline use.
+
+## Load and prepare {#prepare}
+
+The host reads a model asset and passes its bytes to load. Loading validates bounds, dimensions, rate, finite coefficients and supported encoding, then owns an immutable shared copy of the weights. Copies of NeuralHrtfModel share those weights; const predictions may run concurrently. Loading, assignment and destruction belong outside the audio callback. Scalar/SSE2/AVX2/AVX-512/NEON/SVE selection reuses CyDSP's compiled kernels. Validate each deployed platform separately.
+
+```cpp
+#include <cydsp/spatial/NeuralHrtf.h>
+
+cydsp::Status prepareVoice(std::span<const std::byte> bytes,
+                           cydsp::NeuralHrtfModel& model,
+                           cydsp::NeuralBinaural<float>& voice) noexcept {
+    auto status = model.load(bytes);
+    if (status != cydsp::Status::ok) return status;
+    // Audio must actually be running at this exact asset rate.
+    status = voice.prepare({48000, 128, 1}, model);
+    if (status != cydsp::Status::ok) return status;
+    return voice.setDirection({1, 0, 0}, 0);
+}
+```
+
+A 96 kHz model is rejected by a 48 kHz voice. Retrain/adapt the field for the new rate and validate it; changing the RBJ sample rate alone changes the response. Preparation allocates both complete audio banks and bounded delay histories. The initial direction must be installed before process; the input is mono and output stereo, with disjoint sample storage.
+
+## Predict, design and publish {#updates}
+
+Call model.predict(direction, parameters), then designNeuralHrtf(parameters, design) on a worker/control thread. Publish the completed value through a host-owned bounded queue and call voice.setDesign(design, fadeFrames) between process calls. predict also accepts a span of directions with whole-batch preflight; batch input/output must be disjoint. Batch evaluation is sequential and reuses transposed immutable weights through CyDSP SIMD addScaled kernels. It is not a GPU batch or a BLAS dependency.
+
+setDirection combines prediction, coefficient/phase design and installation without allocation, but its cost is greater than installing an already prepared design. Allocation-free is not a callback-time guarantee. The public design helper subtracts the cascades' intrinsic 200–1500 Hz phase-slope ITD, on a 4096-bin FFT frequency grid, before assigning nonnegative external ear delays. Ear levels already restore the training magnitude offset. Applying the raw ITD again or restoring the offset twice is incorrect.
+
+process, reset, predict, designNeuralHrtf and voice updates allocate no memory. The host serializes voice updates and processing. A voice must never be modified concurrently with process. The model may be shared across voices; filter/delay state belongs to each voice.
+
+## Transitions and precision {#quality}
+
+A nonzero transition crossfades complete old/new filter, gain and delay outputs linearly. setDesign and setDirection return transition_in_progress until it finishes; the host retains/retries its most recent target. A first design or zero-length transition installs immediately and resets filter/delay states. The raw-input replay ring keeps tracking input until reset, which chooses the pending endpoint and clears all histories. Before a fading update, the new endpoint replays retained raw input under its own coefficients, gain and delay. NeuralBinauralOptions::transitionHistoryFrames defaults to 512, accepts 0–65536 and is allocated during prepare. Zero selects the earlier cold start. Longer replay costs more CPU in setDesign/setDesigns and approximates, rather than reconstructs, the infinite IIR past. Perceptual transparency is not guaranteed.
+
+Biquad states and coefficients use double precision for float and double audio APIs. A first-order Thiran all-pass supplies fractional residual delays with unity magnitude, avoiding the treble attenuation of linear interpolation. Its phase delay is frequency dependent; this design matches low-band ITD, not the entire high-frequency phase. No approximate math or global floating-point flags are enabled. latencyFrames is zero common buffering latency; causal ear delays and IIR tails remain. The default external-delay capacity is 5 ms and can be prepared up to 100 ms. A design outside capacity is rejected, preserving the current voice. IIR tails are not finite FIR tails.
+
+## Render several voices together {#batch}
+
+Keep a contiguous array of prepared NeuralBinaural objects. processBatch(voices, sources, stereoPairs) takes N mono input channels and 2*N output channels ordered L0,R0,L1,R1,... . It renders up to four voices per kernel group and handles a final partial group. It does not mix sources; route or sum the resulting pairs with CyDSP mixing functions. All voices must share a sample rate and selected backend, with maximum blocks large enough for the call. Input/output sample ranges must be disjoint. Whole-call preflight precedes any processing or output change.
+
+Use setDesigns(voices, completedDesigns, fadeFrames) on the processing owner between blocks to install one worker-prepared design per voice. The entire batch is validated before mutation and history replay is grouped. Each voice keeps independent filter/delay states and its own fade clock; individual updates remain available. Prediction/design may run on a worker, but applying a design or replaying live history must never run concurrently with processing those voices.
+
+The specialized cascade keeps coefficients and states in double precision and reuses existing CyDSP biquad kernels. On x64, stereo groups use SSE2 when a wider backend was selected; full groups use the selected backend. Scalar, NEON and SVE follow their compiled kernels. No weights, training topology or filter count change in this execution path. Faster rendering does not promise lower total CPU for every history size, update rate or workload.
+
+## Export assets and verify {#tools}
+
+```sh
+python scripts/fetch_hrtf_training.py --subjects D2 --rate 48000
+python scripts/train_hrtf_pilot.py --subject D2 --sample-rate 48000 --width 96 --filters 24 --feature-bands 4 --center-grid hybrid --frequency-grid mixed --selection-grid linear --steps 30000
+python scripts/export_hrtf_native.py --run build/hrtf-runs/YOUR_RUN --output build/hrtf-models/D2-48000/model.cyhrtf
+python scripts/validate_hrtf_rendering.py --run build/hrtf-runs/YOUR_RUN
+```
+
+An explicit --transfer-sample-rate with --initial-weights allows transfer from another rate of the same verified listener/dataset; it starts a new optimizer/schedule and records both rates and source hashes. A same-rate continuation remains a separate experiment. Checkpoint source snapshots remain unchanged. Native validation exports actual rendered impulses, compares spectrum/ILD/ITD to SOFA, checks theoretical-response agreement and measures prediction, design, source mixing and full-branch transitions separately. CPU results depend on voice count, quality, rate, backend and block size. Objective metrics do not replace listening/localization tests.
+
+The asset format is little-endian CYHRTF02: eight magic bytes; six uint32 values (inputs, width, outputs, sections per ear, Fourier bands, sample rate); one float32 magnitude offset; then float32 row-major W1,b1,W2,b2,W3,b3, section centers, shifts and Fourier phase constants. The predictor is inputs→width→width→outputs with tanh hidden activations and bounded output decoding. Bounds are width 16–256, 4–32 sections/ear, 1–6 Fourier bands and 44.1–192 kHz. An exact byte count is required. CYHRTF01 benchmark assets are not accepted. The exporter adds SHA-256/provenance and source data notices alongside the asset; the host verifies its selected asset hash and preserves applicable rights.
+''',r'''
+## Ce qui s’exécute dans l’application {#runtime}
+
+NeuralHrtfModel prédit deux cascades de filtres peaking bornés, les niveaux des oreilles et l’ITD voulu droite-moins-gauche à partir d’une direction relative à l’auditeur (+X avant, +Y gauche, +Z haut). NeuralBinaural<float/double> rend ces paramètres avec les biquads et délais fractionnaires CyDSP. La bibliothèque statique C++ ne demande ni PyTorch, Python, CUDA, ONNX ni téléchargement de modèle. Les outils Python d’entraînement/export sont séparés et optionnels. Les poids expérimentaux ne sont pas installés automatiquement avec CyDSP.
+
+Le modèle approche l’amplitude et l’ITD basse fréquence d’un auditeur connu. Il ne reconstruit pas la phase complète des HRIR mesurées et ne fournit pas une HRTF personnalisée pour un auditeur arbitraire. Conserver HrirBinaural avec les mesures SOFA comme référence mesurée et pour les usages offline exigeants.
+
+## Charger et préparer {#prepare}
+
+L’hôte lit une banque de poids puis transmet ses octets à load. Le chargement vérifie bornes, dimensions, fréquence, coefficients finis et encodage, puis possède une copie partagée immuable des poids. Les copies de NeuralHrtfModel partagent les poids ; les prédictions const peuvent être concurrentes. Chargement, affectation et destruction restent hors callback audio. La sélection scalaire/SSE2/AVX2/AVX-512/NEON/SVE réutilise les noyaux compilés CyDSP. Valider séparément chaque plateforme déployée.
+
+```cpp
+#include <cydsp/spatial/NeuralHrtf.h>
+
+cydsp::Status prepareVoice(std::span<const std::byte> bytes,
+                           cydsp::NeuralHrtfModel& model,
+                           cydsp::NeuralBinaural<float>& voice) noexcept {
+    auto status = model.load(bytes);
+    if (status != cydsp::Status::ok) return status;
+    // L’audio doit réellement fonctionner au taux exact de cette banque.
+    status = voice.prepare({48000, 128, 1}, model);
+    if (status != cydsp::Status::ok) return status;
+    return voice.setDirection({1, 0, 0}, 0);
+}
+```
+
+Un modèle 96 kHz est refusé par une voix à 48 kHz. Réentraîner/adapter le champ à la nouvelle fréquence puis le valider ; changer seulement le taux RBJ modifie la réponse. La préparation alloue deux banques audio complètes et des historiques de délai bornés. Installer une direction avant process ; entrée mono, sortie stéréo et zones d’échantillons disjointes.
+
+## Prédire, concevoir et publier {#updates}
+
+Appeler model.predict(direction, parameters), puis designNeuralHrtf(parameters, design) sur un worker/thread de contrôle. Publier la valeur terminée dans une file bornée de l’hôte, puis appeler voice.setDesign(design, fadeFrames) entre deux process. predict accepte aussi un span de directions, avec validation de tout le lot avant écriture ; entrées/sorties du lot disjointes. Le lot est séquentiel et réutilise les poids transposés immuables via les noyaux SIMD addScaled CyDSP. Il ne demande ni lot GPU ni BLAS.
+
+setDirection combine prédiction, conception des coefficients/phase et installation sans allocation, mais coûte davantage qu’un design déjà préparé. Sans allocation ne signifie pas un temps callback garanti. Le helper soustrait l’ITD intrinsèque des cascades, mesuré par pente de phase 200–1 500 Hz sur la grille fréquentielle d’une FFT 4 096, avant d’attribuer les délais externes positifs. Les niveaux des oreilles restaurent déjà l’offset d’amplitude d’entraînement. Ne pas réappliquer l’ITD brut ni restaurer deux fois l’offset.
+
+process, reset, predict, designNeuralHrtf et les mises à jour des voix n’allouent aucune mémoire. L’hôte sérialise mises à jour et traitement d’une voix. Il ne doit jamais modifier une voix pendant son process. Le modèle se partage entre voix ; chaque voix possède ses états de filtres/délais.
+
+## Transitions et précision {#quality}
+
+Une transition non nulle fond linéairement les sorties complètes ancien/nouveau filtres, gain et délai. setDesign et setDirection renvoient transition_in_progress tant qu’elle continue ; l’hôte conserve/réessaie sa cible la plus récente. Le premier design ou une transition nulle s’installe immédiatement en réinitialisant les états de filtres/délais. L’historique d’entrée brute continue jusqu’à reset, qui choisit la cible en attente et efface tous les historiques. Avant une mise à jour en fondu, la nouvelle branche rejoue l’entrée brute conservée avec ses propres coefficients, gain et délai. NeuralBinauralOptions::transitionHistoryFrames vaut 512 par défaut et accepte 0–65536. Zéro conserve le démarrage à froid précédent ; un historique plus long coûte davantage de CPU dans setDesign/setDesigns. Un rejeu fini approche le passé infini d’un IIR et ne garantit pas une transparence perceptive pour tous les signaux ou mouvements.
+
+Coefficients et états biquad restent en double précision, pour les API audio float et double. Un passe-tout Thiran d’ordre 1 fournit les retards fractionnaires résiduels à amplitude unitaire, évitant la perte d’aigus d’une interpolation linéaire. Sa phase dépend de la fréquence ; cette conception vise l’ITD basse fréquence et non toute la phase des aigus. Aucun calcul approximatif ni drapeau flottant global n’est activé. latencyFrames indique zéro latence commune de buffering ; délais causaux par oreille et queues IIR subsistent. La capacité de délai externe vaut 5 ms par défaut, préparables jusqu’à 100 ms. Un design hors capacité est refusé en conservant la voix actuelle. Les queues IIR n’ont pas la durée finie d’une FIR.
+
+## Rendre plusieurs voix ensemble {#batch}
+
+Pour plusieurs émetteurs, conserver un tableau contigu d’objets NeuralBinaural préparés. processBatch(voices, sources, stereoPairs) prend N canaux mono en entrée et 2*N canaux en sortie dans l’ordre L0,R0,L1,R1,... . Il rend jusqu’à quatre voix par groupe de noyau, avec prise en charge du dernier groupe incomplet. Il ne mélange pas les sources ; router ou sommer les paires avec les fonctions de mixage CyDSP habituelles. Les voix doivent partager fréquence et backend sélectionné, avec des blocs préparés assez grands pour l’appel. Les zones d’échantillons entrée/sortie doivent être disjointes. L’appel entier est validé avant traitement ou écriture.
+
+Appeler setDesigns(voices, completedDesigns, fadeFrames) sur le propriétaire du traitement, entre deux blocs, pour installer un design préparé sur worker par voix. L’appel vérifie tout le lot avant mutation et groupe le rejeu de l’historique. Chaque voix garde ses états de filtres/délais et son compteur de fondu ; les mises à jour individuelles restent disponibles. Prédiction et conception peuvent tourner sur un worker, mais l’installation d’un design et le rejeu de l’historique vivant ne doivent jamais être concurrents du traitement de ces voix.
+
+La cascade spécialisée conserve coefficients et états en double précision et réutilise les noyaux biquad CyDSP existants. Sur x64, les groupes stéréo emploient SSE2 lorsqu’un backend plus large a été sélectionné ; les groupes complets emploient le backend sélectionné. Scalaire, NEON et SVE suivent leurs noyaux compilés. Cette exécution ne modifie ni poids, ni topologie entraînée, ni nombre de filtres. Un rendu plus rapide ne garantit pas moins de CPU total pour tous les historiques, rythmes de mise à jour ou usages.
+
+## Exporter les poids et vérifier {#tools}
+
+```sh
+python scripts/fetch_hrtf_training.py --subjects D2 --rate 48000
+python scripts/train_hrtf_pilot.py --subject D2 --sample-rate 48000 --width 96 --filters 24 --feature-bands 4 --center-grid hybrid --frequency-grid mixed --selection-grid linear --steps 30000
+python scripts/export_hrtf_native.py --run build/hrtf-runs/YOUR_RUN --output build/hrtf-models/D2-48000/model.cyhrtf
+python scripts/validate_hrtf_rendering.py --run build/hrtf-runs/YOUR_RUN
+```
+
+L’option explicite --transfer-sample-rate avec --initial-weights autorise le transfert depuis un autre taux du même auditeur/jeu vérifié ; nouvel optimiseur/calendrier et conservation des taux et hashes sources. Une poursuite au même taux reste une nouvelle expérience. Les instantanés sources des checkpoints restent intacts. La validation native exporte les impulsions réellement rendues, compare spectre/ILD/ITD au SOFA, vérifie la réponse théorique et mesure séparément prédiction, conception, mixage et transitions complètes. Le coût dépend du nombre de voix, de la qualité, du taux, du backend et du bloc. Les métriques objectives ne remplacent pas des tests d’écoute/localisation.
+
+Le format little-endian CYHRTF02 contient : huit octets de signature ; six uint32 (entrées, largeur, sorties, sections par oreille, bandes de Fourier, fréquence) ; un float32 d’offset ; puis les float32 W1,b1,W2,b2,W3,b3 en ordre lignes, centres, décalages et constantes de Fourier. Le prédicteur est entrées→largeur→largeur→sorties, avec tanh cachées et décodage borné. Limites : largeur 16–256, 4–32 sections/oreille, 1–6 bandes de Fourier et 44,1–192 kHz. La taille exacte est exigée. Les banques du benchmark CYHRTF01 sont refusées. L’exporteur ajoute SHA-256/provenance et notices des données à côté des poids ; l’hôte vérifie le hash choisi et conserve les droits applicables.
+''')
+
+# HRIR engine selection and HOA diffuse gain, public integration contracts.
+for page in PAGES:
+    if page['id']=='hrtf':
+        page['body']=(page['body'][0]+r'''
+## Interpolate FIRs and select the engine {#interpolation-engine}
+
+HrtfSet::interpolate(direction, left, right, delays) fills two caller-owned spans of exactly bank.taps() samples and a two-element array of ear delays in frames. It uses the same normalized direction and Shepard/nearest policy as HrirBinaural, including exact measured directions. The FIRs contain the prepared sample-rate-conversion response; onset delays remain separate and the optional fractional-delay kernel is not baked. Do not add acoustic onsets twice. Storage is allocated before audio. The const call allocates/frees nothing; independent destinations can query a shared bank concurrently. Overlapping ear spans or overlap with the delay array fail without changing outputs. Float destinations accumulate with float rounding; the renderer interpolates in double storage.
+
+~~~cpp
+std::vector<float> left(bank.taps()), right(bank.taps()); // allocate outside audio
+std::array<double, 2> delays{};
+const auto status = bank.interpolate({0, 1, 0}, left, right, delays);
+if (status != cydsp::Status::ok) return status;
+// Keep delays separate or incorporate them once into the host FIR.
+~~~
+
+Existing HrirBinaural::prepare overloads now select automatic. Use the explicit HrirRenderConfig overload to force direct or FFT. maximumFftSize defaults to 32768 (power of two, 32..262144). An oversized forced FFT fails transactionally; automatic retains the direct path. FFT size covers the whole delayed FIR plus a tile of up to 128 current input frames: this is whole-FIR overlap-save, rather than an unbounded partition engine for long responses. It adds no block buffering latency. Both fade endpoints use the same full input history, with their own ear delays. The fade is shared by both ears and independent of host block boundaries. FFT and direct implement the same FIR/delay model with different numerical summation orders. FFT processing uses CyDSP double FFTs and SIMD accumulation without a reduced-quality approximation or external runtime.
+
+~~~cpp
+cydsp::HrirRenderConfig config;
+config.convolution = cydsp::HrirConvolution::automatic;
+cydsp::HrirBinaural<float> voice;
+const auto ready = voice.prepare({48000, 128, 1}, bank, config);
+if (ready != cydsp::Status::ok) return ready;
+~~~
+
+Declared latency remains the prepared sample-rate-conversion delay plus the optional fractional-delay kernel; causal ear delays remain in the spatial response. setDirection allocates nothing but prepares FIR spectra when a FFT plan exists. Include updates and double-filter fades in the CPU budget, particularly for many voices/all-point interpolation, and serialize them with process. Coefficients and scratch are allocated only in prepare. SmoothedConvolver::stageImpulse is a separate operation which may allocate/free and cannot run concurrently with processing: allocation-free HRTF interpolation does not make this staging operation suitable for the audio callback.
+''',page['body'][1]+r'''
+## Interpoler les FIR et choisir le moteur {#interpolation-engine}
+
+HrtfSet::interpolate(direction, left, right, delays) remplit deux spans de l’appelant, chacun de bank.taps() échantillons, et un tableau de deux délais d’oreilles en frames. La direction normalisée et la politique Shepard/voisins sont celles de HrirBinaural, y compris les directions mesurées exactes. Les FIR contiennent la réponse préparée de conversion de taux ; les délais d’onset restent séparés et le noyau optionnel de délai fractionnaire n’est pas incorporé. Ne doublez pas les onsets acoustiques. Le stockage est alloué avant l’audio. L’appel const n’alloue et ne libère rien ; des destinations indépendantes peuvent interroger simultanément une banque partagée. Les chevauchements des spans d’oreilles ou avec le tableau de délais échouent sans modifier les sorties. Les destinations float accumulent avec un arrondi float ; le renderer interpole en stockage double.
+
+~~~cpp
+std::vector<float> left(bank.taps()), right(bank.taps()); // allouer hors audio
+std::array<double, 2> delays{};
+const auto status = bank.interpolate({0, 1, 0}, left, right, delays);
+if (status != cydsp::Status::ok) return status;
+// Garder les délais séparés ou les incorporer une fois à la FIR de l’hôte.
+~~~
+
+Les surcharges HrirBinaural::prepare existantes sélectionnent désormais automatic. La surcharge HrirRenderConfig permet de forcer direct ou fft. maximumFftSize vaut 32768 par défaut (puissance de deux, de 32 à 262144). Un plan FFT forcé trop grand échoue sans remplacer l’existant ; le mode automatique garde le chemin direct. La taille FFT couvre toute la FIR avec délais plus une tuile courante d’au plus 128 frames : ce moteur overlap-save à FIR entière n’est pas un moteur partitionné sans borne pour les longues réponses. Il n’ajoute aucun buffering de bloc. Les deux extrémités du fondu utilisent le même historique complet, avec leurs délais d’oreilles respectifs. Le fondu est commun aux oreilles et indépendant des frontières de blocs. FFT et direct réalisent le même modèle FIR/délai avec des ordres de sommation numérique différents. Le calcul FFT utilise les FFT double et accumulations SIMD CyDSP, sans approximation de qualité réduite ni runtime externe.
+
+~~~cpp
+cydsp::HrirRenderConfig config;
+config.convolution = cydsp::HrirConvolution::automatic;
+cydsp::HrirBinaural<float> voice;
+const auto ready = voice.prepare({48000, 128, 1}, bank, config);
+if (ready != cydsp::Status::ok) return ready;
+~~~
+
+La latence déclarée reste celle de conversion de taux plus le noyau fractionnaire optionnel ; les délais causaux des oreilles restent dans la réponse spatiale. setDirection n’alloue rien mais prépare les spectres FIR lorsqu’un plan FFT existe. Incluez mises à jour et fondus à deux filtres dans le budget CPU, surtout avec beaucoup de voix ou l’interpolation globale, et sérialisez avec process. Coefficients et scratch sont alloués seulement dans prepare. SmoothedConvolver::stageImpulse est une autre opération, pouvant allouer/libérer et interdite simultanément au traitement : l’interpolation HRTF sans allocation ne rend pas cette préparation adaptée au callback audio.
+''')
+    if page['id']=='binaural':
+        page['body']=(page['body'][0]+r'''
+## Diffuse level and early-reflection timing {#diffuse-level}
+
+Both HoaBinaural preparation overloads fill diffuseReferenceEnergy[2], diffuseDecoderEnergy[2], diffuseGain and diffuseMetricsAvailable in designReport(). These are mean impulse energies for uncorrelated unit-white-noise plane waves over the design directions. The legacy time-domain path uses uniform weights and its causal linear/sinc delay model. The spectral path uses normalized spatialWeights and its frequency-bin delay model, including the real Nyquist endpoint. Decoder power includes interference between spherical-harmonic channels. Legacy measurements use the actual float/double FIRs; spectral metrics precede float coefficient quantization.
+
+The recommended amplitude gain is sqrt(sum(reference energy) / sum(decoder energy)). It is common to both ears, is not applied automatically, and restores integrated broadband energy on the design grid. It does not correct frequency/direction-dependent coloration or certify loudness for arbitrary programme material. Silent/degenerate designs report diffuseMetricsAvailable=false and retain gain=1. Do not divide by zero.
+
+~~~cpp
+cydsp::HoaBinaural<float> early;
+const auto status = early.prepare({48000, 128, 4}, 1, bank); // causal time-domain LS
+if (status != cydsp::Status::ok) return status;
+const auto report = early.designReport();
+const double gain = report.diffuseMetricsAvailable ? report.diffuseGain : 1.0;
+// Apply the fixed gain to both ears after rendering.
+const auto latency = early.latencyFrames();
+~~~
+
+For early reflections aligned to direct sound, this causal LS overload avoids the spectral designer's half-FFT delay. Sample-rate conversion or the optional sinc kernel can still add declared latency. Explicit spectral MagLS retains its centered FIR and half-FFT delay. This update does not select minimum-phase MagLS or an automatic phase-changing shortcut. A broadband gain compensates level, not low-order LS high-frequency magnitude loss. Select the path according to timing and spectral requirements.
+''',page['body'][1]+r'''
+## Niveau diffus et calage des réflexions précoces {#diffuse-level}
+
+Les deux surcharges de préparation HoaBinaural remplissent diffuseReferenceEnergy[2], diffuseDecoderEnergy[2], diffuseGain et diffuseMetricsAvailable dans designReport(). Ce sont les énergies impulsionnelles moyennes d’ondes planes décorrélées de bruit blanc unitaire sur les directions de conception. Le chemin temporel historique utilise des poids uniformes et son modèle causal de délai linéaire/sinc. Le chemin spectral utilise les spatialWeights normalisés et son modèle de délai par bins, y compris l’extrémité Nyquist réelle. La puissance décodée inclut les interférences entre canaux harmoniques. Les mesures historiques utilisent les FIR float/double effectives ; les spectrales précèdent la quantification float des coefficients.
+
+Le gain d’amplitude conseillé vaut sqrt(somme énergie référence / somme énergie décodée). Il est commun aux oreilles, n’est pas appliqué automatiquement et restaure l’énergie large bande intégrée sur la grille de conception. Il ne corrige pas la coloration selon fréquence/direction et ne certifie pas la sonie d’un programme arbitraire. Les conceptions silencieuses/dégénérées fournissent diffuseMetricsAvailable=false et conservent gain=1. Ne divisez pas par zéro.
+
+~~~cpp
+cydsp::HoaBinaural<float> early;
+const auto status = early.prepare({48000, 128, 4}, 1, bank); // LS temporel causal
+if (status != cydsp::Status::ok) return status;
+const auto report = early.designReport();
+const double gain = report.diffuseMetricsAvailable ? report.diffuseGain : 1.0;
+// Appliquer le gain fixe aux deux oreilles après rendu.
+const auto latency = early.latencyFrames();
+~~~
+
+Pour les réflexions précoces calées sur le son direct, cette surcharge LS causale évite la demi-FFT de retard du concepteur spectral. La conversion de taux ou le noyau sinc optionnel peuvent encore ajouter une latence déclarée. Le MagLS spectral explicite garde sa FIR centrée et sa demi-FFT de retard. Cette évolution ne sélectionne aucun MagLS à phase minimale ni raccourci automatique modifiant la phase. Un gain large bande compense le niveau, et non la perte d’amplitude aiguë des LS d’ordre faible. Choisissez selon les contraintes de calage et de spectre.
 ''')

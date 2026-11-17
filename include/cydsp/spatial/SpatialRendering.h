@@ -117,12 +117,25 @@ template <Sample T> class HrtfSet {
     latencyFrames() const noexcept; // Common SRC FIR delay, zero at equal rates.
     [[nodiscard]] bool truncated() const noexcept;
     [[nodiscard]] HrtfStorageReport storageReport() const noexcept;
+    // Allocation-free, const and safe for concurrent independent destinations.
+    // Outputs must each have taps() samples and be disjoint. Returns aligned FIRs
+    // plus separate onset delays in frames; no fractional-delay kernel is baked.
+    // Invalid arguments preserve both outputs and delays. Caller owns storage.
+    [[nodiscard]] Status interpolate(Vec3 direction, std::span<T> left, std::span<T> right,
+                                     std::array<double, 2>& delays) const noexcept;
 
   private:
     template <Sample U> friend class HrirBinaural;
     template <Sample U> friend class HoaBinaural;
     struct State;
     std::shared_ptr<const State> state_;
+};
+enum class HrirConvolution { automatic, direct, fft };
+struct HrirRenderConfig {
+    HrirConvolution convolution = HrirConvolution::automatic;
+    // FFT mode uses overlap-save on the current call, adding no block latency.
+    // Automatic retains the direct path for short calls/FIRs or oversized plans.
+    std::size_t maximumFftSize = 32768;
 };
 template <Sample T> class HrirBinaural {
   public:
@@ -134,6 +147,10 @@ template <Sample T> class HrirBinaural {
                                  CpuBackend = CpuBackend::automatic) noexcept;
     [[nodiscard]] Status prepare(const ProcessSpec& mono, const HrtfSet<T>&,
                                  CpuBackend = CpuBackend::automatic) noexcept;
+    [[nodiscard]] Status prepare(const ProcessSpec& mono, const HrtfSet<T>&,
+                                 const HrirRenderConfig&,
+                                 CpuBackend = CpuBackend::automatic) noexcept;
+    [[nodiscard]] HrirRenderConfig configuration() const noexcept;
     // Spherical Shepard interpolation with Gaussian locality; the prepared policy
     // chooses all points or a bounded nearest-neighbour subset.
     // An exact measured direction reproduces its measured FIR and onset delay.
@@ -213,6 +230,12 @@ struct HoaDecoderReport {
     double initialHighBandMagnitudeError = 0;
     bool maxRe = false;
     bool spectralMetricsAvailable = false; // legacy time-domain overload does not measure errors
+    // Weighted spherical mean impulse energy, for unit white-noise plane waves.
+    // Decoder energies include interference between SH channels. Reference energies
+    // use each design's delay model. Gain is amplitude, and is not applied implicitly.
+    std::array<double, 2> diffuseReferenceEnergy{}, diffuseDecoderEnergy{};
+    double diffuseGain = 1; // sqrt(sum(reference) / sum(decoder)); common to both ears
+    bool diffuseMetricsAvailable = false; // false for a silent/degenerate design
 };
 // Projects time-aligned HRIRs onto an irregular sampled spherical-harmonic
 // field by regularized least squares, then prepares the existing MIMO convolver.

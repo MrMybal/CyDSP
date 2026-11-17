@@ -3,7 +3,7 @@ id: api-spectral-stft
 title: Stft
 description: Causal weighted overlap-add analysis/synthesis with an allocation-free spectral callback.
 section: API reference
-order: 1180
+order: 1181
 revision: 1
 parent: api-spectral
 symbol: cydsp::Stft

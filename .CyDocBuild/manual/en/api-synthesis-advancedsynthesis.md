@@ -3,7 +3,7 @@ id: api-synthesis-advancedsynthesis
 title: AdvancedSynthesis
 description: FM/PM, hard sync, unison, multisegment envelopes, sample-and-hold LFO and procedural sources.
 section: API reference
-order: 1181
+order: 1182
 revision: 1
 parent: api-synthesis
 symbol: cydsp::EnvelopeSegment

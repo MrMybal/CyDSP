@@ -94,7 +94,7 @@ def extract(ast):
         for child in namespace.get('inner',[]): visit(child,['cydsp'])
     # Version macros have no namespace AST declaration. The umbrella exports headers.
     groups['cydsp/core/Version.h']['macros']=re.findall(r'^#define\s+(CYDSP_VERSION_\w+)\s+(.+)$',(ROOT/'include/cydsp/core/Version.h').read_text(),re.M)
-    return {'schemaVersion':1,'libraryVersion':'0.4.0','headers':list(groups.values())}
+    return {'schemaVersion':1,'libraryVersion':re.search(r'project\(CyDSP VERSION (\S+)',(ROOT/'CMakeLists.txt').read_text()).group(1),'headers':list(groups.values())}
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ast',type=Path);parser.add_argument('--clang',type=Path);args=parser.parse_args()

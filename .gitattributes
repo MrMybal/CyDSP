@@ -8,3 +8,10 @@ tests/data/sofa/*.sofa -text
 
 # Preserve the unmodified upstream endian portability header byte-for-byte.
 src/sofa/compact/hrtf/portable_endian.h -text -whitespace
+
+# Original binary acoustic measurements; their own Apache license is retained.
+data/hrtf/**/*.sofa -text
+
+# Keep the complete original dataset license and attribution hashes portable.
+data/hrtf/**/LICENSE.txt -text -whitespace
+data/hrtf/**/NOTICE.txt -text -whitespace

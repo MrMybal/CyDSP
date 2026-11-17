@@ -133,3 +133,4 @@
 #include "cydsp/synthesis/ContactExciter.h"
 #include "cydsp/processors/EchoCanceller.h"
 #include "cydsp/control/Quality.h"
+#include "cydsp/spatial/NeuralHrtf.h"

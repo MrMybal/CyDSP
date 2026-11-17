@@ -3,7 +3,7 @@ id: api-synthesis-livegranulator
 title: LiveGranulator
 description: Prepared circular live-audio history, freeze and independently routed forward/reverse grains.
 section: API reference
-order: 1184
+order: 1185
 revision: 1
 parent: api-synthesis
 symbol: cydsp::LiveGranulator

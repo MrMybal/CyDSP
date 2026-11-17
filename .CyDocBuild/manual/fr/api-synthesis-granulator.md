@@ -3,7 +3,7 @@ id: api-synthesis-granulator
 title: Granulator
 description: Voix de grains bornées sur samples préparés et nuages planifiés reproductibles.
 section: Référence API
-order: 1183
+order: 1184
 sourceRevision: 1
 parent: api-synthesis
 symbol: cydsp::Granulator

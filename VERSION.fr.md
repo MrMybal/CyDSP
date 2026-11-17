@@ -1,9 +1,17 @@
-# CyDSP 0.4.0
+# CyDSP 0.4.4
 
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
+
+- 0.4.4 : Cascades neuronales spécialisées en double précision sur les noyaux SIMD CyDSP existants ; rendu explicite par groupes de quatre voix et mises à jour de designs groupées. Les cibles en fondu rejouent par défaut 512 échantillons d’entrée conservés (réglage 0–65536) ; poids et réponse statique inchangés. Recompiler ensemble bibliothèque statique et consommateurs.
+
+- 0.4.3 : Interpolation HRTF sans allocation ; rendu HRIR direct/FFT/automatique avec historique d’entrée partagé, fondus entre filtres et sans latence de bloc ajoutée. Les deux préparations HOA fournissent les énergies de référence/décodage en champ diffus et un gain commun de compensation. Les moindres carrés causaux conservent leur faible latence ; le MagLS spectral conserve sa demi-FFT de retard déclarée.
+
+- 0.4.2 : API HRTF neuronale native expérimentale : modèle partagé immuable, banques bornées en mémoire, prédiction SIMD, ITD compensé, cascades binaurales en double précision et fondus complets. Outils optionnels d’entraînement/export/validation à 48/96 kHz ; poids expérimentaux séparés.
+
+- 0.4.1 : Sélection SOFA SADIE II originale optionnelle : KU100, KEMAR et un auditeur humain à 48 kHz, 81,38 Mo de mesures. Données/notices Apache-2.0 distinctes du code MIT. Installation explicite, contrôles d’intégrité et téléchargement séparé d’un corpus 96 kHz ignoré pour l’entraînement ; aucun renderer neuronal distribué ni changement de l’API de rendu.
 
 - 0.4.0: Import SOFA optionnel depuis la mémoire, cache HRTF, égalisation en champ diffus, normalisation commune, index des directions voisines et profils de qualité HRTF explicites. Cœur MIT ; notices des lecteurs optionnels fournies.
 - 0.4.0: Conception HOA MagLS/pondérée originale, max-rE optionnel, génération de banques HRIR analytiques et grille procédurale de Fibonacci ; latence et diagnostics numériques explicites.
@@ -41,6 +49,6 @@ Les régressions ont été exécutées sous Windows x64 MSVC/clang-cl et Android
 CyDSP fournit le traitement audio numérique au moyen de son API C++ publique. Les performances dépendent du CPU, du backend, des dimensions des blocs et des réglages ; les gains mesurés ne s’appliquent pas à l’ensemble de la bibliothèque.
 
 
-Les jeux de données HRTF restent fournis par l’hôte. La diffraction utilise une approximation d’écran mince, l’annulation d’écho suppose un chemin linéaire et une référence alignée ; les formants, transitoires et analyses musicales demandent une évaluation selon les sources. Les [contrats avancés](docs/AdvancedExpansionGuide.fr.md) détaillent ces limites.
+Une sélection SADIE II optionnelle est fournie sous Apache-2.0, séparément du code MIT ; son installation est désactivée par défaut. Les autres jeux HRTF sont apportés par l’hôte. La diffraction utilise une approximation d’écran mince, l’annulation d’écho suppose un chemin linéaire et une référence alignée ; les formants, transitoires et analyses musicales demandent une évaluation selon les sources. Les [contrats avancés](docs/AdvancedExpansionGuide.fr.md) détaillent ces limites.
 
 Aucune liste de release détaillée bug par bug n’est publiée. Signaler les problèmes reproductibles dans le [suivi des problèmes](https://github.com/MrMybal/CyDSP/issues).

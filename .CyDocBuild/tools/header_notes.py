@@ -1,5 +1,6 @@
 """English/French explanations for every public header, owned by CyDSP."""
 HEADER_NOTES = {
+'NeuralHrtf': ('Experimental native directional HRTF field and prepared binaural renderer.', 'Champ directionnel HRTF neuronal natif expérimental et rendu binaural préparé.', 'neural-hrtf'),
 'CyDSP': ('All public DSP modules through one include.', 'Tous les modules DSP publics au moyen d’un seul include.', 'overview'),
 'Types': ('Sample types, processing dimensions, status values and arithmetic policies.', 'Types d’échantillons, dimensions de traitement, états et politiques de calcul.', 'contracts'),
 'Version': ('Compile-time version constants and macros for matching headers to the library.', 'Constantes et macros de version pour faire correspondre les en-têtes et la bibliothèque.', 'installation'),

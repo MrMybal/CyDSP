@@ -231,6 +231,7 @@ template <Sample T> struct HrtfSet<T>::State {
     std::size_t taps = 0, tail = 0, latency = 0;
     bool truncated = false;
     std::size_t neighbours = 0, fractionalTaps = 0;
+    VectorOps ops;
     struct Node {
         std::size_t point, left, right;
         unsigned axis;
@@ -287,6 +288,67 @@ template <Sample T> struct HrtfSet<T>::State {
         };
         visit(visit, root);
     }
+    template <class U>
+    void interpolate(Vec3 dir, std::span<U> left, std::span<U> right, std::array<double, 2>& delays,
+                     const VectorOps* selected = nullptr) const noexcept {
+        const auto& operations = selected ? *selected : ops;
+        std::array<std::size_t, 64> ids{};
+        std::array<double, 64> distances{};
+        const auto count = neighbours ? std::min(neighbours, points.size()) : points.size();
+        if (neighbours)
+            nearest(dir, {ids.data(), count}, {distances.data(), count});
+        const auto point = [&](std::size_t j) -> const Point& {
+            return points[neighbours ? ids[j] : j];
+        };
+        const auto distance = [&](std::size_t j) {
+            const double angle = std::acos(std::clamp(dot(dir, point(j).direction), -1., 1.));
+            return angle * angle;
+        };
+        std::size_t exact = count;
+        double closest = std::numeric_limits<double>::infinity();
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto d = distance(j);
+            if (d < 1e-14) {
+                exact = j;
+                break;
+            }
+            closest = std::min(closest, d);
+        }
+        if (exact < count) {
+            const auto& p = point(exact);
+            for (std::size_t t = 0; t < taps; ++t) {
+                left[t] = U(p.fir[t]);
+                right[t] = U(p.fir[taps + t]);
+            }
+            delays = p.delays;
+            return;
+        }
+        const auto weight = [&](std::size_t j) {
+            const double d = distance(j);
+            return std::exp(-(d - closest) / (width * width)) / d;
+        };
+        double sum = 0;
+        for (std::size_t j = 0; j < count; ++j)
+            sum += weight(j);
+        std::fill(left.begin(), left.end(), U{});
+        std::fill(right.begin(), right.end(), U{});
+        delays = {};
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto& p = point(j);
+            const double w = weight(j) / sum;
+            if constexpr (std::same_as<U, double>) {
+                (void)operations.addScaled(std::span<const double>(p.fir).first(taps), left, w);
+                (void)operations.addScaled(std::span<const double>(p.fir).subspan(taps), right, w);
+            } else {
+                for (std::size_t t = 0; t < taps; ++t) {
+                    left[t] = U(double(left[t]) + w * p.fir[t]);
+                    right[t] = U(double(right[t]) + w * p.fir[taps + t]);
+                }
+            }
+            for (unsigned e = 0; e < 2; ++e)
+                delays[e] += w * p.delays[e];
+        }
+    }
 };
 template <Sample T>
 Status HrtfSet<T>::prepare(std::span<const HrirPoint<T>> points,
@@ -312,6 +374,9 @@ Status HrtfSet<T>::prepare(std::span<const HrirPoint<T>> points,
         return Status::invalid_spec;
     try {
         auto s = std::make_shared<State>();
+        const auto vectorStatus = VectorOps::create(CpuBackend::automatic, s->ops);
+        if (vectorStatus != Status::ok)
+            return vectorStatus;
         s->rate = config.targetSampleRate;
         s->width = config.angularWidthRadians;
         s->neighbours = config.interpolationPoints;
@@ -426,6 +491,27 @@ template <Sample T> bool HrtfSet<T>::truncated() const noexcept {
     return state_ && state_->truncated;
 }
 
+template <Sample T>
+Status HrtfSet<T>::interpolate(Vec3 direction, std::span<T> left, std::span<T> right,
+                               std::array<double, 2>& delays) const noexcept {
+    if (!state_)
+        return Status::not_prepared;
+    if (!unit(direction, direction) || left.size() != taps() || right.size() != taps() ||
+        !left.data() || !right.data())
+        return Status::invalid_argument;
+    const auto begin = [](const void* p) { return reinterpret_cast<std::uintptr_t>(p); };
+    const auto overlaps = [&](const void* a, std::size_t na, const void* b, std::size_t nb) {
+        const auto x = begin(a), y = begin(b);
+        return x <= y ? y - x < na : x - y < nb;
+    };
+    if (overlaps(left.data(), left.size_bytes(), right.data(), right.size_bytes()) ||
+        overlaps(left.data(), left.size_bytes(), delays.data(), sizeof(delays)) ||
+        overlaps(right.data(), right.size_bytes(), delays.data(), sizeof(delays)))
+        return Status::invalid_argument;
+    state_->interpolate(direction, left, right, delays);
+    return Status::ok;
+}
+
 Status hrtfPreparation(HrtfQuality quality, double rate, HrtfPreparation& out) noexcept {
     if (unsigned(quality) > unsigned(HrtfQuality::reference) || !isFinite(rate) || rate < 8000 ||
         rate > 768000)
@@ -465,12 +551,75 @@ template <Sample T> HrtfStorageReport HrtfSet<T>::storageReport() const noexcept
 template <Sample T> struct HrirBinaural<T>::State {
     ProcessSpec spec;
     std::shared_ptr<const typename HrtfSet<T>::State> data;
-    std::vector<double> current, next, scratch, sourceFir, kernel, weights;
-    std::vector<std::size_t> neighbours;
+    std::vector<double> current, next, scratch, sourceFir, kernel;
     CircularHistory<T> history;
     VectorOps ops;
     std::array<double, 2> delay{}, nextDelay{};
     std::size_t taps = 0, tail = 0, remaining = 0, total = 0;
+    HrirRenderConfig config;
+    RealFft<double> fft;
+    std::size_t fftTile = 0, prefix = 0;
+    std::vector<double> fftTime, rendered;
+    std::vector<std::complex<double>> inputSpectrum, product, filters;
+    void finishTransition() noexcept {
+        std::copy(next.begin(), next.end(), current.begin());
+        delay = nextDelay;
+        if (fft.size())
+            std::copy_n(filters.begin() + 2 * fft.bins(), 2 * fft.bins(), filters.begin());
+    }
+    void updateSpectrum() noexcept {
+        if (!fft.size())
+            return;
+        for (unsigned ear = 0; ear < 2; ++ear) {
+            std::fill(fftTime.begin(), fftTime.end(), 0.);
+            const auto d = std::size_t(std::floor(nextDelay[ear]));
+            const auto f = nextDelay[ear] - double(d);
+            for (std::size_t j = 0; j < taps; ++j) {
+                const auto h = next[ear * taps + j];
+                fftTime[d + j] += h * (1 - f);
+                fftTime[d + j + 1] += h * f;
+            }
+            (void)fft.forward(fftTime,
+                              std::span(filters).subspan((2 + ear) * fft.bins(), fft.bins()));
+        }
+    }
+    void spectral(AudioBlock<const T> in, AudioBlock<T> out) noexcept {
+        const auto frames = in.frames(), bins = fft.bins();
+        (void)history.readWindow(0, 0, std::span(fftTime).first(prefix));
+        std::reverse(fftTime.begin(), fftTime.begin() + prefix);
+        for (std::size_t i = 0; i < frames; ++i)
+            fftTime[prefix + i] = double(in.channel(0)[i]);
+        std::fill(fftTime.begin() + prefix + frames, fftTime.end(), 0.);
+        (void)fft.forward(fftTime, inputSpectrum);
+        (void)history.push(in);
+        const auto branches = remaining ? 2u : 1u;
+        for (unsigned branch = 0; branch < branches; ++branch)
+            for (unsigned ear = 0; ear < 2; ++ear) {
+                std::fill(product.begin(), product.end(), std::complex<double>{});
+                (void)ops.complexMultiplyAccumulate(
+                    inputSpectrum,
+                    std::span<const std::complex<double>>(filters).subspan(
+                        (branch * 2 + ear) * bins, bins),
+                    product);
+                (void)fft.inverse(product, fftTime);
+                std::copy_n(fftTime.begin() + prefix, frames,
+                            rendered.begin() + (branch * 2 + ear) * fftTile);
+            }
+        for (std::size_t i = 0; i < frames; ++i) {
+            const double mix =
+                remaining ? std::min(1., double(total - remaining + i + 1) / double(total)) : 0;
+            for (unsigned ear = 0; ear < 2; ++ear) {
+                const double a = rendered[ear * fftTile + i];
+                out.channel(ear)[i] =
+                    T(branches == 2 ? a + (rendered[(2 + ear) * fftTile + i] - a) * mix : a);
+            }
+        }
+        if (remaining) {
+            remaining -= std::min(remaining, frames);
+            if (!remaining)
+                finishTransition();
+        }
+    }
     double convolve(std::size_t ear, bool target) noexcept {
         auto& fir = target ? next : current;
         const double age = (target ? nextDelay : delay)[ear];
@@ -507,6 +656,15 @@ Status HrirBinaural<T>::prepare(const ProcessSpec& spec, std::span<const HrirPoi
 template <Sample T>
 Status HrirBinaural<T>::prepare(const ProcessSpec& spec, const HrtfSet<T>& data,
                                 CpuBackend backend) noexcept {
+    return prepare(spec, data, HrirRenderConfig{}, backend);
+}
+template <Sample T>
+Status HrirBinaural<T>::prepare(const ProcessSpec& spec, const HrtfSet<T>& data,
+                                const HrirRenderConfig& config, CpuBackend backend) noexcept {
+    if (unsigned(config.convolution) > unsigned(HrirConvolution::fft) ||
+        !isPowerOfTwo(config.maximumFftSize) || config.maximumFftSize < 32 ||
+        config.maximumFftSize > 262144)
+        return Status::invalid_spec;
     if (!detail::validAnalysisSpec(spec) || spec.channels != 1 || !data.state_ ||
         data.sampleRate() != spec.sampleRate)
         return Status::invalid_spec;
@@ -516,11 +674,7 @@ Status HrirBinaural<T>::prepare(const ProcessSpec& spec, const HrtfSet<T>& data,
         s->data = data.state_;
         s->taps = s->data->taps + (s->data->fractionalTaps ? s->data->fractionalTaps - 1 : 0);
         s->tail = s->data->tail + (s->data->fractionalTaps ? s->data->fractionalTaps - 1 : 0);
-        const auto count = data.state_->neighbours
-                               ? std::min(data.state_->neighbours, data.state_->points.size())
-                               : data.state_->points.size();
-        s->weights.resize(count);
-        s->neighbours.resize(count);
+        s->config = config;
         s->sourceFir.resize(data.state_->taps * 2);
         s->kernel.resize(data.state_->fractionalTaps);
         s->current.resize(2 * s->taps);
@@ -532,6 +686,26 @@ Status HrirBinaural<T>::prepare(const ProcessSpec& spec, const HrtfSet<T>& data,
         status = s->history.prepare(1, s->tail + 2);
         if (status != Status::ok)
             return status;
+        if (config.convolution == HrirConvolution::fft ||
+            (config.convolution == HrirConvolution::automatic && s->taps >= 96 &&
+             spec.maxBlockFrames >= 32)) {
+            s->fftTile = std::min<std::size_t>(128, spec.maxBlockFrames);
+            s->prefix = s->tail;
+            std::size_t n = 32;
+            while (n < s->prefix + s->fftTile)
+                n *= 2;
+            if (n <= config.maximumFftSize) {
+                status = s->fft.prepare(n, backend);
+                if (status != Status::ok)
+                    return status;
+                s->fftTime.resize(n);
+                s->rendered.resize(4 * s->fftTile);
+                s->inputSpectrum.resize(s->fft.bins());
+                s->product.resize(s->fft.bins());
+                s->filters.resize(4 * s->fft.bins());
+            } else if (config.convolution == HrirConvolution::fft)
+                return Status::invalid_spec;
+        }
         HrirBinaural<T> prepared;
         prepared.state_ = std::move(s);
         status = prepared.setDirection(prepared.state_->data->points.front().direction, 0);
@@ -552,45 +726,8 @@ template <Sample T> Status HrirBinaural<T>::setDirection(Vec3 dir, std::size_t f
         return Status::invalid_argument;
     if (s.remaining)
         return Status::transition_in_progress;
-    const auto count = s.weights.size();
-    auto& weights = s.weights;
-    auto& ids = s.neighbours;
-    if (s.data->neighbours)
-        s.data->nearest(dir, ids, weights);
-    else
-        std::iota(ids.begin(), ids.end(), 0);
-    std::size_t exact = count;
-    double closest = std::numeric_limits<double>::infinity(), sum = 0;
-    for (std::size_t j = 0; j < count; ++j) {
-        const double angle =
-            std::acos(std::clamp(dot(dir, s.data->points[ids[j]].direction), -1., 1.));
-        if (angle < 1e-7) {
-            exact = j;
-            break;
-        }
-        weights[j] = angle * angle;
-        closest = std::min(closest, weights[j]);
-    }
-    if (exact == count)
-        for (auto& distance : weights) {
-            distance = std::exp(-(distance - closest) / (s.data->width * s.data->width)) / distance;
-            sum += distance;
-        }
-    std::fill(s.sourceFir.begin(), s.sourceFir.end(), 0.);
-    s.nextDelay = {};
-    if (exact < count) {
-        const auto& p = s.data->points[ids[exact]];
-        std::copy(p.fir.begin(), p.fir.end(), s.sourceFir.begin());
-        s.nextDelay = p.delays;
-    } else
-        for (std::size_t j = 0; j < count; ++j) {
-            const auto& p = s.data->points[ids[j]];
-            const double w = weights[j] / sum;
-            (void)s.ops.addScaled(std::span<const double>(p.fir), std::span<double>(s.sourceFir),
-                                  w);
-            for (unsigned e = 0; e < 2; ++e)
-                s.nextDelay[e] += w * p.delays[e];
-        }
+    s.data->interpolate(dir, std::span(s.sourceFir).first(s.data->taps),
+                        std::span(s.sourceFir).subspan(s.data->taps), s.nextDelay, &s.ops);
     if (s.kernel.empty())
         std::copy(s.sourceFir.begin(), s.sourceFir.end(), s.next.begin());
     else {
@@ -614,11 +751,10 @@ template <Sample T> Status HrirBinaural<T>::setDirection(Vec3 dir, std::size_t f
             s.nextDelay[ear] = integer;
         }
     }
+    s.updateSpectrum();
     s.remaining = s.total = fade;
-    if (!fade) {
-        std::copy(s.next.begin(), s.next.end(), s.current.begin());
-        s.delay = s.nextDelay;
-    }
+    if (!fade)
+        s.finishTransition();
     return Status::ok;
 }
 
@@ -630,6 +766,16 @@ Status HrirBinaural<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexc
     auto status = transformBlocks(s.spec, in, out, 1, 2);
     if (status != Status::ok)
         return status;
+    if (s.fft.size() &&
+        (s.config.convolution == HrirConvolution::fft ||
+         (s.taps >= 96 && in.frames() >= 32 && s.fft.size() <= 8 * (s.taps + s.fftTile)))) {
+        for (std::size_t offset = 0; offset < in.frames();) {
+            const auto n = std::min(s.fftTile, in.frames() - offset);
+            s.spectral(in.subBlock(offset, n), out.subBlock(offset, n));
+            offset += n;
+        }
+        return Status::ok;
+    }
     for (std::size_t i = 0; i < in.frames(); ++i) {
         const T x = in.channel(0)[i];
         (void)s.history.pushFrame({&x, 1});
@@ -638,10 +784,8 @@ Status HrirBinaural<T>::process(AudioBlock<const T> in, AudioBlock<T> out) noexc
             const double a = s.convolve(ear, false);
             out.channel(ear)[i] = T(s.remaining ? a + (s.convolve(ear, true) - a) * t : a);
         }
-        if (s.remaining && !--s.remaining) {
-            std::copy(s.next.begin(), s.next.end(), s.current.begin());
-            s.delay = s.nextDelay;
-        }
+        if (s.remaining && !--s.remaining)
+            s.finishTransition();
     }
     return Status::ok;
 }
@@ -649,12 +793,13 @@ template <Sample T> void HrirBinaural<T>::reset() noexcept {
     if (state_) {
         auto& s = *state_;
         s.history.reset();
-        if (s.remaining) {
-            std::copy(s.next.begin(), s.next.end(), s.current.begin());
-            s.delay = s.nextDelay;
-        }
+        if (s.remaining)
+            s.finishTransition();
         s.remaining = 0;
     }
+}
+template <Sample T> HrirRenderConfig HrirBinaural<T>::configuration() const noexcept {
+    return state_ ? state_->config : HrirRenderConfig{};
 }
 template <Sample T> std::size_t HrirBinaural<T>::latencyFrames() const noexcept {
     return state_ ? state_->data->latency + state_->kernel.size() / 2 : 0;
@@ -1027,6 +1172,64 @@ Status HoaBinaural<T>::prepare(const ProcessSpec& spec, unsigned order, const Hr
                 }
                 routes.push_back({ch, ear, ir});
             }
+        // Diffuse level: a unit plane wave drives all SH channels coherently.
+        // Include their covariance, rather than summing channel energies alone.
+        std::vector<double> gram(spec.channels * spec.channels), basis(spec.channels);
+        const double quadrature = 1. / double(directions.size());
+        std::vector<double> reference(s->tail);
+        for (const auto& point : data.state_->points) {
+            (void)ambisonicCoefficients(order, point.direction, basis);
+            for (std::size_t a = 0; a < spec.channels; ++a)
+                for (std::size_t b = 0; b < spec.channels; ++b)
+                    gram[a * spec.channels + b] += quadrature * basis[a] * basis[b];
+            for (unsigned ear = 0; ear < 2; ++ear) {
+                std::fill(reference.begin(), reference.end(), 0.);
+                const auto delay = std::size_t(point.delays[ear]);
+                const double fraction = point.delays[ear] - double(delay);
+                std::array<double, 129> kernel{};
+                const auto size = kernelTaps ? kernelTaps : 2;
+                double total = 1;
+                if (kernelTaps) {
+                    total = 0;
+                    for (std::size_t j = 0; j < size; ++j) {
+                        kernel[j] =
+                            fraction == 0
+                                ? (j == size / 2 ? 1. : 0.)
+                                : detail::windowedSinc(double(j) - double(size / 2) - fraction, 1.,
+                                                       double(size / 2));
+                        total += kernel[j];
+                    }
+                } else {
+                    kernel[0] = 1 - fraction;
+                    kernel[1] = fraction;
+                }
+                for (std::size_t t = 0; t < data.taps(); ++t)
+                    for (std::size_t j = 0; j < size; ++j)
+                        reference[delay + t + j] +=
+                            point.fir[ear * data.taps() + t] * kernel[j] / total;
+                for (double value : reference)
+                    s->report.diffuseReferenceEnergy[ear] += quadrature * value * value;
+            }
+        }
+        for (unsigned ear = 0; ear < 2; ++ear)
+            for (std::size_t a = 0; a < spec.channels; ++a)
+                for (std::size_t b = 0; b < spec.channels; ++b) {
+                    double product = 0;
+                    for (std::size_t t = 0; t < s->tail; ++t)
+                        product += double(irs[2 * a + ear][t]) * double(irs[2 * b + ear][t]);
+                    s->report.diffuseDecoderEnergy[ear] += gram[a * spec.channels + b] * product;
+                }
+        for (auto& power : s->report.diffuseDecoderEnergy)
+            power = std::max(0., power);
+        const double referencePower =
+            s->report.diffuseReferenceEnergy[0] + s->report.diffuseReferenceEnergy[1];
+        const double decoderPower =
+            s->report.diffuseDecoderEnergy[0] + s->report.diffuseDecoderEnergy[1];
+        if (isFinite(referencePower) && isFinite(decoderPower) && referencePower > 1e-30 &&
+            decoderPower > 1e-30) {
+            s->report.diffuseGain = std::sqrt(referencePower / decoderPower);
+            s->report.diffuseMetricsAvailable = true;
+        }
         status = s->convolution.prepare(spec, 2, routes, 128, 1024, backend);
         if (status != Status::ok)
             return status;

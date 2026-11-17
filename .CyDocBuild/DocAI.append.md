@@ -1,6 +1,6 @@
 ## CyDSP authoring and API rules
 
-The source project is CyDSP 0.4.0, a standalone C++20 numerical DSP library.
+The source project is CyDSP 0.4.4, a standalone C++20 numerical DSP library.
 CyAudioCore may be mentioned as a consumer; do not turn this manual into an engine
 migration guide. Work only in CyDSP and respect its AGENTS.md.
 

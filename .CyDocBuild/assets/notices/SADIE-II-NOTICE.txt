@@ -1,0 +1,23 @@
+SADIE II HRTF data
+Copyright 2018, University of York.
+Licensed under the Apache License, Version 2.0. See LICENSE.txt.
+
+Recorded and developed at The Audio Lab, Department of Electronic Engineering,
+University of York, UK, by Cal Armstrong, Lewis Thresh and Gavin Kearney.
+
+Source: SADIE II Database, version 2-2 (18 June 2024).
+https://doi.org/10.5281/zenodo.12092466
+https://www.york.ac.uk/sadie-project/database.html
+
+Reference the original dataset whenever these data are used in original or
+modified form. For academic use, cite:
+Armstrong, C.; Thresh, L.; Murphy, D.; Kearney, G.
+A Perceptual Evaluation of Individual and Non-Individual HRTFs:
+A Case Study of the SADIE II Database.
+Applied Sciences 2018, 8(11), 2029. https://doi.org/10.3390/app8112029
+
+CyDSP selection: D1 (KU100), D2 (KEMAR), H10 (human), 48 kHz, 256 taps.
+The SOFA files are unmodified byte-for-byte copies of the selected original
+archive members. Other sample rates, room responses, headphone responses and
+anatomical scans are not part of this selection.
+This notice documents attribution and provenance; it adds no license restriction.

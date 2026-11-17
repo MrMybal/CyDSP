@@ -15,7 +15,7 @@ def main():
     pages={(p['locale'],p['id']):p for p in data['pages']}
     en={p['id'] for p in data['pages'] if p['locale']=='en'}
     fr={p['id'] for p in data['pages'] if p['locale']=='fr'}
-    assert en==fr and len(en)==142,(len(en),len(fr))
+    assert en==fr and len(en)==144,(len(en),len(fr))
     links=0;headings=0
     for id in en:
         a=pages['en',id];b=pages['fr',id]
@@ -41,7 +41,7 @@ def main():
                 elif target.startswith('assets/'):
                     assert (OUT/'DocData'/target).is_file(),target
     catalog=json.loads((WORK/'api/catalog.json').read_text())
-    headers=list((ROOT/'include/cydsp').rglob('*.h'));assert len(headers)==len(catalog['headers'])==89
+    headers=list((ROOT/'include/cydsp').rglob('*.h'));assert len(headers)==len(catalog['headers'])==90
     def count(items):return sum(1+count(i.get('members',[])) for i in items)
     declarations=sum(count(h['symbols']) for h in catalog['headers'])
     for h in catalog['headers']:

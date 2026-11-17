@@ -9,7 +9,7 @@
     <td width="400" align="center" valign="middle"><strong>CyDSP</strong><br><sub>C++20 DSP · x64 / ARM64</sub></td>
     <td width="300" align="right" valign="top">
       <p><sub>Library license</sub><br><a href="LICENSE"><strong>MIT</strong></a></p>
-      <p><sub>Version</sub><br><a href="VERSION.md"><strong>0.4.0</strong></a><br><strong>IN DEVELOPMENT</strong></p>
+      <p><sub>Version</sub><br><a href="VERSION.md"><strong>0.4.4</strong></a><br><strong>IN DEVELOPMENT</strong></p>
     </td>
   </tr>
 </table>
@@ -18,7 +18,7 @@
 
 **CyDSP is a C++20 library for audio digital signal processing.** It provides reusable algorithms for effects, equalizers, synthesizers, audio analysis and 3D sound, with a common float/double API and SIMD implementations for x64 and ARM64.
 
-> **IN DEVELOPMENT · 0.4.0**
+> **IN DEVELOPMENT · 0.4.4**
 >
 > The source repository is available on GitHub. Build the library from a local checkout; read the [version notes and platform limitations](VERSION.md).
 
@@ -49,7 +49,7 @@ Combine processors directly or build multibus DSP graphs with explicit sidechain
 | **Audio and musical analysis** | Peak/RMS/DC, stereo correlation, crest factor, true peak, LUFS/LRA, spectrum/features, Mel/log bands, constant-Q, YIN fundamental/confidence, onsets, tempo/beats, chroma, MFCC and key estimates. |
 | **Restoration and diagnostics** | Spectral denoising, hum/click treatment and persistent-resonance attenuation; frequency/phase/group-delay responses, transfer/coherence, THD/THD+N, measurement signals and sweep deconvolution. |
 | **Acoustic echo cancellation** | Mono far-end reference, independent microphone NLMS paths, linked double-talk gating, adaptation controls and diagnostic metrics. |
-| **3D and spatial audio** | Distance/directivity, atmosphere/media, Doppler, acoustic paths, rooms/portals, analytic binaural, shared HRTF onset alignment/resampling/interpolation, VBAP, ACN/SN3D Ambisonics through order 7, binaural HOA with optional MagLS/max-rE, analytic HRIR generation/Fibonacci grids, optional SOFA import/cache, diffuse-field EQ, quality profiles and a thin-screen diffraction approximation. |
+| **3D and spatial audio** | Distance/directivity, atmosphere/media, Doppler, acoustic paths, rooms/portals, analytic binaural, shared HRTF onset alignment/resampling/interpolation, VBAP, ACN/SN3D Ambisonics through order 7, binaural HOA with optional MagLS/max-rE, analytic HRIR generation/Fibonacci grids, optional SOFA import/cache, diffuse-field EQ, quality profiles and a thin-screen diffraction approximation; experimental native neural HRTF prediction/rendering with separate model assets. |
 | **Realtime infrastructure** | Source batches with SIMD sine recurrences and shared assets, vector mixing, buffers/ramps, sample-accurate parameter events, multibus graphs, sidechain/PDC alignment, graph crossfades and common quality profiles. |
 
 ## Realtime processing and CPU architectures
@@ -64,7 +64,7 @@ Windows x64 and Android ARM64 have runtime coverage. Windows ARM64 has static co
 
 **CyAudioCore** uses CyDSP for its numerical audio processing. CyDSP is also usable directly by applications and plugins through its public C++ API.
 
-The [CyDoc manual](https://mrmybal.github.io/CyDSP/Documentation.html#/en/overview) documents processor contracts, supported configurations and latency, with a [public C++ API reference](https://mrmybal.github.io/CyDSP/Documentation.html#/en/api) and [spatial audio guides](https://mrmybal.github.io/CyDSP/Documentation.html#/en/spatial). HRTF datasets are supplied by the application; physical and musical models have the limits documented in those guides.
+The [CyDoc manual](https://mrmybal.github.io/CyDSP/Documentation.html#/en/overview) documents processor contracts, supported configurations and latency, with a [public C++ API reference](https://mrmybal.github.io/CyDSP/Documentation.html#/en/api) and [spatial audio guides](https://mrmybal.github.io/CyDSP/Documentation.html#/en/spatial). An optional 81.38 MB [SADIE II HRTF selection](data/hrtf/sadie-ii-v2-2/README.md) is included under Apache-2.0, separately from MIT code; applications may also supply their own measurements; physical and musical models have the limits documented in those guides.
 
 ---
 
@@ -75,7 +75,7 @@ Use CMake 3.24+ and a C++20 compiler to build static libraries for the target AB
 After installing the CMake package, link it from your application:
 
 ```cmake
-find_package(CyDSP 0.4.0 CONFIG REQUIRED)
+find_package(CyDSP 0.4.4 CONFIG REQUIRED)
 
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # Optional time/pitch processing:
@@ -83,6 +83,8 @@ target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 ```
 
 Optional SOFA: CYDSP_BUILD_SOFA builds CyDSP::Sofa; CYDSP_BUILD_HRTF_ASSETS builds cache/preparation alone. CYDSP_SOFA_COMPLETE adds an external HDF5/zlib SDK for full-precision editor imports. See the [SOFA guide](https://mrmybal.github.io/CyDSP/Documentation.html#/en/sofa).
+
+The optional measured bank contains three original 48 kHz profiles (KU100, KEMAR and H10), with a strict folder budget below 100 MB. Enable `CYDSP_INSTALL_HRTF_DATA=ON` to install the files separately from static libraries; `CyDSP_HRTF_DATA_DIR` identifies the installed folder. The host reads the selected file outside the audio callback. A larger training corpus can be fetched explicitly into ignored build storage; see the [bank guide](https://mrmybal.github.io/CyDSP/Documentation.html#/en/sofa/bundled).
 
 Public headers live under `cydsp/`; `cydsp/CyDSP.h` is the umbrella header. Start with the [processing example](examples/Processing.cpp), [granulation/analysis example](examples/GranulationAndAnalysis.cpp), [spatial/DAW example](examples/SpatialAndDaw.cpp) or [shared-HRTF/source-batch example](examples/AdvancedAudio.cpp).
 
@@ -117,6 +119,7 @@ CyDSP uses the [MIT license](LICENSE), copyright © 2026 MrMybal CyberAlien. Com
 | [signalsmith-stretch](https://github.com/Signalsmith-Audio/signalsmith-stretch) | [MIT](third_party/licenses/signalsmith-stretch.txt) | Time/pitch/formant algorithm adapted into the optional `CyDSP::Stretch` target; upstream files retained as provenance. |
 | [libmysofa reader](https://github.com/hoene/libmysofa) | [BSD-3-Clause](third_party/licenses/libmysofa.txt) | Optional compact SOFA importer only. |
 | [miniz](https://github.com/richgel999/miniz) | [MIT](third_party/licenses/miniz.txt) | Private inflate for the compact importer. |
+| [SADIE II HRTF selection](https://zenodo.org/records/12092466) | [Apache-2.0](third_party/licenses/SADIE-II-Apache-2.0.txt) + [notice](third_party/licenses/SADIE-II-NOTICE.txt) | Optional measured data only, outside the C++ archive. |
 | External HDF5 / zlib SDK | [BSD-3-Clause](third_party/licenses/HDF5.txt) / [Zlib](third_party/licenses/zlib.txt) | Optional complete editor importer; SDK not bundled. |
 
 ## References and links

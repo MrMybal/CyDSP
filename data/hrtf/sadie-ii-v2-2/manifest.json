@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "dataset": "SADIE II",
+  "version": "2-2",
+  "doi": "10.5281/zenodo.12092466",
+  "url": "https://zenodo.org/records/12092466",
+  "license": "Apache-2.0",
+  "copyright": "Copyright 2018, University of York",
+  "licenseFile": "LICENSE.txt",
+  "licenseSha256": "49bbe9114e49214df2ccc324cb3ac8d1d1aa1c3a0947f94c286765e86647b32e",
+  "noticeFile": "NOTICE.txt",
+  "noticeSha256": "90908774d2427a95e6b57fe882a76a887e06f5cc395627b4f0b661e9fef9ae16",
+  "maximumDistributionBytes": 100000000,
+  "signalBytes": 81375249,
+  "files": [
+    {
+      "subject": "D1",
+      "description": "KU100 mannequin",
+      "file": "D1_48K_24bit_256tap_FIR_SOFA.sofa",
+      "bytes": 36310650,
+      "sha256": "9af7cb19531e52fb7ae8ec92621e6ab62b1d5fe584b3742be36699a0ddb0ccd4",
+      "sampleRate": 48000,
+      "points": 8802,
+      "taps": 256,
+      "precisionBits": 64,
+      "sourceArchive": {
+        "url": "https://zenodo.org/records/12092466/files/D1_HRIR_SOFA.zip?download=1",
+        "bytes": 38151804,
+        "checksum": "md5:4850c1eb8e63e2d4f605edcdb4d5c883",
+        "sha256": "366321fa78f211bacc0ec6bea96701625b196a5db54ec16748b0eab0b9705f75",
+        "member": "D1_HRIR_SOFA/D1_48K_24bit_256tap_FIR_SOFA.sofa"
+      },
+      "modifications": "none; selected original 48 kHz file copied byte-for-byte"
+    },
+    {
+      "subject": "D2",
+      "description": "KEMAR mannequin",
+      "file": "D2_48K_24bit_256tap_FIR_SOFA.sofa",
+      "bytes": 36310650,
+      "sha256": "bb4f3d4126e686f438c4dcd8c11541e62393c0d90db1da6f17d1dd13d01c8ef7",
+      "sampleRate": 48000,
+      "points": 8802,
+      "taps": 256,
+      "precisionBits": 64,
+      "sourceArchive": {
+        "url": "https://zenodo.org/records/12092466/files/D2_HRIR_SOFA.zip?download=1",
+        "bytes": 38042020,
+        "checksum": "md5:f555491d1b6b1a108bb4d26b63ad84a4",
+        "sha256": "2561af2c09688c95f3909303cd2ac51cb8c15abb574903f17f635e1376cbce94",
+        "member": "D2_HRIR_SOFA/D2_48K_24bit_256tap_FIR_SOFA.sofa"
+      },
+      "modifications": "none; selected original 48 kHz file copied byte-for-byte"
+    },
+    {
+      "subject": "H10",
+      "description": "human listener",
+      "file": "H10_48K_24bit_256tap_FIR_SOFA.sofa",
+      "bytes": 8753949,
+      "sha256": "b48cf93b1b3919fa61a787242c75763fad2a4b0ee3464e53e165ba12a9720fde",
+      "sampleRate": 48000,
+      "points": 2114,
+      "taps": 256,
+      "precisionBits": 64,
+      "sourceArchive": {
+        "url": "https://zenodo.org/records/12092466/files/H10_HRIR_SOFA.zip?download=1",
+        "bytes": 9591308,
+        "checksum": "md5:501542240c1e2688a00a7f4267a11c5e",
+        "sha256": "9fa9b2043af37c97fa36907d8d4e96f52d527027a15a84320e03f7360a3de0a4",
+        "member": "H10_HRIR_SOFA/H10_48K_24bit_256tap_FIR_SOFA.sofa"
+      },
+      "modifications": "none; selected original 48 kHz file copied byte-for-byte"
+    }
+  ]
+}

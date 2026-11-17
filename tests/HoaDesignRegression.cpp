@@ -262,8 +262,80 @@ void taperAndRotation() {
                 taper.tailFrames() == previous,
             "quadrature size validation");
 }
+
+template <class T> void diffuseLevel() {
+    std::vector<Vec3> dirs(24);
+    ok(sphericalFibonacci(dirs), "diffuse oracle grid");
+    std::vector<T> amplitudes(48);
+    std::vector<HrirPoint<T>> points;
+    for (std::size_t i = 0; i < dirs.size(); ++i) {
+        amplitudes[2 * i] = T(1 + .2 * dirs[i].y + .4 * std::sin(7 * dirs[i].x));
+        amplitudes[2 * i + 1] = T(.8 - .15 * dirs[i].y + .3 * std::cos(5 * dirs[i].z));
+        points.push_back({dirs[i],
+                          {amplitudes.data() + 2 * i, 1},
+                          {amplitudes.data() + 2 * i + 1, 1},
+                          2.25,
+                          3.5});
+    }
+    for (std::size_t fractional : {0u, 17u}) {
+        HrtfPreparation prep;
+        prep.detectOnsets = false;
+        prep.fractionalDelayTaps = fractional;
+        HrtfSet<T> bank;
+        ok(bank.prepare(points, prep), "diffuse bank");
+        for (unsigned method = 0; method < 3; ++method) {
+            HoaBinaural<T> render;
+            HoaDecoderDesign design;
+            design.fftSize = 128;
+            if (!method)
+                ok(render.prepare({48000, 64, 4}, 1, bank), "causal diffuse preparation");
+            else {
+                design.method =
+                    method == 1 ? HoaDecoderMethod::leastSquares : HoaDecoderMethod::magLS;
+                ok(render.prepare({48000, 64, 4}, 1, bank, design), "spectral diffuse preparation");
+            }
+            const auto report = render.designReport();
+            require(report.diffuseMetricsAvailable && report.diffuseGain > 0,
+                    "diffuse measured metrics available");
+            std::array<double, 2> measured{};
+            for (auto direction : dirs) {
+                const auto h = impulse(render, 1, direction, 256);
+                for (unsigned ear = 0; ear < 2; ++ear)
+                    for (std::size_t t = 0; t < 256; ++t)
+                        measured[ear] += double(h[ear * 256 + t]) * double(h[ear * 256 + t]) /
+                                         double(dirs.size());
+            }
+            for (unsigned ear = 0; ear < 2; ++ear)
+                require(std::abs(measured[ear] - report.diffuseDecoderEnergy[ear]) <
+                            (std::same_as<T, float> ? 2e-6 : 2e-12),
+                        "diffuse covariance agrees with independently rendered plane waves");
+            if (!fractional) {
+                std::array<double, 2> reference{};
+                for (std::size_t i = 0; i < dirs.size(); ++i)
+                    for (unsigned ear = 0; ear < 2; ++ear) {
+                        const double amplitude = double(amplitudes[2 * i + ear]);
+                        const double factor =
+                            !method ? (ear ? .5 : .625) : (ear ? 1. - 1. / 128. : 1. - .5 / 128.);
+                        reference[ear] += amplitude * amplitude * factor / double(dirs.size());
+                    }
+                for (unsigned ear = 0; ear < 2; ++ear)
+                    require(std::abs(reference[ear] - report.diffuseReferenceEnergy[ear]) < 2e-12,
+                            "diffuse reference matches analytic delayed-impulse energy");
+            }
+            const double a = report.diffuseReferenceEnergy[0] + report.diffuseReferenceEnergy[1];
+            const double b = measured[0] + measured[1];
+            require(std::abs(b * report.diffuseGain * report.diffuseGain - a) < 3e-6,
+                    "common gain restores integrated diffuse energy");
+            if (!method)
+                require(render.latencyFrames() == fractional / 2,
+                        "causal HOA has no half-FFT delay");
+        }
+    }
+}
 } // namespace
 void hoaDesignRegression() {
+    diffuseLevel<float>();
+    diffuseLevel<double>();
     grid();
     analytic<float>();
     analytic<double>();

@@ -3,7 +3,7 @@ id: api-synthesis-sourcebatch
 title: SourceBatch
 description: Emplacements de sources fixes, banques de samples/tables partagées, voix sinus SIMD et gains multicanaux.
 section: Référence API
-order: 1187
+order: 1188
 sourceRevision: 1
 parent: api-synthesis
 symbol: cydsp::SourceBatch

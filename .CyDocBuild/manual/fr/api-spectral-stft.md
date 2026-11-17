@@ -3,7 +3,7 @@ id: api-spectral-stft
 title: Stft
 description: Analyse/synthèse causale par recouvrement-addition pondéré et callback spectral sans allocation.
 section: Référence API
-order: 1180
+order: 1181
 sourceRevision: 1
 parent: api-spectral
 symbol: cydsp::Stft

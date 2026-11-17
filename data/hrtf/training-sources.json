@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "dataset": "SADIE II",
+  "version": "2-2",
+  "license": "Apache-2.0",
+  "url": "https://zenodo.org/records/12092466",
+  "defaultSampleRate": 96000,
+  "subjects": [
+    {
+      "subject": "D1",
+      "url": "https://zenodo.org/records/12092466/files/D1_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 38151804,
+      "checksum": "md5:4850c1eb8e63e2d4f605edcdb4d5c883",
+      "suggestedSubjectSplit": "reference",
+      "members": {
+        "44100": "D1_HRIR_SOFA/D1_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "D1_HRIR_SOFA/D1_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "D1_HRIR_SOFA/D1_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "366321fa78f211bacc0ec6bea96701625b196a5db54ec16748b0eab0b9705f75"
+    },
+    {
+      "subject": "D2",
+      "url": "https://zenodo.org/records/12092466/files/D2_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 38042020,
+      "checksum": "md5:f555491d1b6b1a108bb4d26b63ad84a4",
+      "suggestedSubjectSplit": "reference",
+      "members": {
+        "44100": "D2_HRIR_SOFA/D2_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "D2_HRIR_SOFA/D2_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "D2_HRIR_SOFA/D2_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "2561af2c09688c95f3909303cd2ac51cb8c15abb574903f17f635e1376cbce94"
+    },
+    {
+      "subject": "H3",
+      "url": "https://zenodo.org/records/12092466/files/H3_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12425209,
+      "checksum": "md5:145826ddba3db973bec5340322b27909",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H3_HRIR_SOFA/H3_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H3_HRIR_SOFA/H3_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H3_HRIR_SOFA/H3_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "8f0b198245e872458313492879af77d0d3ef937eaedb141a9adbe1e69c26dbda"
+    },
+    {
+      "subject": "H4",
+      "url": "https://zenodo.org/records/12092466/files/H4_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12592220,
+      "checksum": "md5:1e44b127d40f2098263d5f0b76faf2c4",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H4_HRIR_SOFA/H4_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H4_HRIR_SOFA/H4_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H4_HRIR_SOFA/H4_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "05d5908b6f0a87c992bfe00b8a3f4712d04b7f1c36249cbee20dd6c34bf92006"
+    },
+    {
+      "subject": "H5",
+      "url": "https://zenodo.org/records/12092466/files/H5_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12479226,
+      "checksum": "md5:8ba6ef23bf97bec3d2eaedc5269572cd",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H5_HRIR_SOFA/H5_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H5_HRIR_SOFA/H5_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H5_HRIR_SOFA/H5_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "458eb4d0e3e8213115153ef31806e3e5f334b7659bb6d12e25fb86a83fd9fabf"
+    },
+    {
+      "subject": "H6",
+      "url": "https://zenodo.org/records/12092466/files/H6_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12418922,
+      "checksum": "md5:a74c25aea92193af5782925f7f15539b",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H6_HRIR_SOFA/H6_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H6_HRIR_SOFA/H6_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H6_HRIR_SOFA/H6_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "6ab1d990700e74f407412667886f515c193a167ca8b7841161d1488f0478035a"
+    },
+    {
+      "subject": "H7",
+      "url": "https://zenodo.org/records/12092466/files/H7_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12543188,
+      "checksum": "md5:0a14c7ced9335e4b279d721de2fb5f57",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H7_HRIR_SOFA/H7_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H7_HRIR_SOFA/H7_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H7_HRIR_SOFA/H7_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "05fc2548205bdf5894e0abcc50015f6e788bb112c9150984f95aa5708cd9e2ef"
+    },
+    {
+      "subject": "H8",
+      "url": "https://zenodo.org/records/12092466/files/H8_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12560113,
+      "checksum": "md5:1586ae2367eed58a2685c3deb112afff",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H8_HRIR_SOFA/H8_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H8_HRIR_SOFA/H8_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H8_HRIR_SOFA/H8_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "1a013368e5db6b9ee7837d8fa94c32f2970f133a45c14110b9ea11ec8f9abcfc"
+    },
+    {
+      "subject": "H9",
+      "url": "https://zenodo.org/records/12092466/files/H9_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 12486091,
+      "checksum": "md5:1a02cb35604b3f4f75f54ae15b875b75",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H9_HRIR_SOFA/H9_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H9_HRIR_SOFA/H9_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H9_HRIR_SOFA/H9_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "b4889c5a9bcd6b9304da8da429dd1bdb7213bb78349108b3e94168a1852fb5e4"
+    },
+    {
+      "subject": "H10",
+      "url": "https://zenodo.org/records/12092466/files/H10_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9591308,
+      "checksum": "md5:501542240c1e2688a00a7f4267a11c5e",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H10_HRIR_SOFA/H10_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H10_HRIR_SOFA/H10_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H10_HRIR_SOFA/H10_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "9fa9b2043af37c97fa36907d8d4e96f52d527027a15a84320e03f7360a3de0a4"
+    },
+    {
+      "subject": "H11",
+      "url": "https://zenodo.org/records/12092466/files/H11_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9353830,
+      "checksum": "md5:087a22222c645e10fda6b1b157ff28e7",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H11_HRIR_SOFA/H11_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H11_HRIR_SOFA/H11_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H11_HRIR_SOFA/H11_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "110b014606c2c694e2c7490070bf6ce888567a911fbb151d7865a1d7f609dffc"
+    },
+    {
+      "subject": "H12",
+      "url": "https://zenodo.org/records/12092466/files/H12_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9316089,
+      "checksum": "md5:004eb65eb2dd61c4536edbb9624ae752",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H12_HRIR_SOFA/H12_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H12_HRIR_SOFA/H12_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H12_HRIR_SOFA/H12_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "3c8d15bfee55f034d646f3361b7cc0c482f82f22e860d15b437509c26b5a117a"
+    },
+    {
+      "subject": "H13",
+      "url": "https://zenodo.org/records/12092466/files/H13_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9387637,
+      "checksum": "md5:f69a501d1d9d05c64cc403e9f37e7bb2",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H13_HRIR_SOFA/H13_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H13_HRIR_SOFA/H13_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H13_HRIR_SOFA/H13_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "da17e58786fdb23ba909c0fce3d07b206ad51a83dbe4370decd0ed9308c348d7"
+    },
+    {
+      "subject": "H14",
+      "url": "https://zenodo.org/records/12092466/files/H14_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9210220,
+      "checksum": "md5:37e2b6f6b6bb034d2b3e1b4b74528ffd",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H14_HRIR_SOFA/H14_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H14_HRIR_SOFA/H14_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H14_HRIR_SOFA/H14_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "a5f123e31ab2e42697b4a7e77c8ff9fc6f87e4c0c47ee0791af121f4bd72657a"
+    },
+    {
+      "subject": "H15",
+      "url": "https://zenodo.org/records/12092466/files/H15_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9287286,
+      "checksum": "md5:f908622a935fd8811094c8e72090f10a",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H15_HRIR_SOFA/H15_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H15_HRIR_SOFA/H15_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H15_HRIR_SOFA/H15_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "6e42fe947e6160b0c04e3382c21c294deacffe293f65fddcd0e7792de94dbfb2"
+    },
+    {
+      "subject": "H16",
+      "url": "https://zenodo.org/records/12092466/files/H16_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9651992,
+      "checksum": "md5:d0bfb8caf7c0b4b7b2c77ba93214408b",
+      "suggestedSubjectSplit": "train",
+      "members": {
+        "44100": "H16_HRIR_SOFA/H16_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H16_HRIR_SOFA/H16_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H16_HRIR_SOFA/H16_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "4687777d25dcc904dd286748c96ea220c6a5c3a48cc81125d42748b5bc33033b"
+    },
+    {
+      "subject": "H17",
+      "url": "https://zenodo.org/records/12092466/files/H17_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9482760,
+      "checksum": "md5:40c6a1185cd6af7055a9fbd8996081ab",
+      "suggestedSubjectSplit": "validation",
+      "members": {
+        "44100": "H17_HRIR_SOFA/H17_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H17_HRIR_SOFA/H17_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H17_HRIR_SOFA/H17_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "018e01ef8d11b59c56e0b0867131f1cc7b6c23cc950c51a65f091438f969da88"
+    },
+    {
+      "subject": "H18",
+      "url": "https://zenodo.org/records/12092466/files/H18_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9527287,
+      "checksum": "md5:207a630ff98bad827a85701c61731856",
+      "suggestedSubjectSplit": "validation",
+      "members": {
+        "44100": "H18_HRIR_SOFA/H18_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H18_HRIR_SOFA/H18_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H18_HRIR_SOFA/H18_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "7720ddfeecbbf00ea54b3e925aecb1577caee49bc22299aac79ed8ebc1f7b0c3"
+    },
+    {
+      "subject": "H19",
+      "url": "https://zenodo.org/records/12092466/files/H19_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9526072,
+      "checksum": "md5:49ebeb61f9cc8cfec30d87ef4880fd6f",
+      "suggestedSubjectSplit": "test",
+      "members": {
+        "44100": "H19_HRIR_SOFA/H19_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H19_HRIR_SOFA/H19_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H19_HRIR_SOFA/H19_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "8907977ae5dbac71bbf29cb2a2cbbb6bde3199780d23ec1614b3fe982e78039d"
+    },
+    {
+      "subject": "H20",
+      "url": "https://zenodo.org/records/12092466/files/H20_HRIR_SOFA.zip?download=1",
+      "archiveBytes": 9299084,
+      "checksum": "md5:d838ecc8a8c97b2ad0157a5ca55c0e73",
+      "suggestedSubjectSplit": "test",
+      "members": {
+        "44100": "H20_HRIR_SOFA/H20_44K_16bit_256tap_FIR_SOFA.sofa",
+        "48000": "H20_HRIR_SOFA/H20_48K_24bit_256tap_FIR_SOFA.sofa",
+        "96000": "H20_HRIR_SOFA/H20_96K_24bit_512tap_FIR_SOFA.sofa"
+      },
+      "archiveSha256": "b92225f994b1e6ab425c0a58e1e18ce7ebf22dcd8512d04448d2d4afd1c4ea3f"
+    }
+  ]
+}

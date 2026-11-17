@@ -3,7 +3,7 @@ id: api-synthesis-wavetable
 title: Wavetable
 description: Prepared harmonic-band tables and block-selected antialiasing oscillator banks.
 section: API reference
-order: 1188
+order: 1189
 revision: 1
 parent: api-synthesis
 symbol: cydsp::Wavetable

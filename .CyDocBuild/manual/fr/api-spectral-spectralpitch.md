@@ -3,7 +3,7 @@ id: api-spectral-spectralpitch
 title: SpectralPitch
 description: Transposition par vocodeur de phase avec phases liées entre canaux, compensation de formants et protection des transitoires.
 section: Référence API
-order: 1179
+order: 1180
 sourceRevision: 1
 parent: api-spectral
 symbol: cydsp::SpectralPitchParameters

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "libraryVersion": "0.4.0",
+  "libraryVersion": "0.4.4",
   "headers": [
     {
       "header": "cydsp/analysis/ConstantQAnalyzer.h",
@@ -4248,7 +4248,7 @@
     },
     {
       "header": "cydsp/core/Version.h",
-      "sha256": "5800eb724526ed89ef0d8311d569c0960e7ae1b864e00364c5ad3a526810cdf2",
+      "sha256": "82a089b0fe282917282d73010065bf4c3893ff1470365e850496293652cd3b50",
       "symbols": [
         {
           "name": "cydsp::versionMajor",
@@ -4286,13 +4286,13 @@
         ],
         [
           "CYDSP_VERSION_PATCH",
-          "0"
+          "4"
         ]
       ]
     },
     {
       "header": "cydsp/CyDSP.h",
-      "sha256": "5081f2b738a2222ae5dcd5da5f4bdd3d94e23097aef4aada7d6c32b9c2857faa",
+      "sha256": "9e8409596e2a628dc4a36bc3d260e7be7e751c3639b2f73f0a080f1719a20768",
       "symbols": []
     },
     {
@@ -19262,6 +19262,567 @@
       ]
     },
     {
+      "header": "cydsp/spatial/NeuralHrtf.h",
+      "sha256": "a6f74c54245731f17a26c8409b28975a32633fa42eb6084fa48cb85112ed5115",
+      "symbols": [
+        {
+          "name": "cydsp::neuralHrtfMaxSections",
+          "kind": "VarDecl",
+          "line": 10,
+          "signature": "inline constexpr std::size_t neuralHrtfMaxSections = 32;",
+          "type": "std::size_t",
+          "default": "32"
+        },
+        {
+          "name": "cydsp::NeuralHrtfSection",
+          "kind": "CXXRecordDecl",
+          "line": 11,
+          "signature": "struct NeuralHrtfSection;",
+          "members": [
+            {
+              "name": "cydsp::NeuralHrtfSection::frequencyHz",
+              "kind": "FieldDecl",
+              "line": 12,
+              "signature": "double frequencyHz = 1000;",
+              "type": "double",
+              "default": "1000"
+            },
+            {
+              "name": "cydsp::NeuralHrtfSection::q",
+              "kind": "FieldDecl",
+              "line": 12,
+              "signature": "double q = 1;",
+              "type": "double",
+              "default": "1"
+            },
+            {
+              "name": "cydsp::NeuralHrtfSection::gainDb",
+              "kind": "FieldDecl",
+              "line": 12,
+              "signature": "double gainDb = 0;",
+              "type": "double",
+              "default": "0"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::NeuralHrtfParameters",
+          "kind": "CXXRecordDecl",
+          "line": 15,
+          "signature": "struct NeuralHrtfParameters;",
+          "members": [
+            {
+              "name": "cydsp::NeuralHrtfParameters::sections",
+              "kind": "FieldDecl",
+              "line": 16,
+              "signature": "std::array<std::array<NeuralHrtfSection, neuralHrtfMaxSections>, 2> sections = {};",
+              "type": "std::array<std::array<NeuralHrtfSection, neuralHrtfMaxSections>, 2>",
+              "default": "{}"
+            },
+            {
+              "name": "cydsp::NeuralHrtfParameters::levelDb",
+              "kind": "FieldDecl",
+              "line": 17,
+              "signature": "std::array<double, 2> levelDb = {};",
+              "type": "std::array<double, 2>",
+              "default": "{}"
+            },
+            {
+              "name": "cydsp::NeuralHrtfParameters::sectionCount",
+              "kind": "FieldDecl",
+              "line": 18,
+              "signature": "std::size_t sectionCount = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfParameters::sampleRate",
+              "kind": "FieldDecl",
+              "line": 19,
+              "signature": "double sampleRate = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfParameters::itdMicroseconds",
+              "kind": "FieldDecl",
+              "line": 19,
+              "signature": "double itdMicroseconds = 0;",
+              "type": "double",
+              "default": "0"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::NeuralHrtfInfo",
+          "kind": "CXXRecordDecl",
+          "line": 21,
+          "signature": "struct NeuralHrtfInfo;",
+          "members": [
+            {
+              "name": "cydsp::NeuralHrtfInfo::width",
+              "kind": "FieldDecl",
+              "line": 22,
+              "signature": "std::size_t width = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfInfo::featureBands",
+              "kind": "FieldDecl",
+              "line": 22,
+              "signature": "std::size_t featureBands = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfInfo::sectionsPerEar",
+              "kind": "FieldDecl",
+              "line": 22,
+              "signature": "std::size_t sectionsPerEar = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfInfo::parameters",
+              "kind": "FieldDecl",
+              "line": 22,
+              "signature": "std::size_t parameters = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfInfo::sampleRate",
+              "kind": "FieldDecl",
+              "line": 23,
+              "signature": "double sampleRate = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfInfo::magnitudeOffsetDb",
+              "kind": "FieldDecl",
+              "line": 23,
+              "signature": "double magnitudeOffsetDb = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfInfo::backend",
+              "kind": "FieldDecl",
+              "line": 24,
+              "signature": "CpuBackend backend = CpuBackend::scalar;",
+              "type": "CpuBackend",
+              "default": "CpuBackend::scalar"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::NeuralHrtfModel",
+          "kind": "CXXRecordDecl",
+          "line": 29,
+          "signature": "class NeuralHrtfModel;",
+          "members": [
+            {
+              "name": "cydsp::NeuralHrtfModel::load",
+              "kind": "CXXMethodDecl",
+              "line": 31,
+              "signature": "Status load(std::span<const std::byte>, CpuBackend = CpuBackend::automatic) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "std::span<const std::byte>",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "CpuBackend",
+                  "default": "CpuBackend::automatic"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralHrtfModel::info",
+              "kind": "CXXMethodDecl",
+              "line": 33,
+              "signature": "NeuralHrtfInfo info() const noexcept;",
+              "parameters": [],
+              "returnType": "NeuralHrtfInfo",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralHrtfModel::predict",
+              "kind": "CXXMethodDecl",
+              "line": 34,
+              "signature": "Status predict(Vec3 listenerDirection, NeuralHrtfParameters&) const noexcept;",
+              "parameters": [
+                {
+                  "name": "listenerDirection",
+                  "type": "Vec3",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "NeuralHrtfParameters &",
+                  "default": ""
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralHrtfModel::predict",
+              "kind": "CXXMethodDecl",
+              "line": 37,
+              "signature": "Status predict(std::span<const Vec3>, std::span<NeuralHrtfParameters>) const noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "std::span<const Vec3>",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "std::span<NeuralHrtfParameters>",
+                  "default": ""
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            }
+          ]
+        },
+        {
+          "name": "cydsp::NeuralHrtfDesign",
+          "kind": "CXXRecordDecl",
+          "line": 46,
+          "signature": "struct NeuralHrtfDesign;",
+          "members": [
+            {
+              "name": "cydsp::NeuralHrtfDesign::sections",
+              "kind": "FieldDecl",
+              "line": 47,
+              "signature": "std::array<std::array<BiquadCoefficients, neuralHrtfMaxSections>, 2> sections = {};",
+              "type": "std::array<std::array<BiquadCoefficients, neuralHrtfMaxSections>, 2>",
+              "default": "{}"
+            },
+            {
+              "name": "cydsp::NeuralHrtfDesign::gain",
+              "kind": "FieldDecl",
+              "line": 48,
+              "signature": "std::array<double, 2> gain = {1, 1};",
+              "type": "std::array<double, 2>",
+              "default": "{1, 1}"
+            },
+            {
+              "name": "cydsp::NeuralHrtfDesign::delayFrames",
+              "kind": "FieldDecl",
+              "line": 48,
+              "signature": "std::array<double, 2> delayFrames = {};",
+              "type": "std::array<double, 2>",
+              "default": "{}"
+            },
+            {
+              "name": "cydsp::NeuralHrtfDesign::sectionCount",
+              "kind": "FieldDecl",
+              "line": 49,
+              "signature": "std::size_t sectionCount = 0;",
+              "type": "std::size_t",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfDesign::sampleRate",
+              "kind": "FieldDecl",
+              "line": 50,
+              "signature": "double sampleRate = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfDesign::desiredItdMicroseconds",
+              "kind": "FieldDecl",
+              "line": 50,
+              "signature": "double desiredItdMicroseconds = 0;",
+              "type": "double",
+              "default": "0"
+            },
+            {
+              "name": "cydsp::NeuralHrtfDesign::intrinsicItdMicroseconds",
+              "kind": "FieldDecl",
+              "line": 50,
+              "signature": "double intrinsicItdMicroseconds = 0;",
+              "type": "double",
+              "default": "0"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::designNeuralHrtf",
+          "kind": "FunctionDecl",
+          "line": 54,
+          "signature": "Status designNeuralHrtf(const NeuralHrtfParameters&, NeuralHrtfDesign&) noexcept;",
+          "parameters": [
+            {
+              "name": "",
+              "type": "const NeuralHrtfParameters &",
+              "default": ""
+            },
+            {
+              "name": "",
+              "type": "NeuralHrtfDesign &",
+              "default": ""
+            }
+          ],
+          "returnType": "Status",
+          "deleted": false
+        },
+        {
+          "name": "cydsp::NeuralBinauralOptions",
+          "kind": "CXXRecordDecl",
+          "line": 55,
+          "signature": "struct NeuralBinauralOptions;",
+          "members": [
+            {
+              "name": "cydsp::NeuralBinauralOptions::maximumDelaySeconds",
+              "kind": "FieldDecl",
+              "line": 56,
+              "signature": "double maximumDelaySeconds = .005;",
+              "type": "double",
+              "default": ".005"
+            },
+            {
+              "name": "cydsp::NeuralBinauralOptions::transitionHistoryFrames",
+              "kind": "FieldDecl",
+              "line": 59,
+              "signature": "std::size_t transitionHistoryFrames = 512;",
+              "type": "std::size_t",
+              "default": "512"
+            }
+          ]
+        },
+        {
+          "name": "cydsp::NeuralBinaural",
+          "kind": "CXXRecordDecl",
+          "line": 66,
+          "signature": "template <Sample T> class NeuralBinaural;",
+          "members": [
+            {
+              "name": "cydsp::NeuralBinaural::NeuralBinaural<T>",
+              "kind": "CXXConstructorDecl",
+              "line": 68,
+              "signature": "NeuralBinaural();",
+              "parameters": [],
+              "returnType": "",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::~NeuralBinaural<T>",
+              "kind": "CXXDestructorDecl",
+              "line": 69,
+              "signature": "~NeuralBinaural();",
+              "parameters": [],
+              "returnType": "",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::NeuralBinaural<T>",
+              "kind": "CXXConstructorDecl",
+              "line": 70,
+              "signature": "NeuralBinaural(NeuralBinaural&&) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "NeuralBinaural<T> &&",
+                  "default": ""
+                }
+              ],
+              "returnType": "",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::operator=",
+              "kind": "CXXMethodDecl",
+              "line": 71,
+              "signature": "NeuralBinaural& operator=(NeuralBinaural&&) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "NeuralBinaural<T> &&",
+                  "default": ""
+                }
+              ],
+              "returnType": "NeuralBinaural<T> &",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::prepare",
+              "kind": "CXXMethodDecl",
+              "line": 72,
+              "signature": "Status prepare(const ProcessSpec& monoSpec, const NeuralHrtfModel&, const NeuralBinauralOptions& = {}) noexcept;",
+              "parameters": [
+                {
+                  "name": "monoSpec",
+                  "type": "const ProcessSpec &",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "const NeuralHrtfModel &",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "const NeuralBinauralOptions &",
+                  "default": "{}"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::setDesign",
+              "kind": "CXXMethodDecl",
+              "line": 78,
+              "signature": "Status setDesign(const NeuralHrtfDesign&, std::size_t transitionFrames = 256) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "const NeuralHrtfDesign &",
+                  "default": ""
+                },
+                {
+                  "name": "transitionFrames",
+                  "type": "std::size_t",
+                  "default": "256"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::setDirection",
+              "kind": "CXXMethodDecl",
+              "line": 80,
+              "signature": "Status setDirection(Vec3, std::size_t transitionFrames = 256) noexcept;",
+              "parameters": [
+                {
+                  "name": "",
+                  "type": "Vec3",
+                  "default": ""
+                },
+                {
+                  "name": "transitionFrames",
+                  "type": "std::size_t",
+                  "default": "256"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::process",
+              "kind": "CXXMethodDecl",
+              "line": 81,
+              "signature": "Status process(AudioBlock<const T> mono, AudioBlock<T> stereo) noexcept;",
+              "parameters": [
+                {
+                  "name": "mono",
+                  "type": "AudioBlock<const T>",
+                  "default": ""
+                },
+                {
+                  "name": "stereo",
+                  "type": "AudioBlock<T>",
+                  "default": ""
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::processBatch",
+              "kind": "CXXMethodDecl",
+              "line": 85,
+              "signature": "static Status processBatch(std::span<NeuralBinaural> voices, AudioBlock<const T> sources, AudioBlock<T> stereoPairs) noexcept;",
+              "parameters": [
+                {
+                  "name": "voices",
+                  "type": "std::span<NeuralBinaural<T>>",
+                  "default": ""
+                },
+                {
+                  "name": "sources",
+                  "type": "AudioBlock<const T>",
+                  "default": ""
+                },
+                {
+                  "name": "stereoPairs",
+                  "type": "AudioBlock<T>",
+                  "default": ""
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::setDesigns",
+              "kind": "CXXMethodDecl",
+              "line": 89,
+              "signature": "static Status setDesigns(std::span<NeuralBinaural> voices, std::span<const NeuralHrtfDesign> designs, std::size_t transitionFrames = 256) noexcept;",
+              "parameters": [
+                {
+                  "name": "voices",
+                  "type": "std::span<NeuralBinaural<T>>",
+                  "default": ""
+                },
+                {
+                  "name": "designs",
+                  "type": "std::span<const NeuralHrtfDesign>",
+                  "default": ""
+                },
+                {
+                  "name": "transitionFrames",
+                  "type": "std::size_t",
+                  "default": "256"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::reset",
+              "kind": "CXXMethodDecl",
+              "line": 92,
+              "signature": "void reset() noexcept;",
+              "parameters": [],
+              "returnType": "void",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::transitionRemainingFrames",
+              "kind": "CXXMethodDecl",
+              "line": 93,
+              "signature": "std::size_t transitionRemainingFrames() const noexcept;",
+              "parameters": [],
+              "returnType": "std::size_t",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::NeuralBinaural::latencyFrames",
+              "kind": "CXXMethodDecl",
+              "line": 94,
+              "signature": "std::size_t latencyFrames() const noexcept;",
+              "parameters": [],
+              "returnType": "std::size_t",
+              "deleted": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "header": "cydsp/spatial/Sofa.h",
       "sha256": "eb7fd17ec8293b491060e0d05a7e9e43fd57e6ad44e0bc06da322ec577dc7478",
       "symbols": [
@@ -21179,7 +21740,7 @@
     },
     {
       "header": "cydsp/spatial/SpatialRendering.h",
-      "sha256": "430421153657318df39f9e4996837905036fe80be63960e682e9ab3d5f6180a2",
+      "sha256": "5e4b0074091d537b33dd8e3002ee527788e1cc3d713f507a66e27d78f1ddeccb",
       "symbols": [
         {
           "name": "cydsp::BinauralEmitter",
@@ -21898,19 +22459,79 @@
               "parameters": [],
               "returnType": "HrtfStorageReport",
               "deleted": false
+            },
+            {
+              "name": "cydsp::HrtfSet::interpolate",
+              "kind": "CXXMethodDecl",
+              "line": 124,
+              "signature": "Status interpolate(Vec3 direction, std::span<T> left, std::span<T> right, std::array<double, 2>& delays) const noexcept;",
+              "parameters": [
+                {
+                  "name": "direction",
+                  "type": "Vec3",
+                  "default": ""
+                },
+                {
+                  "name": "left",
+                  "type": "std::span<T>",
+                  "default": ""
+                },
+                {
+                  "name": "right",
+                  "type": "std::span<T>",
+                  "default": ""
+                },
+                {
+                  "name": "delays",
+                  "type": "std::array<double, 2> &",
+                  "default": ""
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            }
+          ]
+        },
+        {
+          "name": "cydsp::HrirConvolution",
+          "kind": "EnumDecl",
+          "line": 133,
+          "signature": "enum class HrirConvolution { automatic, direct, fft };"
+        },
+        {
+          "name": "cydsp::HrirRenderConfig",
+          "kind": "CXXRecordDecl",
+          "line": 134,
+          "signature": "struct HrirRenderConfig;",
+          "members": [
+            {
+              "name": "cydsp::HrirRenderConfig::convolution",
+              "kind": "FieldDecl",
+              "line": 135,
+              "signature": "HrirConvolution convolution = HrirConvolution::automatic;",
+              "type": "HrirConvolution",
+              "default": "HrirConvolution::automatic"
+            },
+            {
+              "name": "cydsp::HrirRenderConfig::maximumFftSize",
+              "kind": "FieldDecl",
+              "line": 138,
+              "signature": "std::size_t maximumFftSize = 32768;",
+              "type": "std::size_t",
+              "default": "32768"
             }
           ]
         },
         {
           "name": "cydsp::HrirBinaural",
           "kind": "CXXRecordDecl",
-          "line": 127,
+          "line": 140,
           "signature": "template <Sample T> class HrirBinaural;",
           "members": [
             {
               "name": "cydsp::HrirBinaural::HrirBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 129,
+              "line": 142,
               "signature": "HrirBinaural();",
               "parameters": [],
               "returnType": "",
@@ -21919,7 +22540,7 @@
             {
               "name": "cydsp::HrirBinaural::~HrirBinaural<T>",
               "kind": "CXXDestructorDecl",
-              "line": 130,
+              "line": 143,
               "signature": "~HrirBinaural();",
               "parameters": [],
               "returnType": "",
@@ -21928,7 +22549,7 @@
             {
               "name": "cydsp::HrirBinaural::HrirBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 131,
+              "line": 144,
               "signature": "HrirBinaural(HrirBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -21943,7 +22564,7 @@
             {
               "name": "cydsp::HrirBinaural::operator=",
               "kind": "CXXMethodDecl",
-              "line": 132,
+              "line": 145,
               "signature": "HrirBinaural& operator=(HrirBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -21958,7 +22579,7 @@
             {
               "name": "cydsp::HrirBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 133,
+              "line": 146,
               "signature": "Status prepare(const ProcessSpec& mono, std::span<const HrirPoint<T>>, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -21983,7 +22604,7 @@
             {
               "name": "cydsp::HrirBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 135,
+              "line": 148,
               "signature": "Status prepare(const ProcessSpec& mono, const HrtfSet<T>&, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -22006,9 +22627,48 @@
               "deleted": false
             },
             {
+              "name": "cydsp::HrirBinaural::prepare",
+              "kind": "CXXMethodDecl",
+              "line": 150,
+              "signature": "Status prepare(const ProcessSpec& mono, const HrtfSet<T>&, const HrirRenderConfig&, CpuBackend = CpuBackend::automatic) noexcept;",
+              "parameters": [
+                {
+                  "name": "mono",
+                  "type": "const ProcessSpec &",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "const HrtfSet<T> &",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "const HrirRenderConfig &",
+                  "default": ""
+                },
+                {
+                  "name": "",
+                  "type": "CpuBackend",
+                  "default": "CpuBackend::automatic"
+                }
+              ],
+              "returnType": "Status",
+              "deleted": false
+            },
+            {
+              "name": "cydsp::HrirBinaural::configuration",
+              "kind": "CXXMethodDecl",
+              "line": 153,
+              "signature": "HrirRenderConfig configuration() const noexcept;",
+              "parameters": [],
+              "returnType": "HrirRenderConfig",
+              "deleted": false
+            },
+            {
               "name": "cydsp::HrirBinaural::setDirection",
               "kind": "CXXMethodDecl",
-              "line": 142,
+              "line": 159,
               "signature": "Status setDirection(Vec3, std::size_t transitionFrames = 256) noexcept;",
               "parameters": [
                 {
@@ -22028,7 +22688,7 @@
             {
               "name": "cydsp::HrirBinaural::process",
               "kind": "CXXMethodDecl",
-              "line": 143,
+              "line": 160,
               "signature": "Status process(AudioBlock<const T>, AudioBlock<T> stereo) noexcept;",
               "parameters": [
                 {
@@ -22048,7 +22708,7 @@
             {
               "name": "cydsp::HrirBinaural::reset",
               "kind": "CXXMethodDecl",
-              "line": 144,
+              "line": 161,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",
@@ -22057,7 +22717,7 @@
             {
               "name": "cydsp::HrirBinaural::tailFrames",
               "kind": "CXXMethodDecl",
-              "line": 145,
+              "line": 162,
               "signature": "std::size_t tailFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -22066,7 +22726,7 @@
             {
               "name": "cydsp::HrirBinaural::latencyFrames",
               "kind": "CXXMethodDecl",
-              "line": 146,
+              "line": 163,
               "signature": "std::size_t latencyFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -22077,13 +22737,13 @@
         {
           "name": "cydsp::VbapLayout",
           "kind": "CXXRecordDecl",
-          "line": 155,
+          "line": 172,
           "signature": "class VbapLayout;",
           "members": [
             {
               "name": "cydsp::VbapLayout::VbapLayout",
               "kind": "CXXConstructorDecl",
-              "line": 157,
+              "line": 174,
               "signature": "VbapLayout();",
               "parameters": [],
               "returnType": "",
@@ -22092,7 +22752,7 @@
             {
               "name": "cydsp::VbapLayout::~VbapLayout",
               "kind": "CXXDestructorDecl",
-              "line": 158,
+              "line": 175,
               "signature": "~VbapLayout();",
               "parameters": [],
               "returnType": "",
@@ -22101,7 +22761,7 @@
             {
               "name": "cydsp::VbapLayout::VbapLayout",
               "kind": "CXXConstructorDecl",
-              "line": 159,
+              "line": 176,
               "signature": "VbapLayout(VbapLayout&&) noexcept;",
               "parameters": [
                 {
@@ -22116,7 +22776,7 @@
             {
               "name": "cydsp::VbapLayout::operator=",
               "kind": "CXXMethodDecl",
-              "line": 160,
+              "line": 177,
               "signature": "VbapLayout& operator=(VbapLayout&&) noexcept;",
               "parameters": [
                 {
@@ -22131,7 +22791,7 @@
             {
               "name": "cydsp::VbapLayout::prepare",
               "kind": "CXXMethodDecl",
-              "line": 161,
+              "line": 178,
               "signature": "Status prepare(std::span<const Vec3> speakers, bool threeDimensional, bool nearestFallback = false) noexcept;",
               "parameters": [
                 {
@@ -22156,7 +22816,7 @@
             {
               "name": "cydsp::VbapLayout::gains",
               "kind": "CXXMethodDecl",
-              "line": 163,
+              "line": 180,
               "signature": "Status gains(Vec3 direction, std::span<double>) const noexcept;",
               "parameters": [
                 {
@@ -22176,7 +22836,7 @@
             {
               "name": "cydsp::VbapLayout::speakers",
               "kind": "CXXMethodDecl",
-              "line": 164,
+              "line": 181,
               "signature": "std::size_t speakers() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -22187,7 +22847,7 @@
         {
           "name": "cydsp::ambisonicCoefficients",
           "kind": "FunctionDecl",
-          "line": 171,
+          "line": 188,
           "signature": "Status ambisonicCoefficients(unsigned order, Vec3 direction, std::span<double>) noexcept;",
           "parameters": [
             {
@@ -22212,7 +22872,7 @@
         {
           "name": "cydsp::ambisonicRotation",
           "kind": "FunctionDecl",
-          "line": 175,
+          "line": 192,
           "signature": "Status ambisonicRotation(unsigned order, Quaternion, std::span<double>) noexcept;",
           "parameters": [
             {
@@ -22237,13 +22897,13 @@
         {
           "name": "cydsp::AmbisonicRenderer",
           "kind": "CXXRecordDecl",
-          "line": 176,
+          "line": 193,
           "signature": "template <Sample T> class AmbisonicRenderer;",
           "members": [
             {
               "name": "cydsp::AmbisonicRenderer::AmbisonicRenderer<T>",
               "kind": "CXXConstructorDecl",
-              "line": 178,
+              "line": 195,
               "signature": "AmbisonicRenderer();",
               "parameters": [],
               "returnType": "",
@@ -22252,7 +22912,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::~AmbisonicRenderer<T>",
               "kind": "CXXDestructorDecl",
-              "line": 179,
+              "line": 196,
               "signature": "~AmbisonicRenderer();",
               "parameters": [],
               "returnType": "",
@@ -22261,7 +22921,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::AmbisonicRenderer<T>",
               "kind": "CXXConstructorDecl",
-              "line": 180,
+              "line": 197,
               "signature": "AmbisonicRenderer(AmbisonicRenderer&&) noexcept;",
               "parameters": [
                 {
@@ -22276,7 +22936,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::operator=",
               "kind": "CXXMethodDecl",
-              "line": 181,
+              "line": 198,
               "signature": "AmbisonicRenderer& operator=(AmbisonicRenderer&&) noexcept;",
               "parameters": [
                 {
@@ -22291,7 +22951,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::prepare",
               "kind": "CXXMethodDecl",
-              "line": 182,
+              "line": 199,
               "signature": "Status prepare(const ProcessSpec& mono, unsigned order, std::span<const Vec3> speakers, double regularization = 1e-6, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -22326,7 +22986,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::setDirection",
               "kind": "CXXMethodDecl",
-              "line": 185,
+              "line": 202,
               "signature": "Status setDirection(Vec3) noexcept;",
               "parameters": [
                 {
@@ -22341,7 +23001,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::setRotation",
               "kind": "CXXMethodDecl",
-              "line": 186,
+              "line": 203,
               "signature": "Status setRotation(Quaternion) noexcept;",
               "parameters": [
                 {
@@ -22356,7 +23016,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::encode",
               "kind": "CXXMethodDecl",
-              "line": 187,
+              "line": 204,
               "signature": "Status encode(AudioBlock<const T> mono, AudioBlock<T> ambisonic) noexcept;",
               "parameters": [
                 {
@@ -22376,7 +23036,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::rotateField",
               "kind": "CXXMethodDecl",
-              "line": 188,
+              "line": 205,
               "signature": "Status rotateField(AudioBlock<const T>, AudioBlock<T>) noexcept;",
               "parameters": [
                 {
@@ -22396,7 +23056,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::decode",
               "kind": "CXXMethodDecl",
-              "line": 189,
+              "line": 206,
               "signature": "Status decode(AudioBlock<const T>, AudioBlock<T> speakers) noexcept;",
               "parameters": [
                 {
@@ -22416,7 +23076,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::reset",
               "kind": "CXXMethodDecl",
-              "line": 190,
+              "line": 207,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",
@@ -22425,7 +23085,7 @@
             {
               "name": "cydsp::AmbisonicRenderer::channels",
               "kind": "CXXMethodDecl",
-              "line": 191,
+              "line": 208,
               "signature": "std::size_t channels() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -22436,19 +23096,19 @@
         {
           "name": "cydsp::HoaDecoderMethod",
           "kind": "EnumDecl",
-          "line": 197,
+          "line": 214,
           "signature": "enum class HoaDecoderMethod { leastSquares, magLS };"
         },
         {
           "name": "cydsp::HoaDecoderDesign",
           "kind": "CXXRecordDecl",
-          "line": 198,
+          "line": 215,
           "signature": "struct HoaDecoderDesign;",
           "members": [
             {
               "name": "cydsp::HoaDecoderDesign::method",
               "kind": "FieldDecl",
-              "line": 199,
+              "line": 216,
               "signature": "HoaDecoderMethod method = HoaDecoderMethod::magLS;",
               "type": "HoaDecoderMethod",
               "default": "HoaDecoderMethod::magLS"
@@ -22456,7 +23116,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::crossoverHz",
               "kind": "FieldDecl",
-              "line": 200,
+              "line": 217,
               "signature": "double crossoverHz = 2000;",
               "type": "double",
               "default": "2000"
@@ -22464,7 +23124,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::transitionHz",
               "kind": "FieldDecl",
-              "line": 200,
+              "line": 217,
               "signature": "double transitionHz = 500;",
               "type": "double",
               "default": "500"
@@ -22472,7 +23132,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::maxRe",
               "kind": "FieldDecl",
-              "line": 202,
+              "line": 219,
               "signature": "bool maxRe = false;",
               "type": "bool",
               "default": "false"
@@ -22480,7 +23140,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::regularization",
               "kind": "FieldDecl",
-              "line": 203,
+              "line": 220,
               "signature": "double regularization = 1e-6;",
               "type": "double",
               "default": "1e-6"
@@ -22488,7 +23148,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::iterations",
               "kind": "FieldDecl",
-              "line": 204,
+              "line": 221,
               "signature": "std::size_t iterations = 12;",
               "type": "std::size_t",
               "default": "12"
@@ -22496,7 +23156,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::fftSize",
               "kind": "FieldDecl",
-              "line": 204,
+              "line": 221,
               "signature": "std::size_t fftSize = 0;",
               "type": "std::size_t",
               "default": "0"
@@ -22504,7 +23164,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::maximumFftSize",
               "kind": "FieldDecl",
-              "line": 205,
+              "line": 222,
               "signature": "std::size_t maximumFftSize = 65536;",
               "type": "std::size_t",
               "default": "65536"
@@ -22512,7 +23172,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::maximumStorageBytes",
               "kind": "FieldDecl",
-              "line": 205,
+              "line": 222,
               "signature": "std::size_t maximumStorageBytes = 512u * 1024u * 1024u;",
               "type": "std::size_t",
               "default": "512u * 1024u * 1024u"
@@ -22520,7 +23180,7 @@
             {
               "name": "cydsp::HoaDecoderDesign::spatialWeights",
               "kind": "FieldDecl",
-              "line": 206,
+              "line": 223,
               "signature": "std::span<const double> spatialWeights;",
               "type": "std::span<const double>",
               "default": ""
@@ -22530,13 +23190,13 @@
         {
           "name": "cydsp::HoaDecoderReport",
           "kind": "CXXRecordDecl",
-          "line": 208,
+          "line": 225,
           "signature": "struct HoaDecoderReport;",
           "members": [
             {
               "name": "cydsp::HoaDecoderReport::method",
               "kind": "FieldDecl",
-              "line": 209,
+              "line": 226,
               "signature": "HoaDecoderMethod method = HoaDecoderMethod::leastSquares;",
               "type": "HoaDecoderMethod",
               "default": "HoaDecoderMethod::leastSquares"
@@ -22544,7 +23204,7 @@
             {
               "name": "cydsp::HoaDecoderReport::fftSize",
               "kind": "FieldDecl",
-              "line": 210,
+              "line": 227,
               "signature": "std::size_t fftSize = 0;",
               "type": "std::size_t",
               "default": "0"
@@ -22552,7 +23212,7 @@
             {
               "name": "cydsp::HoaDecoderReport::filterTaps",
               "kind": "FieldDecl",
-              "line": 210,
+              "line": 227,
               "signature": "std::size_t filterTaps = 0;",
               "type": "std::size_t",
               "default": "0"
@@ -22560,7 +23220,7 @@
             {
               "name": "cydsp::HoaDecoderReport::latencyFrames",
               "kind": "FieldDecl",
-              "line": 210,
+              "line": 227,
               "signature": "std::size_t latencyFrames = 0;",
               "type": "std::size_t",
               "default": "0"
@@ -22568,7 +23228,7 @@
             {
               "name": "cydsp::HoaDecoderReport::lowBandComplexError",
               "kind": "FieldDecl",
-              "line": 212,
+              "line": 229,
               "signature": "double lowBandComplexError = 0;",
               "type": "double",
               "default": "0"
@@ -22576,7 +23236,7 @@
             {
               "name": "cydsp::HoaDecoderReport::highBandMagnitudeError",
               "kind": "FieldDecl",
-              "line": 212,
+              "line": 229,
               "signature": "double highBandMagnitudeError = 0;",
               "type": "double",
               "default": "0"
@@ -22584,7 +23244,7 @@
             {
               "name": "cydsp::HoaDecoderReport::initialHighBandMagnitudeError",
               "kind": "FieldDecl",
-              "line": 213,
+              "line": 230,
               "signature": "double initialHighBandMagnitudeError = 0;",
               "type": "double",
               "default": "0"
@@ -22592,7 +23252,7 @@
             {
               "name": "cydsp::HoaDecoderReport::maxRe",
               "kind": "FieldDecl",
-              "line": 214,
+              "line": 231,
               "signature": "bool maxRe = false;",
               "type": "bool",
               "default": "false"
@@ -22600,8 +23260,40 @@
             {
               "name": "cydsp::HoaDecoderReport::spectralMetricsAvailable",
               "kind": "FieldDecl",
-              "line": 215,
+              "line": 232,
               "signature": "bool spectralMetricsAvailable = false;",
+              "type": "bool",
+              "default": "false"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::diffuseReferenceEnergy",
+              "kind": "FieldDecl",
+              "line": 236,
+              "signature": "std::array<double, 2> diffuseReferenceEnergy = {};",
+              "type": "std::array<double, 2>",
+              "default": "{}"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::diffuseDecoderEnergy",
+              "kind": "FieldDecl",
+              "line": 236,
+              "signature": "std::array<double, 2> diffuseDecoderEnergy = {};",
+              "type": "std::array<double, 2>",
+              "default": "{}"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::diffuseGain",
+              "kind": "FieldDecl",
+              "line": 237,
+              "signature": "double diffuseGain = 1;",
+              "type": "double",
+              "default": "1"
+            },
+            {
+              "name": "cydsp::HoaDecoderReport::diffuseMetricsAvailable",
+              "kind": "FieldDecl",
+              "line": 238,
+              "signature": "bool diffuseMetricsAvailable = false;",
               "type": "bool",
               "default": "false"
             }
@@ -22610,13 +23302,13 @@
         {
           "name": "cydsp::HoaBinaural",
           "kind": "CXXRecordDecl",
-          "line": 221,
+          "line": 244,
           "signature": "template <Sample T> class HoaBinaural;",
           "members": [
             {
               "name": "cydsp::HoaBinaural::HoaBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 223,
+              "line": 246,
               "signature": "HoaBinaural();",
               "parameters": [],
               "returnType": "",
@@ -22625,7 +23317,7 @@
             {
               "name": "cydsp::HoaBinaural::~HoaBinaural<T>",
               "kind": "CXXDestructorDecl",
-              "line": 224,
+              "line": 247,
               "signature": "~HoaBinaural();",
               "parameters": [],
               "returnType": "",
@@ -22634,7 +23326,7 @@
             {
               "name": "cydsp::HoaBinaural::HoaBinaural<T>",
               "kind": "CXXConstructorDecl",
-              "line": 225,
+              "line": 248,
               "signature": "HoaBinaural(HoaBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -22649,7 +23341,7 @@
             {
               "name": "cydsp::HoaBinaural::operator=",
               "kind": "CXXMethodDecl",
-              "line": 226,
+              "line": 249,
               "signature": "HoaBinaural& operator=(HoaBinaural&&) noexcept;",
               "parameters": [
                 {
@@ -22664,7 +23356,7 @@
             {
               "name": "cydsp::HoaBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 227,
+              "line": 250,
               "signature": "Status prepare(const ProcessSpec& ambisonic, unsigned order, const HrtfSet<T>&, double regularization = 1e-6, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -22699,7 +23391,7 @@
             {
               "name": "cydsp::HoaBinaural::prepare",
               "kind": "CXXMethodDecl",
-              "line": 232,
+              "line": 255,
               "signature": "Status prepare(const ProcessSpec& ambisonic, unsigned order, const HrtfSet<T>& data, const HoaDecoderDesign& design, CpuBackend backend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -22734,7 +23426,7 @@
             {
               "name": "cydsp::HoaBinaural::designReport",
               "kind": "CXXMethodDecl",
-              "line": 235,
+              "line": 258,
               "signature": "HoaDecoderReport designReport() const noexcept;",
               "parameters": [],
               "returnType": "HoaDecoderReport",
@@ -22743,7 +23435,7 @@
             {
               "name": "cydsp::HoaBinaural::setRotation",
               "kind": "CXXMethodDecl",
-              "line": 236,
+              "line": 259,
               "signature": "Status setRotation(Quaternion) noexcept;",
               "parameters": [
                 {
@@ -22758,7 +23450,7 @@
             {
               "name": "cydsp::HoaBinaural::process",
               "kind": "CXXMethodDecl",
-              "line": 237,
+              "line": 260,
               "signature": "Status process(AudioBlock<const T>, AudioBlock<T> stereo) noexcept;",
               "parameters": [
                 {
@@ -22778,7 +23470,7 @@
             {
               "name": "cydsp::HoaBinaural::reset",
               "kind": "CXXMethodDecl",
-              "line": 238,
+              "line": 261,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",
@@ -22787,7 +23479,7 @@
             {
               "name": "cydsp::HoaBinaural::tailFrames",
               "kind": "CXXMethodDecl",
-              "line": 239,
+              "line": 262,
               "signature": "std::size_t tailFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",
@@ -22796,7 +23488,7 @@
             {
               "name": "cydsp::HoaBinaural::latencyFrames",
               "kind": "CXXMethodDecl",
-              "line": 240,
+              "line": 263,
               "signature": "std::size_t latencyFrames() const noexcept;",
               "parameters": [],
               "returnType": "std::size_t",

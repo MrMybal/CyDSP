@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(CyDSP VERSION 0.4.0 LANGUAGES CXX)
+project(CyDSP VERSION 0.4.4 LANGUAGES CXX)
 if(CMAKE_GENERATOR_PLATFORM STREQUAL "ARM64EC" OR CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "ARM64EC")
     message(FATAL_ERROR "ARM64EC needs a separate CyDSP ABI/dispatch implementation")
 endif()
@@ -16,6 +16,7 @@ option(CYDSP_ENABLE_AVX512 "Build optional x64 AVX-512 kernels" ON)
 option(CYDSP_ENABLE_SVE "Build optional ARM64 Linux/Android scalable SVE kernels" ON)
 option(CYDSP_COMPILE_CHECKS "Compile regression sources without linking/running programs" OFF)
 add_library(CyDSP STATIC
+    src/spatial/NeuralHrtf.cpp
     src/synthesis/SourceBatch.cpp
     src/spatial/Diffraction.cpp
     src/analysis/ImpulseAnalysis.cpp
@@ -178,11 +179,12 @@ if(CYDSP_BUILD_STRETCH)
 endif()
 
 include(cmake/Sofa.cmake)
+include(cmake/HrtfData.cmake)
 
 install(TARGETS CyDSP EXPORT CyDSPTargets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT CyDSPTargets NAMESPACE CyDSP:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CyDSP)
-configure_package_config_file(cmake/CyDSPConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfig.cmake INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CyDSP)
+configure_package_config_file(cmake/CyDSPConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfig.cmake INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CyDSP PATH_VARS CMAKE_INSTALL_DATADIR)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfigVersion.cmake VERSION ${PROJECT_VERSION} COMPATIBILITY SameMinorVersion)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/CyDSPConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CyDSP)
 install(DIRECTORY third_party/licenses/ DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP/licenses)
@@ -190,6 +192,8 @@ install(FILES LICENSE third_party/manifest.json docs/Licensing.md DESTINATION ${
 # Ship the complete offline reader; documentation generation remains explicit.
 install(DIRECTORY Documentation/ DESTINATION ${CMAKE_INSTALL_DATADIR}/CyDSP/Documentation COMPONENT Documentation)
 set(cydsp_test_sources
+ tests/NeuralOptimizationRegression.cpp
+ tests/NeuralHrtfRegression.cpp
  tests/PreparedOptimizationRegression.cpp
  tests/AdvancedExpansionContracts.cpp
  tests/AdvancedExpansionRegression.cpp
@@ -274,7 +278,7 @@ foreach(t IN ITEMS cydsp_prepared_measurements cydsp_hotspot_measurements cydsp_
  endif()
 endforeach()
 if(CYDSP_SANITIZE_ADDRESS)
- foreach(t IN ITEMS CyDSP CyDSPStretch CyDSPHrtfAssets CyDSPSofa cydsp_sofa_tests cydsp_prepared_measurements cydsp_hotspot_measurements cydsp_tests cydsp_measurements cydsp_focused_measurements)
+ foreach(t IN ITEMS CyDSP CyDSPStretch CyDSPHrtfAssets CyDSPSofa cydsp_sofa_tests cydsp_hrtf_data_tests cydsp_prepared_measurements cydsp_hotspot_measurements cydsp_tests cydsp_measurements cydsp_focused_measurements)
   if(TARGET ${t})
    if(MSVC)
     target_compile_options(${t} PRIVATE /fsanitize=address /Zi)

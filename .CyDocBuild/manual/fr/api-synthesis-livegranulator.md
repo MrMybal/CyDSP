@@ -3,7 +3,7 @@ id: api-synthesis-livegranulator
 title: LiveGranulator
 description: Historique circulaire live préparé, freeze et grains avant/arrière routés indépendamment.
 section: Référence API
-order: 1184
+order: 1185
 sourceRevision: 1
 parent: api-synthesis
 symbol: cydsp::LiveGranulator

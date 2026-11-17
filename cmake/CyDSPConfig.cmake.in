@@ -1,4 +1,8 @@
 @PACKAGE_INIT@
+set(CyDSP_HRTF_DATA_DIR "")
+if(@CYDSP_INSTALL_HRTF_DATA@)
+    set(CyDSP_HRTF_DATA_DIR "@PACKAGE_CMAKE_INSTALL_DATADIR@/CyDSP/hrtf/sadie-ii-v2-2")
+endif()
 include(CMakeFindDependencyMacro)
 if(@CYDSP_PACKAGE_THREADS@)
     find_dependency(Threads)

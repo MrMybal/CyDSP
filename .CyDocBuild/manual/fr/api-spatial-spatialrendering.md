@@ -3,7 +3,7 @@ id: api-spatial-spatialrendering
 title: SpatialRendering
 description: Binaural analytique/mesuré, préparation HRTF partagée, VBAP et Ambisonics ACN/SN3D d’ordre 7.
 section: Référence API
-order: 1176
+order: 1177
 sourceRevision: 1
 parent: api-spatial
 symbol: cydsp::BinauralEmitter
@@ -425,6 +425,40 @@ Utiliser les entrées et le type retourné selon le contrat du module lié ; les
 
 Retour : `HrtfStorageReport` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
 
+### `HrtfSet::interpolate` {#symbol-hrtfset-interpolate}
+
+```cpp
+Status interpolate(Vec3 direction, std::span<T> left, std::span<T> right, std::array<double, 2>& delays) const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `direction` | `Vec3` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `left` | `std::span<T>` | — | Plage contiguë empruntée de type/constance indiqués ; conserver sa durée de vie. |
+| `right` | `std::span<T>` | — | Plage contiguë empruntée de type/constance indiqués ; conserver sa durée de vie. |
+| `delays` | `std::array<double, 2> &` | — | Référence mutable ; la déclaration et le guide précisent la propriété de sortie/état. |
+
+Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+## `HrirConvolution` {#symbol-hrirconvolution}
+
+```cpp
+enum class HrirConvolution { automatic, direct, fft };
+```
+
+## `HrirRenderConfig` {#symbol-hrirrenderconfig}
+
+```cpp
+struct HrirRenderConfig;
+```
+
+| Champ | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `convolution` | `HrirConvolution` | `HrirConvolution::automatic` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `maximumFftSize` | `std::size_t` | `32768` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+
 ## `HrirBinaural` {#symbol-hrirbinaural}
 
 ```cpp
@@ -504,6 +538,33 @@ Préparer hors callback audio ; vérifier Status avant d’utiliser la nouvelle 
 | `argument 3` | `CpuBackend` | `CpuBackend::automatic` | Choix de noyaux compilés disponibles pour CPU/OS ; sélection automatique à la préparation. |
 
 Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+### `HrirBinaural::prepare` {#symbol-hrirbinaural-prepare-3}
+
+```cpp
+Status prepare(const ProcessSpec& mono, const HrtfSet<T>&, const HrirRenderConfig&, CpuBackend = CpuBackend::automatic) noexcept;
+```
+
+Préparer hors callback audio ; vérifier Status avant d’utiliser la nouvelle configuration.
+
+| Paramètre | Type | Défaut | Sens |
+| --- | --- | --- | --- |
+| `mono` | `const ProcessSpec &` | — | Taux, bloc maximal et nombre de canaux préparés. |
+| `argument 2` | `const HrtfSet<T> &` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `argument 3` | `const HrirRenderConfig &` | — | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `argument 4` | `CpuBackend` | `CpuBackend::automatic` | Choix de noyaux compilés disponibles pour CPU/OS ; sélection automatique à la préparation. |
+
+Retour : `Status` — Vérifier Status ; ok indique le succès.
+
+### `HrirBinaural::configuration` {#symbol-hrirbinaural-configuration}
+
+```cpp
+HrirRenderConfig configuration() const noexcept;
+```
+
+Utiliser les entrées et le type retourné selon le contrat du module lié ; les getters ne synchronisent pas les accès.
+
+Retour : `HrirRenderConfig` — Valeur/vue retournée ; respecter la durée de vie empruntée et les unités indiquées par l’API.
 
 ### `HrirBinaural::setDirection` {#symbol-hrirbinaural-setdirection}
 
@@ -883,6 +944,10 @@ struct HoaDecoderReport;
 | `initialHighBandMagnitudeError` | `double` | `0` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
 | `maxRe` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
 | `spectralMetricsAvailable` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
+| `diffuseReferenceEnergy` | `std::array<double, 2>` | `{}` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `diffuseDecoderEnergy` | `std::array<double, 2>` | `{}` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `diffuseGain` | `double` | `1` | Valeur/configuration du type déclaré ; appliquer le contrat du module lié. |
+| `diffuseMetricsAvailable` | `bool` | `false` | Option ou prédicat vrai/faux explicite. |
 
 ## `HoaBinaural` {#symbol-hoabinaural}
 

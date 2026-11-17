@@ -605,3 +605,58 @@ real-spectrum bins with a vector kernel into a natural-order buffer and scales t
 result in one vector pass. The progressive convolution tiers use ranged versions
 of the split/merge kernels inside their existing bounded jobs; job counts and the
 per-frame work budget are unchanged.
+
+
+## Experimental neural HRTF runtime
+
+NeuralHrtfModel owns validated immutable shared weights, independent of Python,
+PyTorch, CUDA and ONNX. Loading transposes dense weights once; prediction reuses
+VectorOps SIMD addScaled kernels without allocation. The memory-only CYHRTF02
+format bounds sizes before allocation and preserves the previous model on failure.
+NeuralBinaural prepares two complete double-precision CyDSP biquad banks and
+bounded histories. Full branch output crossfades include gains and residual delays.
+A unity-magnitude Thiran all-pass preserves the learned magnitude; its phase is an
+approximation. Design subtracts intrinsic low-band cascade ITD before causal delays.
+Prediction/design can run on a worker, with host-owned publication of complete
+NeuralHrtfDesign values. Voice updates/process must be serialized. No model weights
+are linked into the archive or installed by default; optional training/export assets
+retain their own provenance and data notices. A model's exact rate is mandatory.
+
+
+The specialized renderer packs input once per <=128-frame tile and feeds existing
+CyDSP double biquad kernels directly, retaining ordered TDF-II recurrences.
+Stereo on a selected x64 AVX backend uses the SSE2 bank kernel; up to four voices
+(eight ear lanes) share wider kernels through processBatch. Mixed independent
+fade clocks and a final partial voice group are supported. The batch API validates
+all voices and sample ranges before mutation and emits separate L0,R0,... pairs;
+it does not perform mixing or launch threads.
+
+A bounded raw mono ring retains 512 frames per voice by default (0..65536 chosen
+at prepare). Fading targets replay this input with the new gain, coefficients,
+integer delay and all-pass state before crossfading. setDesigns groups that replay.
+Replay approximates an infinite IIR past and adds bounded CPU work at installation;
+0 keeps the legacy cold-start policy. It does not add audio buffering latency.
+The owner serializes installation and process; only immutable prediction/design
+can be moved to a separate worker without an ownership handoff. Weights are unchanged.
+
+## Measured HRIR engine and HOA level reports
+
+HrtfSet owns immutable aligned double FIRs, onset delays, the spatial index and
+selected interpolation kernels. Public interpolate writes caller-owned FIR/delay
+storage without allocation; independent queries can share the asset. Each renderer
+keeps its own input history, endpoint filters and transition state.
+
+HrirBinaural automatically chooses direct FIR or whole-FIR FFT overlap-save over
+tiles of up to 128 current input frames. The FFT input includes enough earlier
+samples for the complete delayed FIR. Current and destination spectra therefore
+read the same history without a cold-start/warmup replacement or added block
+latency. Plans/scratch are prepared once; setDirection updates spectra in place.
+Direct mode remains explicit. Large plans and short calls can retain direct work;
+whole-FIR FFT is not an unlimited partitioned engine for very long references.
+
+Both HoaBinaural preparation paths measure diffuse reference and decoder energy.
+The causal time-domain path includes SH covariance and its actual fractional-delay
+FIRs; the spectral path integrates weighted squared responses by Parseval including
+DC/Nyquist. The suggested common-ear gain is diagnostic and is not applied by
+process. The causal LS path supplies the low-latency alternative; spectral MagLS
+retains its explicit half-FFT delay and phase policy.

@@ -19,7 +19,7 @@ parent: overview
 | macOS / Linux desktop | Cibles de sources ; exécution à valider pour cette version. |
 | x86 / ARM32 | Chemins de compatibilité existants ; non réexécutés pour cet état. Les noyaux double ARM32 peuvent revenir au scalaire. |
 
-Les ABI ne sont pas interchangeables. La version 0.4.0 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
+Les ABI ne sont pas interchangeables. La version 0.4.4 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
 
 ## Capacités préparées {#capacities}
 
@@ -35,4 +35,4 @@ Les ABI ne sont pas interchangeables. La version 0.4.0 est en développement ; u
 
 ## Interpréter les modèles {#models}
 
-Aucun jeu HRTF n’est fourni ; sa provenance/licence et son adaptation à l’auditeur relèvent de l’application. Binaural analytique, diffraction sur écran mince, transferts de pièces, physique des contacts et estimations musicales sont des modèles réduits/heuristiques. True peak et sonie ne sont pas présentés comme des produits broadcast certifiés. L’annulation d’écho est linéaire et exige horloges/référence alignées. Choisissez les limites de chaque configuration et évaluez des contenus réalistes sans extrapoler depuis un signal synthétique unique.
+La [sélection SADIE II optionnelle](doc:sofa#bundled) possède sa propre licence de données Apache-2.0. L’adaptation à l’auditeur et les droits des autres banques relèvent de l’application. Binaural analytique, diffraction sur écran mince, transferts de pièces, physique des contacts et estimations musicales sont des modèles réduits/heuristiques. True peak et sonie ne sont pas présentés comme des produits broadcast certifiés. L’annulation d’écho est linéaire et exige horloges/référence alignées. Choisissez les limites de chaque configuration et évaluez des contenus réalistes sans extrapoler depuis un signal synthétique unique.

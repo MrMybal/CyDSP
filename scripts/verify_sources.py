@@ -53,6 +53,13 @@ for component in manifest['components']:
             require(copyright_line in source, 'Missing original attribution: ' + relative)
         require(component['noticePath'] in source, 'Missing notice reference: ' + relative)
 
+# Measured assets have their own license/provenance and a strict distribution budget.
+from verify_hrtf_data import verify as verify_hrtf_data
+try:
+    verify_hrtf_data(ROOT / 'data/hrtf/sadie-ii-v2-2')
+except (ValueError, KeyError, OSError) as error:
+    errors.append('Measured HRTF data: ' + str(error))
+
 # Original SOFA fixtures are source assets, with no imported measurement rights.
 fixtures=json.loads(project_file('tests/data/sofa/manifest.json').read_text(encoding='utf-8'))
 require(fixtures['license']=='MIT', 'Unexpected fixture license')

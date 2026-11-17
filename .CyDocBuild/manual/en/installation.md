@@ -31,7 +31,7 @@ Production builds create static libraries; native tests and measurements are opt
 Point `CMAKE_PREFIX_PATH` at the absolute install prefix. After defining the application's target:
 
 ```cmake
-find_package(CyDSP 0.4.0 CONFIG REQUIRED)
+find_package(CyDSP 0.4.4 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```

@@ -1,9 +1,17 @@
-# CyDSP 0.4.0
+# CyDSP 0.4.4
 
 
 **IN DEVELOPMENT.** Source distribution; no binary release is published.
 
 ## Changes
+
+- 0.4.4: Specialized double-precision neural cascades on existing CyDSP SIMD kernels; explicit four-voice batch rendering and grouped design updates. Fading targets replay 512 retained input frames by default (configurable 0–65536); unchanged model assets and static transfer. Rebuild the static library and consumers together.
+
+- 0.4.3: Allocation-free HRTF interpolation; direct/FFT/automatic HRIR rendering with shared input history, continuous FIR crossfades and no added block latency. Diffuse-field reference/decoder energy and a common level-compensation gain are reported by both HOA preparation paths. The causal least-squares path retains its low latency; spectral MagLS retains its declared half-FFT delay.
+
+- 0.4.2: Experimental native neural HRTF API: immutable shared model, memory-only bounded assets, SIMD prediction, compensated ITD, double-precision binaural cascades and full-output crossfades. Optional 48/96 kHz training/export/quality tools; weights are separate experimental assets.
+
+- 0.4.1: Optional original SADIE II SOFA selection: KU100, KEMAR and one human listener at 48 kHz, 81.38 MB of measurements. Apache-2.0 data/notices stay separate from MIT code. Explicit installation, integrity checks and a larger ignored 96 kHz training-corpus fetcher; no packaged neural renderer or rendering API change.
 
 - 0.4.0: Optional memory-only SOFA import, decoded HRTF cache, diffuse-field EQ, common level normalization, nearest-direction index and explicit HRTF quality profiles. Core MIT; optional reader notices accompany the library.
 - 0.4.0: Original MagLS/weighted HOA decoder design, optional max-rE, owned analytic HRIR generation and a procedural Fibonacci grid; explicit latency and numerical diagnostics.
@@ -41,6 +49,6 @@ Windows x64 MSVC/clang-cl and Android ARM64 on Quest 3 have executed regression 
 CyDSP provides numerical audio processing through its public C++ API. Performance depends on CPU, backend, block dimensions and algorithm settings; measured gains do not apply to the entire library.
 
 
-HRTF datasets are supplied by the host. Diffraction uses a thin-screen approximation, echo cancellation assumes a linear path and aligned reference, and formant/transient/music processing needs source-specific assessment. The [advanced contracts](docs/AdvancedExpansionGuide.fr.md) detail these limits.
+An optional SADIE II selection is supplied under Apache-2.0, separately from MIT code; installation defaults off. Other HRTF datasets are supplied by the host. Diffraction uses a thin-screen approximation, echo cancellation assumes a linear path and aligned reference, and formant/transient/music processing needs source-specific assessment. The [advanced contracts](docs/AdvancedExpansionGuide.fr.md) detail these limits.
 
 No separate bug-by-bug release list is published. Report reproducible issues through the [issue tracker](https://github.com/MrMybal/CyDSP/issues).

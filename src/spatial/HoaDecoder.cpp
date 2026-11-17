@@ -182,6 +182,7 @@ Status designHoaFilters(unsigned order, double rate, std::span<const HrirPoint<d
         std::vector<C> target(m), modified(m), ls(channels), current(channels), next(channels),
             previous(channels), older(channels), prediction(channels);
         double lowError = 0, lowEnergy = 0, highError = 0, initialHighError = 0, highEnergy = 0;
+        std::array<double, 2> referenceEnergy{}, decoderEnergy{};
         for (unsigned ear = 0; ear < 2; ++ear) {
             for (std::size_t i = 0; i < m; ++i) {
                 std::fill(time.begin(), time.end(), 0.);
@@ -285,6 +286,13 @@ Status designHoaFilters(unsigned order, double rate, std::span<const HrirPoint<d
                             highEnergy += weights[i] * std::norm(target[i]);
                         }
                     }
+                const double binWeight = (k == 0 || k + 1 == bins) ? 1. : 2.;
+                for (std::size_t i = 0; i < m; ++i) {
+                    const auto h = response({y.data() + i * channels, channels}, current);
+                    referenceEnergy[ear] +=
+                        binWeight * weights[i] * std::norm(target[i]) / double(n);
+                    decoderEnergy[ear] += binWeight * weights[i] * std::norm(h) / double(n);
+                }
                 for (std::size_t j = 0; j < channels; ++j)
                     coefficients[(ear * channels + j) * bins + k] = current[j];
             }
@@ -309,6 +317,14 @@ Status designHoaFilters(unsigned order, double rate, std::span<const HrirPoint<d
                   std::sqrt(initialHighError / std::max(1e-30, highEnergy)),
                   c.maxRe};
         report.spectralMetricsAvailable = true;
+        report.diffuseReferenceEnergy = referenceEnergy;
+        report.diffuseDecoderEnergy = decoderEnergy;
+        const double a = referenceEnergy[0] + referenceEnergy[1],
+                     b = decoderEnergy[0] + decoderEnergy[1];
+        if (isFinite(a) && isFinite(b) && a > 1e-30 && b > 1e-30) {
+            report.diffuseGain = std::sqrt(a / b);
+            report.diffuseMetricsAvailable = true;
+        }
         output = std::move(filters);
         return Status::ok;
     } catch (const Failure& f) {

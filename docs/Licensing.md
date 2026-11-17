@@ -64,8 +64,8 @@ correspond to reviewed HDF5 2.2.0/zlib 1.3.1; distributors must retain notices f
 their actual SDK build and enabled dependencies. No GPL/AGPL/LGPL component is added.
 
 These legal texts are installed under share/CyDSP/licenses and included in CyDoc.
-Measured HRTF banks have separate rights; none is shipped. Test fixtures are
-original synthetic CyDSP signals covered by the root MIT license.
+Measured HRTF banks have separate rights; the optional selection below is
+Apache-2.0. Synthetic test fixtures remain original CyDSP signals under MIT.
 
 ## Original HOA decoder and analytic HRIR additions
 
@@ -74,3 +74,23 @@ owning analytic HRIR helper are original CyDSP MIT code using its existing FFT,
 matrix convolution and analytic binaural processor. The DAGA 2018 publication is
 a mathematical reference. No IEM/SPARTA implementation, extra dependency or
 measured HRTF dataset is included.
+
+## Optional measured HRTF selection (0.4.1)
+
+data/hrtf/sadie-ii-v2-2 contains original SADIE II version 2-2 SOFA files:
+KU100/D1, KEMAR/D2 and human/H10, each at 48 kHz, 256 samples per ear.
+Signal files total 81,375,249 bytes. This separately licensed data does not
+change the MIT license of original CyDSP code and is not embedded in static
+archives. CYDSP_INSTALL_HRTF_DATA explicitly enables installation.
+
+Copyright 2018 University of York. The complete original Apache-2.0 grant is
+retained in the data folder's LICENSE.txt and third_party/licenses/SADIE-II-Apache-2.0.txt.
+NOTICE.txt and third_party/licenses/SADIE-II-NOTICE.txt preserve attribution,
+original DOI and the selected subjects. Keep these with redistributed data,
+retain applicable notices and identify later modifications. The SOFA files are
+unmodified byte-for-byte copies, with pinned archive/member provenance and SHA-256
+digests in manifest.json. Source: https://zenodo.org/records/12092466.
+
+The optional fetcher puts a larger original training corpus under ignored build/
+storage; it does not change the shipped selection or train a model. Dataset
+rights remain Apache-2.0. Other host-supplied datasets retain their own terms.

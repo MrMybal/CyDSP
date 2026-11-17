@@ -152,8 +152,134 @@ template <class T> void render() {
         &audit);
     require(audit.pass, "spatial rendering realtime");
 }
+
+template <class T> void interpolationAndFft() {
+    constexpr std::size_t taps = 256;
+    std::array<std::vector<T>, 4> fir;
+    for (std::size_t f = 0; f < fir.size(); ++f) {
+        fir[f].resize(taps);
+        for (std::size_t i = 0; i < taps; ++i)
+            fir[f][i] = T(.1 * std::cos(double(i * (f + 3))) * std::exp(-double(i) / 80));
+    }
+    const std::array<HrirPoint<T>, 2> points{
+        {{{1, 0, 0}, fir[0], fir[1], 2.25, 7.75}, {{0, 1, 0}, fir[2], fir[3], 11.5, 4.125}}};
+    for (auto backend : {CpuBackend::scalar, CpuBackend::automatic})
+        for (std::size_t neighbours : {0u, 1u, 2u})
+            for (std::size_t fractional : {0u, 17u}) {
+                HrtfPreparation preparation;
+                preparation.detectOnsets = false;
+                preparation.interpolationPoints = neighbours;
+                preparation.fractionalDelayTaps = fractional;
+                HrtfSet<T> bank;
+                ok(bank.prepare(points, preparation));
+                std::vector<T> left(taps), right(taps);
+                std::array<double, 2> delays{};
+                ok(bank.interpolate({1, 0, 0}, left, right, delays));
+                require(left == fir[0] && right == fir[1] && delays[0] == 2.25 && delays[1] == 7.75,
+                        "public exact HRTF FIR and delays");
+                ok(bank.interpolate({1, 1, 0}, left, right, delays));
+                if (neighbours != 1) {
+                    for (std::size_t t = 0; t < taps; ++t)
+                        require(std::abs(double(left[t]) - .5 * double(fir[0][t] + fir[2][t])) <
+                                    2e-8,
+                                "public symmetric interpolation");
+                    require(std::abs(delays[0] - 6.875) < 1e-12, "public weighted onset delay");
+                }
+                const auto saved = left;
+                const auto savedDelay = delays;
+                require(bank.interpolate({0, 0, 0}, left, right, delays) ==
+                                Status::invalid_argument &&
+                            left == saved && delays == savedDelay,
+                        "invalid interpolation transactional");
+                require(bank.interpolate({1, 0, 0}, left, left, delays) ==
+                                Status::invalid_argument &&
+                            left == saved,
+                        "interpolation overlap transactional");
+                HrirBinaural<T> direct, spectral, automatic;
+                HrirRenderConfig c;
+                c.convolution = HrirConvolution::direct;
+                ok(direct.prepare({48000, 257, 1}, bank, c, backend));
+                c.convolution = HrirConvolution::fft;
+                ok(spectral.prepare({48000, 257, 1}, bank, c, backend));
+                ok(automatic.prepare({48000, 257, 1}, bank, backend));
+                require(direct.latencyFrames() == spectral.latencyFrames() &&
+                            direct.tailFrames() == spectral.tailFrames(),
+                        "FFT adds no buffering latency/tail");
+                AudioBuffer<T> in, a, b, d;
+                ok(in.resize(1, 257));
+                ok(a.resize(2, 257));
+                ok(b.resize(2, 257));
+                ok(d.resize(2, 257));
+                const auto edit = [&](Vec3 direction, std::size_t fade) {
+                    ok(direct.setDirection(direction, fade));
+                    ok(spectral.setDirection(direction, fade));
+                    ok(automatic.setDirection(direction, fade));
+                };
+                edit({1, 0, 0}, 0);
+                std::size_t position = 0;
+                for (unsigned pass = 0; pass < 60; ++pass) {
+                    if (pass == 8)
+                        edit({1, 1, 0}, 71); // finishes inside a large block
+                    if (pass == 20)
+                        edit({0, 1, 0}, 513); // spans mixed FFT/direct call sizes
+                    if (pass == 45) {
+                        direct.reset();
+                        spectral.reset();
+                        automatic.reset();
+                    }
+                    const auto frames =
+                        std::array<std::size_t, 6>{128, 1, 257, 31, 64, 7}[pass % 6];
+                    for (std::size_t i = 0; i < frames; ++i)
+                        in.block().channel(0)[i] = T(.2 * std::sin(double(position++ * 7)));
+                    ok(direct.process(in.block(frames), a.block(frames)));
+                    ok(spectral.process(in.block(frames), b.block(frames)));
+                    ok(automatic.process(in.block(frames), d.block(frames)));
+                    for (unsigned ear = 0; ear < 2; ++ear)
+                        for (std::size_t i = 0; i < frames; ++i) {
+                            const double tolerance = std::same_as<T, float> ? 2e-7 : 2e-12;
+                            require(
+                                std::abs(double(a.block().channel(ear)[i]) -
+                                         double(b.block().channel(ear)[i])) < tolerance,
+                                "FFT HRIR equals full-history direct convolution during changes");
+                            require(std::abs(double(a.block().channel(ear)[i]) -
+                                             double(d.block().channel(ear)[i])) < tolerance,
+                                    "automatic mixed block partition equivalence");
+                        }
+                }
+                struct Audit {
+                    HrirBinaural<T>* p;
+                    HrtfSet<T>* bank;
+                    AudioBuffer<T>* in;
+                    AudioBuffer<T>* out;
+                    std::vector<T>* l;
+                    std::vector<T>* r;
+                    Status status;
+                } audit{&spectral, &bank, &in, &b, &left, &right, Status::ok};
+                runRealtimeAudit(
+                    [](void* ptr) noexcept {
+                        auto& a = *static_cast<Audit*>(ptr);
+                        std::array<double, 2> delays{};
+                        a.p->reset();
+                        a.status = a.bank->interpolate({1, 1, 0}, *a.l, *a.r, delays);
+                        if (a.status == Status::ok)
+                            a.status = a.p->setDirection({1, 0, 0}, 19);
+                        if (a.status == Status::ok)
+                            a.status = a.p->process(a.in->block(128), a.out->block(128));
+                        a.p->reset();
+                    },
+                    &audit);
+                ok(audit.status);
+                c.maximumFftSize = 32;
+                require(spectral.prepare({48000, 257, 1}, bank, c, backend) ==
+                                Status::invalid_spec &&
+                            spectral.tailFrames() == direct.tailFrames(),
+                        "bounded FFT preparation preserves plan");
+            }
+}
 } // namespace
 void spatialRenderingRegression() {
+    interpolationAndFft<float>();
+    interpolationAndFft<double>();
     transforms();
     render<float>();
     render<double>();

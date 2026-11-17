@@ -3,7 +3,7 @@ id: api-synthesis-wavetable
 title: Wavetable
 description: Tables préparées par bandes harmoniques et banques d’oscillateurs antirepliement sélectionnées par bloc.
 section: Référence API
-order: 1188
+order: 1189
 sourceRevision: 1
 parent: api-synthesis
 symbol: cydsp::Wavetable

@@ -19,7 +19,7 @@ parent: overview
 | macOS / desktop Linux | Source targets; execution remains to validate for this version. |
 | x86 / ARM32 | Compatibility paths exist; they were not rerun for this snapshot. ARM32 double kernels can fall back to scalar. |
 
-No ABI is interchangeable with another. Version 0.4.0 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
+No ABI is interchangeable with another. Version 0.4.4 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
 
 ## Prepared capacities {#capacities}
 
@@ -35,4 +35,4 @@ No ABI is interchangeable with another. Version 0.4.0 is in development; target 
 
 ## Interpret models correctly {#models}
 
-No HRTF dataset is supplied; its source/license and listener suitability are application concerns. Analytic binaural, thin-screen diffraction, room transfer, contact physics and musical estimates are reduced/heuristic models. True peak/loudness are not presented as certified broadcast products. Echo cancellation is linear and needs aligned clocks/reference. Choose limits from each header's configuration and assess realistic content rather than extrapolating from a single synthetic signal.
+The optional [SADIE II selection](doc:sofa#bundled) carries its own Apache-2.0 data license. Listener suitability and rights for other banks remain application concerns. Analytic binaural, thin-screen diffraction, room transfer, contact physics and musical estimates are reduced/heuristic models. True peak/loudness are not presented as certified broadcast products. Echo cancellation is linear and needs aligned clocks/reference. Choose limits from each header's configuration and assess realistic content rather than extrapolating from a single synthetic signal.

@@ -3,7 +3,7 @@ id: api-synthesis-contactexciter
 title: ContactExciter
 description: Force/velocity/impulse contact excitation for impacts, sliding, rolling and bowing.
 section: API reference
-order: 1182
+order: 1183
 revision: 1
 parent: api-synthesis
 symbol: cydsp::ContactExciter
