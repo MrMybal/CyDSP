@@ -223,6 +223,12 @@ Status ModulatedOscillator<T>::process(AudioBlock<const T> fm, AudioBlock<const 
         return Status::channel_mismatch;
     if (out.frames() > s.spec.maxBlockFrames)
         return Status::block_too_large;
+    // With no modulation input, the disjoint-block checks below never see the outputs.
+    if (!fm.channels() && !pm.channels()) {
+        const auto status = validateDisjointBlocks<T>({}, out);
+        if (status != Status::ok)
+            return status;
+    }
     for (auto block : {fm, pm})
         if (block.channels()) {
             auto spec = s.spec;

@@ -408,3 +408,27 @@ Sampler rejection is 10log10(linear-output power / filtered-mip-output power) fo
 
 Current second-extension evidence: [advanced validation](AdvancedExpansionValidation.fr.md).
 Earlier measurements above retain their original source hashes.
+
+## MusicalAnalyzer Mel and DCT preparation, 2026-11-18
+
+MusicalAnalyzer now stores the nonzero bins of each triangular Mel band and
+precomputes the DCT cosines in `prepare`. The comparison uses revision `68a423a`
+as the baseline. Both versions processed the same mono float signal at 48 kHz
+with a 2048-point FFT, 256-frame hop, 40 Mel bands and 13 MFCCs.
+
+| Target | Before (µs/hop) | After (µs/hop) | Time saved |
+| --- | ---: | ---: | ---: |
+| Windows x64, Ryzen 9 7900X, MSVC Release, strict FP | 63.882 | 36.950 | 42.2% |
+| Android ARM64, Quest 3, NEON, NDK 27.2 | 158.079 | 108.274 | 31.5% |
+
+Each run reports the median of seven series of 3000 calls. The table uses the
+median of four runs per version on Windows and three per version on Quest, with
+the versions interleaved. The MFCC fingerprint matched the baseline on each
+target. An additional Windows comparison covered float and double across scalar,
+SSE2, AVX2 and AVX-512. All 86,016 MFCC array entries from 2,688 analysis frames
+matched bit for bit, including a configuration with 22 empty Mel bands.
+
+The updated 64-grain benchmark keeps the forward and reverse voices inside
+the sample bank through warmup and timing. On Windows x64 its median for a
+128-frame stereo float block was 217.1 µs with AVX-512. Earlier figures used
+silent reverse voices and represent a lighter workload.

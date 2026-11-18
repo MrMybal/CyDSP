@@ -38,7 +38,8 @@ Status Panner<T>::prepare(const ProcessSpec& spec, CpuBackend backend) noexcept 
                            backend);
 }
 template <Sample T> Status Panner<T>::setPan(double pan, PanLaw law, std::size_t ramp) noexcept {
-    if (!isFinite(pan) || pan < -1 || pan > 1)
+    if (!isFinite(pan) || pan < -1 || pan > 1 ||
+        unsigned(law) > unsigned(PanLaw::squareRoot4_5dB))
         return Status::invalid_argument;
     if (!matrix_.inputChannels())
         return Status::not_prepared;
@@ -62,7 +63,6 @@ template <Sample T> struct DryWetMixer<T>::State {
     AudioBuffer<T> dry;
     std::vector<T> history;
     std::size_t ring = 0, position = 0, latency = 0, pending = 0;
-    bool hasDry = false;
     std::array<double, 2> gain{0.5, 0.5};
 };
 template <Sample T> DryWetMixer<T>::DryWetMixer() = default;
@@ -93,7 +93,8 @@ Status DryWetMixer<T>::prepare(const ProcessSpec& spec, std::size_t maximum) noe
     }
 }
 template <Sample T> Status DryWetMixer<T>::setMix(double wet, MixLaw law) noexcept {
-    if (!isFinite(wet) || wet < 0 || wet > 1)
+    if (!isFinite(wet) || wet < 0 || wet > 1 ||
+        unsigned(law) > unsigned(MixLaw::squareRoot4_5dB))
         return Status::invalid_argument;
     if (!state_)
         return Status::not_prepared;
@@ -112,20 +113,19 @@ template <Sample T> void DryWetMixer<T>::reset() noexcept {
     if (state_) {
         std::fill(state_->history.begin(), state_->history.end(), T{});
         state_->position = state_->pending = 0;
-        state_->hasDry = false;
     }
 }
 template <Sample T> Status DryWetMixer<T>::pushDrySamples(AudioBlock<const T> in) noexcept {
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
-    if (s.hasDry)
+    if (s.pending && in.frames())
         return Status::transition_in_progress;
     if (in.frames() > s.spec.maxBlockFrames)
         return Status::block_too_large;
     auto block = s.dry.block(in.frames());
     auto status = validateProcessBlocks(s.spec, in, block);
-    if (status != Status::ok)
+    if (status != Status::ok || !in.frames())
         return status;
     // A zero-capacity delay has no movable history. Avoid two integer modulo
     // operations per frame in the common zero-latency parallel-effects path.
@@ -133,11 +133,9 @@ template <Sample T> Status DryWetMixer<T>::pushDrySamples(AudioBlock<const T> in
         for (std::size_t ch = 0; ch < in.channels(); ++ch) {
             const auto source = in.channel(ch);
             std::copy(source.begin(), source.end(), block.channel(ch).begin());
-            if (!source.empty())
-                s.history[ch] = source.back();
+            s.history[ch] = source.back();
         }
         s.pending = in.frames();
-        s.hasDry = true;
         return Status::ok;
     }
     for (std::size_t i = 0; i < in.frames(); ++i) {
@@ -150,26 +148,23 @@ template <Sample T> Status DryWetMixer<T>::pushDrySamples(AudioBlock<const T> in
         s.position = (s.position + 1) % s.ring;
     }
     s.pending = in.frames();
-    s.hasDry = true;
     return Status::ok;
 }
 template <Sample T> Status DryWetMixer<T>::mixWetSamples(AudioBlock<T> wet) noexcept {
     if (!state_)
         return Status::not_prepared;
     auto& s = *state_;
-    if (!s.hasDry)
-        return Status::not_prepared;
-    if (wet.frames() != s.pending)
-        return Status::invalid_argument;
+    if (wet.frames() && wet.frames() != s.pending)
+        return s.pending ? Status::invalid_argument : Status::not_prepared;
     auto status = validateProcessBlocks<T>(s.spec, wet, wet);
-    if (status != Status::ok)
+    if (status != Status::ok || !wet.frames())
         return status;
     auto dry = s.dry.block(s.pending);
     for (std::size_t ch = 0; ch < wet.channels(); ++ch)
         for (std::size_t i = 0; i < wet.frames(); ++i)
             wet.channel(ch)[i] =
                 static_cast<T>(s.gain[0] * dry.channel(ch)[i] + s.gain[1] * wet.channel(ch)[i]);
-    s.hasDry = false;
+    s.pending = 0;
     return Status::ok;
 }
 template <Sample T> Status WaveShaper<T>::prepare(const ProcessSpec& spec) noexcept {

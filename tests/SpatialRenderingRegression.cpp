@@ -67,6 +67,23 @@ void transforms() {
             energy += g * g;
         require(std::abs(energy - 1) < 1e-12, "3D VBAP energy");
     }
+
+    const std::array<Vec3, 4> face{{{1, -1, -1}, {1, 1, -1}, {1, 1, 1}, {1, -1, 1}}};
+    const std::array<std::size_t, 4> perm{2, 0, 3, 1};
+    const std::array<Vec3, 4> reordered{face[perm[0]], face[perm[1]], face[perm[2]], face[perm[3]]};
+    VbapLayout other;
+    ok(layout.prepare(face, true));
+    ok(other.prepare(reordered, true));
+    std::array<double, 4> below{}, above{}, permuted{};
+    ok(layout.gains({1, -.5, -.500001}, below));
+    ok(layout.gains({1, -.5, -.499999}, above));
+    ok(other.gains({1, -.5, -.499999}, permuted));
+    for (std::size_t i = 0; i < face.size(); ++i) {
+        require(std::abs(below[i] - above[i]) < 3e-6, "VBAP discontinuity at face diagonal");
+        require(std::abs(permuted[i] - above[perm[i]]) < 1e-12, "VBAP face depends on ordering");
+        ok(layout.gains(face[i], gains));
+        require(std::abs(gains[i] - 1) < 1e-12, "VBAP face vertex lost");
+    }
 }
 template <class T> void render() {
     const ProcessSpec spec{48000, 64, 1};

@@ -13,6 +13,49 @@ void require(bool v, const char* m) {
 void ok(Status s) {
     require(s == Status::ok, "music physical status");
 }
+template <class T> void melCepstrum() {
+    constexpr std::size_t n = 256, bands = 80, coefficients = 32;
+    constexpr double rate = 48000;
+    MusicalAnalysisConfig config;
+    config.fftFrames = config.hopFrames = n;
+    config.melBands = bands;
+    config.mfccCount = coefficients;
+    config.minimumPitchHz = 400;
+    MusicalAnalyzer<T> analyzer;
+    ok(analyzer.prepare({rate, n, 1}, config));
+    // Opposite impulses half a window apart have zero mean. After Hann weighting,
+    // odd FFT bins have unit magnitude and even bins cancel.
+    std::array<T, n> signal{};
+    signal[n / 4] = 1;
+    signal[3 * n / 4] = -1;
+    const T* channels[]{signal.data()};
+    ok(analyzer.process({channels, 1, n}));
+
+    const double melMax = 2595 * std::log10(1 + rate * .5 / 700);
+    auto edge = [&](std::size_t i) {
+        return 700 * (std::pow(10., melMax * double(i) / double(bands + 1) / 2595) - 1);
+    };
+    std::array<double, bands> logs{};
+    for (std::size_t m = 0; m < bands; ++m) {
+        const double left = edge(m), centre = edge(m + 1), right = edge(m + 2);
+        double power = 0;
+        for (std::size_t k = 1; k <= n / 2; k += 2) {
+            const double hz = double(k) * rate / n;
+            if (hz > left && hz < right)
+                power += (hz < centre ? (hz - left) / (centre - left)
+                                      : (right - hz) / (right - centre)) / double(n * n);
+        }
+        logs[m] = std::log(std::max(1e-20, power));
+    }
+    const auto actual = analyzer.features();
+    for (std::size_t c = 0; c < coefficients; ++c) {
+        double expected = 0;
+        for (std::size_t m = 0; m < bands; ++m)
+            expected += logs[m] * std::cos(std::numbers::pi * double(c) * (double(m) + .5) / bands);
+        expected *= std::sqrt((c ? 2. : 1.) / bands);
+        require(std::abs(actual.mfcc[c] - expected) < 1e-10, "MFCC dense analytic spectrum");
+    }
+}
 template <class T> void test() {
     const ProcessSpec spec{8000, 128, 1};
     MusicalAnalysisConfig config;
@@ -149,6 +192,8 @@ template <class T> void test() {
 }
 } // namespace
 void musicalPhysicalRegression() {
+    melCepstrum<float>();
+    melCepstrum<double>();
     test<float>();
     test<double>();
 }

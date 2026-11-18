@@ -830,6 +830,31 @@ struct VbapLayout::State {
     std::vector<Vec3> speakers;
     std::vector<Basis> bases;
     bool three = false, fallback = false;
+
+    void addHullTriangle(std::span<const std::size_t> order, std::size_t i, std::size_t j,
+                         std::size_t k) {
+        const auto a = speakers[order[i]], b = speakers[order[j]], c = speakers[order[k]];
+        const double det = dot(a, cross(b, c));
+        if (std::abs(det) < 1e-9)
+            return;
+        const Vec3 normal = cross(b - a, c - a), inward = cross(normal, c - b);
+        const double faceTolerance = 1e-10 * length(normal), edgeTolerance = 1e-10 * length(inward);
+        for (std::size_t t = 0; t < order.size(); ++t) {
+            const auto point = speakers[order[t]];
+            const double offset = dot(normal, point - a);
+            if ((det > 0 ? offset : -offset) > faceTolerance)
+                return;
+            // The coplanar speakers form a convex polygon on the unit sphere.
+            // Fan from its first vertex, accepting BC only if it is a boundary
+            // edge (every face vertex lies on the same side of BC as A).
+            if (std::abs(offset) <= faceTolerance &&
+                (t < i || dot(inward, point - b) < -edgeTolerance))
+                return;
+        }
+        bases.push_back({{order[i], order[j], order[k]},
+                         {cross(b, c) * (1 / det), cross(c, a) * (1 / det),
+                          cross(a, b) * (1 / det)}});
+    }
 };
 VbapLayout::VbapLayout() = default;
 VbapLayout::~VbapLayout() = default;
@@ -869,27 +894,19 @@ Status VbapLayout::prepare(std::span<const Vec3> speakers, bool three, bool fall
                 s->bases.push_back(
                     {{a, b, 0}, {{{y.y / det, -y.x / det, 0}, {-x.y / det, x.x / det, 0}, {}}}});
             }
-        } else
+        } else {
+            std::vector<std::size_t> order(n);
+            std::iota(order.begin(), order.end(), std::size_t{0});
+            // A geometric anchor makes the same triangulation for reordered channels.
+            std::sort(order.begin(), order.end(), [&](auto lhs, auto rhs) {
+                const auto a = s->speakers[lhs], b = s->speakers[rhs];
+                return std::array{a.x, a.y, a.z} < std::array{b.x, b.y, b.z};
+            });
             for (std::size_t i = 0; i < n; ++i)
                 for (std::size_t j = i + 1; j < n; ++j)
-                    for (std::size_t k = j + 1; k < n; ++k) {
-                        const auto a = s->speakers[i], b = s->speakers[j], c = s->speakers[k];
-                        const double det = dot(a, cross(b, c));
-                        if (std::abs(det) < 1e-9)
-                            continue;
-                        const auto normal = cross(b - a, c - a);
-                        const double plane = dot(normal, a);
-                        bool hull = true;
-                        for (auto v : s->speakers)
-                            if ((dot(normal, v) - plane) * plane > 1e-8) {
-                                hull = false;
-                                break;
-                            }
-                        if (hull)
-                            s->bases.push_back({{i, j, k},
-                                                {cross(b, c) * (1 / det), cross(c, a) * (1 / det),
-                                                 cross(a, b) * (1 / det)}});
-                    }
+                    for (std::size_t k = j + 1; k < n; ++k)
+                        s->addHullTriangle(order, i, j, k);
+        }
         if (s->bases.empty())
             return Status::unsupported_format;
         state_.swap(s);

@@ -206,17 +206,36 @@ template <Sample T> void processors() {
     ok(pan.prepare({48000, 4096, 1}));
     const T* mono[]{in.block().channel(0).data()};
     ok(pan.setPan(0));
+    for (auto invalid : {-1, 25})
+        require(pan.setPan(-1, static_cast<PanLaw>(invalid)) == Status::invalid_argument,
+                "unknown pan law accepted");
     ok(pan.process({mono, 1, 4096}, out.block()));
     require(std::abs(out.block().channel(0)[0] - std::sqrt(.5)) < tolerance, "pan centre power");
     DryWetMixer<T> mix;
-    ok(mix.prepare(spec, 64));
-    ok(mix.setWetLatency(32));
-    ok(mix.setMix(0));
-    ok(mix.pushDrySamples(in.block()));
-    clear(out.block());
-    ok(mix.mixWetSamples(out.block()));
-    require(out.block().channel(0)[32] == 1 && out.block().channel(0)[0] == 0,
-            "dry latency alignment");
+    for (std::size_t latency : {0u, 32u}) {
+        ok(mix.prepare(spec, latency));
+        ok(mix.setWetLatency(latency));
+        ok(mix.setMix(0));
+        for (auto invalid : {-1, 25})
+            require(mix.setMix(1, static_cast<MixLaw>(invalid)) == Status::invalid_argument,
+                    "unknown mix law accepted");
+        ok(mix.mixWetSamples(out.block(0)));
+        ok(mix.pushDrySamples(in.block(0)));
+        require(mix.mixWetSamples(out.block()) == Status::not_prepared,
+                "empty dry push created a pending block");
+        ok(mix.pushDrySamples(in.block()));
+        ok(mix.pushDrySamples(in.block(0)));
+        ok(mix.mixWetSamples(out.block(0)));
+        require(mix.pushDrySamples({mono, 1, 0}) == Status::channel_mismatch,
+                "empty dry push ignored a wrong channel count");
+        require(mix.pushDrySamples(in.block()) == Status::transition_in_progress,
+                "empty wet mix consumed the pending dry block");
+        clear(out.block());
+        ok(mix.mixWetSamples(out.block()));
+        for (std::size_t i = 0; i < out.block().frames(); ++i)
+            require(out.block().channel(0)[i] == (i == latency ? T{1} : T{}),
+                    "dry latency alignment after empty block");
+    }
     Oversampler<T> over;
     ok(over.prepare(spec, 4));
     AudioBlock<T> high;

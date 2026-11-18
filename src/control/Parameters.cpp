@@ -14,22 +14,36 @@ bool valid(const ParameterDescriptor& d) noexcept {
            unsigned(d.unit) <= unsigned(ParameterUnit::degrees) &&
            (d.scale != ParameterScale::logarithmic || d.minimum > 0);
 }
+double logDistance(double low, double high) noexcept {
+    const double span = high - low;
+    return span <= low ? std::log1p(span / low) : std::log(high) - std::log(low);
+}
 } // namespace
 double parameterToNormalized(const ParameterDescriptor& d, double v) noexcept {
     if (!valid(d) || !isFinite(v))
         return 0;
-    v = std::clamp(v, d.minimum, d.maximum);
+    if (v <= d.minimum)
+        return 0;
+    if (v >= d.maximum)
+        return 1;
     return d.scale == ParameterScale::logarithmic
-               ? (std::log(v) - std::log(d.minimum)) / (std::log(d.maximum) - std::log(d.minimum))
+               ? std::clamp(logDistance(d.minimum, v) / logDistance(d.minimum, d.maximum), 0., 1.)
                : (v - d.minimum) / (d.maximum - d.minimum);
 }
 double parameterFromNormalized(const ParameterDescriptor& d, double v) noexcept {
     if (!valid(d) || !isFinite(v))
         return 0;
-    v = std::clamp(v, 0., 1.);
-    return d.scale == ParameterScale::logarithmic
-               ? std::exp(std::log(d.minimum) + v * (std::log(d.maximum) - std::log(d.minimum)))
-               : d.minimum + v * (d.maximum - d.minimum);
+    if (v <= 0)
+        return d.minimum;
+    if (v >= 1)
+        return d.maximum;
+    if (d.scale == ParameterScale::linear)
+        return std::clamp(d.minimum + v * (d.maximum - d.minimum), d.minimum, d.maximum);
+    const double step = v * logDistance(d.minimum, d.maximum);
+    const double value = d.maximum - d.minimum <= d.minimum
+                             ? d.minimum + d.minimum * std::expm1(step)
+                             : std::exp(std::log(d.minimum) + step);
+    return std::clamp(value, d.minimum, d.maximum);
 }
 struct ParameterBank::State {
     struct Parameter {

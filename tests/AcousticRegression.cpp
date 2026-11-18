@@ -41,6 +41,26 @@ void rooms() {
     count = 99;
     require(graph.route(1, 3, ids, count, travel) == Status::disconnected && count == 99,
             "closed portal route transaction");
+
+    std::array<AcousticPortal, 2> parallel{{{101, 1, 2, 10}, {102, 1, 2, 11}}};
+    parallel[0].medium.absorptionDbPerMetre = {2, 2, 2};
+    ok(graph.prepare(rooms, parallel));
+    ok(graph.route(1, 2, ids, count, travel));
+    require(count == 1 && ids[0] == 101 && std::abs(travel.bandGains[0] - .1) < 1e-14,
+            "unweighted portal travel time");
+    ok(graph.prepare(rooms, parallel, .01));
+    ok(graph.route(1, 2, ids, count, travel));
+    require(count == 1 && ids[0] == 102 && travel.bandGains[0] == 1,
+            "weighted portal medium absorption");
+    parallel[0].medium.absorptionDbPerMetre = {1000, 1000, 0};
+    parallel[1].bandGains = {.5, .5, .5};
+    ok(graph.prepare(rooms, parallel, .01));
+    ok(graph.route(1, 2, ids, count, travel));
+    require(ids[0] == 101, "portal weight uses transmitted RMS across bands");
+    parallel[0].opening = .25;
+    ok(graph.prepare(rooms, parallel, .01));
+    ok(graph.route(1, 2, ids, count, travel));
+    require(ids[0] == 102, "portal opening contributes to loss");
     RoomCellGrid grid;
     std::array<RoomResponse, 8> values;
     for (std::size_t i = 0; i < 8; ++i)
@@ -89,6 +109,26 @@ template <class T> void paths() {
         },
         &c);
     require(c.passed, "path realtime");
+}
+template <class T> void subSamplePath() {
+    AcousticPathRenderer<T> renderer;
+    ok(renderer.prepare({48000, 16, 1}, 1, .01));
+    AcousticPath path;
+    path.delaySeconds = .5 / 48000;
+    ok(renderer.setPaths({&path, 1}, 0));
+    AudioBuffer<T> input, output;
+    ok(input.resize(1, 16));
+    ok(output.resize(1, 16));
+    std::ranges::fill(input.block().channel(0), T{1});
+    ok(renderer.process(input.block(), output.block()));
+    require(std::abs(output.block().channel(0)[0] - .5) < 1e-7, "causal sub-sample delay at onset");
+    for (auto sample : output.block().channel(0).subspan(1))
+        require(std::abs(sample - 1.) < 1e-7, "sub-sample path changes DC gain");
+    path.delaySeconds = .25 / 48000;
+    ok(renderer.setPaths({&path, 1}, 8));
+    ok(renderer.process(input.block(), output.block()));
+    for (auto sample : output.block().channel(0))
+        require(std::abs(sample - 1.) < 1e-7, "sub-sample path fade changes DC gain");
 }
 template <class T> void fdn(CpuBackend backend) {
     FdnReverb<T> reverb;
@@ -195,6 +235,8 @@ void acousticRegression() {
     rooms();
     paths<float>();
     paths<double>();
+    subSamplePath<float>();
+    subSamplePath<double>();
     bank<float>();
     bank<double>();
     for (auto backend : {CpuBackend::scalar, CpuBackend::sse2, CpuBackend::avx2, CpuBackend::avx512,

@@ -118,6 +118,8 @@ template <class T> void batch() {
     AudioBuffer<T> sample;
     ok(sample.resize(1, 2048));
     std::fill(sample.block().channel(0).begin(), sample.block().channel(0).end(), T{1});
+    for (std::size_t i = 1024; i < 2048; ++i)
+        sample.block().channel(0)[i] = T(double(i) / 2048 + (i % 2 ? .25 : -.25));
     SampleData<T> data;
     ok(data.prepare(sample.block(), 8000));
     const SampleData<T>* assets[]{&data};
@@ -139,6 +141,18 @@ template <class T> void batch() {
         require(std::abs(double(out.block().channel(1)[i])) < 1e-12, "left positioned grain");
     }
     require(grains.activeVoices() == 0, "grain lifetime");
+    g.playbackRatio = -2;
+    g.samplePosition = 1536;
+    g.startOffsetFrames = 0;
+    ok(grains.start(0, g));
+    ok(grains.process(out.block()));
+    for (std::size_t i = 0; i < g.durationFrames; ++i) {
+        const double position = g.samplePosition + double(i) * g.playbackRatio;
+        const T envelope = T(.5 - .5 * std::cos(2 * pi * double(i) / double(g.durationFrames)));
+        const T expected = data.value(0, position, 2) * envelope;
+        require(std::abs(double(out.block().channel(0)[i]) - expected) < 1e-7,
+                "reverse grain position and antialias filter");
+    }
     std::array<T, 256> cycle{};
     for (std::size_t i = 0; i < cycle.size(); ++i)
         cycle[i] = T(std::sin(2 * pi * double(i) / 256));

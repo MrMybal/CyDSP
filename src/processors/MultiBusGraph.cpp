@@ -3,6 +3,7 @@
 #include "cydsp/core/Memory.h"
 #include "cydsp/math/VectorOps.h"
 #include "detail/Analysis.h"
+#include "detail/Crossfade.h"
 #include <algorithm>
 #include <array>
 #include <vector>
@@ -152,8 +153,8 @@ template <Sample T> struct MultiBusGraph<T>::State {
                         history[node.dryHead] = dry;
                         dry = history[(node.dryHead + 1) % capacity];
                     }
-                    out.channel(ch)[i] = T(double(out.channel(ch)[i]) * (1 - node.bypass) +
-                                           double(dry) * node.bypass);
+                    out.channel(ch)[i] =
+                        T(detail::linearCrossfade(double(out.channel(ch)[i]), double(dry), node.bypass));
                 }
             }
             if (++node.dryHead == capacity)
@@ -600,7 +601,7 @@ Status GraphTransition<T>::process(std::span<const AudioBlock<const T>> input,
             for (std::size_t ch = 0; ch < output[bus].channels(); ++ch) {
                 const double old = s.views[a][bus].channel(ch)[i];
                 const double next = mix > 0 ? double(s.views[b][bus].channel(ch)[i]) : 0;
-                output[bus].channel(ch)[i] = T(old * (1 - mix) + next * mix);
+                output[bus].channel(ch)[i] = T(detail::linearCrossfade(old, next, mix));
             }
     }
     return Status::ok;

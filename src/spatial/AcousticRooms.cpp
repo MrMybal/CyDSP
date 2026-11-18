@@ -27,6 +27,21 @@ bool validResponse(const RoomResponse& r) {
            isFinite(r.diffusion) && r.diffusion >= 0 && r.diffusion <= 1 && isFinite(r.wet) &&
            r.wet >= 0 && r.wet <= 1;
 }
+double portalLossDb(const AcousticPortal& portal) noexcept {
+    std::array<double, 3> loss{};
+    for (std::size_t b = 0; b < loss.size(); ++b)
+        loss[b] = portal.bandGains[b] > 0
+                      ? portal.medium.absorptionDbPerMetre[b] * portal.lengthMetres -
+                            20 * std::log10(portal.bandGains[b])
+                      : std::numeric_limits<double>::infinity();
+    // Measure mean transmitted power relative to the strongest band. This also
+    // distinguishes routes whose absolute transmission underflows to silence.
+    const double best = *std::min_element(loss.begin(), loss.end());
+    double relativePower = 0;
+    for (double db : loss)
+        relativePower += std::pow(10., (best - db) / 10);
+    return best - 10 * std::log10(portal.opening) - 10 * std::log10(relativePower / 3);
+}
 } // namespace
 Status estimateRoomResponse(const AcousticRoom& room, const AcousticMedium& medium,
                             RoomResponse& output, RoomDecayModel model) noexcept {
@@ -104,14 +119,8 @@ Status AcousticPortalGraph::prepare(std::span<const AcousticRoom> rooms,
                     return Status::invalid_argument;
             if (p.opening == 0 || *std::max_element(p.bandGains.begin(), p.bandGains.end()) == 0)
                 continue;
-            const double cost =
-                p.lengthMetres / p.medium.speedMetresPerSecond -
-                weight * 20 *
-                    std::log10(std::sqrt(std::max(1e-300, p.opening *
-                                                              (p.bandGains[0] * p.bandGains[0] +
-                                                               p.bandGains[1] * p.bandGains[1] +
-                                                               p.bandGains[2] * p.bandGains[2]) /
-                                                              3)));
+            const double cost = p.lengthMetres / p.medium.speedMetresPerSecond +
+                                (weight > 0 ? weight * portalLossDb(p) : 0.);
             auto assign = [&](std::size_t from, std::size_t to) {
                 if (cost < s->cost[from * n + to]) {
                     s->cost[from * n + to] = cost;

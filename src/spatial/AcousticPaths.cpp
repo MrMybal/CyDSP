@@ -19,6 +19,12 @@ template <Sample T> struct AcousticPathRenderer<T>::State {
     std::vector<Slot> slots;
     CircularHistory<T> history;
     double maximumDelay = 0, lowPole = 0, highPole = 0;
+    double readDelay(double frames) const noexcept {
+        // The centered cubic stencil needs one sample ahead of the integer delay.
+        const auto interpolation =
+            frames < 1 ? HistoryInterpolation::linear : HistoryInterpolation::lagrange3;
+        return double(history.read(0, frames, interpolation));
+    }
 };
 template <Sample T> AcousticPathRenderer<T>::AcousticPathRenderer() = default;
 template <Sample T> AcousticPathRenderer<T>::~AcousticPathRenderer() = default;
@@ -165,13 +171,11 @@ Status AcousticPathRenderer<T>::process(AudioBlock<const T> input, AudioBlock<T>
                     p.gain[b] += (p.target[b] - p.gain[b]) * step;
                 --p.gainRemaining;
             }
-            double value = double(s.history.read(0, p.delay, HistoryInterpolation::lagrange3));
+            double value = s.readDelay(p.delay);
             if (p.delayRemaining) {
                 const double mix =
                     double(p.delayTotal - p.delayRemaining + 1) / double(p.delayTotal);
-                value =
-                    value * (1 - mix) +
-                    double(s.history.read(0, p.nextDelay, HistoryInterpolation::lagrange3)) * mix;
+                value = value * (1 - mix) + s.readDelay(p.nextDelay) * mix;
                 if (!--p.delayRemaining) {
                     p.delay = p.nextDelay;
                     if (p.queued) {

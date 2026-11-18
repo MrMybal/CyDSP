@@ -112,6 +112,23 @@ void parameters() {
                                              parameterToNormalized(descriptors[1], 440)) -
                      440) < 1e-10,
             "parameter logarithmic conversion");
+    const auto& hz = descriptors[1];
+    const std::array<ParameterEvent, 2> limits{{
+        {hz.id, 0, parameterFromNormalized(hz, 0), 0},
+        {hz.id, 1, parameterFromNormalized(hz, 1), 0},
+    }};
+    ok(bank.render(limits, output.block(2)));
+    require(output.block().channel(1)[0] == hz.minimum &&
+                output.block().channel(1)[1] == hz.maximum,
+            "logarithmic endpoints produce valid automation events");
+    auto narrow = hz;
+    narrow.minimum = narrow.initial = 20000;
+    const double middle = std::nextafter(narrow.minimum, 20001.);
+    narrow.maximum = std::nextafter(middle, 20001.);
+    require(parameterFromNormalized(narrow, .5) == middle &&
+                std::abs(parameterToNormalized(narrow, middle) - .5) < 1e-14 &&
+                parameterToNormalized(narrow, narrow.maximum) == 1,
+            "logarithmic ranges retain adjacent representable values");
     struct C {
         ParameterBank* bank;
         AudioBlock<double> out;

@@ -27,6 +27,31 @@ void response() {
     require(std::abs(std::abs(result.gain) - .707) < 1e-10 && result.groupDelayFrames > 0,
             "analytic IIR response");
 }
+void dehumCoefficientTransaction() {
+    const ProcessSpec spec{768000, 64, 1};
+    Dehum<float> filter, reference;
+    const DehumParameters current{2000, 4, 60, 2};
+    for (auto* processor : {&filter, &reference}) {
+        ok(processor->prepare(spec, 2));
+        ok(processor->setParameters(current));
+    }
+    std::array<float, 64> input{1.f}, actual{}, expected{};
+    const float* in[]{input.data()};
+    float* out[]{actual.data()};
+    float* ref[]{expected.data()};
+    ok(filter.process({in, 1, 64}, {out, 1, 64}));
+    ok(reference.process({in, 1, 64}, {ref, 1, 64}));
+    // At this rate, the first notch is stable in float and the second rounds to a unit pole.
+    require(filter.setParameters({10.5, 1, 60, 2}) == Status::invalid_argument,
+            "dehum rejects an unrepresentable harmonic");
+    ok(filter.process({in, 1, 64}, {out, 1, 64}));
+    ok(reference.process({in, 1, 64}, {ref, 1, 64}));
+    require(actual == expected, "dehum failed edit preserves all sections and histories");
+    ok(filter.setParameters({10.5, 1, 60, 1}));
+    Dehum<double> precise;
+    ok(precise.prepare(spec, 2));
+    ok(precise.setParameters({10.5, 1, 60, 2}));
+}
 template <class T> void test() {
     const ProcessSpec spec{8000, 128, 1};
     AudioBuffer<T> in, out, desired, predicted;
@@ -255,6 +280,7 @@ template <class T> void test() {
 } // namespace
 void restorationDiagnosticsRegression() {
     response();
+    dehumCoefficientTransaction();
     test<float>();
     test<double>();
 }

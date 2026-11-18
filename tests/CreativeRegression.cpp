@@ -43,6 +43,24 @@ void controls() {
         require(a.next() == b.next(), "S&H seeded sequence");
     require(a.next() != first, "S&H step at period");
 }
+template <class T> void oscillatorRejectedOutput() {
+    const ProcessSpec spec{48000, 64, 2};
+    ModulatedOscillator<T> oscillator, reference;
+    ok(oscillator.prepare(spec));
+    ok(reference.prepare(spec));
+    std::array<T, 128> actual{}, expected{};
+    T* channels[]{actual.data(), actual.data() + 64};
+    T* referenceChannels[]{expected.data(), expected.data() + 64};
+    T* overlapping[]{actual.data(), actual.data() + 1};
+    ok(oscillator.process({channels, 2, 64}));
+    ok(reference.process({referenceChannels, 2, 64}));
+    require(oscillator.process({overlapping, 2, 64}) == Status::partial_overlap &&
+                actual == expected,
+            "modulated oscillator rejects overlap before writing");
+    ok(oscillator.process({channels, 2, 64}));
+    ok(reference.process({referenceChannels, 2, 64}));
+    require(actual == expected, "modulated oscillator preserves phase and filter on error");
+}
 template <class T> void test() {
     const ProcessSpec spec{8000, 64, 1};
     AudioBuffer<T> in, out, side;
@@ -240,6 +258,8 @@ template <class T> void test() {
 } // namespace
 void creativeRegression() {
     controls();
+    oscillatorRejectedOutput<float>();
+    oscillatorRejectedOutput<double>();
     test<float>();
     test<double>();
 }

@@ -147,6 +147,35 @@ template <class T> void sidechainAndBypass() {
                 graph.timing().tailFrames == std::numeric_limits<std::size_t>::max(),
             "finite tail overflow prepare transaction");
 }
+template <class T> void bypassEndpoints() {
+    const std::array<DspBus, 1> io{{{0, 1}}};
+    const auto constant = [](void* raw, std::span<const AudioBlock<const T>>,
+                             std::span<AudioBlock<T>> out) noexcept {
+        auto channel = out[0].channel(0);
+        std::fill(channel.begin(), channel.end(), *static_cast<const T*>(raw));
+        return Status::ok;
+    };
+    T invalid = std::numeric_limits<T>::quiet_NaN(), valid = T{5};
+    const std::array<DspNode<T>, 2> nodes{
+        {{1, &invalid, constant, io, io, {2, 0}}, {2, &valid, constant, io, io, {0, 0}}}};
+    const std::array<DspConnection, 3> edges{
+        {{graphInputNode, 0, 1, 0, 1}, {1, 0, 2, 0, 1}, {2, 0, graphOutputNode, 0, 1}}};
+    MultiBusGraph<T> graph;
+    ok(graph.prepare({48000, 4, 1}, io, io, nodes, edges));
+    std::array<T, 4> samples{1, 2, 3, 4}, output{};
+    const T* inputData[]{samples.data()};
+    T* outputData[]{output.data()};
+    std::array<AudioBlock<const T>, 1> in{{{inputData, 1, 4}}};
+    std::array<AudioBlock<T>, 1> out{{{outputData, 1, 4}}};
+    ok(graph.process(in, out));
+    require(output == std::array<T, 4>{5, 5, 5, 5}, "inaudible dry affected wet output");
+    ok(graph.setBypassed(1, true, 0));
+    ok(graph.setBypassed(2, true, 0));
+    samples = {6, 7, 8, 9};
+    ok(graph.process(in, out));
+    require(output == std::array<T, 4>{3, 4, 6, 7},
+            "bypass must select aligned dry history even with nonfinite wet");
+}
 template <class T> void transition() {
     const std::array<DspBus, 1> io{{{0, 1}}};
     const std::array<DspConnection, 2> edges{{{0, 0, 1, 0, 1}, {1, 0, graphOutputNode, 0, 1}}};
@@ -196,6 +225,15 @@ template <class T> void transition() {
     ok(transition.process(in, out));
     for (T sample : output.block().channel(0))
         require(sample == 3, "new graph not retained after fade");
+
+    b.gain = std::numeric_limits<T>::quiet_NaN();
+    MultiBusGraph<T> replacement;
+    ok(replacement.prepare({48000, 64, 1}, io, io, na, edges));
+    ok(transition.stage(std::move(replacement)));
+    ok(transition.startTransition(2));
+    ok(transition.process(in, out));
+    for (T sample : output.block().channel(0).subspan(17))
+        require(sample == T{1}, "inaudible old graph contaminated the completed fade");
 }
 } // namespace
 void multiBusGraphRegression() {
@@ -203,6 +241,8 @@ void multiBusGraphRegression() {
     alignment<double>();
     sidechainAndBypass<float>();
     sidechainAndBypass<double>();
+    bypassEndpoints<float>();
+    bypassEndpoints<double>();
     transition<float>();
     transition<double>();
 }

@@ -25,6 +25,8 @@ struct AcousticPortal {
 };
 // Immutable prepared transfer topology. Edge lengths include the travel distances
 // supplied by the host. It does not trace engine geometry or infer room obstacles.
+// Each edge costs its travel time plus lossWeightSecondsPerDb times its
+// three-band RMS loss in dB, including opening, band gains and medium absorption.
 class AcousticPortalGraph {
   public:
     AcousticPortalGraph();

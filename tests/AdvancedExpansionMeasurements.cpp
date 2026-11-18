@@ -114,23 +114,25 @@ template <class T> void measurements() {
         }
         {
             AudioBuffer<T> sample;
-            ok(sample.resize(1, 32768));
-            for (std::size_t i = 0; i < 32768; ++i)
+            // Keep every signed read inside the bank through warmup and all timed blocks.
+            constexpr std::size_t sampleFrames = 65536;
+            ok(sample.resize(1, sampleFrames));
+            for (std::size_t i = 0; i < sampleFrames; ++i)
                 sample.block().channel(0)[i] = T(.2 * std::sin(.1 * double(i)));
             SampleData<T> asset;
             ok(asset.prepare(sample.block(), 48000));
-            ok(asset.setLoop(0, 32768, 128));
+            ok(asset.setLoop(0, sampleFrames, 128));
             const SampleData<T>* assets[]{&asset};
             SourceBatch<T> grains;
             ok(grains.prepare(spec, 64, {}, assets, backend));
             for (std::size_t v = 0; v < 64; ++v) {
                 BatchSource s;
                 s.kind = BatchSourceKind::grain;
-                s.samplePosition = double(v * 41);
                 s.durationFrames = 480000;
                 s.gain = 1. / 64;
                 s.channelGains[1] = .5;
                 s.playbackRatio = v % 2 ? -1 : 1.5;
+                s.samplePosition = double(v % 2 ? sampleFrames - 1 - v * 41 : v * 41);
                 ok(grains.start(v, s));
             }
             bench<T>("sharedSampleGrains64", backend, 2, [&] {

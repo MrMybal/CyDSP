@@ -2,6 +2,7 @@
 #include "cydsp/core/CircularHistory.h"
 #include "cydsp/processors/BiquadCascade.h"
 #include "detail/Analysis.h"
+#include "detail/BiquadAlgorithm.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -190,6 +191,8 @@ template <Sample T> Status Dehum<T>::setParameters(const DehumParameters& p) noe
         c.b0 = (1 - wet) + wet * c.b0;
         c.b1 = (1 - wet) * c.a1 + wet * c.b1;
         c.b2 = (1 - wet) * c.a2 + wet * c.b2;
+        if (!detail::roundBiquad<T>(c, c))
+            return Status::invalid_argument;
     }
     for (std::size_t i = 0; i < s.maximum; ++i)
         (void)s.cascade.setSection(i, coefficients[i]);

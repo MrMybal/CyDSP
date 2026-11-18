@@ -7,11 +7,16 @@
 #include <vector>
 namespace cydsp {
 template <Sample T> struct MusicalAnalyzer<T>::State {
+    struct MelBand {
+        std::size_t firstBin = 0;
+        std::vector<double> weights;
+    };
     ProcessSpec spec;
     MusicalAnalysisConfig config;
     RealFft<double> fft;
     std::vector<double> history, time, reference, correlation, energy, difference, window, previous,
-        melWeights, melLog;
+        melLog, dctCosines;
+    std::vector<MelBand> melBands;
     std::vector<std::complex<double>> spectrum, refSpectrum;
     std::size_t head = 0, filled = 0, since = 0, minLag = 0, maxLag = 0, onsetCount = 0;
     std::uint64_t clock = 0, lastOnset = 0;
@@ -166,17 +171,17 @@ template <Sample T> struct MusicalAnalyzer<T>::State {
             }
         result.keyConfidence = chromaSum > 1e-12 ? std::clamp((bestScore - second) * 4, 0., 1.) : 0;
         for (std::size_t m = 0; m < config.melBands; ++m) {
+            const auto& band = melBands[m];
             double p = 0;
-            for (std::size_t k = 0; k < bins; ++k)
-                p += melWeights[m * bins + k] * correlation[k];
+            for (std::size_t i = 0; i < band.weights.size(); ++i)
+                p += band.weights[i] * correlation[band.firstBin + i];
             melLog[m] = std::log(std::max(1e-20, p));
         }
         result.mfcc = {};
         for (std::size_t c = 0; c < config.mfccCount; ++c) {
             double value = 0;
             for (std::size_t m = 0; m < config.melBands; ++m)
-                value += melLog[m] * std::cos(std::numbers::pi * double(c) * (double(m) + .5) /
-                                              double(config.melBands));
+                value += melLog[m] * dctCosines[c * config.melBands + m];
             result.mfcc[c] = value * std::sqrt((c ? 2. : 1.) / double(config.melBands));
         }
         result.frameEnd = clock;
@@ -221,8 +226,13 @@ Status MusicalAnalyzer<T>::prepare(const ProcessSpec& spec, const MusicalAnalysi
         s->previous.resize(bins);
         s->spectrum.resize(bins);
         s->refSpectrum.resize(bins);
-        s->melWeights.resize(c.melBands * bins);
+        s->melBands.resize(c.melBands);
         s->melLog.resize(c.melBands);
+        s->dctCosines.resize(c.mfccCount * c.melBands);
+        for (std::size_t i = 0; i < c.mfccCount; ++i)
+            for (std::size_t m = 0; m < c.melBands; ++m)
+                s->dctCosines[i * c.melBands + m] =
+                    std::cos(std::numbers::pi * double(i) * (double(m) + .5) / double(c.melBands));
         for (std::size_t i = 0; i < n; ++i)
             s->window[i] = .5 - .5 * std::cos(2 * std::numbers::pi * double(i) / double(n));
         const double melMax = 2595 * std::log10(1 + spec.sampleRate * .5 / 700);
@@ -233,10 +243,20 @@ Status MusicalAnalyzer<T>::prepare(const ProcessSpec& spec, const MusicalAnalysi
                     (std::pow(10., melMax * double(m + 1) / double(c.melBands + 1) / 2595) - 1),
                 d = 700 *
                     (std::pow(10., melMax * double(m + 2) / double(c.melBands + 1) / 2595) - 1);
-            for (std::size_t k = 0; k < bins; ++k) {
+            auto& band = s->melBands[m];
+            const auto begin =
+                std::min(bins, std::size_t(std::floor(a * double(n) / spec.sampleRate)));
+            const auto end =
+                std::min(bins, std::size_t(std::ceil(d * double(n) / spec.sampleRate)) + 1);
+            band.weights.reserve(end - begin);
+            for (std::size_t k = begin; k < end; ++k) {
                 const double f = double(k) * spec.sampleRate / double(n);
-                s->melWeights[m * bins + k] =
-                    std::max(0., std::min((f - a) / (b - a), (d - f) / (d - b)));
+                const double weight = std::min((f - a) / (b - a), (d - f) / (d - b));
+                if (weight > 0) {
+                    if (band.weights.empty())
+                        band.firstBin = k;
+                    band.weights.push_back(weight);
+                }
             }
         }
         state_.swap(s);

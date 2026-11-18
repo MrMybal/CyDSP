@@ -161,7 +161,7 @@ template <Sample T> Status SourceBatch<T>::process(AudioBlock<T> out) noexcept {
                         const auto* sample = s.samples[v.p.asset];
                         const double ratio =
                             v.p.playbackRatio * sample->sampleRate() / s.spec.sampleRate;
-                        x = sample->value(0, v.position, ratio);
+                        x = sample->value(0, v.position, std::abs(ratio));
                         x *= T(.5 - .5 * std::cos(2 * std::numbers::pi * double(v.age) /
                                                   double(v.p.durationFrames)));
                         v.position += ratio;
