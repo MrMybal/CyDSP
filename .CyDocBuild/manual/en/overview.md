@@ -1,6 +1,6 @@
 ---
 id: overview
-title: CyDSP 0.4.5
+title: CyDSP 0.4.6
 description: Choose and combine numerical audio processors.
 section: Guides
 order: 0
@@ -27,7 +27,7 @@ Start with [installation](doc:installation), then build a [first processing chai
 
 CyDSP processes in-memory audio. Your application supplies the audio callback, stream ownership and surrounding services. CyAudioCore is one project using its public API. You can link CyDSP directly into another application.
 
-Version 0.4.5 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
+Version 0.4.6 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
 
 ## Public API {#api}
 

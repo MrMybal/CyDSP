@@ -3,7 +3,7 @@ PAGES=[]
 def add(id,en_title,fr_title,en_desc,fr_desc,parent,en,fr):
     PAGES.append(dict(id=id,title=(en_title,fr_title),description=(en_desc,fr_desc),parent=parent,body=(en.strip(),fr.strip())))
 
-add('overview','CyDSP 0.4.5','CyDSP 0.4.5','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
+add('overview','CyDSP 0.4.6','CyDSP 0.4.6','Choose and combine numerical audio processors.','Choisir et assembler les traitements audio numériques.',None,r'''
 ## What you can build {#purpose}
 
 CyDSP is a C++20 audio digital signal processing library. Use its float/double processors in an effect, synthesizer, DAW, game or audio engine. It supplies filters, dynamics, convolution, spectral processing, synthesis, sampling, analysis, restoration and 3D sound through prepared storage and a common planar API.
@@ -24,7 +24,7 @@ Start with [installation](doc:installation), then build a [first processing chai
 
 CyDSP processes in-memory audio. Your application supplies the audio callback, stream ownership and surrounding services. CyAudioCore is one project using its public API. You can link CyDSP directly into another application.
 
-Version 0.4.5 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
+Version 0.4.6 is in development. [Platform and model limits](doc:limits) distinguish available algorithms from targets requiring execution validation. Keep the [MIT and component notices](doc:licensing) with redistributed software.
 ''',r'''
 ## Ce que vous pouvez construire {#purpose}
 
@@ -46,7 +46,7 @@ Commencez par l’[installation](doc:installation), puis une [première chaîne 
 
 CyDSP traite l’audio en mémoire. L’application fournit le callback audio, possède les flux et gère les services qui les entourent. CyAudioCore est un projet utilisant son API publique. CyDSP peut être lié directement à une autre application.
 
-La version 0.4.5 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
+La version 0.4.6 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
 ''')
 
 add('installation','Build and link CyDSP','Compiler et lier CyDSP','Build the static libraries and use their CMake targets.','Compiler les bibliothèques statiques et utiliser leurs cibles CMake.','overview',r'''
@@ -73,7 +73,7 @@ Production builds create static libraries; native tests and measurements are opt
 Point `CMAKE_PREFIX_PATH` at the absolute install prefix. After defining the application's target:
 
 ```cmake
-find_package(CyDSP 0.4.5 CONFIG REQUIRED)
+find_package(CyDSP 0.4.6 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -103,7 +103,7 @@ Les builds de production créent des bibliothèques statiques ; tests natifs et 
 Faites pointer `CMAKE_PREFIX_PATH` vers le préfixe d’installation absolu. Après définition de la cible de l’application :
 
 ```cmake
-find_package(CyDSP 0.4.5 CONFIG REQUIRED)
+find_package(CyDSP 0.4.6 CONFIG REQUIRED)
 target_link_libraries(MyApplication PRIVATE CyDSP::CyDSP)
 # target_link_libraries(MyApplication PRIVATE CyDSP::Stretch)
 ```
@@ -1435,7 +1435,7 @@ add('limits','Platforms, capacities and model limits','Plateformes, capacités e
 | macOS / desktop Linux | Source targets; execution remains to validate for this version. |
 | x86 / ARM32 | Compatibility paths exist; they were not rerun for this snapshot. ARM32 double kernels can fall back to scalar. |
 
-No ABI is interchangeable with another. Version 0.4.5 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
+No ABI is interchangeable with another. Version 0.4.6 is in development; target deployment needs its own content/performance assessment. Performance depends on processor, dimensions, quality, backend and block boundaries.
 
 ## Prepared capacities {#capacities}
 
@@ -1464,7 +1464,7 @@ The optional [SADIE II selection](doc:sofa#bundled) carries its own Apache-2.0 d
 | macOS / Linux desktop | Cibles de sources ; exécution à valider pour cette version. |
 | x86 / ARM32 | Chemins de compatibilité existants ; non réexécutés pour cet état. Les noyaux double ARM32 peuvent revenir au scalaire. |
 
-Les ABI ne sont pas interchangeables. La version 0.4.5 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
+Les ABI ne sont pas interchangeables. La version 0.4.6 est en développement ; un déploiement exige son évaluation de contenu/performance. Le coût dépend du processeur, des dimensions, de la qualité, du backend et des frontières de blocs.
 
 ## Capacités préparées {#capacities}
 
@@ -1549,7 +1549,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Installed package:
-find_package(CyDSP 0.4.5 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.6 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 A separately configured game build may enable HrtfAssets alone and consume decoded caches without either file-format reader.
@@ -1704,7 +1704,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Depuis un paquet installé :
-find_package(CyDSP 0.4.5 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.6 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 Une compilation distincte pour le jeu peut activer seulement HrtfAssets et charger les caches décodés sans aucun lecteur de format.

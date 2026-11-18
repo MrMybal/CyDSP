@@ -25,7 +25,7 @@ set(CYDSP_BUILD_SOFA ON CACHE BOOL "")
 add_subdirectory(CyDSP)
 target_link_libraries(editor PRIVATE CyDSP::Sofa)
 # Installed package:
-find_package(CyDSP 0.4.5 CONFIG REQUIRED COMPONENTS Sofa)
+find_package(CyDSP 0.4.6 CONFIG REQUIRED COMPONENTS Sofa)
 ~~~
 
 A separately configured game build may enable HrtfAssets alone and consume decoded caches without either file-format reader.

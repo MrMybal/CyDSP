@@ -1,9 +1,12 @@
-# CyDSP 0.4.5
+# CyDSP 0.4.6
 
 
 **EN DÉVELOPPEMENT.** Distribution sous forme de sources ; aucune release binaire publiée.
 
 ## Changements
+
+- **0.4.6** corrige la lecture inversée des grains, la reprise de l’oscillateur après un chevauchement des sorties, les bornes de l’automation logarithmique, les blocs dry/wet vides et le bypass des graphes. Une loi de mixage ou de panoramique invalide, ou des coefficients de filtre antironflement non représentables, préservent désormais le réglage précédent. En spatialisation, le panoramique VBAP 3D retrouve sa continuité entre enceintes coplanaires, les retards inférieurs à un échantillon conservent le niveau d’un signal constant et le routage pondéré des portails tient compte de l’absorption du milieu. Les presets prennent en charge CMake 3.24.
+- `MusicalAnalyzer` prépare une seule fois les poids Mel non nuls et les cosinus de la DCT. Sur le banc mono à 48 kHz, le temps par pas de 256 échantillons a baissé de 42,2 % sur Ryzen 9 7900X et de 31,5 % sur Quest 3. Les MFCC mesurés sont identiques à ceux de l’implémentation précédente sur chaque cible. [Mesures et conditions de test](docs/Measurements.md)
 
 - 0.4.5 : retrait optionnel du délai acoustique commun minimal pendant la préparation HRTF. Un même décalage pour toute la banque conserve les écarts entre oreilles et directions ; `removedCommonDelayFrames()` expose l’avance réelle en frames au taux cible. Le timing de mesure reste conservé par défaut.
 

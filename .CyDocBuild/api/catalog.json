@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "libraryVersion": "0.4.5",
+  "libraryVersion": "0.4.6",
   "headers": [
     {
       "header": "cydsp/analysis/ConstantQAnalyzer.h",
@@ -4248,7 +4248,7 @@
     },
     {
       "header": "cydsp/core/Version.h",
-      "sha256": "c3bdf6ff4cb7c59c240d8c071681ae29bff5246e0708e635ee49de69956940a1",
+      "sha256": "a538242bf6c753ccf70789b3641608fd8a22da46936ecc5b1924b9aefeec70ce",
       "symbols": [
         {
           "name": "cydsp::versionMajor",
@@ -4286,7 +4286,7 @@
         ],
         [
           "CYDSP_VERSION_PATCH",
-          "5"
+          "6"
         ]
       ]
     },
@@ -17858,7 +17858,7 @@
     },
     {
       "header": "cydsp/spatial/AcousticRooms.h",
-      "sha256": "7186f0edf8e90d43e99e9fc747638a3983f63d99c1c779bc6132d373a6d8d8e9",
+      "sha256": "c6b3b9b814970906d31a92d728aac615f088c1fdfbb2fc1ce1ed5f05a3c76545",
       "symbols": [
         {
           "name": "cydsp::AcousticRoom",
@@ -18051,13 +18051,13 @@
         {
           "name": "cydsp::AcousticPortalGraph",
           "kind": "CXXRecordDecl",
-          "line": 28,
+          "line": 30,
           "signature": "class AcousticPortalGraph;",
           "members": [
             {
               "name": "cydsp::AcousticPortalGraph::AcousticPortalGraph",
               "kind": "CXXConstructorDecl",
-              "line": 30,
+              "line": 32,
               "signature": "AcousticPortalGraph();",
               "parameters": [],
               "returnType": "",
@@ -18066,7 +18066,7 @@
             {
               "name": "cydsp::AcousticPortalGraph::~AcousticPortalGraph",
               "kind": "CXXDestructorDecl",
-              "line": 31,
+              "line": 33,
               "signature": "~AcousticPortalGraph();",
               "parameters": [],
               "returnType": "",
@@ -18075,7 +18075,7 @@
             {
               "name": "cydsp::AcousticPortalGraph::AcousticPortalGraph",
               "kind": "CXXConstructorDecl",
-              "line": 32,
+              "line": 34,
               "signature": "AcousticPortalGraph(AcousticPortalGraph&&) noexcept;",
               "parameters": [
                 {
@@ -18090,7 +18090,7 @@
             {
               "name": "cydsp::AcousticPortalGraph::operator=",
               "kind": "CXXMethodDecl",
-              "line": 33,
+              "line": 35,
               "signature": "AcousticPortalGraph& operator=(AcousticPortalGraph&&) noexcept;",
               "parameters": [
                 {
@@ -18105,7 +18105,7 @@
             {
               "name": "cydsp::AcousticPortalGraph::prepare",
               "kind": "CXXMethodDecl",
-              "line": 34,
+              "line": 36,
               "signature": "Status prepare(std::span<const AcousticRoom>, std::span<const AcousticPortal>, double lossWeightSecondsPerDb = 0) noexcept;",
               "parameters": [
                 {
@@ -18130,7 +18130,7 @@
             {
               "name": "cydsp::AcousticPortalGraph::route",
               "kind": "CXXMethodDecl",
-              "line": 36,
+              "line": 38,
               "signature": "Status route(std::uint32_t sourceRoom, std::uint32_t destinationRoom, std::span<std::uint32_t> portalIds, std::size_t& count, AcousticTravel&) const noexcept;",
               "parameters": [
                 {
@@ -18167,13 +18167,13 @@
         {
           "name": "cydsp::RoomCellGrid",
           "kind": "CXXRecordDecl",
-          "line": 46,
+          "line": 48,
           "signature": "class RoomCellGrid;",
           "members": [
             {
               "name": "cydsp::RoomCellGrid::RoomCellGrid",
               "kind": "CXXConstructorDecl",
-              "line": 48,
+              "line": 50,
               "signature": "RoomCellGrid();",
               "parameters": [],
               "returnType": "",
@@ -18182,7 +18182,7 @@
             {
               "name": "cydsp::RoomCellGrid::~RoomCellGrid",
               "kind": "CXXDestructorDecl",
-              "line": 49,
+              "line": 51,
               "signature": "~RoomCellGrid();",
               "parameters": [],
               "returnType": "",
@@ -18191,7 +18191,7 @@
             {
               "name": "cydsp::RoomCellGrid::RoomCellGrid",
               "kind": "CXXConstructorDecl",
-              "line": 50,
+              "line": 52,
               "signature": "RoomCellGrid(RoomCellGrid&&) noexcept;",
               "parameters": [
                 {
@@ -18206,7 +18206,7 @@
             {
               "name": "cydsp::RoomCellGrid::operator=",
               "kind": "CXXMethodDecl",
-              "line": 51,
+              "line": 53,
               "signature": "RoomCellGrid& operator=(RoomCellGrid&&) noexcept;",
               "parameters": [
                 {
@@ -18221,7 +18221,7 @@
             {
               "name": "cydsp::RoomCellGrid::prepare",
               "kind": "CXXMethodDecl",
-              "line": 52,
+              "line": 54,
               "signature": "Status prepare(Vec3 origin, Vec3 spacing, std::array<std::size_t, 3> dimensions, std::span<const RoomResponse>) noexcept;",
               "parameters": [
                 {
@@ -18251,7 +18251,7 @@
             {
               "name": "cydsp::RoomCellGrid::sample",
               "kind": "CXXMethodDecl",
-              "line": 54,
+              "line": 56,
               "signature": "Status sample(Vec3 position, RoomResponse&) const noexcept;",
               "parameters": [
                 {
@@ -18273,13 +18273,13 @@
         {
           "name": "cydsp::RoomReverbBank",
           "kind": "CXXRecordDecl",
-          "line": 63,
+          "line": 65,
           "signature": "template <Sample T> class RoomReverbBank;",
           "members": [
             {
               "name": "cydsp::RoomReverbBank::RoomReverbBank<T>",
               "kind": "CXXConstructorDecl",
-              "line": 65,
+              "line": 67,
               "signature": "RoomReverbBank();",
               "parameters": [],
               "returnType": "",
@@ -18288,7 +18288,7 @@
             {
               "name": "cydsp::RoomReverbBank::~RoomReverbBank<T>",
               "kind": "CXXDestructorDecl",
-              "line": 66,
+              "line": 68,
               "signature": "~RoomReverbBank();",
               "parameters": [],
               "returnType": "",
@@ -18297,7 +18297,7 @@
             {
               "name": "cydsp::RoomReverbBank::RoomReverbBank<T>",
               "kind": "CXXConstructorDecl",
-              "line": 67,
+              "line": 69,
               "signature": "RoomReverbBank(RoomReverbBank&&) noexcept;",
               "parameters": [
                 {
@@ -18312,7 +18312,7 @@
             {
               "name": "cydsp::RoomReverbBank::operator=",
               "kind": "CXXMethodDecl",
-              "line": 68,
+              "line": 70,
               "signature": "RoomReverbBank& operator=(RoomReverbBank&&) noexcept;",
               "parameters": [
                 {
@@ -18327,7 +18327,7 @@
             {
               "name": "cydsp::RoomReverbBank::prepare",
               "kind": "CXXMethodDecl",
-              "line": 69,
+              "line": 71,
               "signature": "Status prepare(const ProcessSpec&, std::size_t rooms = 8, const FdnConfig& = {}, CpuBackend = CpuBackend::automatic) noexcept;",
               "parameters": [
                 {
@@ -18357,7 +18357,7 @@
             {
               "name": "cydsp::RoomReverbBank::setRoom",
               "kind": "CXXMethodDecl",
-              "line": 71,
+              "line": 73,
               "signature": "Status setRoom(std::size_t, const FdnParameters&, std::size_t rampFrames = 256) noexcept;",
               "parameters": [
                 {
@@ -18382,7 +18382,7 @@
             {
               "name": "cydsp::RoomReverbBank::beginBlock",
               "kind": "CXXMethodDecl",
-              "line": 73,
+              "line": 75,
               "signature": "Status beginBlock(std::size_t frames) noexcept;",
               "parameters": [
                 {
@@ -18397,7 +18397,7 @@
             {
               "name": "cydsp::RoomReverbBank::send",
               "kind": "CXXMethodDecl",
-              "line": 74,
+              "line": 76,
               "signature": "Status send(std::size_t room, AudioBlock<const T>, double gain = 1) noexcept;",
               "parameters": [
                 {
@@ -18422,7 +18422,7 @@
             {
               "name": "cydsp::RoomReverbBank::render",
               "kind": "CXXMethodDecl",
-              "line": 75,
+              "line": 77,
               "signature": "Status render() noexcept;",
               "parameters": [],
               "returnType": "Status",
@@ -18431,7 +18431,7 @@
             {
               "name": "cydsp::RoomReverbBank::mix",
               "kind": "CXXMethodDecl",
-              "line": 76,
+              "line": 78,
               "signature": "Status mix(AudioBlock<T>) const noexcept;",
               "parameters": [
                 {
@@ -18446,7 +18446,7 @@
             {
               "name": "cydsp::RoomReverbBank::roomOutput",
               "kind": "CXXMethodDecl",
-              "line": 77,
+              "line": 79,
               "signature": "AudioBlock<const T> roomOutput(std::size_t room) const noexcept;",
               "parameters": [
                 {
@@ -18461,7 +18461,7 @@
             {
               "name": "cydsp::RoomReverbBank::reset",
               "kind": "CXXMethodDecl",
-              "line": 78,
+              "line": 80,
               "signature": "void reset() noexcept;",
               "parameters": [],
               "returnType": "void",

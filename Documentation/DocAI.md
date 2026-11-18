@@ -5,7 +5,7 @@ This file is for assistants working on the application's documentation. The huma
 ```json
 {
   "application": "CyDSP",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "entry": "Documentation.html",
   "manifest": "DocData/manifest.json",
   "defaultLocale": "en",
@@ -43,7 +43,7 @@ Use Documentation.html#/LOCALE/PAGE/ANCHOR for contextual help, with correctly e
 
 ## CyDSP authoring and API rules
 
-The source project is CyDSP 0.4.5, a standalone C++20 numerical DSP library.
+The source project is CyDSP 0.4.6, a standalone C++20 numerical DSP library.
 CyAudioCore may be mentioned as a consumer; do not turn this manual into an engine
 migration guide. Work only in CyDSP and respect its AGENTS.md.
 

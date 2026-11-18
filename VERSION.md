@@ -1,9 +1,12 @@
-# CyDSP 0.4.5
+# CyDSP 0.4.6
 
 
 **IN DEVELOPMENT.** Source distribution; no binary release is published.
 
 ## Changes
+
+- **0.4.6** fixes reverse grain playback, oscillator recovery after overlapping outputs, logarithmic automation endpoints, empty dry/wet blocks and graph bypass. Invalid mix and pan laws and unrepresentable dehum coefficients now preserve the previous settings. Spatial fixes cover continuous 3D VBAP panning across coplanar speakers, unity gain for sub-sample acoustic delays on constant input, and medium absorption in weighted portal routing. Build presets now support CMake 3.24.
+- `MusicalAnalyzer` prepares the nonzero Mel weights and DCT cosines once. In the 48 kHz mono benchmark, time per 256-frame hop fell by 42.2% on Ryzen 9 7900X and 31.5% on Quest 3. The measured MFCCs matched the previous implementation on each target. [Measurements and test conditions](docs/Measurements.md)
 
 - 0.4.5: Optional removal of the earliest common acoustic HRTF delay at preparation. One bank-wide offset preserves interaural and directional timing; `removedCommonDelayFrames()` reports the actual advance in target-rate frames. Measurement timing is retained by default.
 

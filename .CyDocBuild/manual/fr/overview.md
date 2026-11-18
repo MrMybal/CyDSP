@@ -1,6 +1,6 @@
 ---
 id: overview
-title: CyDSP 0.4.5
+title: CyDSP 0.4.6
 description: Choisir et assembler les traitements audio numériques.
 section: Guides
 order: 0
@@ -27,7 +27,7 @@ Commencez par l’[installation](doc:installation), puis une [première chaîne 
 
 CyDSP traite l’audio en mémoire. L’application fournit le callback audio, possède les flux et gère les services qui les entourent. CyAudioCore est un projet utilisant son API publique. CyDSP peut être lié directement à une autre application.
 
-La version 0.4.5 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
+La version 0.4.6 est en développement. Les [limites des plateformes et modèles](doc:limits) distinguent les algorithmes disponibles des cibles restant à valider en exécution. Conservez les [notices MIT et tierces](doc:licensing) avec les logiciels redistribués.
 
 ## API publique {#api}
 

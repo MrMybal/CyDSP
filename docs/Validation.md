@@ -1,3 +1,16 @@
+# CyDSP 0.4.6 — 2026-11-18
+
+Un projet consommateur Windows x64 a résolu le paquet installé avec
+`find_package(CyDSP 0.4.6 EXACT CONFIG REQUIRED COMPONENTS CyDSP Stretch)`,
+vérifié les macros et constantes de version à la compilation et lié les deux
+bibliothèques statiques. Les trois suites Release ont réussi (DSP, import SOFA
+et données HRTF). Le manuel installé annonce également la version 0.4.6.
+
+Les [mesures de MusicalAnalyzer](Measurements.md) comparent le code de cette
+version à la révision `68a423a` sur Ryzen 9 7900X et Quest 3.
+
+---
+
 # CyDSP 0.4.5 : référence temporelle HRTF — 2026-11-17
 
 Retrait optionnel du minimum des arrivées extraites de toute la banque, deux
